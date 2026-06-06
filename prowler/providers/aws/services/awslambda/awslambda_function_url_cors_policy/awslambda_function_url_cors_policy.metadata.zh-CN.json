@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "awslambda_function_url_cors_policy",
+  "CheckTitle": "Lambda 函数 URL CORS 不允许通配符源 (*)",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices/Network Reachability",
+    "Effects/Data Exposure"
+  ],
+  "ServiceName": "awslambda",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsLambdaFunction",
+  "ResourceGroup": "serverless",
+  "Description": "**Lambda 函数 URL** CORS 策略会被检查 `AllowOrigins`。存在 `*` 表示 CORS 配置中允许广泛的源。",
+  "Risk": "**通配符源**允许任何网站从浏览器调用端点并读取响应，削弱了源隔离。\n\n如果可访问状态更改方法，这可能导致数据暴露（C）和未经授权的操作（I），从而可能被脚本滥用和跨源攻击利用。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://support.icompaas.com/support/solutions/articles/62000229584-ensure-lambda-function-url-cors-configurations-were-checked",
+    "https://docs.aws.amazon.com/lambda/latest/api/API_Cors.html",
+    "https://tutorialsdojo.com/how-to-configure-aws-lambda-function-url-with-cross-origin-resource-sharing/",
+    "https://dev.to/rimutaka/aws-lambda-function-url-with-cors-explained-by-example-14df"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws lambda update-function-url-config --function-name <example_resource_name> --cors AllowOrigins=https://www.example.com",
+      "NativeIaC": "```yaml\n# CloudFormation：将 Lambda 函数 URL CORS 限制为特定源\nResources:\n  FunctionUrl:\n    Type: AWS::Lambda::Url\n    Properties:\n      TargetFunctionArn: <example_resource_arn>\n      AuthType: AWS_IAM\n      Cors:\n        AllowOrigins:\n          - https://www.example.com  # 关键：通过仅允许此源来移除 '*' 通配符\n```",
+      "Other": "1. 在 AWS 控制台中，转到 Lambda > 函数并选择 <example_resource_name>\n2. 打开配置 > 函数 URL > 编辑\n3. 在 CORS 中，从允许的源中删除 '*' 并输入 https://www.example.com\n4. 保存更改",
+      "Terraform": "```hcl\n# Terraform：将 Lambda 函数 URL CORS 限制为特定源\nresource \"aws_lambda_function_url\" \"example\" {\n  function_name      = \"<example_resource_name>\"\n  authorization_type = \"AWS_IAM\"\n  cors {\n    allow_origins = [\"https://www.example.com\"] # 关键：通过仅允许此源来移除 '*' 通配符\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "对 CORS 应用最小权限：\n- 将 `AllowOrigins` 限制为受信任的域；避免使用 `*`\n- 限制 `AllowMethods`/`AllowHeaders`；除非需要，否则禁用 `AllowCredentials`\n- 优先使用经过身份验证的访问（例如，`AWS_IAM`）并强制执行资源策略以实现纵深防御",
+      "Url": "https://hub.prowler.com/check/awslambda_function_url_cors_policy"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

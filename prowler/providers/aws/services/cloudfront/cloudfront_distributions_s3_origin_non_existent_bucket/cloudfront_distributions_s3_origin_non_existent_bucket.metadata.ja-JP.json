@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "cloudfront_distributions_s3_origin_non_existent_bucket",
+  "CheckTitle": "CloudFrontディストリビューションのS3オリジンが既存のバケットを参照している",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/NIST 800-53 Controls"
+  ],
+  "ServiceName": "cloudfront",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsCloudFrontDistribution",
+  "ResourceGroup": "network",
+  "Description": "`S3OriginConfig`を持つ**CloudFrontディストリビューション**は、既存の**S3バケットオリジン**（静的ウェブサイトホスティングを除く）を参照する必要があります。\n\n設定されたバケット名が存在しないオリジンを識別します。",
+  "Risk": "**ダングリングS3オリジン**により、潜在的な**バケットの乗っ取り**が可能になります：アクセスが制限されていない場合、攻撃者が欠落しているバケットを作成し、CloudFrontが攻撃者によって制御されたオブジェクトを取得する可能性があります。\n\nこれは**整合性**（コンテンツスプーフィング、キャッシュポイズニング）と**可用性**（エラー/タイムアウト）を脅かし、ユーザーの信頼を弱めます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/whitepapers/latest/secure-content-delivery-amazon-cloudfront/s3-origin-with-cloudfront.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/cloudfront-controls.html#cloudfront-12",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/CloudFront/cloudfront-existing-s3-bucket.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation：CloudFront S3オリジンによって参照されるS3バケットが存在することを確認\nResources:\n  <example_resource_name>:\n    Type: AWS::S3::Bucket\n    Properties:\n      BucketName: <example_resource_name>  # 重要：存在させるために、CloudFrontオリジンのドメインで使用されるバケット名（\".s3\"の前）と完全に一致する必要がある\n```",
+      "Other": "1. AWSコンソールで、CloudFrontを開き、ディストリビューションを選択\n2. オリジンに移動し、S3オリジンを選択し、ドメイン名を記録（バケット名は\".s3\"の前のテキスト）\n3. S3コンソールを開き、バケットの作成をクリックし、ステップ2の正確なバケット名を入力してバケットを作成\n4. チェックを再実行",
+      "Terraform": "```hcl\n# CloudFront S3オリジンによって参照されるS3バケットが存在することを確認\nresource \"aws_s3_bucket\" \"<example_resource_name>\" {\n  bucket = \"<example_resource_name>\"  # 重要：CloudFrontオリジンのドメインで使用されるバケット名（\".s3\"の前）と完全に一致する必要がある\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "オリジンが有効な、所有するバケットを参照していることを確認します。古い参照を削除または更新します。**オリジンアクセス制御**（またはOAI）と厳格なバケットポリシーを強制して、ディストリビューションのみがオブジェクトにアクセスできるようにします。**最小権限**を適用し、バケット名を管理し、オリジンのヘルスを監視して誤ったルーティングを防ぎます。",
+      "Url": "https://hub.prowler.com/check/cloudfront_distributions_s3_origin_non_existent_bucket"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "defender_ensure_defender_for_os_relational_databases_is_on",
+  "CheckTitle": "确保 Microsoft Defender for Open-Source Relational Databases 设置为“开启”",
+  "CheckType": [],
+  "ServiceName": "defender",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AzureDefenderPlan",
+  "ResourceGroup": "security",
+  "Description": "确保 Microsoft Defender for Open-Source Relational Databases 设置为“开启”",
+  "Risk": "开启 Microsoft Defender for Open-source relational databases 可为开源关系型数据库启用威胁检测，并在 Microsoft Defender for Cloud 中提供威胁情报、异常检测和行为分析能力。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "启用 Microsoft Defender for Open-source relational databases 可实现更强的纵深防御，并借助 Microsoft Security Response Center (MSRC) 提供的威胁检测能力进行防护。",
+      "Url": ""
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

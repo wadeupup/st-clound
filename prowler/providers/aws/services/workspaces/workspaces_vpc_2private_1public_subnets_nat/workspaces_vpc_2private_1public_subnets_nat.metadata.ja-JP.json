@@ -1,0 +1,39 @@
+{
+  "Provider": "aws",
+  "CheckID": "workspaces_vpc_2private_1public_subnets_nat",
+  "CheckTitle": "Workspace はプライベートサブネット内に配置されており、その VPC には少なくとも 1 つのパブリックサブネット、2 つのプライベートサブネット、および NAT Gateway が存在します。",
+  "CheckType": [
+    "ソフトウェアおよび設定チェック / AWS セキュリティベストプラクティス / ネットワーク到達性"
+  ],
+  "ServiceName": "workspaces",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Other",
+  "ResourceGroup": "compute",
+  "Description": "Amazon WorkSpaces は、2 つのプライベートサブネットと 1 つのパブリックサブネットを含む VPC 内に配置されており、WorkSpace はプライベートサブネット上で起動され、VPC は NAT Gateway を介したアウトバウンド通信（egress）を提供しています。",
+  "Risk": "WorkSpaces をパブリックサブネットに配置したり、NAT Gateway を設けていなかったりすると、デスクトップがインターネットから直接到達可能な状態となり、認証情報への攻撃やセッションハイジャックを受けるリスクが高まり、機密性（confidentiality）および完全性（integrity）が損なわれます。 また、適切に制御されたアウトバウンド通信（egress）がない場合、更新プログラムの適用やディレクトリ接続に失敗する可能性があり、可用性（availability）に影響を与えるだけでなく、運用チームが安全でない回避策を取る原因にもなります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/workspaces/latest/adminguide/amazon-workspaces-vpc.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# 最小構成の VPC セットアップ：1 つのパブリックサブネット、2 つのプライベートサブネット、および NAT Gateway \nResources:\n  VPC:\n    Type: AWS::EC2::VPC\n    Properties:\n      CidrBlock: 10.0.0.0/16\n\n  IGW:\n    Type: AWS::EC2::InternetGateway\n\n  AttachIGW:\n    Type: AWS::EC2::VPCGatewayAttachment\n    Properties:\n      VpcId: !Ref VPC\n      InternetGatewayId: !Ref IGW\n\n  PublicSubnet:\n    Type: AWS::EC2::Subnet\n    Properties:\n      VpcId: !Ref VPC\n      CidrBlock: 10.0.0.0/24\n\n  PrivateSubnetA:\n    Type: AWS::EC2::Subnet\n    Properties:\n      VpcId: !Ref VPC\n      CidrBlock: 10.0.1.0/24   # プライベートサブネット 1（必須）\n\n  PrivateSubnetB:\n    Type: AWS::EC2::Subnet\n    Properties:\n      VpcId: !Ref VPC\n      CidrBlock: 10.0.2.0/24   # プライベートサブネット 2（必須）\n\n  NatEip:\n    Type: AWS::EC2::EIP\n    Properties:\n      Domain: vpc\n\n  NatGw:\n    Type: AWS::EC2::NatGateway\n    Properties:\n      AllocationId: !GetAtt NatEip.AllocationId  # 重要：プライベートサブネットのアウトバウンド通信には NAT が必要\n      SubnetId: !Ref PublicSubnet                # 重要：NAT はパブリックサブネット内に配置する必要があります。\n\n  PublicRt:\n    Type: AWS::EC2::RouteTable\n    Properties:\n      VpcId: !Ref VPC\n\n  PublicDefaultRoute:\n    Type: AWS::EC2::Route\n    Properties:\n      RouteTableId: !Ref PublicRt\n      DestinationCidrBlock: 0.0.0.0/0\n      GatewayId: !Ref IGW                       # 重要：これにより、このサブネットはパブリックサブネットになります。\n\n  AssocPublic:\n    Type: AWS::EC2::SubnetRouteTableAssociation\n    Properties:\n      SubnetId: !Ref PublicSubnet\n      RouteTableId: !Ref PublicRt\n\n  PrivateRt:\n    Type: AWS::EC2::RouteTable\n    Properties:\n      VpcId: !Ref VPC\n\n  PrivateDefaultRoute:\n    Type: AWS::EC2::Route\n    Properties:\n      RouteTableId: !Ref PrivateRt\n      DestinationCidrBlock: 0.0.0.0/0\n      NatGatewayId: !Ref NatGw                  # 重要：プライベートサブネットはインターネット接続に NAT を使用します。\n\n  AssocPrivateA:\n    Type: AWS::EC2::SubnetRouteTableAssociation\n    Properties:\n      SubnetId: !Ref PrivateSubnetA\n      RouteTableId: !Ref PrivateRt              # WorkSpace のサブネットは、プライベートルートテーブル（Private Route Table）に関連付けられている必要があります。\n\n  AssocPrivateB:\n    Type: AWS::EC2::SubnetRouteTableAssociation\n    Properties:\n      SubnetId: !Ref PrivateSubnetB\n      RouteTableId: !Ref PrivateRt              # 重要：少なくとも 2 つのプライベートサブネットを確保します。\n```",
+      "Other": "1. Amazon の AWS Console で VPC > Internet gateways に移動し、対象の VPC に Internet Gateway がアタッチされていることを確認します。\n2. VPC > Subnets に移動し、その VPC にパブリック用として少なくとも 1 つ、プライベート用として 2 つのサブネット（可能であれば異なる AZ に配置）が存在することを確認します。必要に応じて不足しているサブネットを作成してください。\n3. VPC > NAT Gateways に移動し、パブリックサブネット内に NAT Gateway を作成し、Elastic IP を割り当てます。\n4. VPC > Route tables に移動し、以下を確認・設定します。 パブリックサブネットに関連付けられたルートテーブル 0.0.0.0/0 のルートが Internet Gateway をターゲットとして設定されていることを確認します（これによりパブリックサブネットとして機能します）。 プライベートサブネットに関連付けられたルートテーブル 0.0.0.0/0 のルートが NAT Gateway をターゲットとして設定されていることを確認し、Internet Gateway をターゲットとする 0.0.0.0/0 のルートが存在する場合は削除します。 これにより、プライベートサブネットは NAT 経由で外部通信を行う構成になります。\n5. WorkSpace がプライベートサブネットのいずれかに配置されていることを確認し、そのサブネットをプライベート用ルートテーブル（ルート: 0.0.0.0/0 → NAT Gateway）に関連付けます\n6. 確認事項：VPC に 1 つ以上のパブリックサブネット、2 つ以上のプライベートサブネット、少なくとも 1 つの NAT Gateway が存在し、かつ WorkSpace のサブネットがプライベートサブネットであることを確認します。",
+      "Terraform": "```hcl\n# 最小構成の VPC セットアップ：1 つのパブリックサブネット、2 つのプライベートサブネット、および NAT Gateway\nresource \"aws_vpc\" \"main\" {\n  cidr_block = \"10.0.0.0/16\"\n}\n\nresource \"aws_internet_gateway\" \"main\" {\n  vpc_id = aws_vpc.main.id\n}\n\nresource \"aws_subnet\" \"public\" {\n  vpc_id     = aws_vpc.main.id\n  cidr_block = \"10.0.0.0/24\"\n}\n\nresource \"aws_subnet\" \"private_a\" {\n  vpc_id     = aws_vpc.main.id\n  cidr_block = \"10.0.1.0/24\"  # プライベートサブネット 1（必須）\n}\n\nresource \"aws_subnet\" \"private_b\" {\n  vpc_id     = aws_vpc.main.id\n  cidr_block = \"10.0.2.0/24\"  # プライベートサブネット 2（必須）\n}\n\nresource \"aws_eip\" \"nat\" {\n  domain = \"vpc\"\n}\n\nresource \"aws_nat_gateway\" \"nat\" {\n  allocation_id = aws_eip.nat.id               # 重要：プライベートサブネットのアウトバウンド通信には NAT が必要\n  subnet_id     = aws_subnet.public.id         # 重要：NAT はパブリックサブネット内に配置する必要があります。\n}\n\nresource \"aws_route_table\" \"public\" {\n  vpc_id = aws_vpc.main.id\n  route {                                      # 重要：これにより、このサブネットはパブリックサブネットになります。\n    cidr_block = \"0.0.0.0/0\"\n    gateway_id = aws_internet_gateway.main.id\n  }\n}\n\nresource \"aws_route_table_association\" \"public\" {\n  subnet_id      = aws_subnet.public.id\n  route_table_id = aws_route_table.public.id\n}\n\nresource \"aws_route_table\" \"private\" {\n  vpc_id = aws_vpc.main.id\n  route {                                      # 重要：プライベートサブネットはインターネット接続に NAT を使用します。\n    cidr_block     = \"0.0.0.0/0\"\n    nat_gateway_id = aws_nat_gateway.nat.id\n  }\n}\n\nresource \"aws_route_table_association\" \"private_a\" {\n  subnet_id      = aws_subnet.private_a.id     # 重要：WorkSpace のサブネットはプライベートルートテーブルに関連付ける必要があります。\n  route_table_id = aws_route_table.private.id\n}\n\nresource \"aws_route_table_association\" \"private_b\" {\n  subnet_id      = aws_subnet.private_b.id\n  route_table_id = aws_route_table.private.id  # 重要：少なくとも 2 つのプライベートサブネットを確保します。\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "WorkSpaces はプライベートサブネット内で起動し、VPC は 1 つのパブリックサブネットと 2 つのプライベートサブネットで構成します。アウトバウンド通信は NAT Gateway を介して提供し、ネットワーク分離（network segmentation）および最小権限（least privilege）の原則に基づいてインバウンド通信を制限します。\nさらに、サブネットは複数の AZ に分散配置し、多層防御（defense in depth）の観点から WorkSpaces にパブリック IP を割り当てないようにします。",
+      "Url": "https://hub.prowler.com/check/workspaces_vpc_2private_1public_subnets_nat"
+    }
+  },
+  "Categories": [
+    "trust-boundaries",
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

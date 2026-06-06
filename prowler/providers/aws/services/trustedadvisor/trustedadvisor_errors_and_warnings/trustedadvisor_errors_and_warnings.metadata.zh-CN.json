@@ -1,0 +1,37 @@
+{
+  "Provider": "aws",
+  "CheckID": "trustedadvisor_errors_and_warnings",
+  "CheckTitle": "Trusted Advisor检查没有错误或警告",
+  "CheckType": [
+    "软件和配置检查/AWS安全最佳实践"
+  ],
+  "ServiceName": "trustedadvisor",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "monitoring",
+  "Description": "**评估AWS Trusted Advisor**检查状态，以识别“警告”或“错误”项。该发现反映了Trusted Advisor在**安全**、**容错**、**服务限制**和**成本**等类别中报告的状态，指出了需要注意的配置或配额。",
+  "Risk": "未解决的**警告/错误**可能会留下影响CIA的错误配置：\n-**保密性**：公共访问或弱身份验证会暴露数据\n-**完整性**：过于宽松的设置允许不必要的更改\n-**可用性**：限制耗尽或弹性差会引发停机\n它们也会增加不必要的成本。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://aws.amazon.com/premiumsupport/technology/trusted-advisor/best-practice-checklist/",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/TrustedAdvisor/checks.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "1.登录AWS控制台并打开Trusted Advisor\n2.转到检查并将状态筛选为警告和错误\n3.打开每个失败检查，然后单击查看详细信息/建议操作\n4.将列出的修复程序应用于受影响的资源\n5.单击复选框上的“刷新”并重复，直到所有复选框都显示“确定”",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "采用持续流程来纠正Trusted Advisor的发现：\n-优先考虑**“错误”**，然后是“警告”`\n-分配所有权和SLA\n-将警报与工作流集成\n-执行**最小权限**、分段、加密、MFA和测试备份\n-定期重新评估以确认修复并防止退化",
+      "Url": "https://hub.prowler.com/check/trustedadvisor_errors_and_warnings"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "vpc_endpoint_for_ec2_enabled",
+  "CheckTitle": "VPC 有一个 Amazon EC2 VPC 端点",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践/网络可达性"
+  ],
+  "ServiceName": "vpc",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsEc2VpcEndpointService",
+  "ResourceGroup": "network",
+  "Description": "**Amazon VPC** 会针对指向 **Amazon EC2 API**（`ec2`）的 **接口型 VPC 端点** 进行评估。其存在表明该 VPC 内通过 **AWS PrivateLink** 具备私有的 EC2 API 连接能力。",
+  "Risk": "如果没有私有 EC2 端点，EC2 API 流量将通过 IGW/NAT 出站。这会扩大对网络路径威胁（例如 DNS 劫持、中间人攻击）的暴露，并削弱出站隔离。它还为 API 访问增加了互联网出站依赖，如果 NAT/边缘路径发生故障，将降低可用性。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/config/latest/developerguide/service-vpc-endpoint-enabled.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/ec2-controls.html#ec2-10",
+    "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/interface-vpc-endpoints.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws ec2 create-vpc-endpoint --vpc-id <VPC_ID> --service-name com.amazonaws.<REGION>.ec2 --vpc-endpoint-type Interface --subnet-ids <SUBNET_ID>",
+      "NativeIaC": "```yaml\n#CloudFormation：在 VPC 中创建一个 EC2 接口型 VPC 端点\nResources:\n  VPCEndpoint:\n    Type: AWS::EC2::VPCEndpoint\n    Properties:\n      VpcId: \"<example_resource_id>\"                 #关键：该端点的目标 VPC\n      ServiceName: !Sub \"com.amazonaws.${AWS::Region}.ec2\"  #严重：EC2 接口端点服务\n      VpcEndpointType: Interface                      #关键：创建一个接口端点\n      SubnetIds:                                      #关键：用于放置端点 ENI 的子网\n        - \"<example_resource_id>\"\n```",
+      "Other": "1. 在 AWS 控制台中，前往 VPC > Endpoints\n2. 点击 Create endpoint\n3. 对于 Service category，选择 AWS services，并选择 Service name com.amazonaws.<region>.ec2\n4. 选择你的 VPC 和至少一个子网\n5. 点击 Create endpoint",
+      "Terraform": "```hcl\n#创建一个 EC2 接口型 VPC 端点\nresource \"aws_vpc_endpoint\" \"<example_resource_name>\" {\n  vpc_id            = \"<example_resource_id>\"           #关键：目标 VPC\n  service_name      = \"com.amazonaws.<region>.ec2\"      #严重：EC2 接口端点服务\n  vpc_endpoint_type = \"Interface\"                       #关键：接口端点\n  subnet_ids        = [\"<example_resource_id>\"]         #严重：端点 ENI 的子网\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "对每个需要 EC2 API 访问的 VPC，使用 EC2 服务的**接口 VPC 端点**。\n- 启用**私有 DNS**，使调用保留在 AWS 网络中\n- 应用限制性的端点策略（最小权限）\n- 减少对公共出口的依赖，并分层实施控制以实现**纵深防御**",
+      "Url": "https://hub.prowler.com/check/vpc_endpoint_for_ec2_enabled"
+    }
+  },
+  "Categories": [
+    "internet-exposed",
+    "trust-boundaries"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

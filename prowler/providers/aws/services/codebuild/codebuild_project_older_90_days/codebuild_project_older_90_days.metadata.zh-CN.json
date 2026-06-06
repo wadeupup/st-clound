@@ -1,0 +1,40 @@
+{
+  "Provider": "aws",
+  "CheckID": "codebuild_project_older_90_days",
+  "CheckTitle": "CodeBuild 项目在过去 90 天内已被调用",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices"
+  ],
+  "ServiceName": "codebuild",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsCodeBuildProject",
+  "ResourceGroup": "devops",
+  "Description": "评估 **AWS CodeBuild 项目**的最近活动，使用最后一次构建调用时间戳。在 `90 天`内未被调用或从未构建的项目被视为**非活动**项目。",
+  "Risk": "**非活动项目**会增加**攻击面**。休眠的 webhook 或**源凭据**可能被滥用，附加的 **IAM 角色**可能保留过多权限。过时的配置可能在环境变量或日志中暴露**密钥**，威胁构建**完整性**和数据**机密性**，同时增加可避免的成本和运营蔓延。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/codebuild/latest/userguide/delete-project.html",
+    "https://support.icompaas.com/support/solutions/articles/62000233684-ensure-codebuild-project-has-been-invoked-in-the-last-90-days"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "1. 打开 AWS 控制台并转到 CodeBuild\n2. 在构建项目中，选择项目\n3. 点击开始构建，然后确认开始构建\n4. 等待构建开始以更新最后调用时间",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "实施生命周期管理：审查闲置超过 `90 天`的项目，确认所有权和需求，然后删除或归档。撤销未使用的 webhook、令牌和服务角色；轮换任何密钥。实施**最小权限**、标记和定期审计，以减少**攻击面**，保持构建环境整洁和可防御。",
+      "Url": "https://hub.prowler.com/check/codebuild_project_older_90_days"
+    }
+  },
+  "Categories": [
+    "ci-cd"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

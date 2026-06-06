@@ -1,0 +1,32 @@
+{
+  "Provider": "aws",
+  "CheckID": "cognito_user_pool_advanced_security_enabled",
+  "CheckTitle": "Cognito ユーザープールで完全機能の高度なセキュリティが有効になっていることを確認する",
+  "CheckType": [],
+  "ServiceName": "cognito",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:aws:cognito-idp:region:account:userpool/userpool-id",
+  "Severity": "medium",
+  "ResourceType": "AwsCognitoUserPool",
+  "ResourceGroup": "IAM",
+  "Description": "Amazon Cognito ユーザープールの高度なセキュリティ機能は、ユーザープールに追加のセキュリティを提供します。これらの機能には、侵害された認証情報の保護、電話番号の確認、アカウント乗っ取り保護が含まれます。",
+  "Risk": "高度なセキュリティ機能が有効になっていない場合、ユーザープールは不正アクセスに対してより脆弱になります。",
+  "RelatedUrl": "https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pool-settings-advanced-security.html",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "Amazon Cognito ユーザープールの高度なセキュリティ機能を有効にするには、Amazon Cognito のドキュメントの手順に従ってください。",
+      "Url": "https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pool-settings-advanced-security.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

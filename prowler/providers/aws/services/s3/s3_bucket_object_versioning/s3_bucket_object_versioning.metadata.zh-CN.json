@@ -1,0 +1,33 @@
+{
+  "Provider": "aws",
+  "CheckID": "s3_bucket_object_versioning",
+  "CheckTitle": "检查 S3 存储桶是否已启用对象版本控制",
+  "CheckType": [
+    "数据保护"
+  ],
+  "ServiceName": "s3",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:s3:::bucket_name",
+  "Severity": "medium",
+  "ResourceType": "AwsS3Bucket",
+  "ResourceGroup": "storage",
+  "Description": "检查 S3 存储桶是否已启用对象版本控制",
+  "Risk": "通过版本控制，您可以轻松地从意外的用户操作和应用程序故障中恢复。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://docs.prowler.com/checks/aws/s3-policies/s3_16-enable-versioning#aws-console",
+      "Terraform": "https://docs.prowler.com/checks/aws/s3-policies/s3_16-enable-versioning#terraform"
+    },
+    "Recommendation": {
+      "Text": "对于包含敏感信息且经常发生变化的存储桶，请使用 Amazon 控制台或 API 配置版本控制，因为备份可能不足以捕获所有更改。",
+      "Url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/Versioning.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

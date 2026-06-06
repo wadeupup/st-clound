@@ -1,0 +1,35 @@
+{
+  "Provider": "aws",
+  "CheckID": "iam_no_root_access_key",
+  "CheckTitle": "确保不存在 root 账户访问密钥",
+  "CheckType": [
+    "Software and Configuration Checks",
+    "Industry and Regulatory Standards",
+    "CIS AWS Foundations Benchmark"
+  ],
+  "ServiceName": "iam",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "critical",
+  "ResourceType": "AwsIamAccessKey",
+  "ResourceGroup": "IAM",
+  "Description": "确保不存在 root 账户访问密钥",
+  "Risk": "root 账户是 AWS 账户中权限最高的用户。AWS Access Keys 提供对 AWS 账户的编程访问。建议移除所有与 root 账户关联的访问密钥。移除 root 账户访问密钥可减少账户被攻陷的途径。移除 root 访问密钥也有助于推动创建并使用遵循最小权限的基于角色账户。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "使用凭证报告检查用户，并确保 access_key_1_active 与 access_key_2_active 字段均为 FALSE。若使用 AWS Organizations，可考虑启用集中式 Root 管理并移除各账户单独的 root 凭证。",
+      "Url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_getting-report.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

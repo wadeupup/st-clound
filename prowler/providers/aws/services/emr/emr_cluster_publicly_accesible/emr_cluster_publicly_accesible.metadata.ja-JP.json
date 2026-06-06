@@ -1,0 +1,40 @@
+{
+  "Provider": "aws",
+  "CheckID": "emr_cluster_publicly_accesible",
+  "CheckTitle": "EMR クラスターがパブリックアクセス可能でないこと",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices/Network Reachability",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "TTPs/Initial Access"
+  ],
+  "ServiceName": "emr",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "compute",
+  "Description": "**Amazon EMR クラスター**について、マスターおよびコア/タスクノードの security groups に任意送信元（`0.0.0.0/0` または `::/0`）を許可する受信ルールがあるかを確認し、**公開ネットワーク露出** を評価します。\n\n対象は稼働中クラスターのみで、検出結果にはクラスター ノードに関連付けられた具体的な security groups の露出が示されます。",
+  "Risk": "EMR ノードへの **インターネット公開受信** はサービスや UI への直接アクセスを許し、ブルートフォース、RCE、データ窃取を容易にします。攻撃者は VPC 内でピボットし、ジョブや出力を改ざん（**完全性**）、データセットを流出（**機密性**）し、計算資源悪用によって **可用性** を低下させる可能性があります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-block-public-access.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation: Security Group without public ingress for EMR nodes\nResources:\n  <example_resource_name>:\n    Type: AWS::EC2::SecurityGroup\n    Properties:\n      GroupDescription: SG for EMR without public access\n      VpcId: <example_resource_id>\n      SecurityGroupIngress:\n        - IpProtocol: tcp\n          FromPort: 22\n          ToPort: 22\n          CidrIp: 10.0.0.0/8  # CRITICAL: restrict source; do not use 0.0.0.0/0 or ::/0 to avoid public access\n```",
+      "Other": "1. AWS コンソールで EMR > Clusters に移動し、対象クラスターを開きます\n2. クラスター詳細の Network and security で Master および Core/Task の Security Groups を確認します\n3. EC2 コンソール > Security Groups で各グループを開きます\n4. Inbound rules を編集し、Source が 0.0.0.0/0 または ::/0 のルールを削除します\n5. 必要な場合は管理下の特定 CIDR のみ再追加して保存します",
+      "Terraform": "```hcl\n# Restrict EMR SG ingress to avoid 0.0.0.0/0 or ::/0\nresource \"aws_security_group_rule\" \"<example_resource_name>\" {\n  type              = \"ingress\"\n  from_port         = 22\n  to_port           = 22\n  protocol          = \"tcp\"\n  security_group_id = \"<example_resource_id>\"  # EMR master/core SG\n  cidr_blocks       = [\"10.0.0.0/8\"]           # CRITICAL: restrict source; not 0.0.0.0/0 or ::/0\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "**最小権限** と **多層防御** を適用してください：\n- クラスターはプライベートサブネットで運用し、Public IP を避ける\n- ノード security groups で `0.0.0.0/0` と `::/0` を拒否し、信頼済み CIDR のみ許可\n- EMR **Block Public Access** を有効に維持し、例外を最小化\n- **bastion/SSM**、プライベート接続、ログ監視でアクセスを強化",
+      "Url": "https://hub.prowler.com/check/emr_cluster_publicly_accesible"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

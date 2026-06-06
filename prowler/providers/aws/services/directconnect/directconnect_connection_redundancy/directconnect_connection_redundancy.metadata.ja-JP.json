@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "directconnect_connection_redundancy",
+  "CheckTitle": "Direct Connect 接続が各リージョンで少なくとも2つのロケーションにまたがっている",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/AWS Security Best Practices/Network Reachability"
+  ],
+  "ServiceName": "directconnect",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "network",
+  "Description": "**AWS Direct Connect** 接続は、**接続とロケーションの冗長性**でプロビジョニングされています。各リージョンで**少なくとも2つの異なる Direct Connect ロケーション**にまたがる複数の接続です。",
+  "Risk": "**接続/ロケーションの冗長性**がないと、**単一障害点**が作成され、**可用性**が低下します。ルーター、ファイバー、またはサイトの障害により、AWS へのプライベートパスが切断され、アプリトラフィック、データレプリケーション、管理アクセスが停止し、代替パスが復元されるまでタイムアウトまたは長時間のダウンタイムが発生する可能性があります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/awssupport/latest/user/fault-tolerance-checks.html#amazon-direct-connect-location-resiliency",
+    "https://repost.aws/knowledge-center/direct-connect-physical-redundancy",
+    "https://aws.amazon.com/directconnect/resiliency-recommendation/"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws directconnect create-connection --region <REGION> --location <NEW_DX_LOCATION_CODE> --bandwidth 1Gbps --connection-name <example_resource_name>",
+      "NativeIaC": "",
+      "Other": "1. AWS コンソールで、Direct Connect > Connections に移動します\n2. 接続の作成をクリックします\n3. リージョン：既存の接続が存在するリージョンを選択します\n4. 名前：<example_resource_name> を入力します\n5. ロケーション：既存の接続とは異なる Direct Connect ロケーションを選択します\n6. 帯域幅：サポートされている値（例：1 Gbps）を選択します\n7. 接続の作成をクリックします",
+      "Terraform": "```hcl\n# 異なるロケーションに追加の Direct Connect 接続を作成\nresource \"aws_dx_connection\" \"example\" {\n  name      = \"<example_resource_name>\"\n  bandwidth = \"1Gbps\"\n  location  = \"<NEW_DX_LOCATION_CODE>\" # 重要：同じリージョンで異なる DX ロケーションを選択してロケーション冗長性を実現\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "**冗長性**と**多層防御**を適用します：\n- **2つの異なるロケーション**にまたがって 2 つの Direct Connect 接続をデプロイします\n- 自動フェイルオーバーには**動的、アクティブ/アクティブルーティング**を使用します\n- **プロバイダー/デバイスの多様性**を確保します\n- 容量を調整して、1 つのリンクの損失が残りのパスを過負荷にしないようにします\n- **VPN**を第三のバックアップとして検討します",
+      "Url": "https://hub.prowler.com/check/directconnect_connection_redundancy"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

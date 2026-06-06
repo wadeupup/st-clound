@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "storage_ensure_file_shares_soft_delete_is_enabled",
+  "CheckTitle": "确保 Azure 文件共享已启用软删除",
+  "CheckType": [],
+  "ServiceName": "storage",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AzureStorageAccount",
+  "ResourceGroup": "storage",
+  "Description": "确保 Azure 文件共享启用软删除，以防止重要数据被误删或恶意删除。该功能可在指定时间内保留已删除的文件共享，在永久删除前可进行恢复。",
+  "Risk": "若未启用软删除，文件共享一旦被误删或恶意删除将导致永久数据丢失，除非已部署独立备份机制，否则无法恢复。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/storage/files/storage-files-prevent-file-share-deletion?tabs=azure-portal",
+  "Remediation": {
+    "Code": {
+      "CLI": "az storage account file-service-properties update --account-name <storage-account-name> --enable-delete-retention true --delete-retention-days <number-of-days>",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity-staging/knowledge-base/azure/StorageAccounts/enable-soft-delete-for-file-shares.html",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "在 Azure 存储账户上为文件共享启用软删除，以便在配置的保留期内恢复已删除共享。",
+      "Url": "https://learn.microsoft.com/en-us/azure/storage/files/storage-files-prevent-file-share-deletion?tabs=azure-portal"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

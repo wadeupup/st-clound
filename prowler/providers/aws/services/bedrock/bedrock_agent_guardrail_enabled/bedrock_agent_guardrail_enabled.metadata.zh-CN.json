@@ -1,0 +1,34 @@
+{
+  "Provider": "aws",
+  "CheckID": "bedrock_agent_guardrail_enabled",
+  "CheckTitle": "确保为 Amazon Bedrock 代理会话启用了防护栏",
+  "CheckType": [],
+  "ServiceName": "bedrock",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:bedrock:region:account-id:agent/resource-id",
+  "Severity": "high",
+  "ResourceType": "Other",
+  "ResourceGroup": "ai_ml",
+  "Description": "此检查确保启用了防护栏以保护 Amazon Bedrock 代理会话。防护栏通过在 AI 模型交互过程中过滤和阻止有害或敏感内容来帮助降低安全风险。",
+  "Risk": "如果未启用防护栏，Amazon Bedrock 代理会话容易受到有害提示或输入的影响，这些输入可能暴露敏感信息或生成不当内容。这可能导致隐私侵犯、数据泄露或其他安全风险。",
+  "RelatedUrl": "https://docs.aws.amazon.com/bedrock/latest/userguide/guardrails.html",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/Bedrock/protect-agent-sessions-with-guardrails.html",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "为 Amazon Bedrock 代理会话启用防护栏，以在交互过程中防止有害的输入和输出。",
+      "Url": "https://docs.aws.amazon.com/bedrock/latest/userguide/guardrails-create.html"
+    }
+  },
+  "Categories": [
+    "gen-ai"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

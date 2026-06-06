@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "neptune_cluster_iam_authentication_enabled",
+  "CheckTitle": "Neptune クラスターには IAM 認証が有効になっています",
+  "CheckType": [
+    "ソフトウェアと構成のチェック/AWS セキュリティベストプラクティス",
+    "ソフトウェアと構成のチェック/業界および規制基準/AWS 基礎セキュリティベストプラクティス",
+    "TTPs/資格情報アクセス"
+  ],
+  "ServiceName": "neptune",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsRdsDbCluster",
+  "ResourceGroup": "database",
+  "Description": "Neptune DB クラスターは **IAM データベース認証**について評価されます。\n\nこの設定が有効になっている場合、クラスターは IAM ベースの認証をサポートします。\n無効になっている場合、クラスターは従来のデータベース資格情報を必要とします。",
+  "Risk": "**無効な IAM データベース認証**は、データベースの機密性と整合性を弱めます。\n\n- 静的または埋め込まれた DB 資格情報が盗まれたり再利用されたりする可能性があり、不正なクエリやデータの流出を可能にします\n- 攻撃者は集中アクセス制御を回避し、権限を昇格させ、IAM ベースの監査証跡なしで横方向に移動する可能性があります",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/neptune-controls.html#neptune-7",
+    "https://docs.aws.amazon.com/config/latest/developerguide/neptune-cluster-iam-database-authentication.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/Neptune/iam-db-authentication.html#",
+    "https://hub.steampipe.io/plugins/turbot/terraform/queries/neptune/neptune_cluster_iam_authentication_enabled"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws neptune modify-db-cluster --db-cluster-identifier <DB_CLUSTER_ID> --enable-iam-database-authentication --apply-immediately",
+      "NativeIaC": "```yaml\nResources:\n  NeptuneCluster:\n    Type: AWS::Neptune::DBCluster\n    Properties:\n      DBClusterIdentifier: <DB_CLUSTER_ID>\n      IamAuthEnabled: true  # 静的な DB 資格情報の代わりに IAM 認証を有効にします\n```",
+      "Terraform": "```hcl\nresource \"aws_neptune_cluster\" \"example_resource\" {\n  cluster_identifier                  = \"<DB_CLUSTER_ID>\"\n  iam_database_authentication_enabled = true  # 静的な DB 資格情報の代わりに IAM 認証を有効にします\n}\n```",
+      "Other": "1. AWS マネジメントコンソールにサインインし、Amazon Neptune > データベースを開きます\n2. DB クラスターを選択し、**アクション** > **変更**を選択します\n3. **認証**で、**IAM DB 認証**を有効にし、**すぐに適用**をチェックします\n4. **続行**をクリックし、次に **DB クラスターの変更**をクリックします"
+    },
+    "Recommendation": {
+      "Text": "静的な DB 資格情報を削除し、監査可能性を向上させるために、**IAM データベース認証**と集中型アイデンティティ管理を採用します。\n\n- データベースロールに対して**最小特権**を強制します\n- 短命の資格情報、集中型のローテーションとログを使用します\n- 多層防御を適用し、責任追跡のために DB アクセスを IAM と統合します",
+      "Url": "https://hub.prowler.com/check/neptune_cluster_iam_authentication_enabled"
+    }
+  },
+  "Categories": [
+    "identity-access"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

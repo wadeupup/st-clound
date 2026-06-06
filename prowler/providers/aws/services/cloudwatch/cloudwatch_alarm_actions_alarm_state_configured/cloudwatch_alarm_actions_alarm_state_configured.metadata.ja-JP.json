@@ -1,0 +1,46 @@
+{
+  "Provider": "aws",
+  "CheckID": "cloudwatch_alarm_actions_alarm_state_configured",
+  "CheckTitle": "CloudWatch メトリクスアラームに ALARM 状態のアクションが設定されている",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices"
+  ],
+  "ServiceName": "cloudwatch",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsCloudWatchAlarm",
+  "ResourceGroup": "monitoring",
+  "Description": "Amazon CloudWatch メトリクスアラームについて、`ALARM` 状態に対して構成された **アクション** があるかどうかを評価します。この検出結果は、監視対象メトリクスがしきい値を超えても実行されるアクションが設定されていないアラームをフラグします。",
+  "Risk": "**ALARM アクション** がなければ、しきい値の違反時に **通知** や **自動対応** が行われません。これにより検知と封じ込めが遅れ、次のようなリスクが生じます：\n- 可用性：障害の長期化やスケールアウトの見逃し\n- 整合性/機密性：異常が放置され、改ざんやデータ損失を招く可能性",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/AlarmThatSendsEmail.html#alarms-and-actions",
+    "https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/cloudwatch/client/put_metric_alarm.html",
+    "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_metric_alarm",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/cloudwatch-controls.html#cloudwatch-15",
+    "https://support.icompaas.com/support/solutions/articles/62000233431-ensure-cloudwatch-alarms-have-specified-actions-configured-for-the-alarm-state",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/CloudWatch/cloudwatch-alarm-action.html",
+    "https://awscli.amazonaws.com/v2/documentation/api/2.0.34/reference/cloudwatch/put-metric-alarm.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws cloudwatch put-metric-alarm --alarm-name <alarm-name> --metric-name <metric-name> --namespace <namespace> --statistic <statistic> --period <period-seconds> --evaluation-periods <evaluation-periods> --threshold <threshold> --comparison-operator <comparison-operator> --alarm-actions <action-arn>",
+      "NativeIaC": "```yaml\n# CloudFormation: add an ALARM action to a metric alarm\nResources:\n  <example_resource_name>:\n    Type: AWS::CloudWatch::Alarm\n    Properties:\n      AlarmName: <example_resource_name>\n      MetricName: <metric-name>\n      Namespace: <namespace>\n      Statistic: Average\n      Period: 60\n      EvaluationPeriods: 1\n      Threshold: 1\n      ComparisonOperator: GreaterThanThreshold\n      AlarmActions:\n        - <action-arn>  # CRITICAL: adds an action for ALARM state so the check passes\n```",
+      "Other": "1. AWS コンソールで CloudWatch > Alarms に移動します\n2. 対象のアラームを選択し、[Edit]（または [Modify alarm]）をクリックします\n3. [Actions] セクションで、[When alarm state is ALARM] の下にアクション（SNS トピックなど）を追加します\n4. [Save changes] をクリックします",
+      "Terraform": "```hcl\n# Terraform: add an ALARM action to a metric alarm\nresource \"aws_cloudwatch_metric_alarm\" \"<example_resource_name>\" {\n  alarm_name          = \"<example_resource_name>\"\n  metric_name         = \"<metric-name>\"\n  namespace           = \"<namespace>\"\n  statistic           = \"Average\"\n  period              = 60\n  evaluation_periods  = 1\n  threshold           = 1\n  comparison_operator = \"GreaterThanThreshold\"\n  alarm_actions       = [\"<action-arn>\"] # CRITICAL: ensures an action is configured for ALARM state\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "各アラームに少なくとも 1 つの **ALARM 状態アクション**（SNS による通知、Lambda/SSM による自動修復など）を割り当てます。アクションを有効な状態に保ち、ターゲットには **最小権限の原則** を適用し、定期的にテストします。*重要なメトリクス* については、EventBridge などの冗長経路を追加し、**多層防御** を強化します。",
+      "Url": "https://hub.prowler.com/check/cloudwatch_alarm_actions_alarm_state_configured"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+
+

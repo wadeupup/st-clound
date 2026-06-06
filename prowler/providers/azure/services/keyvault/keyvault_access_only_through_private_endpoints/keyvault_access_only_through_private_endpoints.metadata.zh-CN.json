@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "keyvault_access_only_through_private_endpoints",
+  "CheckTitle": "确保在使用专用终结点时已禁用公共网络访问。",
+  "CheckType": [],
+  "ServiceName": "keyvault",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "/subscriptions/{subscription_id}/resourceGroups/{resource_group}/providers/Microsoft.KeyVault/vaults/{vault_name}",
+  "Severity": "high",
+  "ResourceType": "KeyVault",
+  "ResourceGroup": "security",
+  "Description": "检查已配置专用终结点的 Key Vault 是否禁用了公共网络访问。",
+  "Risk": "在使用专用终结点时仍允许 Key Vault 公共网络访问，可能导致敏感数据暴露于未授权访问风险。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/key-vault/general/network-security",
+  "Remediation": {
+    "Code": {
+      "CLI": "az keyvault update --resource-group <resource_group> --name <vault_name> --public-network-access disabled",
+      "NativeIaC": "{\n  \"type\": \"Microsoft.KeyVault/vaults\",\n  \"apiVersion\": \"2022-07-01\",\n  \"properties\": {\n    \"publicNetworkAccess\": \"disabled\"\n  }\n}",
+      "Terraform": "resource \"azurerm_key_vault\" \"example\" {\n  # ... other configuration ...\n\n  public_network_access_enabled = false\n}",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/KeyVault/use-private-endpoints.html"
+    },
+    "Recommendation": {
+      "Text": "对使用专用终结点的 Key Vault 禁用公共网络访问，以确保网络流量仅通过专用终结点传输。",
+      "Url": "https://learn.microsoft.com/en-us/azure/private-link/private-endpoint-overview"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

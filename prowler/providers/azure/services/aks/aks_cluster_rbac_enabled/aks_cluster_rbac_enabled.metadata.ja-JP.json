@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "aks_cluster_rbac_enabled",
+  "CheckTitle": "AKS の RBAC が有効になっていることを確認する",
+  "CheckType": [],
+  "ServiceName": "aks",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Microsoft.ContainerService/ManagedClusters",
+  "ResourceGroup": "container",
+  "Description": "Azure Kubernetes Service（AKS）は、ユーザー認証に Azure Active Directory（AD）を使用するよう構成できます。この構成では、Azure AD の認証トークンを使用して AKS クラスターにサインインします。さらに、Kubernetes のロール ベース アクセス制御（Kubernetes RBAC）を構成し、ユーザーの識別情報またはグループ メンバーシップに基づいてクラスター リソースへのアクセスを制限できます。",
+  "Risk": "Kubernetes RBAC と AKS は、クラスターへのアクセスを保護し、開発者や運用者に必要最小限の権限のみを付与するのに役立ちます。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/aks/azure-ad-rbac?tabs=portal",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/AKS/enable-role-based-access-control-for-kubernetes-service.html#",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-kubernetes-policies/bc_azr_kubernetes_2#terraform"
+    },
+    "Recommendation": {
+      "Text": "",
+      "Url": "https://learn.microsoft.com/en-us/security/benchmark/azure/security-controls-v2-privileged-access#pa-7-follow-just-enough-administration-least-privilege-principle"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

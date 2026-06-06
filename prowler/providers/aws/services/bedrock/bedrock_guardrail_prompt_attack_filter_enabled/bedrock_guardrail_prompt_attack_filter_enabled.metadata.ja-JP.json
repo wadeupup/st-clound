@@ -1,0 +1,34 @@
+{
+  "Provider": "aws",
+  "CheckID": "bedrock_guardrail_prompt_attack_filter_enabled",
+  "CheckTitle": "Amazon Bedrockガードレールに対して最高強度のプロンプト攻撃フィルターを設定",
+  "CheckType": [],
+  "ServiceName": "bedrock",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:bedrock:region:account-id:guardrails/resource-id",
+  "Severity": "high",
+  "ResourceType": "Other",
+  "ResourceGroup": "ai_ml",
+  "Description": "プロンプトインジェクションとバイパス技術を軽減するために、Amazon Bedrockガードレールのプロンプト攻撃フィルター強度がHIGHに設定されていることを確認します。",
+  "Risk": "プロンプト攻撃フィルター強度がHIGHに設定されていない場合、Bedrockモデルはプロンプトインジェクション攻撃やジェイルブレイク試行に対してより脆弱になる可能性があり、有害または機密コンテンツがフィルターをバイパスしてエンドユーザーに到達する可能性があります。",
+  "RelatedUrl": "https://docs.aws.amazon.com/bedrock/latest/userguide/guardrails.html",
+  "Remediation": {
+    "Code": {
+      "CLI": "aws bedrock put-guardrails-configuration --guardrails-config 'promptAttackStrength=HIGH'",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/Bedrock/prompt-attack-strength.html",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "プロンプトインジェクション攻撃を防ぎ、コンテンツ操作に対する堅牢な保護を確保するために、Amazon Bedrockガードレールのプロンプト攻撃フィルター強度をHIGHに設定します。",
+      "Url": "https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-injection.html"
+    }
+  },
+  "Categories": [
+    "gen-ai"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "プロンプトインジェクション攻撃のリスクを最小限に抑えるために、プロンプト攻撃保護を最高強度に設定してください。"
+}
+

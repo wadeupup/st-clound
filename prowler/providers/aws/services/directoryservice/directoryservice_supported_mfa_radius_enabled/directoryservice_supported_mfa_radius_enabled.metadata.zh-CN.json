@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "directoryservice_supported_mfa_radius_enabled",
+  "CheckTitle": "AWS Directory Service 目录已启用基于 RADIUS 的 MFA",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "TTPs/Initial Access",
+    "TTPs/Credential Access"
+  ],
+  "ServiceName": "directoryservice",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "IAM",
+  "Description": "评估**AWS Directory Service 目录**的**基于 RADIUS 的多因素身份验证**，确认 MFA 已配置且 RADIUS 集成处于活动状态。",
+  "Risk": "如果没有**RADIUS MFA**，基于目录的 AWS 集成服务登录仅依赖单一因素，使凭据填充和网络钓鱼攻击能够成功。泄露的密码可能授予未授权访问，导致数据泄露，并启用权限提升，破坏机密性和完整性。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/directoryservice/latest/admin-guide/ms_ad_mfa.html",
+    "https://support.icompaas.com/support/solutions/articles/62000233537-ensure-multi-factor-authentication-mfa-using-a-radius-server-is-enabled-in-directory-service"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws ds enable-radius --directory-id <example_resource_id> --radius-settings '{\"RadiusServers\":[\"<RADIUS_IP_OR_DNS>\"],\"SharedSecret\":\"<SHARED_SECRET>\"}'",
+      "NativeIaC": "",
+      "Other": "1. 登录 AWS 控制台并打开 Directory Service\n2. 选择您的目录并打开它\n3. 转到 Networking & security 选项卡\n4. 在 Multi-factor authentication 中，点击 Actions > Enable\n5. 输入 RADIUS 服务器 IP 和共享密钥，然后点击 Enable\n6. 等待 RADIUS 状态显示 Completed",
+      "Terraform": "```hcl\nresource \"aws_directory_service_radius_settings\" \"<example_resource_name>\" {\n  directory_id  = \"<example_resource_id>\"            # 要启用 RADIUS MFA 的目录\n  radius_servers = [\"<RADIUS_IP_OR_DNS>\"]             # 关键：RADIUS 服务器端点\n  shared_secret  = \"<SHARED_SECRET>\"                   # 关键：RADIUS 的共享密钥\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "为所有 Directory Service 身份验证启用并强制执行**基于 RADIUS 的 MFA**。应用**最小权限**，强化和监控 RADIUS 基础设施，轮换共享密钥，并限制网络访问（例如，`UDP/1812`）。使用**纵深防御**，通过分段和会话控制限制横向移动并减少爆炸半径。",
+      "Url": "https://hub.prowler.com/check/directoryservice_supported_mfa_radius_enabled"
+    }
+  },
+  "Categories": [
+    "identity-access"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

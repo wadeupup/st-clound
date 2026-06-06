@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "app_function_latest_runtime_version",
+  "CheckTitle": "确保 Azure Functions 使用最新受支持的运行时",
+  "CheckType": [],
+  "ServiceName": "app",
+  "SubServiceName": "function",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Microsoft.Web/sites",
+  "ResourceGroup": "serverless",
+  "Description": "将 Azure Functions 保持在最新受支持的运行时版本对安全性与性能至关重要。更新通常包含安全补丁与增强功能，有助于防范已知漏洞和潜在利用。此外，较新的运行时版本可能提供更好的功能并优化资源利用率。",
+  "Risk": "使用过时的运行时版本可能带来安全风险和性能下降。过时运行时可能存在未修复漏洞，使其更容易遭受攻击。",
+  "RelatedUrl": "https://docs.microsoft.com/en-us/azure/azure-functions/functions-versions",
+  "Remediation": {
+    "Code": {
+      "CLI": "az functionapp config appsettings set --name <function_app_name> --resource-group <resource_group_name> --settings FUNCTIONS_EXTENSION_VERSION=~4",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/Functions/azure-function-runtime-version.html",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "",
+      "Url": "https://learn.microsoft.com/en-us/azure/azure-functions/migrate-version-3-version-4?tabs=net8%2Cazure-cli%2Cwindows&pivots=programming-language-python"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "请持续关注 Azure Functions 的最新安全更新与补丁发布，以保持环境安全并保持最新状态。"
+}

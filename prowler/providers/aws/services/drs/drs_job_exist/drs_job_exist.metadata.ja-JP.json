@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "drs_job_exist",
+  "CheckTitle": "リージョンで AWS Elastic Disaster Recovery (DRS) が有効化され、少なくとも 1 つの回復ジョブが存在するか",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices"
+  ],
+  "ServiceName": "drs",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "compute",
+  "Description": "**AWS Elastic Disaster Recovery** はリージョンごとに評価され、サービスが**初期化**されており、少なくとも 1 つの**回復またはドリルジョブ**が存在することを確認し、フェイルオーバーが実行されたことを示します。",
+  "Risk": "DRS が有効になっていない、または以前のジョブがない場合、ワークロードは**保護されず、テストもされていない**状態となり、**可用性**が損なわれます。\n障害やランサムウェア攻撃中、回復が遅延または失敗する可能性があり、RTO/RPO が増加し、**データ損失**と長時間のダウンタイムを引き起こします。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://aws.amazon.com/blogs/storage/cross-region-disaster-recovery-using-aws-elastic-disaster-recovery/",
+    "https://docs.aws.amazon.com/drs/latest/userguide/quick-start-guide-gs.html",
+    "https://aws.amazon.com/disaster-recovery/",
+    "https://docs.aws.amazon.com/drs/latest/userguide/recovery-job.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "1. AWS コンソールで、対象リージョンに切り替えます\n2. Elastic Disaster Recovery (DRS) を開きます\n3. \"Set default replication settings\"（または Settings > Initialize）をクリックし、\"Configure and initialize\" を選択してこのリージョンで DRS を有効化します\n4. \"Source servers\" > \"Add server\" に移動し、インストールコマンドをコピーして 1 台のサーバーで実行し、Data replication status = Healthy および Ready for recovery と表示されるまで待ちます\n5. そのサーバーを選択し、\"Initiate recovery drill\"（または \"Initiate recovery\"）を選択して確認し、ジョブを作成します\n6. \"Recovery job history\" でジョブが完了したことを確認します",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "必要なリージョンで DRS を有効化し、重要なワークロードを保護します。RTO/RPO を定義し、**定期的な回復ドリル**を実行して、起動設定と依存関係を検証します。**最小権限**を適用し、レプリケーションの健全性を監視し、フェイルオーバー手順を文書化して、一貫性があり再現可能な回復を確保します。",
+      "Url": "https://hub.prowler.com/check/drs_job_exist"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

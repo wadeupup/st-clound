@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "codebuild_project_uses_allowed_github_organizations",
+  "CheckTitle": "使用 GitHub 的 CodeBuild 项目使用允许的 GitHub 组织",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices"
+  ],
+  "ServiceName": "codebuild",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsCodeBuildProject",
+  "ResourceGroup": "devops",
+  "Description": "评估从 **GitHub/GitHub Enterprise** 获取源代码的 **CodeBuild 项目**（使用信任 CodeBuild 的服务角色），通过从存储库 URL 派生组织名称并与**允许的组织**列表进行比较。",
+  "Risk": "使用来自**不受信任的 GitHub 组织**的存储库可能允许外部工作流承担项目角色并获得 AWS 凭据。\n- 机密性：数据/密钥泄露\n- 完整性：未经授权的更改\n- 可用性：构建滥用或服务中断",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://medium.com/@adan.alvarez/gaining-long-term-aws-access-with-codebuild-and-github-873324638784",
+    "https://paul-hands-phd.medium.com/using-aws-codebuild-to-set-up-github-continuous-integration-19b92efbd094",
+    "https://docs.aws.amazon.com/codebuild/latest/userguide/connections-github-app.html",
+    "https://docs.aws.amazon.com/codebuild/latest/userguide/auth-and-access-control-iam-identity-based-access-control.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws codebuild update-project --name <example_resource_name> --source type=GITHUB,location=https://github.com/<ALLOWED_GITHUB_ORG>/<REPO>",
+      "NativeIaC": "```yaml\n# CloudFormation: point CodeBuild project to a repo in an allowed GitHub org\nResources:\n  <example_resource_name>:\n    Type: AWS::CodeBuild::Project\n    Properties:\n      ServiceRole: <example_resource_arn>\n      Artifacts:\n        Type: NO_ARTIFACTS\n      Environment:\n        Type: LINUX_CONTAINER\n        ComputeType: BUILD_GENERAL1_SMALL\n        Image: aws/codebuild/standard:7.0\n      Source:\n        Type: GITHUB\n        Location: https://github.com/<ALLOWED_GITHUB_ORG>/<REPO>  # FIX: repo org must be in the allowed list\n```",
+      "Other": "1. 打开 AWS 控制台并转到 CodeBuild > 构建项目\n2. 选择项目并点击编辑\n3. 在源中，将存储库 URL 设置为 https://github.com/<ALLOWED_GITHUB_ORG>/<REPO>\n4. 点击更新以保存",
+      "Terraform": "```hcl\n# Terraform: set CodeBuild source to a repo under an allowed GitHub org\nresource \"aws_codebuild_project\" \"<example_resource_name>\" {\n  name         = \"<example_resource_name>\"\n  service_role = \"<example_resource_arn>\"\n\n  artifacts { type = \"NO_ARTIFACTS\" }\n\n  environment {\n    compute_type = \"BUILD_GENERAL1_SMALL\"\n    image        = \"aws/codebuild/standard:7.0\"\n    type         = \"LINUX_CONTAINER\"\n  }\n\n  source {\n    type     = \"GITHUB\"\n    location = \"https://github.com/<ALLOWED_GITHUB_ORG>/<REPO>\" # FIX: use an allowed GitHub org\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "通过明确的允许列表将源限制为**已批准的 GitHub 组织**。对 CodeBuild 服务角色实施**最小权限**，避免管理员权限。对允许列表更改应用**职责分离**，并添加**纵深防御**（分支保护、审查、监控）以防止工作流滥用。",
+      "Url": "https://hub.prowler.com/check/codebuild_project_uses_allowed_github_organizations"
+    }
+  },
+  "Categories": [
+    "software-supply-chain",
+    "ci-cd"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

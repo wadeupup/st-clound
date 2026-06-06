@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "networkfirewall_in_all_vpc",
+  "CheckTitle": "VPCにNetwork Firewallが有効になっています",
+  "CheckType": [
+    "ソフトウェアと構成のチェック/AWS セキュリティベストプラクティス/ネットワーク到達可能性",
+    "ソフトウェアと構成のチェック/業界および規制基準/AWS 基礎セキュリティベストプラクティス"
+  ],
+  "ServiceName": "networkfirewall",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsEc2Vpc",
+  "ResourceGroup": "network",
+  "Description": "**AWS Network Firewall**が同じVPCに関連付けられている**VPCs**は、ネットワークトラフィックを検査およびフィルタリングします。\n\nNetwork FirewallリソースがリンクされていないVPCを特定します。",
+  "Risk": "**Network Firewall**がない場合、VPCトラフィックは詳細な検査や集中ポリシーの適用を回避でき、**データの流出**、**コマンド・アンド・コントロール**、**横方向の移動**を可能にします。監視されていないフローにより機密性が低下し、マルウェアや破壊的なトラフィックによって整合性と可用性が脅かされます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/network-firewall/latest/developerguide/vpc-config.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/NetworkFirewall/network-firewall-in-use.html",
+    "https://docs.aws.amazon.com/network-firewall/latest/developerguide/setting-up.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws network-firewall create-firewall --firewall-name <example_resource_name> --firewall-policy-arn <example_resource_id> --vpc-id <example_resource_id> --subnet-mappings \"SubnetId=<example_resource_id>\"",
+      "NativeIaC": "```yaml\n# CloudFormation: VPCにNetwork Firewallを作成します\nResources:\n  <example_resource_name>:\n    Type: AWS::NetworkFirewall::Firewall\n    Properties:\n      FirewallName: <example_resource_name>\n      FirewallPolicyArn: <example_resource_id>  # 重要: ファイアウォールに必要なポリシー\n      VpcId: <example_resource_id>              # 重要: ファイアウォールを対象のVPCに関連付けます（チェックを修正）\n      SubnetMappings:                           # 重要: VPCにファイアウォールエンドポイントを作成します\n        - SubnetId: <example_resource_id>\n```",
+      "Other": "1. AWSコンソールで、Network Firewall > Firewalls > Create firewallに移動します\n2. 名前を入力し、対象のVPCを選択します\n3. 既存のFirewallポリシーを選択する（またはプロンプトが表示されたら作成する）\n4. サブネットマッピングの下でVPCから少なくとも1つのサブネットを追加します\n5. Create firewallを選択します\n6. ファイアウォールが選択したVPCに表示されることを確認します",
+      "Terraform": "```hcl\n# VPCにNetwork Firewallを作成します\nresource \"aws_networkfirewall_firewall\" \"<example_resource_name>\" {\n  name                = \"<example_resource_name>\"\n  firewall_policy_arn = \"<example_resource_id>\"  # 重要: 必要なポリシー\n  vpc_id              = \"<example_resource_id>\"  # 重要: ファイアウォールをVPCに関連付けます（チェックを修正）\n\n  subnet_mapping {                                # 重要: VPCにファイアウォールエンドポイントを作成します\n    subnet_id = \"<example_resource_id>\"\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "各VPCに**AWS Network Firewall**をデプロイするか、専用のハブVPCを通じて検査を集中化します。\n\n`default-deny`の姿勢を採用し、最小特権ルールを設定し、必要な宛先への送信を制限し、ワークロードをセグメント化します（**多層防御**、**ゼロトラスト**）。ログを有効にしてネットワークポリシーを監視および調整します。",
+      "Url": "https://hub.prowler.com/check/networkfirewall_in_all_vpc"
+    }
+  },
+  "Categories": [
+    "trust-boundaries"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

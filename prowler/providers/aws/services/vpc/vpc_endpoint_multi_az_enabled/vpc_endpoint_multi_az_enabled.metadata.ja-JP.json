@@ -1,0 +1,40 @@
+{
+  "Provider": "aws",
+  "CheckID": "vpc_endpoint_multi_az_enabled",
+  "CheckTitle": "Amazon VPC インターフェイスエンドポイントには、複数のアベイラビリティーゾーンにまたがるサブネットがあります",
+  "CheckType": [
+    "ソフトウェアと構成チェック/AWSセキュリティのベストプラクティス",
+    "ソフトウェアと設定のチェック/業界および規制基準/AWS 基盤セキュリティのベストプラクティス"
+  ],
+  "ServiceName": "vpc",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsEc2VpcEndpointService",
+  "ResourceGroup": "network",
+  "Description": "**VPC インターフェイスエンドポイント** は、そのエンドポイントネットワークインターフェイスが **複数のサブネット** に配置されているかどうかで評価され、これは異なる **アベイラビリティーゾーン** 間での分散を意味します。1 つのサブネットにのみ存在するエンドポイントが特定されます。",
+  "Risk": "**単一サブネットのエンドポイント**は、**単一AZ依存**を生みます。AZの障害またはルーティングの問題によりサービスへのアクセスが遮断され、**可用性**が低下する可能性があります。ワークロードは**パブリックエンドポイント**にフォールバックする可能性があり、トラフィックがインターネットにさらされ、傍受や改ざんによって**機密性**が損なわれるリスクがあります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/vpc/latest/privatelink/interface-endpoints.html",
+    "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/interface-vpc-endpoints.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws ec2 modify-vpc-endpoint --vpc-endpoint-id <example_resource_id> --add-subnet-ids <example_subnet_id_2>",
+      "NativeIaC": "```yaml\nResources:\n  <example_resource_name>:\n    Type: AWS::EC2::VPCEndpoint\n    Properties:\n      VpcEndpointType: Interface\n      VpcId: <example_resource_id>\n      ServiceName: com.amazonaws.<region>.<service>\n      SubnetIds:  #重大: チェックに合格するには、少なくとも2つのサブネット（できれば異なるAZ内）を含めてください\n        - <example_subnet_id_1>\n        - <example_subnet_id_2>\n```",
+      "Other": "1. AWS VPC コンソールを開き、Endpoints に移動します\n2. インターフェイスエンドポイントを選択します\n3. Actions > Manage subnets をクリックします\n4. 別のアベイラビリティーゾーンにある追加のサブネットを選択します\n5. Modify subnets をクリックして保存します",
+      "Terraform": "```hcl\nresource \"aws_vpc_endpoint\" \"<example_resource_name>\" {\n  vpc_id            = \"<example_resource_id>\"\n  service_name      = \"com.amazonaws.<region>.<service>\"\n  vpc_endpoint_type = \"Interface\"\n\n  subnet_ids = [\n    \"<example_subnet_id_1>\",\n    \"<example_subnet_id_2>\"  #重大: マルチAZの要件を満たすために、2つ目のサブネット（理想的には別のAZ内）を追加してください\n  ]\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "単一AZへの依存を排除するため、**異なるAZにまたがる複数のサブネット**にインターフェイスエンドポイントを配置します。クライアントが最も近いエンドポイントを使用できるよう、ゾーンローカルルーティングを優先し、さらに**プライベートDNS**および制限的な**セキュリティグループ**と組み合わせることで、**多層防御**と耐障害性のある接続をサポートしつつ、公開範囲を制限します。",
+      "Url": "https://hub.prowler.com/check/vpc_endpoint_multi_az_enabled"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

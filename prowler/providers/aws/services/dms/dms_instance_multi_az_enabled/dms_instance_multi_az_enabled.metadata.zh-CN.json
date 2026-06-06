@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "dms_instance_multi_az_enabled",
+  "CheckTitle": "DMS 复制实例已启用多可用区 (Multi-AZ)",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Effects/Denial of Service"
+  ],
+  "ServiceName": "dms",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsDmsReplicationInstance",
+  "ResourceGroup": "database",
+  "Description": "**AWS DMS 复制实例** 会检查其 **Multi-AZ** 配置。启用了 `multi_az` 的实例被视为具有跨可用区的备用实例，而未启用的实例则被识别为单可用区。",
+  "Risk": "如果未启用 **Multi-AZ**，单个可用区故障或维护事件就可能中断迁移，导致长时间停机（**可用性**）以及复制中断或回滚（**完整性**）。当复制实例不可用时，任务可能停滞、切换风险上升，并且需要手动恢复。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/dms/latest/userguide/CHAP_ReplicationInstance.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/DMS/multi-az.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws dms modify-replication-instance --replication-instance-arn arn:aws:dms:<REGION>:<ACCOUNT_ID>:rep:<REPLICATION_ID> --multi-az --apply-immediately",
+      "NativeIaC": "```yaml\n# CloudFormation：在 DMS 复制实例上启用 Multi-AZ\nResources:\n  <example_resource_name>:\n    Type: AWS::DMS::ReplicationInstance\n    Properties:\n      ReplicationInstanceClass: dms.t3.micro\n      MultiAZ: true  # 关键：启用 Multi-AZ 以通过该检查\n```",
+      "Other": "1. 打开 AWS DMS 控制台\n2. 转到 Replication instances 并选择您的实例\n3. 单击 Modify\n4. 勾选 Multi-AZ\n5. 勾选 Apply immediately\n6. 单击 Modify 保存",
+      "Terraform": "```hcl\n# 在 DMS 复制实例上启用 Multi-AZ\nresource \"aws_dms_replication_instance\" \"<example_resource_name>\" {\n  replication_instance_id     = \"<example_resource_name>\"\n  replication_instance_class  = \"dms.t3.micro\"\n  multi_az                    = true  # 关键：启用 Multi-AZ 以通过该检查\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "在处理生产或对时间敏感的迁移的 DMS 复制实例上启用 **Multi-AZ**（将 `multi_az` 设置为 `true`），以确保冗余和自动故障转移。\n\n应用高可用性原则：在多个可用区之间分布、测试故障转移、监控健康状况，并合理规划维护以将影响降到最低。",
+      "Url": "https://hub.prowler.com/check/dms_instance_multi_az_enabled"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+
+

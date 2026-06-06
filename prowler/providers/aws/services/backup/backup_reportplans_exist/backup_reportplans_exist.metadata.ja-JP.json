@@ -1,0 +1,40 @@
+{
+  "Provider": "aws",
+  "CheckID": "backup_reportplans_exist",
+  "CheckTitle": "少なくとも1つのAWS Backupレポート計画が存在する",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices"
+  ],
+  "ServiceName": "backup",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "low",
+  "ResourceType": "AwsBackupBackupPlan",
+  "ResourceGroup": "storage",
+  "Description": "既存のバックアップ計画を持つ**AWS Backup**環境は、`jobs`または`compliance`レポートを生成する少なくとも1つの**レポート計画**の存在について評価されます。",
+  "Risk": "レポート計画がない場合、バックアップの失敗や見逃された復元が気づかれない可能性があり、**可用性**と回復目標に損害を与えます。保持、スケジューリング、または暗号化制御のギャップが報告されずに継続する可能性があり、アカウントとリージョン全体で**整合性**と監査可能性を弱め、SLA違反の可能性を増加させます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/aws-backup/latest/devguide/create-report-plan-console.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws backup create-report-plan --report-plan-name <REPORT_PLAN_NAME> --report-delivery-channel s3BucketName=<S3_BUCKET_NAME>,formats=CSV --report-setting reportTemplate=BACKUP_JOB_REPORT",
+      "NativeIaC": "```yaml\nResources:\n  <example_resource_name>:\n    Type: AWS::Backup::ReportPlan\n    Properties:\n      ReportPlanName: <example_resource_name> # 重要：チェックをパスするために必要なレポート計画を作成\n      ReportDeliveryChannel:\n        S3BucketName: <example_resource_name> # 重要：レポートの宛先バケット\n        Formats:\n          - CSV # 重要：有効なレポートファイル形式\n      ReportSetting:\n        ReportTemplate: BACKUP_JOB_REPORT # 重要：ジョブレポートを有効にする最小テンプレート\n```",
+      "Other": "1. AWS Backupコンソールを開き、レポートに移動\n2. レポート計画の作成をクリック\n3. バックアップジョブ（ジョブレポート）テンプレートを選択\n4. レポート計画名を入力し、S3バケットを選択\n5. ファイル形式としてCSVを選択\n6. レポート計画の作成をクリック",
+      "Terraform": "```hcl\nresource \"aws_backup_report_plan\" \"<example_resource_name>\" {\n  name = \"<example_resource_name>\" # 重要：少なくとも1つのレポート計画を作成\n\n  report_delivery_channel {\n    s3_bucket_name = \"<example_resource_name>\" # 重要：レポートの宛先バケット\n    formats        = [\"CSV\"] # 重要：有効なレポートファイル形式\n  }\n\n  report_setting {\n    report_template = \"BACKUP_JOB_REPORT\" # 重要：最小ジョブレポートテンプレート\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "**レポート計画**を確立し、維持して、バックアップアクティビティとポリシー遵守を継続的に監視します。\n- レポートストレージに最小権限を適用\n- カバレッジのために関連するアカウントとリージョンを含める\n- レポートを定期的に確認し、異常に対してアラートを発する\n- バックアップ管理者と監査員の間の職務分離を強制",
+      "Url": "https://hub.prowler.com/check/backup_reportplans_exist"
+    }
+  },
+  "Categories": [
+    "logging"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

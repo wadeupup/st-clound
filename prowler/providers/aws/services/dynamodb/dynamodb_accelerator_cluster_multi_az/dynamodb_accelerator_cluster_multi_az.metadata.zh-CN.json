@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "dynamodb_accelerator_cluster_multi_az",
+  "CheckTitle": "DynamoDB Accelerator (DAX) 集群的节点分布在多个可用区",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Effects/Denial of Service"
+  ],
+  "ServiceName": "dynamodb",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "database",
+  "Description": "**Amazon DynamoDB Accelerator (DAX)** 集群节点在**可用区**中的分布会被评估。节点分布在区域内多个可用区的集群被识别为多可用区；节点仅位于单个可用区的集群被识别为单可用区。",
+  "Risk": "如果没有**多可用区 DAX 节点**，可用区中断或主节点故障可能导致缓存**不可用**，损害**可用性**，并在负载转移到 DynamoDB 时导致**延迟峰值**和**节流**。缓存丢失可能导致更高的成本，并在读取密集型工作负载中触发**超时级联**。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://support.icompaas.com/support/solutions/articles/62000233618-ensure-dynamodb-accelerator-dax-clusters-have-nodes-in-multiple-availability-zones",
+    "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DAX.concepts.cluster.html#DAX.concepts.regions-and-azs",
+    "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DAX.create-cluster.console.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws dax increase-replication-factor --cluster-name <example_resource_name> --new-replication-factor 2 --availability-zones <AZ_1> <AZ_2>",
+      "NativeIaC": "```yaml\nResources:\n  DAXCluster:\n    Type: AWS::DAX::Cluster\n    Properties:\n      ClusterName: <example_resource_name>\n      IAMRoleARN: <example_resource_id>\n      NodeType: <NODE_TYPE>\n      ReplicationFactor: 2  # CRITICAL: at least 2 nodes so nodes can be placed in multiple AZs\n      SubnetGroupName: <example_resource_name>\n      AvailabilityZones:     # CRITICAL: specify multiple AZs to ensure multi-AZ placement\n        - <AZ_1>\n        - <AZ_2>\n```",
+      "Other": "1. 在 AWS 控制台中，前往 DynamoDB > DAX > Subnet groups，确保集群使用的子网组包含至少两个可用区的子网；如果添加了子网，请保存。\n2. 前往 DynamoDB > DAX > Clusters，选择 <example_resource_name>，然后选择 Modify。\n3. 将 Cluster size 设置为 2 或更多。\n4. 在 Availability Zones（或节点放置）中，选择至少两个不同的可用区。\n5. 保存更改并等待状态变为 Available，然后在 Cluster details 中确认节点显示多个可用区。",
+      "Terraform": "```hcl\nresource \"aws_dax_cluster\" \"example\" {\n  cluster_name       = \"<example_resource_name>\"\n  node_type          = \"<NODE_TYPE>\"\n  replication_factor = 2  # CRITICAL: at least 2 nodes to allow multi-AZ\n  iam_role_arn       = \"<example_resource_id>\"\n  subnet_group_name  = \"<example_resource_name>\"\n  availability_zones = [\"<AZ_1>\", \"<AZ_2>\"]  # CRITICAL: ensures nodes are in multiple AZs\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "部署**DAX 集群**时，至少使用 `3` 个节点，分布在不同的**可用区**，以确保容错能力。使用跨越多个可用区的子网组，通过集群端点访问，并定期验证**故障转移**。监控容量以避免单可用区或单节点依赖。",
+      "Url": "https://hub.prowler.com/check/dynamodb_accelerator_cluster_multi_az"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

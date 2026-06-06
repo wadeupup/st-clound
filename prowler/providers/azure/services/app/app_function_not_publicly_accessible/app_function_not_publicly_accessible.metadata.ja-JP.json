@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "app_function_not_publicly_accessible",
+  "CheckTitle": "Azure Functions がパブリックにアクセス可能になっていないことを確認する",
+  "CheckType": [],
+  "ServiceName": "app",
+  "SubServiceName": "function",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Microsoft.Web/sites",
+  "ResourceGroup": "serverless",
+  "Description": "Azure Functions はパブリック インターネットに公開すべきではありません。アクセスを制限することで、潜在的な脅威からアプリケーションを保護し、攻撃対象領域を減らすことができます。",
+  "Risk": "Azure Functions をパブリック インターネットに公開すると、不正アクセス、データ漏えい、その他のセキュリティ脅威のリスクが高まります。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/azure-functions/functions-networking-options",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/Functions/azure-function-exposed.html",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "Azure Functions のセキュリティ ガイドラインを確認し、アクセス制限が適用されていることを確認してください。セキュリティ強化のために Azure Private Link と Key Vault の利用を検討してください。",
+      "Url": "https://learn.microsoft.com/en-us/azure/app-service/overview-access-restrictions"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

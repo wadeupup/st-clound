@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "awslambda_function_vpc_multi_az",
+  "CheckTitle": "Lambda 函数配置了至少两个可用区中的 VPC 子网",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices/Network Reachability"
+  ],
+  "ServiceName": "awslambda",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsLambdaFunction",
+  "ResourceGroup": "serverless",
+  "Description": "附加到 VPC 的**AWS Lambda** 函数使用的子网至少跨越所需数量的**可用区**（默认为 `2`）。\n\n评估会计算函数配置的子网的唯一 AZ 数量。",
+  "Risk": "单可用区部署限制了**可用性**。可用区中断或子网/IP 耗尽可能会阻止 ENI 创建和 VPC 访问，导致调用失败、超时和事件积压。\n\n这会降低正常运行时间，并可能延迟关键事件的处理。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/lambda/latest/operatorguide/networking-vpc.html",
+    "https://stackzonecom.tawk.help/article/aws-config-rule-lambda-vpc-multi-az-check",
+    "https://stackoverflow.com/questions/62052490/why-aws-lambda-suggests-to-set-up-two-subnets-if-vpc-is-configured",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/lambda-controls.html#lambda-5"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws lambda update-function-configuration --function-name <example_resource_name> --vpc-config SubnetIds=<subnet_id_az1>,<subnet_id_az2>,SecurityGroupIds=<example_security_group_id>",
+      "NativeIaC": "```yaml\nResources:\n  <example_resource_name>:\n    Type: AWS::Lambda::Function\n    Properties:\n      Role: <example_role_arn>\n      Handler: index.handler\n      Runtime: python3.12\n      Code:\n        ZipFile: |\n          def handler(event, context):\n            return \"\"\n      VpcConfig:\n        SecurityGroupIds:\n          - <example_security_group_id>\n        SubnetIds:\n          - <subnet_id_az1>  # 关键：选择不同 AZ 中的子网\n          - <subnet_id_az2>  # 关键：确保函数在 >=2 个 AZ 中运行\n```",
+      "Other": "1. 打开 Lambda 控制台并选择函数\n2. 转到配置 > VPC > 编辑\n3. 选择目标 VPC 并选择至少两个不同可用区中的子网\n4. 选择一个安全组\n5. 点击保存",
+      "Terraform": "```hcl\nresource \"aws_lambda_function\" \"<example_resource_name>\" {\n  function_name = \"<example_resource_name>\"\n  role          = \"<example_role_arn>\"\n  handler       = \"index.handler\"\n  runtime       = \"python3.12\"\n  filename      = \"function.zip\"\n\n  vpc_config {\n    subnet_ids         = [\"<subnet_id_az1>\", \"<subnet_id_az2>\"] # 关键：不同 AZ 中的子网\n    security_group_ids = [\"<example_security_group_id>\"]\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "将 VPC 连接的函数分布在 `2` 个不同 AZ 的子网中，以确保**容错性**。\n- 从不同 AZ 中选择子网\n- 避免 AZ 固定的配置或固定 IP\n- 为每个 AZ 提供出口/端点和路由\n- 定期测试 AZ 故障转移\n与**弹性**和**纵深防御**保持一致。",
+      "Url": "https://hub.prowler.com/check/awslambda_function_vpc_multi_az"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

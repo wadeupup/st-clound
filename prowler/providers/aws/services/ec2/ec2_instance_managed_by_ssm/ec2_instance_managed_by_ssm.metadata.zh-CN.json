@@ -1,0 +1,34 @@
+{
+  "Provider": "aws",
+  "CheckID": "ec2_instance_managed_by_ssm",
+  "CheckTitle": "检查 EC2 实例是否由 Systems Manager 管理",
+  "CheckType": [
+    "Infrastructure Security"
+  ],
+  "ServiceName": "ec2",
+  "SubServiceName": "instance",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "medium",
+  "ResourceType": "AwsEc2Instance",
+  "ResourceGroup": "compute",
+  "Description": "检查 EC2 实例是否由 Systems Manager 管理",
+  "Risk": "AWS Config 提供 AWS 托管规则，这些是预定义的、可自定义的规则，AWS Config 使用它们来评估您的 AWS 资源配置是否符合常见的最佳实践。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/SSM/ssm-managed-instances.html",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "验证并应用 Systems Manager 先决条件。",
+      "Url": "https://docs.aws.amazon.com/systems-manager/latest/userguide/managed_instances.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

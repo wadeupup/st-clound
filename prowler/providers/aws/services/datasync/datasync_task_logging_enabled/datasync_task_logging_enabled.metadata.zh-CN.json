@@ -1,0 +1,36 @@
+{
+  "Provider": "aws",
+  "CheckID": "datasync_task_logging_enabled",
+  "CheckTitle": "DataSync 任务应启用日志记录",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices"
+  ],
+  "ServiceName": "datasync",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:aws:datasync:{region}:{account-id}:task/{task-id}",
+  "Severity": "high",
+  "ResourceType": "AwsDataSyncTask",
+  "ResourceGroup": "storage",
+  "Description": "此控制检查 AWS DataSync 任务是否启用了日志记录。如果任务未定义 CloudWatchLogGroupArn 属性，则控制失败。",
+  "Risk": "如果未启用日志记录，重要的操作数据可能会丢失，使得难以排查问题、监控性能并确保符合审计要求。",
+  "RelatedUrl": "https://docs.aws.amazon.com/datasync/latest/userguide/monitor-datasync.html#enable-logging",
+  "Remediation": {
+    "Code": {
+      "CLI": "aws datasync update-task --task-arn <task-arn> --cloud-watch-log-group-arn <log-group-arn>",
+      "NativeIaC": "",
+      "Other": "https://docs.aws.amazon.com/datasync/latest/userguide/monitor-datasync.html#enable-logging",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "为您的 DataSync 任务配置日志记录，以确保捕获操作数据并可用于调试、监控和审计目的。",
+      "Url": "https://docs.aws.amazon.com/datasync/latest/userguide/monitor-datasync.html#enable-logging"
+    }
+  },
+  "Categories": [
+    "logging"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

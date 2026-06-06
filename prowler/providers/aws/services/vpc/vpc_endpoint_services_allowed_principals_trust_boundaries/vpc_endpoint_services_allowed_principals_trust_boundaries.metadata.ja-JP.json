@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "vpc_endpoint_services_allowed_principals_trust_boundaries",
+  "CheckTitle": "VPC エンドポイントサービスでは、信頼できるプリンシパルのみ、またはなしのみが許可されます",
+  "CheckType": [
+    "ソフトウェアおよび設定のチェック/AWS セキュリティのベストプラクティス/ネットワーク到達可能性",
+    "ソフトウェアと設定のチェック/業界および規制基準/AWS 基盤セキュリティのベストプラクティス",
+    "TTPs/初期アクセス",
+    "影響／データ露出"
+  ],
+  "ServiceName": "vpc",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsEc2VpcEndpointService",
+  "ResourceGroup": "network",
+  "Description": "**VPC endpoint services** は、その **allowed principals** について評価され、各項目を設定済みの信頼済みアカウントのセットと比較し、許可リスト内に存在する未信頼のプリンシパルまたはワイルドカード `*` を特定します。",
+  "Risk": "信頼されていない、またはワイルドカードのプリンシパルがあなたのサービスへのPrivateLink接続を作成できると、セグメンテーションが損なわれます。これにより、不正なデータアクセス（**機密性**）、内部APIの悪用（**完全性**）、およびバックエンドへの過剰な負荷（**可用性**）が可能になります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/vpc/latest/privatelink/vpc-endpoints-access.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n#信頼できるプリンシパルのみを許可する（または、どのプリンシパルも許可しない場合は何もアタッチしない）\nResources:\n  <example_resource_name>:\n    Type: AWS::EC2::VPCEndpointServicePermissions\n    Properties:\n      ServiceId: <example_resource_id>\n      AllowedPrincipals:\n        - arn:aws:iam::<TRUSTED_ACCOUNT_ID>:root  #重大: この信頼できるアカウントのみにアクセスを制限します\n```",
+      "Other": "1. AWS VPC コンソールを開き、Endpoint services に移動します\n2. エンドポイントサービス（<example_resource_id>）を選択します\n3. Allowed principals タブを開き、Edit allowed principals をクリックします\n4. 信頼されていないすべてのエントリ（ワイルドカード（*）を含む）を削除します\n5. 必要に応じて、リストを空のまま（principal なし）にするか、信頼されたアカウント ID/ARN のみを残します\n6. 変更を保存します",
+      "Terraform": "```hcl\n#信頼されたプリンシパルのみを許可します（許可しない場合はこのリソースを削除してください）\nresource \"aws_vpc_endpoint_service_allowed_principal\" \"<example_resource_name>\" {\n  service_id    = \"<example_resource_id>\"\n  principal_arn = \"arn:aws:iam::<TRUSTED_ACCOUNT_ID>:root\"  #重大: この信頼されたアカウントのみがエンドポイントを作成できます\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "**最小権限**を適用する: **許可されたプリンシパル**を審査済みのアカウントIDに制限し、`*`を避ける。中央の信頼レジストリを維持し、承認ワークフローによって**職務の分離**を徹底し、エントリを定期的に見直す。強力なサービス認証と継続的な構成監視により、**多層防御**を使用する。",
+      "Url": "https://hub.prowler.com/check/vpc_endpoint_services_allowed_principals_trust_boundaries"
+    }
+  },
+  "Categories": [
+    "trust-boundaries"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

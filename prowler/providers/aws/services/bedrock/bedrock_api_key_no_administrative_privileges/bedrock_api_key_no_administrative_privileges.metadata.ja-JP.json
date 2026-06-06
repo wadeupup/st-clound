@@ -1,0 +1,38 @@
+{
+  "Provider": "aws",
+  "CheckID": "bedrock_api_key_no_administrative_privileges",
+  "CheckTitle": "Amazon Bedrock APIキーに管理権限または権限昇格がないことを確認",
+  "CheckType": [
+    "Software and Configuration Checks",
+    "Industry and Regulatory Standards"
+  ],
+  "ServiceName": "bedrock",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:iam:region:account-id:user/{user-name}/credential/{api-key-id}",
+  "Severity": "high",
+  "ResourceType": "AwsIamServiceSpecificCredential",
+  "ResourceGroup": "IAM",
+  "Description": "Amazon Bedrock APIキーに管理権限または権限昇格機能がないことを確認します。管理権限を持つAPIキーは、AWS環境内の任意のリソースに対して任意のアクションを実行でき、権限昇格によりユーザーは自分に追加の権限を付与できます。どちらも重大なセキュリティリスクをもたらします。",
+  "Risk": "管理権限を持つAmazon Bedrock APIキーは、AWS環境内の任意のリソースに対して任意のアクションを実行できます。権限昇格機能により、ユーザーは意図した範囲を超えて追加の権限を自分に付与できます。最小権限の原則に違反するこれらの両方が、セキュリティの脆弱性、データ漏洩、データ損失、またはAPIキーが侵害または悪用された場合の予期しない費用につながる可能性があります。",
+  "RelatedUrl": "https://docs.aws.amazon.com/bedrock/latest/userguide/api-keys.html",
+  "Remediation": {
+    "Code": {
+      "CLI": "aws iam delete-service-specific-credential --user-name <username> --service-specific-credential-id <credential-id>",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "Amazon Bedrock APIキーに最小権限の原則を適用します。管理権限や権限昇格機能を付与するのではなく、特定のタスクに必要な権限のみを割り当てます。最小権限の原則に基づいて、最小限の権限を持つカスタムIAMポリシーを作成します。APIキーの権限を定期的に確認および監査し、権限昇格に使用できないことを確認します。",
+      "Url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html#grant-least-privilege"
+    }
+  },
+  "Categories": [
+    "gen-ai",
+    "trust-boundaries"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "このチェックは、Amazon Bedrock APIキーが、添付されたIAMポリシーまたはインラインポリシーを通じて管理権限または権限昇格機能を持たないことを確認します。最小権限の原則に従い、APIキーが最小限の必要な権限のみを持ち、権限昇格に使用できないことを保証します。"
+}
+

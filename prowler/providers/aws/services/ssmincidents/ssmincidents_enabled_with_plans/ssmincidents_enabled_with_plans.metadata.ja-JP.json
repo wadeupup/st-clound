@@ -1,0 +1,39 @@
+{
+  "Provider": "aws",
+  "CheckID": "ssmincidents_enabled_with_plans",
+  "CheckTitle": "SSM Incidents のレプリケーションセットは ACTIVE であり、少なくとも 1 つのレスポンスプランがあります",
+  "CheckType": [
+    "ソフトウェアと構成チェック/AWSセキュリティのベストプラクティス",
+    "ソフトウェアおよび構成のチェック/業界および規制基準/NIST CSF コントロール（米国）"
+  ],
+  "ServiceName": "ssmincidents",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "monitoring",
+  "Description": "**Incident Manager** は **レプリケーションセット** と **対応計画** を使用します。これは、レプリケーションセットが存在し、`ACTIVE` であること、および調整されたインシデント対応のために少なくとも 1 つの対応計画が設定されていることを評価します。",
+  "Risk": "`ACTIVE` のレプリケーションセットや対応計画がないと、インシデントでは調整された対応や自動化が欠如し、MTTR が増加し、可用性と完全性に影響を及ぼします。\n\n脅威には、封じ込めの遅れや誤ったエスカレーション経路に起因する、長時間の停止、ラテラルムーブメント、データ流出が含まれます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/incident-manager/latest/userguide/response-plans.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation: 最小限の Incident Manager レスポンスプランを作成する\nResources:\n  ResponsePlan:\n    Type: AWS::SSMIncidents::ResponsePlan\n    Properties:\n      Name: <example_resource_name>  # 重要：少なくとも1つのレスポンスプランが存在することを保証します\n      IncidentTemplate:              # 重要: 応答計画に必要なテンプレート\n        Title: <example_title>       # 重大: 必須\n        Impact: 5                    # 重大度: 必須（1=最高、5=最低）\n```",
+      "Other": "1. AWS コンソールで、Systems Manager > Incident Manager に移動します\n2. Replication sets > Create replication set > 少なくとも 1 つの Region を追加 > Create; Status が ACTIVE になるまで待ちます\n3. Response plans > Create response plan > Name、Title、Impact を設定 > Create\n4. 確認: Replication set が ACTIVE を示し、少なくとも 1 つの response plan が存在します",
+      "Terraform": "```hcl\n# レプリケーションセットが存在し、ACTIVE になることを確認する\nresource \"aws_ssmincidents_replication_set\" \"example\" {\n  regions {                      # 重要: レプリケーションセットを作成してACTIVEにできるようにする\n    region_name = \"us-east-1\"\n  }\n}\n\n# 最小限の応答計画を作成する\nresource \"aws_ssmincidents_response_plan\" \"example\" {\n  name = \"<example_resource_name>\"  # 重要：少なくとも1つのレスポンスプランが存在することを保証します\n\n  incident_template {                # 重大: 必須 template for the plan\n    title  = \"<example_title>\"\n    impact = 5\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "`ACTIVE` の**レプリケーションセット**を確立し、エンゲージメント、エスカレーション、ランブック、重大度、およびコミュニケーションを定義する**レスポンスプラン**を作成します。\n\n自動化ロールには**最小権限**を適用し、プランを定期的にテストし、それらをトリガーするためにモニタリングと統合し、冗長な連絡先とリージョンを用いた**多層防御**を使用します。",
+      "Url": "https://hub.prowler.com/check/ssmincidents_enabled_with_plans"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

@@ -1,0 +1,45 @@
+{
+  "Provider": "aws",
+  "CheckID": "networkfirewall_policy_default_action_fragmented_packets",
+  "CheckTitle": "Network Firewall ポリシーはデフォルトで断片化されたパケットをドロップまたは転送します",
+  "CheckType": [
+    "ソフトウェアと構成のチェック/AWS セキュリティベストプラクティス/ネットワーク到達可能性",
+    "ソフトウェアと構成のチェック/業界および規制基準/AWS 基礎セキュリティベストプラクティス",
+    "ソフトウェアと構成のチェック/業界および規制基準/NIST 800-53 コントロール (米国)",
+    "TTPs/防御回避"
+  ],
+  "ServiceName": "networkfirewall",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsNetworkFirewallFirewall",
+  "ResourceGroup": "network",
+  "Description": "**Network Firewall ポリシー**は、`StatelessFragmentDefaultActions` 設定が **断片化された UDP パケット**に対して `aws:drop` または `aws:forward_to_sfe` を使用していることを確認するために評価されます。",
+  "Risk": "**断片化された UDP** に `aws:pass` を使用すると、検査されていないトラフィックがファイアウォールを通過することができます。攻撃者は断片化を通じてフィルターを回避し、**データの流出**（機密性）、ペイロードの密輸や横方向の移動（完全性）、およびサービスに負担をかける断片フラッド（可用性）を可能にします。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/network-firewall/latest/APIReference/API_FirewallPolicy.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/networkfirewall-controls.html#networkfirewall-5",
+    "https://docs.aws.amazon.com/network-firewall/latest/developerguide/firewall-policy-updating.html",
+    "https://docs.aws.amazon.com/network-firewall/latest/developerguide/stateless-default-actions.html",
+    "https://docs.aws.amazon.com/config/latest/developerguide/netfw-policy-default-action-fragment-packets.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\nResources:\n  <example_resource_name>:\n    Type: AWS::NetworkFirewall::FirewallPolicy\n    Properties:\n      FirewallPolicyName: <example_resource_name>\n      FirewallPolicy:\n        StatelessDefaultActions:\n          - aws:drop\n        StatelessFragmentDefaultActions:\n          - aws:drop  # 重要: チェックを通過するために、断片化された UDP パケットがデフォルトでドロップされることを保証します\n```",
+      "Other": "1. Amazon VPC コンソールを開き、Network Firewall > Firewall policies に移動します\n2. 編集するポリシーを選択し、編集を選択します\n3. ステートレスのデフォルトアクションの下で、断片化されたパケットを見つけます\n4. アクションをドロップ（またはステートフルルールグループに転送）に設定します\n5. 変更を保存します",
+      "Terraform": "```hcl\nresource \"aws_networkfirewall_firewall_policy\" \"<example_resource_name>\" {\n  name = \"<example_resource_name>\"\n\n  firewall_policy {\n    stateless_default_actions          = [\"aws:drop\"]\n    stateless_fragment_default_actions = [\"aws:drop\"]  # 重要: チェックを通過するために、断片化された UDP パケットをデフォルトでドロップします\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "`StatelessFragmentDefaultActions` を `aws:drop` または `aws:forward_to_sfe` に設定して、断片がブロックされるか、**ステートフル検査**に送信されるようにします。トラフィックフローに対して**最小特権**を適用し、ルールグループで**多層防御**を使用し、異常な断片化をログで監視します。",
+      "Url": "https://hub.prowler.com/check/networkfirewall_policy_default_action_fragmented_packets"
+    }
+  },
+  "Categories": [
+    "trust-boundaries"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

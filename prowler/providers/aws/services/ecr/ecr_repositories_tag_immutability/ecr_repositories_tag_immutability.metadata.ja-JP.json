@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "ecr_repositories_tag_immutability",
+  "CheckTitle": "ECR リポジトリでイメージタグの不変性が有効になっている",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices"
+  ],
+  "ServiceName": "ecr",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsEcrRepository",
+  "ResourceGroup": "container",
+  "Description": "Amazon ECR リポジトリは **イメージタグの不変性** について評価されます。タグの更新を許可する（`MUTABLE`）リポジトリが識別され、不変タグ（`IMMUTABLE` など）を強制するリポジトリが認識されます。",
+  "Risk": "可変タグにより、信頼されたタグの背後にあるイメージを置き換えることができ、リリースの **整合性** を損ないます。これにより、サプライチェーン注入、意図しないロールアウト、バックドア付きデプロイメントが可能になり、**可用性** が損なわれます。悪意のあるイメージがデータを窃取し、**機密性** に影響を与える可能性があります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/config/latest/developerguide/ecr-private-tag-immutability-enabled.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/ecr-controls.html#ecr-2",
+    "https://docs.aws.amazon.com/AmazonECR/latest/userguide/image-tag-mutability.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws ecr put-image-tag-mutability --repository-name <repository-name> --image-tag-mutability IMMUTABLE",
+      "NativeIaC": "```yaml\nResources:\n  <example_resource_name>:\n    Type: AWS::ECR::Repository\n    Properties:\n      ImageTagMutability: IMMUTABLE  # Critical: enables tag immutability to prevent tag overwrites\n```",
+      "Other": "1. Amazon ECR コンソールを開きます\n2. リポジトリ（プライベート）に移動し、リポジトリを選択します\n3. 操作 > 編集をクリックします\n4. イメージタグの不変性を不変に設定します\n5. 保存をクリックします",
+      "Terraform": "```hcl\nresource \"aws_ecr_repository\" \"<example_resource_name>\" {\n  name                 = \"<example_resource_name>\"\n  image_tag_mutability = \"IMMUTABLE\" # Critical: enables tag immutability to prevent tag overwrites\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "**タグの不変性** を有効にして、タグが単一のアーティファクトにマッピングされるようにします。ビルドごとに **バージョン化されたタグ** を使用し、CI/CD で再タグ付けをブロックし、プッシュアクションに **最小権限** を適用します。**イメージ署名** とアドミッション制御を階層化して、信頼されたイメージのみを実行します。*例外が必要な場合は、範囲を狭く保ち、監視します。*",
+      "Url": "https://hub.prowler.com/check/ecr_repositories_tag_immutability"
+    }
+  },
+  "Categories": [
+    "container-security"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

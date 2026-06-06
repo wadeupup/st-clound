@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "sagemaker_endpoint_config_prod_variant_instances",
+  "CheckTitle": "SageMaker 端点配置中的所有生产变体都至少具有两个初始实例",
+  "CheckType": [
+    "软件和配置检查/AWS安全最佳实践",
+    "影响/拒绝服务"
+  ],
+  "ServiceName": "sagemaker",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "ai_ml",
+  "Description": "Amazon SageMaker 端点配置会被评估，以确保每个生产变体都使用至少两个的**初始实例数量**。会识别出基于实例的端点中 `InitialInstanceCount` 小于两个的变体，这表明没有内置的多可用区冗余。",
+  "Risk": "**单实例变体**是**单点故障**。如果该实例或其可用区发生故障，推理将变得不可用，导致**服务中断**、**违反 SLA**以及依赖系统中的**级联故障**。这主要会降低**可用性**和可靠性。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/sagemaker-controls.html#sagemaker-4",
+    "https://docs.aws.amazon.com/config/latest/developerguide/sagemaker-endpoint-config-prod-instance-count.html",
+    "https://docs.aws.amazon.com/sagemaker/latest/dg/serverless-endpoints-create.html#serverless-endpoints-create-config"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws sagemaker delete-endpoint-config --endpoint-config-name <endpoint-config-name>",
+      "NativeIaC": "```yaml\n# CloudFormation：InitialInstanceCount > 1 的 EndpointConfig\nResources:\n  <example_resource_name>:\n    Type: AWS::SageMaker::EndpointConfig\n    Properties:\n      ProductionVariants:\n        - VariantName: <example_resource_name>\n          ModelName: <example_resource_name>\n          InstanceType: ml.m5.large\n          InitialInstanceCount: 2  # 关键：设置为 >=2，这样所有变体一开始至少有两个实例\n```",
+      "Other": "1. 在 AWS 控制台中，转到 SageMaker > 推理 > 端点配置\n2. 单击“创建端点配置”，并添加每个生产变体，将“初始实例计数”设置为 2\n3. 如果任何端点使用旧配置，请转到 SageMaker > 推理 > 端点，选择该端点，选择“更新”，然后选择新的端点配置\n4. 返回“端点配置”并删除不合规的配置",
+      "Terraform": "```hcl\n# 具有 InitialInstanceCount > 1 的 SageMaker 端点配置\nresource \"aws_sagemaker_endpoint_configuration\" \"<example_resource_name>\" {\n  production_variants {\n    variant_name           = \"<example_resource_name>\"\n    model_name             = \"<example_resource_name>\"\n    instance_type          = \"ml.m5.large\"\n    initial_instance_count = 2 # 关键：设置为 >=2，这样该变体才能通过检查\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "应用**弹性**原则：\n- 以 `InitialInstanceCount >= 2` 运行每个生产变体\n- 通过基于健康状况的扩缩容将容量分布到各个可用区\n- 使用滚动/金丝雀更新以避免停机\n- 合理调整容量大小以容忍节点丢失\n\n*对于突发性工作负载，考虑使用无服务器或自动扩缩容来实现弹性。*",
+      "Url": "https://hub.prowler.com/check/sagemaker_endpoint_config_prod_variant_instances"
+    }
+  },
+  "Categories": [
+    "resilience",
+    "gen-ai"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

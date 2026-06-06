@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "cloudwatch_log_group_not_publicly_accessible",
+  "CheckTitle": "CloudWatch 日志组不可被公开访问",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices/Network Reachability",
+    "TTPs/Initial Access/Unauthorized Access",
+    "Effects/Data Exposure"
+  ],
+  "ServiceName": "cloudwatch",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Other",
+  "ResourceGroup": "monitoring",
+  "Description": "具有允许任意主体访问资源策略的 **CloudWatch 日志组** 会被识别。使用 `Principal:\"*\"` 或在引用日志组 ARN 时使用通配 `Resource` 的语句，表明该日志组通过公共策略暴露。",
+  "Risk": "对日志组的公共访问使未授权日志读取成为可能，会暴露密钥和运行元数据，损害 **机密性**。如果允许广泛的操作，攻击者可以修改订阅或日志，从而破坏 **完整性** 并干扰审计证据的 **可用性**。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/iam-access-control-overview-cwl.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws logs delete-resource-policy --policy-name <policy-name>",
+      "NativeIaC": "```yaml\nResources:\n  <example_resource_name>:\n    Type: AWS::Logs::ResourcePolicy\n    Properties:\n      PolicyName: <example_resource_name>\n      PolicyDocument:\n        Version: '2012-10-17'\n        Statement:\n          - Effect: Allow\n            Principal:\n              AWS: \"<example_account_id>\"  # FIX: restrict to specific account (not *) to prevent public access\n            Action: logs:PutSubscriptionFilter\n            Resource: \"arn:aws:logs:<region>:<account-id>:destination:<example_resource_name>\"\n```",
+      "Other": "1. 打开 CloudWatch 控制台\n2. 转到 Logs > Resource policies\n3. 选择暴露日志组的策略（Principal 为 \"*\" 或 Resource 为 \"*\"）\n4. 单击删除并确认",
+      "Terraform": "```hcl\nresource \"aws_cloudwatch_log_resource_policy\" \"<example_resource_name>\" {\n  policy_name     = \"<example_resource_name>\"\n  policy_document = jsonencode({\n    Version   = \"2012-10-17\"\n    Statement = [{\n      Effect    = \"Allow\"\n      Principal = { AWS = \"<example_account_id>\" } # FIX: restrict Principal (not \"*\") to avoid public access\n      Action    = \"logs:PutSubscriptionFilter\"\n      Resource  = \"arn:aws:logs:<region>:<account-id>:destination:<example_resource_name>\"\n    }]\n  })\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "从日志组资源策略中移除公共访问。将 `Principal:\"*\"` 和 `Resource:\"*\"` 替换为范围更窄的主体和具体 ARN。仅授予必要操作，使用条件约束使用场景，并通过定期策略审查来实施 **最小权限原则** 和 **职责分离**。",
+      "Url": "https://hub.prowler.com/check/cloudwatch_log_group_not_publicly_accessible"
+    }
+  },
+  "Categories": [
+    "internet-exposed",
+    "identity-access"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+
+

@@ -1,0 +1,35 @@
+{
+  "Provider": "aws",
+  "CheckID": "iam_user_no_setup_initial_access_key",
+  "CheckTitle": "在为所有具有控制台密码的 IAM 用户进行初始用户设置时，不要设置访问密钥",
+  "CheckType": [
+    "软件和配置检查",
+    "行业和监管标准",
+    "CIS AWS 基础基准"
+  ],
+  "ServiceName": "iam",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "medium",
+  "ResourceType": "AwsIamAccessKey",
+  "ResourceGroup": "IAM",
+  "Description": "在为所有具有控制台密码的 IAM 用户进行初始用户设置时，不要设置访问密钥",
+  "Risk": "AWS 控制台默认启用创建访问密钥的复选框。这导致许多访问密钥被不必要地生成。除了不必要的凭证外，还会在审计和轮换这些密钥时产生不必要的管理工作。要求用户在其配置文件创建后采取额外步骤，将更强烈地表明访问密钥对其工作是（a）必要的，并且（b）一旦在账户上建立访问密钥，这些密钥可能在组织中的某处使用。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "从 IAM 控制台：生成凭证报告并禁用不需要的密钥。",
+      "Url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_getting-report.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "CAF 安全史诗：IAM"
+}

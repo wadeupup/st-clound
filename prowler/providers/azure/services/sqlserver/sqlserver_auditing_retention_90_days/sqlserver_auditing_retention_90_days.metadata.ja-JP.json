@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "sqlserver_auditing_retention_90_days",
+  "CheckTitle": "'Auditing' の保持期間が '90 日より長い' ことを確認する",
+  "CheckType": [],
+  "ServiceName": "sqlserver",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "SQLServer",
+  "ResourceGroup": "database",
+  "Description": "SQL Server 監査保持期間は 90 日より長く設定する必要があります。",
+  "Risk": "監査ログは異常確認に利用でき、侵害の疑い、情報の不正利用、アクセスの不正利用に関する洞察を提供します。",
+  "RelatedUrl": "https://docs.microsoft.com/en-us/azure/sql-database/sql-database-auditing",
+  "Remediation": {
+    "Code": {
+      "CLI": "Set-AzSqlServerAudit -ResourceGroupName resource_group_name -ServerName SQL_Server_name -RetentionInDays 100 -LogAnalyticsTargetState Enabled -WorkspaceResourceId '/subscriptions/subscription_ID/resourceGroups/insights-integration/providers/Microsoft.OperationalInsights/workspaces/workspace_name'",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity-staging/knowledge-base/azure/Sql/auditing-retention.html#",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-logging-policies/bc_azr_logging_3"
+    },
+    "Recommendation": {
+      "Text": "1. SQL servers に移動します。2. 各サーバー インスタンスで。3. Auditing をクリックします。4. storage が選択されている場合は Advanced properties を展開します。5. Retention (days) を 90 日より長く、または 0（無制限保持）に設定します。6. Save を選択します。",
+      "Url": "https://learn.microsoft.com/en-us/purview/audit-log-retention-policies"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

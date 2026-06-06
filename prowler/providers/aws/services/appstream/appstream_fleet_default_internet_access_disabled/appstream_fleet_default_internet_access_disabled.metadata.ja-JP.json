@@ -1,0 +1,44 @@
+{
+  "Provider": "aws",
+  "CheckID": "appstream_fleet_default_internet_access_disabled",
+  "CheckTitle": "AppStream フリートでデフォルトのインターネットアクセスが無効になっています",
+  "CheckType": [
+    "ソフトウェアと設定チェック/AWS セキュリティベストプラクティス/ネットワーク到達可能性",
+    "ソフトウェアと設定チェック/業界および規制基準/AWS 基礎セキュリティベストプラクティス",
+    "ソフトウェアと設定チェック/業界および規制基準/CIS AWS 基礎ベンチマーク"
+  ],
+  "ServiceName": "appstream",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "compute",
+  "Description": "**Amazon AppStream フリート**は、`EnableDefaultInternetAccess` 設定について評価され、ストリーミングインスタンスがデフォルトのインターネット接続を持つフリートを識別します。",
+  "Risk": "**直接インターネットアクセス**により、ストリーミングインスタンスがパブリックに露出します。脅威には以下が含まれます：\n- リモートエクスプロイトとマルウェア、**機密性**と**整合性**の低下\n- 制御されていないエグレスによる**データ流出**の可能性\n\nまた、約100インスタンスの制限を強制し、高同時実行性のデプロイメントの**可用性**を低下させます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/appstream2/latest/developerguide/set-up-stacks-fleets.html",
+    "https://support.icompaas.com/support/solutions/articles/62000233540-ensure-default-internet-access-from-your-amazon-appstream-fleet-streaming-instances-remains-unchecked",
+    "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-appstream-fleet.html",
+    "https://docs.aws.amazon.com/appstream2/latest/developerguide/internet-access.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws appstream update-fleet --name <example_resource_name> --no-enable-default-internet-access",
+      "NativeIaC": "```yaml\n# CloudFormation: AppStream フリートでデフォルトのインターネットアクセスを無効にします\nResources:\n  <example_resource_name>:\n    Type: AWS::AppStream::Fleet\n    Properties:\n      Name: <example_resource_name>\n      InstanceType: <INSTANCE_TYPE>\n      EnableDefaultInternetAccess: false  # 重要：デフォルトのインターネットアクセスを無効にしてチェックを通過します\n```",
+      "Other": "1. AWS コンソールで、Amazon AppStream 2.0 > Fleets に移動します\n2. ターゲットフリートを選択します\n3. フリートが RUNNING の場合、Actions > Stop をクリックし、状態が Stopped になるまで待ちます\n4. Edit（または Modify）をクリックします\n5. \"Default internet access\"（\"Enable default internet access\" を無効にする）のチェックを外します\n6. フリートを保存/更新し、必要に応じて起動します",
+      "Terraform": "```hcl\n# Terraform: AppStream フリートでデフォルトのインターネットアクセスを無効にします\nresource \"aws_appstream_fleet\" \"<example_resource_name>\" {\n  name          = \"<example_resource_name>\"\n  instance_type = \"stream.standard.small\"\n  image_name    = \"<IMAGE_NAME>\"\n  compute_capacity { desired_instances = 1 }\n\n  enable_default_internet_access = false  # 重要：デフォルトのインターネットアクセスを無効にしてチェックを通過します\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "デフォルトのインターネットアクセスを無効にし（`EnableDefaultInternetAccess=false`）、フリートを**プライベートサブネット**に配置します。**NAT ゲートウェイ**またはプロキシを介してエグレスを提供し、**エグレスフィルタリング**を強制し、**最小権限**と**ゼロトラスト**を適用してアウトバウンドトラフィックを制限します。可能な限り AWS サービスへのプライベート接続を使用します。",
+      "Url": "https://hub.prowler.com/check/appstream_fleet_default_internet_access_disabled"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "Infrastructure Security"
+}
+

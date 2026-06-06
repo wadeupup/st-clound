@@ -1,0 +1,33 @@
+{
+  "Provider": "azure",
+  "CheckID": "storage_ensure_encryption_with_customer_managed_keys",
+  "CheckTitle": "确保 Microsoft Azure 存储账户使用客户管理密钥（CMKs）而非 Microsoft 管理密钥",
+  "CheckType": [],
+  "ServiceName": "storage",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AzureStorageAccount",
+  "ResourceGroup": "storage",
+  "Description": "确保 Microsoft Azure 存储账户使用客户管理密钥（CMKs）而非 Microsoft 管理密钥",
+  "Risk": "若你希望自行控制并管理存储账户内容的加密密钥，则必须指定客户管理密钥。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/StorageAccounts/cmk-encryption.html",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-general-policies/ensure-that-storage-accounts-use-customer-managed-key-for-encryption#terraform"
+    },
+    "Recommendation": {
+      "Text": "在静态数据加密场景中，使用客户管理密钥而不是 Microsoft 管理密钥。",
+      "Url": ""
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

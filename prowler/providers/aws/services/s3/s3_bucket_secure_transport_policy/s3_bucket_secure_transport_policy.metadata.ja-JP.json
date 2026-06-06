@@ -1,0 +1,35 @@
+{
+  "Provider": "aws",
+  "CheckID": "s3_bucket_secure_transport_policy",
+  "CheckTitle": "S3バケットに安全な転送ポリシーがあるか確認してください。",
+  "CheckType": [
+    "データ保護"
+  ],
+  "ServiceName": "s3",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:s3:::bucket_name",
+  "Severity": "medium",
+  "ResourceType": "AwsS3Bucket",
+  "ResourceGroup": "storage",
+  "Description": "S3バケットに安全な転送ポリシーがあるか確認してください。",
+  "Risk": "バケットポリシーでHTTPSが強制されていない場合、クライアントとS3バケット間の通信で暗号化されていないHTTPが使用される可能性があります。その結果、機密情報がネットワークまたはインターネット上で平文のまま送信されるおそれがあります。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://docs.prowler.com/checks/aws/s3-policies/s3_15-secure-data-transport#aws-console",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "S3 バケットで転送中の暗号化が有効になっていることを確認してください。",
+      "Url": "https://aws.amazon.com/premiumsupport/knowledge-center/s3-bucket-policy-for-config-rule/"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

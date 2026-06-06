@@ -1,0 +1,45 @@
+{
+  "Provider": "aws",
+  "CheckID": "transfer_server_in_transit_encryption_enabled",
+  "CheckTitle": "Transfer Family 服务器已启用传输中加密",
+  "CheckType": [
+    "软件和配置检查/AWS安全最佳实践",
+    "软件和配置检查/行业和监管标准/AWS 基础安全最佳实践",
+    "软件和配置检查/行业和监管标准/NIST 800-53 控制措施",
+    "软件和配置检查/行业和监管标准/PCI-DSS",
+    "软件和配置检查/行业和监管标准/HIPAA 控制（美国）",
+    "影响/数据暴露"
+  ],
+  "ServiceName": "transfer",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Other",
+  "ResourceGroup": "storage",
+  "Description": "**AWS Transfer Family 服务器**将根据启用的协议中是否存在未加密的 `FTP` 协议进行评估，而不是使用 SFTP、FTPS 或 AS2 等加密选项。",
+  "Risk": "允许使用 **FTP** 会以明文暴露凭据和文件内容，从而破坏机密性。攻击者可以通过嗅探或执行 **MITM** 来读取或篡改文件，破坏完整性，并造成凭据被盗，而这些凭据可被重复利用以获得更广泛的未授权访问。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/config/latest/developerguide/transfer-family-server-no-ftp.html",
+    "https://docs.aws.amazon.com/transfer/latest/userguide/edit-server-config.html#edit-protocols",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/transfer-controls.html#transfer-2"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws transfer update-server --server-id <server-id> --protocols SFTP",
+      "NativeIaC": "```yaml\n# CloudFormation：确保未启用 FTP\nResources:\n  <example_resource_name>:\n    Type: AWS::Transfer::Server\n    Properties:\n      Protocols:\n        - SFTP  # 关键：仅使用 SFTP；不包括 FTP（未加密）\n```",
+      "Other": "1. 打开 AWS 控制台 > AWS Transfer Family\n2. 转到 Servers 并选择服务器（<example_resource_id>）\n3. 点击 Protocols 旁边的 Edit\n4. 取消勾选 FTP，并确保至少选择了 SFTP（或 FTPS/AS2）\n5. 保存",
+      "Terraform": "```hcl\n# 确保未启用 FTP\nresource \"aws_transfer_server\" \"<example_resource_name>\" {\n  protocols = [\"SFTP\"]  # 关键：排除 FTP 以强制传输中加密\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "移除 `FTP`；仅允许 **SFTP**、**FTPS** 或 **AS2**，以强制实施**传输中加密**。\n\n采用纵深防御：按网络位置限制（allowlists/VPC），强制执行强加密策略，并结合监控使用最小权限角色。",
+      "Url": "https://hub.prowler.com/check/transfer_server_in_transit_encryption_enabled"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

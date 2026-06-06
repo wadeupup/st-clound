@@ -1,0 +1,38 @@
+{
+  "Provider": "aws",
+  "CheckID": "resourceexplorer2_indexes_found",
+  "CheckTitle": "Resource Explorer のインデックスは存在します",
+  "CheckType": [
+    "ソフトウェアと構成チェック/AWSセキュリティのベストプラクティス"
+  ],
+  "ServiceName": "resourceexplorer2",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "low",
+  "ResourceType": "Other",
+  "ResourceGroup": "governance",
+  "Description": "**AWS Resource Explorer** には、アカウント内にユーザー所有の **インデックス** が存在します。この評価では、リソースのカタログ化と検索のために、有効化されているいずれかのリージョンに少なくとも 1 つのインデックスが存在するかどうかを判定します。",
+  "Risk": "インデックスが欠如していると資産の可視性が低下し、設定ミスのある、または孤立したリソースが気付かれないままになる死角が生まれます。これにより、**機密性**（見えない公開露出）、**完全性**（不正な変更が検知されない）、および**可用性**（封じ込めと復旧の遅延）が損なわれ、インシデント対応が長引き、ラテラルムーブメントを許すことになります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/resource-explorer/latest/userguide/manage-service-turn-on-region.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws resource-explorer-2 create-index --region <REGION>",
+      "NativeIaC": "```yaml\nResources:\n  <example_resource_name>:\n    Type: AWS::ResourceExplorer2::Index\n    Properties:\n      Type: LOCAL  # 重大: チェックで少なくとも1つのインデックスが見つかるように、このリージョンにローカルインデックスを作成します\n```",
+      "Other": "1. AWSマネジメントコンソールにサインインし、**AWS Resource Explorer** を開きます\n2. **Settings** > **Indexes** に移動します\n3. **Create indexes** をクリックします\n4. 現在のリージョンを選択し、**Create indexes** をクリックします\n5. インデックスの状態がACTIVEになるまで待ちます",
+      "Terraform": "```hcl\nresource \"aws_resourceexplorer2_index\" \"<example_resource_name>\" {\n  type = \"LOCAL\"  # 重大: チェックが通るようにローカルインデックスを作成する\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "すべてのアクティブなリージョンで**Resource Explorer インデックス**を作成し、クロスリージョン検索のための**アグリゲーターインデックス**を指定してください。ビューには最小権限アクセスを適用し、タグ付け標準に整合させ、インデックス作成ステータスを定期的に確認してください。これにより、インベントリの精度が向上し、多層防御を支援し、検出と修復を迅速化できます。",
+      "Url": "https://hub.prowler.com/check/resourceexplorer2_indexes_found"
+    }
+  },
+  "Categories": [
+    "forensics-ready"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

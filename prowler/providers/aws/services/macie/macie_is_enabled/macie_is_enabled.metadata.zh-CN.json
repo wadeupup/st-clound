@@ -1,0 +1,40 @@
+{
+  "Provider": "aws",
+  "CheckID": "macie_is_enabled",
+  "CheckTitle": "Amazon Macie 已启用",
+  "CheckType": [
+    "软件和配置检查/行业和法规标准/AWS 基础安全最佳实践",
+    "软件和配置检查/AWS 安全最佳实践"
+  ],
+  "ServiceName": "macie",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "security",
+  "Description": "**Amazon Macie** 的状态根据每个区域的 **S3** 存在情况进行评估，以确定敏感数据发现是否正常运行。结果反映 Macie 是否在账户和区域中处于活动状态或 `PAUSED`/未启用状态。",
+  "Risk": "如果没有激活 Macie，**S3** 中的敏感数据可能会保持未分类和暴露状态。配置错误的访问和公共存储桶可能未被检测到，从而导致数据泄露和秘密泄漏。这会降低机密性，并通过减少对敏感数据所在位置的可见性来扩大泄露影响范围。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://aws.amazon.com/macie/getting-started/"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws macie2 enable-macie --region <REGION>",
+      "NativeIaC": "```yaml\n# CloudFormation：在此区域启用 Amazon Macie\nResources:\n  MacieSession:\n    Type: AWS::Macie::Session\n    Properties:\n      Status: ENABLED  # 关键：为此区域的账户启用 Macie\n```",
+      "Other": "1. 登录 AWS 管理控制台并切换到目标区域\n2. 打开 Amazon Macie\n3. 点击开始使用或启用 Macie\n4. 如果 Macie 显示为暂停/暂停状态，点击恢复 Macie\n5. 在每个有 S3 存储桶的区域重复上述步骤",
+      "Terraform": "```hcl\n# 在此区域启用 Amazon Macie\nresource \"aws_macie2_account\" \"main\" {\n  # 关键：创建此资源为该区域的账户启用 Macie\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "在托管 **S3** 数据的所有区域启用并维护 **Amazon Macie**。使用持续的敏感数据发现，为您的数据类型应用自定义分类，并将发现结果路由到监控。为 Macie 访问实施最小权限，并通过限制性存储桶策略和访问控制加强深度防御。",
+      "Url": "https://hub.prowler.com/check/macie_is_enabled"
+    }
+  },
+  "Categories": [
+    "secrets",
+    "forensics-ready"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

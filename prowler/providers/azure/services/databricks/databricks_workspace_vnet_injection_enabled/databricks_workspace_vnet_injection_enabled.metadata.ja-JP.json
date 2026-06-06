@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "databricks_workspace_vnet_injection_enabled",
+  "CheckTitle": "Azure Databricks ワークスペースがカスタマー管理 VNet（VNet Injection）にデプロイされていることを確認する",
+  "CheckType": [],
+  "ServiceName": "databricks",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Databricks/workspaces/{workspaceName}",
+  "Severity": "medium",
+  "ResourceType": "AzureDatabricksWorkspace",
+  "ResourceGroup": "ai_ml",
+  "Description": "Azure Databricks ワークスペースが Databricks 管理 VNet ではなく、カスタマー管理の仮想ネットワーク（VNet Injection）にデプロイされているかを確認します。",
+  "Risk": "Databricks 管理 VNet を使用すると、ネットワーク セキュリティ ポリシー、ファイアウォール構成、ルーティングの制御が制限され、不正アクセスやデータ流出のリスクが高まります。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/databricks/administration-guide/cloud-configurations/azure/vnet-inject",
+  "Remediation": {
+    "Code": {
+      "CLI": "az databricks workspace create --name <databricks-workspace-name> --resource-group <resource-group-name> --location <region> --managed-resource-group <managed-rg-name> --enable-no-public-ip true --network-security-group-rule \"NoAzureServices\" --public-network-access Disabled --custom-virtual-network-id /subscriptions/<subscription-id>/resourceGroups/<resource-group-name>/providers/Microsoft.Network/virtualNetworks/<vnet-name>",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "Databricks ワークスペースをカスタマー管理 VNet にデプロイし、ネットワーク セキュリティとコンプライアンスに対する制御を強化してください。",
+      "Url": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/Databricks/check-for-vnet-injection.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

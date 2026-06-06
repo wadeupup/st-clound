@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "defender_ensure_defender_for_os_relational_databases_is_on",
+  "CheckTitle": "Microsoft Defender for Open-Source Relational Databases が「オン」に設定されていることを確認する",
+  "CheckType": [],
+  "ServiceName": "defender",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AzureDefenderPlan",
+  "ResourceGroup": "security",
+  "Description": "Microsoft Defender for Open-Source Relational Databases が「オン」に設定されていることを確認する",
+  "Risk": "Microsoft Defender for Open-source relational databases を有効化すると、オープンソース リレーショナル データベース向けの脅威検知が有効になり、Microsoft Defender for Cloud において脅威インテリジェンス、異常検知、振る舞い分析を提供します。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "Microsoft Defender for Open-source relational databases を有効化することで、Microsoft Security Response Center (MSRC) が提供する脅威検知を活用した、より強固な多層防御を実現できます。",
+      "Url": ""
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

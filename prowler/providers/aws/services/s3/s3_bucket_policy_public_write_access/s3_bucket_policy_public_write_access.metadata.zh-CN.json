@@ -1,0 +1,35 @@
+{
+  "Provider": "aws",
+  "CheckID": "s3_bucket_policy_public_write_access",
+  "CheckTitle": "检查 S3 存储桶是否具有允许写入访问的策略。",
+  "CheckType": [
+    "IAM"
+  ],
+  "ServiceName": "s3",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:s3:::bucket_name",
+  "Severity": "critical",
+  "ResourceType": "AwsS3Bucket",
+  "ResourceGroup": "storage",
+  "Description": "检查 S3 存储桶是否具有允许写入访问的策略。",
+  "Risk": "非预期用户可以将对象放入给定的存储桶中。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://docs.prowler.com/checks/aws/s3-policies/s3_18-write-permissions-public#aws-console",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "确保已设置适当的存储桶策略，并应用最小权限原则。",
+      "Url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_examples_s3_rw-bucket.html"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

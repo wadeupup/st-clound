@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "eks_cluster_private_nodes_enabled",
+  "CheckTitle": "EKS 集群已启用私有端点访问",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices/Network Reachability",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "TTPs/Initial Access/Unauthorized Access"
+  ],
+  "ServiceName": "eks",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsEksCluster",
+  "ResourceGroup": "container",
+  "Description": "**Amazon EKS 集群**已为 **Kubernetes API 服务器**启用 **私有端点访问**，允许控制平面流量使用 VPC 解析的私有端点。\n\n该检查评估集群的 `endpointPrivateAccess` 设置。",
+  "Risk": "如果没有 **私有端点访问**，API 服务器会暴露在公共互联网上。这会扩大攻击面并削弱 **机密性**和 **完整性**：被盗用的凭据或错误配置的 CIDR 可能启用未经授权的 API 调用、密钥读取、Pod 部署和配置更改。**可用性**也依赖于互联网出口，增加了故障模式。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/eks/latest/userguide/private-clusters.html",
+    "https://docs.aws.amazon.com/eks/latest/userguide/cluster-endpoint.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws eks update-cluster-config --region <REGION> --name <CLUSTER_NAME> --resources-vpc-config endpointPrivateAccess=true",
+      "NativeIaC": "```yaml\n# CloudFormation: Enable private endpoint access for an EKS cluster\nResources:\n  <example_resource_name>:\n    Type: AWS::EKS::Cluster\n    Properties:\n      RoleArn: <example_resource_id>\n      ResourcesVpcConfig:\n        SubnetIds:\n          - <example_resource_id>\n        EndpointPrivateAccess: true  # Critical: enables private endpoint access to pass the check\n```",
+      "Other": "1. 在 AWS 控制台中，打开 Amazon EKS 并选择您的集群\n2. 转到网络选项卡\n3. 点击集群端点访问旁边的编辑\n4. 启用私有访问\n5. 点击保存",
+      "Terraform": "```hcl\n# Terraform: Enable private endpoint access for an EKS cluster\nresource \"aws_eks_cluster\" \"<example_resource_name>\" {\n  name     = \"<example_resource_name>\"\n  role_arn = \"<example_resource_id>\"\n\n  vpc_config {\n    subnet_ids              = [\"<example_resource_id>\"]\n    endpoint_private_access = true  # Critical: enables private API endpoint access to pass the check\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "启用 **私有端点访问**，并禁用或严格限制公共端点。\n\n要求从私有网络进行管理，通过 IAM/RBAC 强制执行 **最小权限**，并通过分段和日志记录应用 **纵深防御**。*如果需要外部访问*，仅允许特定的 CIDR 并监控 API 活动。",
+      "Url": "https://hub.prowler.com/check/eks_cluster_private_nodes_enabled"
+    }
+  },
+  "Categories": [
+    "internet-exposed",
+    "trust-boundaries"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "启用私有节点会限制对公共互联网的出站访问。如果需要出站互联网访问，可以使用 Cloud NAT 或 NAT 网关。"
+}
+

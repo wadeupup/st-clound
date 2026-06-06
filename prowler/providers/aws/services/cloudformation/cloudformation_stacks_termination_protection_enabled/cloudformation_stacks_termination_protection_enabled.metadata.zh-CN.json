@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "cloudformation_stacks_termination_protection_enabled",
+  "CheckTitle": "CloudFormation 堆栈已启用终止保护",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Effects/Data Destruction"
+  ],
+  "ServiceName": "cloudformation",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsCloudFormationStack",
+  "ResourceGroup": "devops",
+  "Description": "**AWS CloudFormation 根堆栈**会被评估是否启用了**终止保护**。检测会识别是否启用了 `termination protection` 以阻止非嵌套堆栈的堆栈删除。",
+  "Risk": "没有**终止保护**，人为错误或自动化可能删除整个堆栈，导致立即的**可用性**损失和托管资源的潜在**数据销毁**。\n\n具有删除权限的攻击者可以更容易地触发中断并阻碍恢复。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-protect-stacks.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/CloudFormation/stack-termination-protection.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws cloudformation update-termination-protection --stack-name <STACK_NAME> --enable-termination-protection",
+      "NativeIaC": "",
+      "Other": "1. 打开 AWS CloudFormation 控制台\n2. 选择目标堆栈\n3. 选择堆栈操作 > 编辑终止保护\n4. 选择启用并保存",
+      "Terraform": "```hcl\nresource \"aws_cloudformation_stack\" \"<example_resource_name>\" {\n  name                           = \"<example_resource_name>\"\n  template_url                   = \"https://s3.amazonaws.com/<bucket>/<template>.json\"\n  enable_termination_protection  = true # 关键：启用终止保护以防止堆栈删除\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "为关键工作负载的根堆栈启用**终止保护**。对可以更改此设置或删除堆栈的人员强制执行**最小权限**，要求通过更改集进行**更改审查**，并应用**堆栈策略**以及数据存储的 `DeletionPolicy: Retain` 以实现纵深防御。",
+      "Url": "https://hub.prowler.com/check/cloudformation_stacks_termination_protection_enabled"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "Infrastructure Protection"
+}
+

@@ -1,0 +1,39 @@
+{
+  "Provider": "aws",
+  "CheckID": "kms_cmk_are_used",
+  "CheckTitle": "KMS カスタマーマネージドキーが有効化されているか、削除予定になっています",
+  "CheckType": [
+    "ソフトウェアと構成のチェック/AWS セキュリティベストプラクティス",
+    "ソフトウェアと構成のチェック/業界および規制基準/AWS 基礎セキュリティベストプラクティス"
+  ],
+  "ServiceName": "kms",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "low",
+  "ResourceType": "AwsKmsKey",
+  "ResourceGroup": "security",
+  "Description": "**カスタマーマネージド KMS キー**はキーの状態によって評価されます。`Enabled` のキーは使用中と見なされます。`Enabled` ではなく `PendingDeletion` でもないキーは未使用として識別され、`PendingDeletion` のキーは削除予定として認識されます。",
+  "Risk": "**未使用の CMK** を保持すると、**攻撃対象領域** と **コスト** が増加します。\n\nそのようなキーが再有効化されたり誤って設定されたりすると、意図しない復号を許可し、**機密性** に影響を与える可能性があります。未使用と誤認してキーを削除すると、**回復不能なデータ損失** を引き起こし、**可用性** に悪影響を及ぼす可能性があります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/kms/latest/developerguide/deleting-keys-determining-usage.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws kms enable-key --key-id <key_id>",
+      "NativeIaC": "```yaml\n# CloudFormation: KMS CMK が有効化されていることを確認\nResources:\n  <example_resource_name>:\n    Type: AWS::KMS::Key\n    Properties:\n      Enabled: true  # 重要: キーを有効化してその状態を \"Enabled\" にする (PASS)\n      KeyPolicy:\n        Version: '2012-10-17'\n        Statement:\n          - Sid: Enable IAM User Permissions\n            Effect: Allow\n            Principal:\n              AWS: !Sub arn:aws:iam::${AWS::AccountId}:root\n            Action: 'kms:*'\n            Resource: '*'\n```",
+      "Other": "1. AWS コンソールにサインインし、Key Management Service (KMS) を開く\n2. カスタマーマネージドキーに移動し、影響を受けたキーを選択\n3. キーアクション > 有効化 を選択\n4. キーを有効化することを確認",
+      "Terraform": "```hcl\n# Terraform: KMS CMK が有効化されていることを確認\nresource \"aws_kms_key\" \"<example_resource_name>\" {\n  is_enabled = true  # 重要: キーの状態を Enabled に設定する (PASS)\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "**キーライフサイクル**を採用する: ログ、所有者、タグで実際の使用を確認し、必要な場合のみキーを `Enabled` に保ち、それ以外は待機期間を設けて**削除をスケジュール**します。\n\nキーの有効化/無効化または削除には**最小特権**を適用し、承認を要求し、**職務分離**で KMS 活動を監視します。",
+      "Url": "https://hub.prowler.com/check/kms_cmk_are_used"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

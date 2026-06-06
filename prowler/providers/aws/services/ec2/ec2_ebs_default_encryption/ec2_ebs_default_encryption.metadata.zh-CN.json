@@ -1,0 +1,36 @@
+{
+  "Provider": "aws",
+  "CheckID": "ec2_ebs_default_encryption",
+  "CheckTitle": "检查是否启用了 EBS 默认加密",
+  "CheckType": [
+    "Data Protection"
+  ],
+  "ServiceName": "ec2",
+  "SubServiceName": "ebs",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "compute",
+  "Description": "检查是否启用了 EBS 默认加密",
+  "Risk": "如果未启用，静态敏感信息将不受保护",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "aws ec2 enable-ebs-encryption-by-default",
+      "NativeIaC": "",
+      "Other": "https://docs.prowler.com/checks/aws/general-policies/ensure-ebs-default-encryption-is-enabled#aws-console",
+      "Terraform": "https://docs.prowler.com/checks/aws/general-policies/ensure-ebs-default-encryption-is-enabled#terraform"
+    },
+    "Recommendation": {
+      "Text": "启用加密。尽可能使用 CMK。这将提供额外的管理和隐私优势。",
+      "Url": "https://aws.amazon.com/premiumsupport/knowledge-center/ebs-automatic-encryption/"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

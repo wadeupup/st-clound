@@ -1,0 +1,33 @@
+{
+  "Provider": "aws",
+  "CheckID": "iam_no_custom_policy_permissive_role_assumption",
+  "CheckTitle": "過度に許容的なロール引き受け（例: * に対する sts:AssumeRole）を許可するカスタム IAM ポリシーが存在しないことを確認する",
+  "CheckType": [
+    "Software and Configuration Checks"
+  ],
+  "ServiceName": "iam",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "high",
+  "ResourceType": "AwsIamPolicy",
+  "ResourceGroup": "IAM",
+  "Description": "過度に許容的なロール引き受け（例: * に対する sts:AssumeRole）を許可するカスタム IAM ポリシーが存在しないことを確認する",
+  "Risk": "制限されていない場合、意図しないアクセスが発生する可能性があります。",
+  "RelatedUrl": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_permissions-to-switch.html#roles-usingrole-createpolicy",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "権限を付与する際は最小権限の原則を使用してください。",
+      "Url": "https://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRole.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "CAF Security Epic: IAM"
+}

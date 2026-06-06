@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "wafv2_webacl_logging_enabled",
+  "CheckTitle": "AWS WAFv2 Web ACL 已启用日志记录",
+  "CheckType": [
+    "软件和配置检查/AWS安全最佳实践",
+    "软件和配置检查/行业和监管标准/AWS 基础安全最佳实践"
+  ],
+  "ServiceName": "wafv2",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsWafv2WebAcl",
+  "ResourceGroup": "security",
+  "Description": "启用**日志记录**的 **AWS WAFv2 Web ACL** 会捕获受检请求和规则评估的详细信息。该评估会确定每个 Web ACL 是否已配置日志记录，以记录由该 ACL 分析的流量。",
+  "Risk": "没有 **WAF 日志记录**，对已允许/已阻止请求的可见性将丧失，从而削弱检测与响应能力。**SQLi**、**凭证填充** 和 **bot/DDoS 探测** 可能在未被察觉的情况下发生，带来数据暴露风险（C）、未被发现的规则误用（I），以及因未被看见的滥用导致的服务不稳定（A）。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/WAF/enable-web-acls-logging.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/waf-controls.html#waf-11",
+    "https://docs.aws.amazon.com/cli/latest/reference/wafv2/put-logging-configuration.html",
+    "https://docs.aws.amazon.com/waf/latest/developerguide/logging.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws wafv2 put-logging-configuration --logging-configuration ResourceArn=<WEB_ACL_ARN>,LogDestinationConfigs=<DESTINATION_ARN>",
+      "NativeIaC": "```yaml\n# CloudFormation：为 WAFv2 Web ACL 启用日志记录\nResources:\n  <example_resource_name>:\n    Type: AWS::WAFv2::LoggingConfiguration\n    Properties:\n      ResourceArn: arn:aws:wafv2:<region>:<account-id>:regional/webacl/<example_resource_name>/<example_resource_id>  # 关键：将目标 Web ACL 记录日志\n      LogDestinationConfigs:  # 关键：日志发送到哪里\n        - arn:aws:logs:<region>:<account-id>:log-group:aws-waf-logs-<example_resource_name>\n```",
+      "Other": "1. 在 AWS 控制台中，前往 AWS WAF & Shield > Web ACLs\n2. 选择目标 Web ACL\n3. 打开 Logging and metrics（或 Logging）部分，然后点击 Enable logging\n4. 选择一个日志目标（CloudWatch Logs 日志组、S3 存储桶或 Kinesis Data Firehose）\n5. 点击 Save 以启用日志记录",
+      "Terraform": "```hcl\n# 为 WAFv2 Web ACL 启用日志记录\nresource \"aws_wafv2_web_acl_logging_configuration\" \"<example_resource_name>\" {\n  resource_arn           = \"<example_resource_arn>\"                 # 严重：目标 Web ACL ARN\n  log_destination_configs = [\"<example_destination_arn>\"]           # 严重：日志目标 ARN\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "在所有 WAFv2 Web ACL 上启用 **日志记录**，并将日志发送到集中式目标。对日志传输应用 **最小权限**，**编辑敏感字段**，并进行筛选以保留高价值事件。与监控/SIEM 集成以实现 **告警和关联分析**，并将其作为 **纵深防御** 的一部分进行例行审查。",
+      "Url": "https://hub.prowler.com/check/wafv2_webacl_logging_enabled"
+    }
+  },
+  "Categories": [
+    "logging"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

@@ -1,0 +1,40 @@
+{
+  "Provider": "aws",
+  "CheckID": "neptune_cluster_deletion_protection",
+  "CheckTitle": "Neptune クラスターには削除保護が有効になっています",
+  "CheckType": [
+    "ソフトウェアと構成のチェック/AWS セキュリティベストプラクティス",
+    "業界および規制基準/AWS 基礎セキュリティベストプラクティス",
+    "影響/データ破壊"
+  ],
+  "ServiceName": "neptune",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "database",
+  "Description": "Neptune DB クラスターには**削除保護**が有効になっています。",
+  "Risk": "**削除保護**がないと、**可用性**と**整合性**が弱まります。クラスターは、誤った管理者の操作、不正な自動化、または侵害された資格情報によって削除される可能性があります。\n\nクラスターの削除は、即時のサービス停止、潜在的なデータの永久的な損失、およびバックアップやリストアが不十分な場合の長時間の復旧時間を引き起こします。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/neptune-controls.html#neptune-4"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws neptune modify-db-cluster --db-cluster-identifier <DB_CLUSTER_IDENTIFIER> --deletion-protection --apply-immediately",
+      "NativeIaC": "```yaml\nResources:\n  NeptuneCluster:\n    Type: AWS::Neptune::DBCluster\n    Properties:\n      DBClusterIdentifier: <CLUSTER_ID>\n      DeletionProtection: true  # 誤ったまたは悪意のあるクラスター削除を防止します\n```",
+      "Terraform": "```hcl\nresource \"aws_neptune_cluster\" \"example_resource\" {\n  cluster_identifier  = \"<CLUSTER_ID>\"\n  deletion_protection = true  # 誤ったまたは悪意のあるクラスター削除を防止します\n}\n```",
+      "Other": "1. AWS マネジメントコンソールにサインインし、Amazon Neptune を開きます\n2. ナビゲーションペインで、データベースを選択します\n3. DB クラスターを選択し、[Modify] を選択します\n4. 削除保護を有効にします\n5. [Apply immediately]（表示されている場合）を選択し、その後 [Modify DB cluster] を選択します"
+    },
+    "Recommendation": {
+      "Text": "本番環境の Neptune クラスターに対して**削除保護**を有効にし、削除操作に対して**最小特権**と**職務分離**の原則を適用します。\n\n変更管理の承認を強制し、削除権限を監査されたロールに制限し、破壊的な操作を実行できる自動化されたワークフローを制限して、誤ったまたは悪意のある削除を防ぎます。",
+      "Url": "https://hub.prowler.com/check/neptune_cluster_deletion_protection"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

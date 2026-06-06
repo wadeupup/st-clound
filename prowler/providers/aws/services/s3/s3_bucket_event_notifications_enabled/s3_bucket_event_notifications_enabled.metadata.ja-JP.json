@@ -1,0 +1,33 @@
+{
+  "Provider": "aws",
+  "CheckID": "s3_bucket_event_notifications_enabled",
+  "CheckTitle": "S3 バケットでイベント通知が有効になっているか確認してください。",
+  "CheckType": [
+    "ソフトウェアおよび設定のチェック／業界および規制基準／NIST 800-53 管理策"
+  ],
+  "ServiceName": "s3",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:s3:::bucket_name",
+  "Severity": "medium",
+  "ResourceType": "AwsS3Bucket",
+  "ResourceGroup": "storage",
+  "Description": "S3 バケットでイベント通知が有効になっているかどうかを確認してください。",
+  "Risk": "イベント通知がないと、S3 バケット上の重要なアクションが見過ごされる可能性があり、データのセキュリティや可用性に影響を与える可能性のあるオブジェクトの作成、削除、または更新などの重大な変更に対して適時に対応する機会を逃すことにつながります。",
+  "RelatedUrl": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/notification-how-to-event-types-and-destinations.html#supported-notification-event-types",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://docs.aws.amazon.com/securityhub/latest/userguide/s3-controls.html#s3-11",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "すべてのS3汎用バケットでイベント通知を有効にして、オブジェクトの作成、削除、タグ付け、ライフサイクルイベントなどの重要なイベントを監視し、関連する変更の可視性と迅速な対応を確保します。",
+      "Url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/EventNotifications.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

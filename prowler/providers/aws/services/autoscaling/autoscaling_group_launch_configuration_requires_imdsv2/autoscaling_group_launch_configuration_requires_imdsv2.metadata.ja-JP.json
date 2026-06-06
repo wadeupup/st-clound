@@ -1,0 +1,46 @@
+{
+  "Provider": "aws",
+  "CheckID": "autoscaling_group_launch_configuration_requires_imdsv2",
+  "CheckTitle": "Auto Scaling グループが IMDSv2 を強制するか、インスタンスメタデータサービスを無効にしています",
+  "CheckType": [
+    "ソフトウェアと設定チェック/AWS セキュリティベストプラクティス",
+    "ソフトウェアと設定チェック/業界および規制基準/AWS 基礎セキュリティベストプラクティス",
+    "ソフトウェアと設定チェック/業界および規制基準/CIS AWS 基礎ベンチマーク",
+    "TTPs/資格情報アクセス",
+    "影響/データ露出"
+  ],
+  "ServiceName": "autoscaling",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsAutoScalingAutoScalingGroup",
+  "ResourceGroup": "compute",
+  "Description": "Amazon EC2 Auto Scaling 起動設定は、**インスタンスメタデータサービス**設定について評価されます。インスタンスは、メタデータエンドポイントを `enabled` に設定し、`http_tokens=required`（**IMDSv2** を強制）にするか、メタデータサービスを `disabled` にする必要があります。\n\n`http_tokens=optional` を許可するか、バージョンを省略すると、レガシーアクセスが有効なままになります。",
+  "Risk": "強制された**IMDSv2**がない場合、**SSRF**とローカルエスケープパスが**IAM ロール資格情報**にアクセスでき、不正な API 呼び出しを可能にします。\n\n攻撃者は以下を実行できます：\n- 盗まれたトークンでデータを流出させる\n- 横方向に移動し、リソースを変更して、機密性と整合性を低下させる",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://trendmicro.com/cloudoneconformity/knowledge-base/aws/EC2/require-imds-v2.html",
+    "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/configuring-IMDS-new-instances.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/autoscaling-controls.html#autoscaling-3",
+    "https://aws.plainenglish.io/dont-let-metadata-leak-why-imdsv2-is-a-must-and-how-to-migrate-a88e1e285394"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws autoscaling create-launch-configuration --launch-configuration-name <new-launch-config> --image-id <AMI_ID> --instance-type <INSTANCE_TYPE> --metadata-options 'HttpTokens=required,HttpEndpoint=enabled'",
+      "NativeIaC": "```yaml\n# CloudFormation: ASG 起動設定が IMDSv2 を強制します\nResources:\n  LaunchConfig:\n    Type: AWS::AutoScaling::LaunchConfiguration\n    Properties:\n      ImageId: <example_ami_id>\n      InstanceType: <example_instance_type>\n      MetadataOptions:\n        HttpTokens: required     # 重要：IMDSv2 トークンを要求します（IMDSv1 を無効にします）\n        HttpEndpoint: enabled    # 重要：v2 を強制しながら IMDS を有効に保ちます\n\n  AutoScalingGroup:\n    Type: AWS::AutoScaling::AutoScalingGroup\n    Properties:\n      LaunchConfigurationName: !Ref LaunchConfig\n      MinSize: 1\n      MaxSize: 1\n      VPCZoneIdentifier:\n        - <example_subnet_id>\n```",
+      "Other": "1. AWS コンソールで、EC2 > Auto Scaling > Launch configurations に移動します\n2. Create launch configuration をクリックし、グループが使用する同じ AMI とインスタンスタイプを選択します\n3. Advanced details を展開し、Metadata options を次のように設定します：Metadata accessible = Enabled、Metadata version = V2 only (token required)\n4. 起動設定を作成します\n5. EC2 > Auto Scaling > Auto Scaling groups に移動し、グループを選択し、Edit をクリックします\n6. Launch configuration の下で、新しい起動設定を選択し、Save をクリックします\n7. （代替案）IMDS を完全に無効にするには：起動設定を作成する際に、Metadata accessible を Disabled に設定します",
+      "Terraform": "```hcl\n# ASG 起動設定が IMDSv2 を強制します\nresource \"aws_launch_configuration\" \"example\" {\n  image_id      = \"<example_ami_id>\"\n  instance_type = \"<example_instance_type>\"\n\n  metadata_options {\n    http_tokens   = \"required\"  # 重要：IMDSv2 トークンを要求します（IMDSv1 をブロックします）\n    http_endpoint = \"enabled\"   # 重要：v2 を強制しながら IMDS を有効にします\n  }\n}\n\nresource \"aws_autoscaling_group\" \"example\" {\n  launch_configuration = aws_launch_configuration.example.name\n  min_size             = 1\n  max_size             = 1\n  vpc_zone_identifier  = [\"<example_subnet_id>\"]\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "メタデータが `enabled` の場合、`http_tokens=required` を設定して、Auto Scaling 起動インスタンスに**IMDSv2**を要求します。*メタデータが不要な場合*、無効にします。\n\nインスタンスロールに**最小権限**を適用し、IMDSv2 をアカウントのデフォルトとして設定し、**多層防御**（エグレスフィルタリング、SSRF 保護）を使用して露出を制限します。",
+      "Url": "https://hub.prowler.com/check/autoscaling_group_launch_configuration_requires_imdsv2"
+    }
+  },
+  "Categories": [
+    "secrets"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

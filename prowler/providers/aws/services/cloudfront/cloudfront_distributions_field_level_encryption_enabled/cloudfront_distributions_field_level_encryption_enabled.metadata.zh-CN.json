@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "cloudfront_distributions_field_level_encryption_enabled",
+  "CheckTitle": "CloudFront 分配已启用字段级加密",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Effects/Data Exposure"
+  ],
+  "ServiceName": "cloudfront",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "low",
+  "ResourceType": "AwsCloudFrontDistribution",
+  "ResourceGroup": "network",
+  "Description": "CloudFront 分配的默认缓存行为通过 `field_level_encryption_id` 关联了**字段级加密**，针对指定的请求字段进行边缘加密。",
+  "Risk": "缺少**字段级加密**，敏感输入（PII、支付数据、凭据）可能以明文形式出现在源路径、日志或中间件中。这会削弱**机密性**，可能导致数据泄露和内部滥用，如果令牌被捕获，可能导致会话或账户泄露。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/field-level-encryption.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/CloudFront/field-level-encryption-enabled.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws cloudfront create-field-level-encryption-config --field-level-encryption-config file://fle-config.json && aws cloudfront get-distribution-config --id <DISTRIBUTION_ID> --output json > current-config.json && echo 'Manually edit current-config.json to add FieldLevelEncryptionId to DefaultCacheBehavior, then run:' && echo 'aws cloudfront update-distribution --id <DISTRIBUTION_ID> --distribution-config file://current-config.json --if-match $(aws cloudfront get-distribution-config --id <DISTRIBUTION_ID> --query \"ETag\" --output text)'",
+      "NativeIaC": "```yaml\n# CloudFormation：在默认缓存行为上启用字段级加密\nResources:\n  FLEConfig:\n    Type: AWS::CloudFront::FieldLevelEncryptionConfig\n    Properties:\n      FieldLevelEncryptionConfig:\n        CallerReference: !Ref AWS::StackName\n        ContentTypeProfileConfig:\n          ForwardWhenContentTypeIsUnknown: true\n          ContentTypeProfiles:\n            Quantity: 0\n\n  <example_resource_name>:\n    Type: AWS::CloudFront::Distribution\n    Properties:\n      DistributionConfig:\n        Enabled: true\n        Origins:\n          - DomainName: \"<example_resource_name>.s3.amazonaws.com\"\n            Id: \"<example_resource_id>\"\n            S3OriginConfig: {}\n        DefaultCacheBehavior:\n          TargetOriginId: \"<example_resource_id>\"\n          ViewerProtocolPolicy: redirect-to-https\n          CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6\n          FieldLevelEncryptionId: !Ref FLEConfig  # 关键：在默认缓存行为上启用 FLE\n```",
+      "Other": "1. 在 AWS 控制台中，转到 CloudFront\n2. 如果您没有字段级加密配置：\n   - 在左侧菜单中，点击公钥 > 添加公钥（粘贴您的 RSA 公钥）\n   - 点击字段级加密 > 创建配置文件（选择公钥并添加要加密的字段）\n   - 点击字段级加密 > 创建配置（将配置文件设置为默认配置文件）\n3. 将其附加到您的分配：\n   - 转到分配 > 选择 <example_resource_id>\n   - 选择行为 > 选择默认 (*) > 编辑\n   - 将字段级加密配置设置为您创建的配置\n   - 点击保存更改并等待部署",
+      "Terraform": "```hcl\n# 在默认缓存行为上启用字段级加密\nresource \"aws_cloudfront_field_level_encryption_config\" \"fle\" {\n  content_type_profile_config {\n    forward_when_content_type_is_unknown = true\n  }\n}\n\nresource \"aws_cloudfront_distribution\" \"<example_resource_name>\" {\n  enabled = true\n\n  origin {\n    domain_name = \"<example_resource_name>.s3.amazonaws.com\"\n    origin_id   = \"<example_resource_id>\"\n  }\n\n  default_cache_behavior {\n    target_origin_id       = \"<example_resource_id>\"\n    viewer_protocol_policy = \"redirect-to-https\"\n    cache_policy_id        = \"658327ea-f89d-4fab-a63d-7e88639e58f6\"\n    field_level_encryption_id = aws_cloudfront_field_level_encryption_config.fle.id # 关键：启用 FLE\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "为敏感请求字段启用**字段级加密**，并将其绑定到相关的缓存行为。对解密密钥应用**最小权限**，轮换和监控密钥，并分离职责。作为**纵深防御**，最小化数据收集，避免记录密钥，要求端到端 HTTPS，并验证输入。",
+      "Url": "https://hub.prowler.com/check/cloudfront_distributions_field_level_encryption_enabled"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "Data Protection"
+}
+

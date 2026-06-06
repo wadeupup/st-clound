@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "sqs_queues_server_side_encryption_enabled",
+  "CheckTitle": "SQSキューではサーバー側の暗号化が有効になっています",
+  "CheckType": [
+    "ソフトウェアと構成チェック/AWSセキュリティのベストプラクティス",
+    "業界および規制基準/AWS基盤セキュリティのベストプラクティス",
+    "影響／データ露出"
+  ],
+  "ServiceName": "sqs",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsSqsQueue",
+  "ResourceGroup": "messaging",
+  "Description": "**Amazon SQS キュー** は、保存中のメッセージ本文を保護する **KMS キー**（`SSE-KMS`）で構成された **サーバー側暗号化** について評価されます。\n\n関連付けられた KMS キーがないキューが特定されます。",
+  "Risk": "**KMS-backed SSE** がないと、メッセージ本文にはテナント管理のキーや詳細な監査がなくなります。メッセージ内のシークレット、トークン、または PII は、**権限の悪用**、設定ミス、または意図しない統合を通じてアクセスされやすくなり、**機密性** が低下し、キーの無効化やローテーションによってアクセスを取り消すことができないため、封じ込めも制限されます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-server-side-encryption.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/SQS/queue-encrypted-with-kms-customer-master-keys.html",
+    "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-configure-sse-existing-queue.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws sqs set-queue-attributes --queue-url <QUEUE_URL> --attributes KmsMasterKeyId=<KMS_KEY_ID_OR_ALIAS>",
+      "NativeIaC": "```yaml\n# CloudFormation: SQSキューのSSE-KMSを有効化する\nResources:\n  <example_resource_name>:\n    Type: AWS::SQS::Queue\n    Properties:\n      KmsMasterKeyId: alias/aws/sqs  # 重大: KMS キーを設定し、SSE-KMS を有効にして、キューが kms_key_id を報告するようにします\n```",
+      "Other": "1. AWS コンソールで、Amazon SQS > Queues に移動します\n2. キューを選択して Edit をクリックします\n3. Encryption を展開します\n4. Server-side encryption を Enabled に設定します\n5. AWS KMS key で、alias/aws/sqs を選択します（または特定の KMS キーを選択します）\n6. Save をクリックします",
+      "Terraform": "```hcl\n# SQSキューに対してSSE-KMSを有効にする\nresource \"aws_sqs_queue\" \"<example_resource_name>\" {\n  kms_master_key_id = \"alias/aws/sqs\"  # 重大: KMS キーを設定し、SSE-KMS を有効にして、キューが kms_key_id を報告するようにします\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "**カスタマー管理のKMSキー**を使用して、すべてのキューで**SSE-KMS**を有効にします。\n- キーおよびキューポリシーに**最小権限**を適用し、`Encrypt/Decrypt` を制限する\n- キーのローテーションと職務分離を強制する\n- セキュリティとコストのバランスを考慮してデータキーの再利用を調整する\n- **多層防御**をサポートするためにキーとキューへのアクセスを監視する",
+      "Url": "https://hub.prowler.com/check/sqs_queues_server_side_encryption_enabled"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

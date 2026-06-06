@@ -1,0 +1,40 @@
+{
+  "Provider": "aws",
+  "CheckID": "memorydb_cluster_auto_minor_version_upgrades",
+  "CheckTitle": "MemoryDB 集群已启用自动小版本升级",
+  "CheckType": [
+    "软件和配置检查/补丁管理",
+    "软件和配置检查/AWS 安全最佳实践"
+  ],
+  "ServiceName": "memorydb",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "database",
+  "Description": "**MemoryDB 集群**会根据 `auto_minor_version_upgrade` 设置进行评估，该设置会自动应用新的小版本引擎。",
+  "Risk": "如果没有自动小版本升级，集群可能运行**已知漏洞的引擎版本**。\n- 可利用的 CVE 允许未经授权的读/写（机密性、完整性）\n- 未修补的漏洞可能导致 **DoS** 或数据丢失（可用性）\n- 版本漂移增加操作风险并减缓事件响应",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/memorydb/latest/devguide/engine-versions.html",
+    "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_UpgradeDBInstance.Upgrading.html#USER_UpgradeDBInstance.Upgrading.AutoMinorVersionUpgrades"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws memorydb update-cluster --cluster-name <cluster-name> --auto-minor-version-upgrade",
+      "NativeIaC": "```yaml\n# 为 MemoryDB 集群启用自动小版本升级\nResources:\n  <example_resource_name>:\n    Type: AWS::MemoryDB::Cluster\n    Properties:\n      ClusterName: <example_resource_name>\n      ACLName: <example_acl_name>\n      NodeType: <example_node_type>\n      NumShards: 1\n      AutoMinorVersionUpgrade: true  # 关键：启用自动小版本升级\n```",
+      "Other": "1. 在 AWS 控制台中，转到 MemoryDB > Clusters\n2. 选择集群 <cluster-name> 并点击编辑\n3. 启用“自动小版本升级”\n4. 点击保存更改",
+      "Terraform": "```hcl\nresource \"aws_memorydb_cluster\" \"<example_resource_name>\" {\n  name       = \"<example_resource_name>\"\n  acl_name   = \"<example_acl_name>\"\n  node_type  = \"<example_node_type>\"\n  num_shards = 1\n\n  auto_minor_version_upgrade = true  # 关键：启用自动小版本升级\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "为所有集群启用**自动小版本升级**（`auto_minor_version_upgrade=true`）。在维护窗口中安排更新，在预发布环境中验证，并保持回滚计划。应用**深度防御**，通过严格的 ACL 和监控在版本发布之间限制暴露。",
+      "Url": "https://hub.prowler.com/check/memorydb_cluster_auto_minor_version_upgrades"
+    }
+  },
+  "Categories": [
+    "vulnerabilities"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

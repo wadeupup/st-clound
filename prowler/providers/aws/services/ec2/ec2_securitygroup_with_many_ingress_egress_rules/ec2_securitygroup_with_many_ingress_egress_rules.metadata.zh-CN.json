@@ -1,0 +1,34 @@
+{
+  "Provider": "aws",
+  "CheckID": "ec2_securitygroup_with_many_ingress_egress_rules",
+  "CheckTitle": "查找具有超过 50 条入站或出站规则的安全组",
+  "CheckType": [
+    "Infrastructure Security"
+  ],
+  "ServiceName": "ec2",
+  "SubServiceName": "securitygroup",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "high",
+  "ResourceType": "AwsEc2SecurityGroup",
+  "ResourceGroup": "network",
+  "Description": "查找具有超过 50 条入站或出站规则的安全组。",
+  "Risk": "如果安全组未正确配置，将显著增加攻击面。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "采用零信任（Zero Trust）方法，将入站流量尽可能收窄，并同时考虑南北向与东西向流量的限制。",
+      "Url": "https://docs.aws.amazon.com/vpc/latest/userguide/VPC_SecurityGroups.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

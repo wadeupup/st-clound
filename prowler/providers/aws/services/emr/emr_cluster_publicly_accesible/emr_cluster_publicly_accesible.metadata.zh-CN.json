@@ -1,0 +1,40 @@
+{
+  "Provider": "aws",
+  "CheckID": "emr_cluster_publicly_accesible",
+  "CheckTitle": "EMR 集群不应可被公网访问",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices/Network Reachability",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "TTPs/Initial Access"
+  ],
+  "ServiceName": "emr",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "compute",
+  "Description": "会通过检查主节点与核心/任务节点安全组中允许任意来源（`0.0.0.0/0` 或 `::/0`）入站的规则，来评估 **Amazon EMR 集群**是否存在**公网网络暴露**。\n\n仅评估活动状态集群，检查结果会标明集群节点所关联的具体安全组暴露情况。",
+  "Risk": "EMR 节点对互联网**开放入站**会让服务和 UI 被直接访问，从而助长暴力破解、远程代码执行和数据窃取。攻击者可在 VPC 内横向移动、篡改作业和输出（**完整性**）、外泄数据集（**机密性**），或滥用计算资源挖矿，导致**可用性**下降。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-block-public-access.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation: Security Group without public ingress for EMR nodes\nResources:\n  <example_resource_name>:\n    Type: AWS::EC2::SecurityGroup\n    Properties:\n      GroupDescription: SG for EMR without public access\n      VpcId: <example_resource_id>\n      SecurityGroupIngress:\n        - IpProtocol: tcp\n          FromPort: 22\n          ToPort: 22\n          CidrIp: 10.0.0.0/8  # CRITICAL: restrict source; do not use 0.0.0.0/0 or ::/0 to avoid public access\n```",
+      "Other": "1. 在 AWS 控制台进入 EMR > Clusters 并打开受影响集群\n2. 在集群详情的 Network and security 中记录 Master 与 Core/Task 的 Security Groups\n3. 进入 EC2 控制台 > Security Groups，并选择记录的每个安全组\n4. 编辑 Inbound rules，删除 Source 为 0.0.0.0/0 或 ::/0 的规则\n5. 如确有访问需求，仅添加你可控的特定 CIDR，然后保存",
+      "Terraform": "```hcl\n# Restrict EMR SG ingress to avoid 0.0.0.0/0 or ::/0\nresource \"aws_security_group_rule\" \"<example_resource_name>\" {\n  type              = \"ingress\"\n  from_port         = 22\n  to_port           = 22\n  protocol          = \"tcp\"\n  security_group_id = \"<example_resource_id>\"  # EMR master/core SG\n  cidr_blocks       = [\"10.0.0.0/8\"]           # CRITICAL: restrict source; not 0.0.0.0/0 or ::/0\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "应用**最小权限**与**纵深防御**：\n- 将集群部署在私有子网，避免公网 IP\n- 在节点安全组中拒绝 `0.0.0.0/0` 和 `::/0`，仅允许可信 CIDR\n- 保持 EMR **Block Public Access** 启用并尽量减少例外\n- 使用 **bastion/SSM**、私有连接和日志审计强化访问控制",
+      "Url": "https://hub.prowler.com/check/emr_cluster_publicly_accesible"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

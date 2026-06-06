@@ -1,0 +1,35 @@
+{
+  "Provider": "aws",
+  "CheckID": "iam_root_mfa_enabled",
+  "CheckTitle": "ルートアカウントにMFAが有効になっていることを確認する",
+  "CheckType": [
+    "ソフトウェアと構成のチェック",
+    "業界および規制の標準",
+    "CIS AWS Foundations ベンチマーク"
+  ],
+  "ServiceName": "iam",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "critical",
+  "ResourceType": "AwsIamUser",
+  "ResourceGroup": "IAM",
+  "Description": "ルートアカウントにMFAが有効になっていることを確認する",
+  "Risk": "ルートアカウントはAWSアカウント内で最も特権のあるユーザーです。MFAはユーザー名とパスワードに加えて追加の保護層を提供します。MFAが有効になっている場合、ユーザーがAWSのウェブサイトにサインインすると、ユーザー名とパスワードに加えてAWS MFAデバイスからの認証コードが求められます。ルートアカウントに仮想MFAを使用する場合、使用するデバイスは個人用デバイスではなく、専用のモバイルデバイス（タブレットまたは電話）であることが推奨されます。このデバイスは、個人のデバイスとは独立して充電され、安全に管理されるべきです。（非個人用仮想MFA）これにより、デバイスの紛失や交換、またはデバイスの所有者が会社を退職した場合にMFAへのアクセスを失うリスクが軽減されます。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "IAMコンソールを使用してダッシュボードに移動し、ルートアカウントでMFAを有効化を展開します。AWS Organizationsを使用している場合は、集中管理されたルート管理を有効にし、個別のルート資格情報を削除することを検討してください。",
+      "Url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_root-user.html#id_root-user_manage_mfa"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

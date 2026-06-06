@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "elb_cross_zone_load_balancing_enabled",
+  "CheckTitle": "Classic Load Balancer 已启用跨可用区负载均衡",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Effects/Denial of Service",
+    "Effects/Resource Consumption"
+  ],
+  "ServiceName": "elb",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsElbLoadBalancer",
+  "ResourceGroup": "network",
+  "Description": "启用**跨可用区负载均衡**的 Classic Load Balancer 会将请求分发到所有已启用可用区中的已注册目标。\n\n此检查评估该设置是否为 `enabled`，而不是仅将流量分发到同一可用区内的目标。",
+  "Risk": "如果未启用**跨可用区负载均衡**，流量可能因 DNS 偏斜或容量不均而集中在单一 AZ，导致**热点**、超时和延迟。这会降低服务**可用性**，并在 AZ 受损或实例丢失时增加级联故障风险。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/elb-controls.html#elb-9",
+    "https://docs.aws.amazon.com/elasticloadbalancing/latest/classic/enable-disable-crosszone-lb.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/ELB/elb-cross-zone-load-balancing-enabled.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws elb modify-load-balancer-attributes --load-balancer-name <load-balancer-name> --load-balancer-attributes \"{\\\"CrossZoneLoadBalancing\\\":{\\\"Enabled\\\":true}}\"",
+      "NativeIaC": "```yaml\n# CloudFormation: Enable cross-zone load balancing on a Classic Load Balancer\nResources:\n  <example_resource_name>:\n    Type: AWS::ElasticLoadBalancing::LoadBalancer\n    Properties:\n      CrossZone: true  # Critical: enables cross-zone load balancing to pass the check\n      Listeners:\n        - LoadBalancerPort: 80\n          InstancePort: 80\n          Protocol: HTTP\n      AvailabilityZones:\n        - <example_az>\n```",
+      "Other": "1. 打开 AWS EC2 控制台\n2. 进入 Load Balancing > Load Balancers 并选择你的 Classic Load Balancer\n3. 打开 Attributes 标签并点击 Edit\n4. 启用 Cross-zone load balancing\n5. 点击 Save changes",
+      "Terraform": "```hcl\n# Terraform: Enable cross-zone load balancing on a Classic Load Balancer\nresource \"aws_elb\" \"<example_resource_name>\" {\n  name = \"<example_resource_name>\"\n\n  listener {\n    lb_port           = 80\n    lb_protocol       = \"http\"\n    instance_port     = 80\n    instance_protocol = \"http\"\n  }\n\n  availability_zones = [\"<example_az>\"]\n\n  cross_zone_load_balancing = true  # Critical: enables cross-zone load balancing to pass the check\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "将 Classic Load Balancer 的 `cross-zone load balancing` 设置为 `enabled`，并至少使用两个 AZ。\n\n平衡各 AZ 容量，结合自动扩缩容实施健壮的健康检查，并按**高可用**架构设计，确保在流量高峰或部分 AZ 故障期间负载仍可均匀分配。",
+      "Url": "https://hub.prowler.com/check/elb_cross_zone_load_balancing_enabled"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

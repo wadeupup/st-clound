@@ -1,0 +1,44 @@
+{
+  "Provider": "aws",
+  "CheckID": "opensearch_service_domains_node_to_node_encryption_enabled",
+  "CheckTitle": "Amazon OpenSearch Service 域已启用节点到节点加密",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践",
+    "软件和配置检查/行业和法规标准/AWS 基础安全最佳实践",
+    "软件和配置检查/行业和监管标准/NIST CSF 控制（美国）",
+    "软件和配置检查/行业和监管标准/NIST 800-53 控制（美国）",
+    "软件和配置检查/行业和法规标准/PCI-DSS"
+  ],
+  "ServiceName": "opensearch",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsOpenSearchServiceDomain",
+  "ResourceGroup": "database",
+  "Description": "**Amazon OpenSearch 域**使用**节点到节点加密**通过 TLS 保护集群节点之间的流量。此发现评估域的 `node_to_node_encryption` 配置以进行集群内通信。",
+  "Risk": "未加密的集群内流量使得任何拥有网络立足点的人都可以拦截和操纵。\n- **机密性**：文档、凭证、元数据的暴露\n- **完整性**：查询和分片复制的篡改\n- **可用性**：欺骗/中间人攻击可能会破坏协调并导致中断",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/ntn.html",
+    "https://docs.aws.amazon.com/opensearch-service/latest/developerguide/ntn.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/Elasticsearch/node-to-node-encryption.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws opensearchservice update-domain-config --domain-name <DOMAIN_NAME> --node-to-node-encryption-options Enabled=true",
+      "NativeIaC": "```yaml\n# CloudFormation：为 OpenSearch 域启用节点到节点加密\nResources:\n  OpenSearchDomain:\n    Type: AWS::OpenSearchService::Domain\n    Properties:\n      NodeToNodeEncryptionOptions:\n        Enabled: true  # 关键：启用节点间 TLS 以通过检查\n```",
+      "Other": "1. 在 AWS 控制台中，转到 OpenSearch Service > Domains\n2. 选择目标域\n3. 点击编辑（或操作 > 编辑安全配置）\n4. 在加密下，启用节点到节点加密\n5. 点击保存更改",
+      "Terraform": "```hcl\n# Terraform：为 OpenSearch 域启用节点到节点加密\nresource \"aws_opensearch_domain\" \"<example_resource_name>\" {\n  domain_name = \"<example_resource_name>\"\n\n  node_to_node_encryption {\n    enabled = true  # 关键：加密集群内流量以通过检查\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "启用**节点到节点加密**（`node_to_node_encryption: true`）以强制对节点间流量使用 TLS。应用**深度防御**：要求客户端使用 HTTPS，限制网络暴露，并使用最小权限。在预生产环境中验证性能并仔细规划，因为此设置实际上是不可逆的。",
+      "Url": "https://hub.prowler.com/check/opensearch_service_domains_node_to_node_encryption_enabled"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

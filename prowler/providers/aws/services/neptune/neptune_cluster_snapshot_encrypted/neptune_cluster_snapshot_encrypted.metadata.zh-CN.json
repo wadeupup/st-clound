@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "neptune_cluster_snapshot_encrypted",
+  "CheckTitle": "Neptune DB 集群快照在静态时加密",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践/静态加密",
+    "软件和配置检查/行业和法规标准/AWS 基础安全最佳实践",
+    "影响/数据暴露"
+  ],
+  "ServiceName": "neptune",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsRdsDbClusterSnapshot",
+  "ResourceGroup": "database",
+  "Description": "Neptune DB 集群快照在静态时加密。评估检查每个快照的加密属性是否启用，以确认数据在存储时受到保护。",
+  "Risk": "**未加密的 Neptune 快照**削弱了数据机密性。如果由于凭证泄露或配置错误而被访问或共享，攻击者可以恢复或下载快照内容，从而实现**数据泄露**，并暴露敏感记录。这会削弱整体数据保护态势。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/neptune-controls.html#neptune-6",
+    "https://docs.aws.amazon.com/neptune/latest/userguide/backup-restore-share-snapshot.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws rds copy-db-cluster-snapshot --source-db-cluster-snapshot-identifier <source-snapshot> --target-db-cluster-snapshot-identifier <encrypted-snapshot> --kms-key-id <kms-key-id>",
+      "NativeIaC": "",
+      "Terraform": "```hcl\nresource \"aws_neptune_cluster\" \"restored\" {\n  cluster_identifier  = \"restored-cluster\"\n  snapshot_identifier = \"<source-snapshot>\"\n  storage_encrypted   = true  # 确保从快照恢复的集群已加密\n}\n```",
+      "Other": "1. 登录 AWS 管理控制台并打开 Amazon Neptune\n2. 在左侧窗格中选择 **Snapshots**\n3. 选择未加密的快照并点击 **Actions** > **Restore snapshot**\n4. 在恢复页面启用 **Encryption** 并选择一个 KMS 密钥\n5. 点击 **Restore DB cluster**\n6. 集群恢复后，为恢复的（加密的）集群创建一个新快照"
+    },
+    "Recommendation": {
+      "Text": "通过实施**静态加密**和强大的密钥管理来保护快照数据。\n\n- 使用具有受控生命周期和轮换的**客户管理密钥**\n- 对快照访问和共享应用**最小权限**\n- 通过组织配置和策略控制防止创建未加密的快照",
+      "Url": "https://hub.prowler.com/check/neptune_cluster_snapshot_encrypted"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

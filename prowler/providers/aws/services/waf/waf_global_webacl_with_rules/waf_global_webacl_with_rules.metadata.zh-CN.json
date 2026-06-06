@@ -1,0 +1,40 @@
+{
+  "Provider": "aws",
+  "CheckID": "waf_global_webacl_with_rules",
+  "CheckTitle": "AWS WAF Classic 全局 Web ACL 至少有一个规则或规则组",
+  "CheckType": [
+    "软件和配置检查/AWS安全最佳实践",
+    "软件和配置检查/行业和监管标准/AWS 基础安全最佳实践",
+    "软件和配置检查/行业和监管标准/NIST 800-53 控制措施"
+  ],
+  "ServiceName": "waf",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsWafWebAcl",
+  "ResourceGroup": "security",
+  "Description": "**AWS WAF Classic 全局 Web ACL** 会被评估，以确定是否存在至少一个检查 HTTP(S) 请求的 **规则** 或 **规则组**",
+  "Risk": "如果没有规则，Web ACL 将完全依赖其默认操作。如果为 `allow`，恶意流量会在未经检查的情况下到达源站；如果为 `block`，合法流量可能会被拒绝。\n- SQLi/XSS 可能会暴露数据（机密性）\n- 恶意请求可能会更改状态（完整性）\n- 机器人和爬取行为可能会耗尽资源（可用性）",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/waf-controls.html#waf-8",
+    "https://docs.aws.amazon.com/waf/latest/developerguide/classic-web-acl-editing.html",
+    "https://docs.aws.amazon.com/waf/latest/developerguide/waf-rules.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws waf update-web-acl --web-acl-id <WEB_ACL_ID> --change-token <CHANGE_TOKEN> --updates '[{\"Action\":\"INSERT\",\"ActivatedRule\":{\"Priority\":1,\"RuleId\":\"<RULE_ID>\",\"Action\":{\"Type\":\"BLOCK\"}}}]'",
+      "NativeIaC": "```yaml\nResources:\n  <example_resource_name>:\n    Type: AWS::WAF::WebACL\n    Properties:\n      Name: <example_resource_name>\n      MetricName: <example_metric_name>\n      DefaultAction:\n        Type: ALLOW\n      Rules:\n        - Action:\n            Type: BLOCK\n          Priority: 1\n          RuleId: <example_rule_id>  # 关键：添加一条规则，以便 Web ACL 不为空\n          # 这可确保 Web ACL 至少有一条规则，将 FAIL 更改为 PASS\n```",
+      "Other": "1. 打开 AWS 控制台并前往 WAF\n2. 在左侧菜单中，点击 Switch to AWS WAF Classic\n3. 在顶部，将 Filter 设置为 Global (CloudFront)\n4. 点击 Web ACLs 并选择你的 web ACL\n5. 在 Rules 选项卡上，点击 Edit web ACL\n6. 在 Rules 中，选择现有规则或规则组，然后点击 Add rule to web ACL\n7. 点击 Save changes",
+      "Terraform": "```hcl\nresource \"aws_waf_web_acl\" \"<example_resource_name>\" {\n  name        = \"<example_resource_name>\"\n  metric_name = \"<example_metric_name>\"\n\n  default_action {\n    type = \"ALLOW\"\n  }\n\n  rules { # 关键：至少添加一条规则，以使 Web ACL 不为空\n    priority = 1\n    rule_id  = \"<example_rule_id>\"\n    type     = \"REGULAR\"\n    action {\n      type = \"BLOCK\"\n    }\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "为每个全局 Web ACL 填充有效保护措施：\n- 使用规则组和有针对性的规则（托管、基于速率、IP 集）\n- 应用最小权限原则：在可行的情况下默认 `block`；显式 `allow` 所需流量\n- 分层部署防御并启用日志记录以调优策略\n- *考虑迁移到 WAFv2*",
+      "Url": "https://hub.prowler.com/check/waf_global_webacl_with_rules"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

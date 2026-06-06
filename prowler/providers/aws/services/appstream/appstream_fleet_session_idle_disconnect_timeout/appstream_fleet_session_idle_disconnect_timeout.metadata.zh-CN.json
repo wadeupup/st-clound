@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "appstream_fleet_session_idle_disconnect_timeout",
+  "CheckTitle": "AppStream 队列会话空闲断开超时为 10 分钟或更短",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践",
+    "影响/数据暴露"
+  ],
+  "ServiceName": "appstream",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "compute",
+  "Description": "**Amazon AppStream 队列**根据**空闲断开超时**设置进行评估，确认在非活动用户被断开连接且会话的 `disconnect_timeout` 窗口开始之前，该设置配置为 `10 分钟`（`<=600 秒`）或更短。",
+  "Risk": "**长时间的空闲会话**使桌面/应用程序在用户不在场的情况下仍可访问，从而可能发生**会话劫持**、**肩窥**和**数据暴露**。它们还会**消耗容量**并延长**计费**，降低其他用户的**可用性**。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/appstream2/latest/developerguide/set-up-stacks-fleets.html",
+    "https://awscli.amazonaws.com/v2/documentation/api/2.9.6/reference/appstream/update-fleet.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws appstream update-fleet --name <FLEET_NAME> --idle-disconnect-timeout-in-seconds 600",
+      "NativeIaC": "```yaml\nResources:\n  <example_resource_name>:\n    Type: AWS::AppStream::Fleet\n    Properties:\n      Name: <example_resource_name>\n      InstanceType: stream.standard.small\n      ComputeCapacity:\n        DesiredInstances: 1\n      IdleDisconnectTimeoutInSeconds: 600  # 关键：设置为 10 分钟或更短以通过检查\n```",
+      "Other": "1. 打开 AWS 控制台并转到 AppStream 2.0 > Fleets\n2. 选择您的队列并单击 Edit\n3. 找到 \"Idle disconnect timeout\"\n4. 将其设置为 10 分钟（600 秒）或更短\n5. 单击 Save",
+      "Terraform": "```hcl\nresource \"aws_appstream_fleet\" \"<example_resource_name>\" {\n  name          = \"<example_resource_name>\"\n  instance_type = \"stream.standard.small\"\n  image_name    = \"<IMAGE_NAME>\"\n\n  compute_capacity {\n    desired_instances = 1\n  }\n\n  idle_disconnect_timeout_in_seconds = 600  # 关键：强制 <= 10 分钟以通过检查\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "配置**空闲断开超时为 10 分钟**。与较短的 `disconnect_timeout` 配对，要求在重新连接时**重新进行身份验证**，并强制执行**最小权限**。监控会话指标，并根据角色进行调整，以平衡**安全性**、**成本**和**用户体验**。",
+      "Url": "https://hub.prowler.com/check/appstream_fleet_session_idle_disconnect_timeout"
+    }
+  },
+  "Categories": [
+    "identity-access"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "Infrastructure Security"
+}
+

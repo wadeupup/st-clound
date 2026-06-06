@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "emr_cluster_account_public_block_enabled",
+  "CheckTitle": "EMR 账户已启用 Block Public Access",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices/Network Reachability",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices"
+  ],
+  "ServiceName": "emr",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Other",
+  "ResourceGroup": "compute",
+  "Description": "会按区域评估 Amazon EMR 账户级 **Block Public Access** 配置。当启用 `BlockPublicSecurityGroupRules` 时，除允许端口外，集群不能使用允许公有来源（`0.0.0.0/0`、`::/0`）入站的安全组。",
+  "Risk": "面向公网的 EMR 规则会让互联网可达集群节点和 UI，增加暴力破解和远程漏洞利用风险。\n\n攻击者可窃取作业数据、篡改处理结果或横向进入 VPC，进而通过数据泄露、篡改和服务中断破坏**机密性**、**完整性**和**可用性**。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/EMR/block-public-access.html",
+    "https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-block-public-access.html",
+    "https://github.com/cloudmatos/matos/tree/master/remediations/aws/emr/block-emr-public-access"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws emr put-block-public-access-configuration --block-public-access-configuration BlockPublicSecurityGroupRules=true",
+      "NativeIaC": "```yaml\n# CloudFormation: Enable EMR Block Public Access (account/Region level)\nResources:\n  EmrBpaRole:\n    Type: AWS::IAM::Role\n    Properties:\n      AssumeRolePolicyDocument:\n        Version: '2012-10-17'\n        Statement:\n          - Effect: Allow\n            Principal:\n              Service: lambda.amazonaws.com\n            Action: sts:AssumeRole\n      Policies:\n        - PolicyName: EmrBpaPut\n          PolicyDocument:\n            Version: '2012-10-17'\n            Statement:\n              - Effect: Allow\n                Action: elasticmapreduce:PutBlockPublicAccessConfiguration\n                Resource: \"*\"\n\n  EmrBpaFunction:\n    Type: AWS::Lambda::Function\n    Properties:\n      Role: !GetAtt EmrBpaRole.Arn\n      Runtime: python3.12\n      Handler: index.handler\n      Code:\n        ZipFile: |\n          import boto3, json, urllib.request\n          def handler(event, context):\n              try:\n                  boto3.client('emr').put_block_public_access_configuration(\n                      BlockPublicAccessConfiguration={\n                          'BlockPublicSecurityGroupRules': True  # CRITICAL: enables EMR Block Public Access\n                      }\n                  )\n                  status='SUCCESS'\n              except Exception:\n                  status='FAILED'\n              body=json.dumps({\n                  'Status': status,\n                  'PhysicalResourceId': 'EmrBPA',  # respond to CFN\n                  'StackId': event['StackId'],\n                  'RequestId': event['RequestId'],\n                  'LogicalResourceId': event['LogicalResourceId']\n              }).encode()\n              req=urllib.request.Request(event['ResponseURL'], data=body, method='PUT')\n              req.add_header('content-type','')\n              req.add_header('content-length',str(len(body)))\n              urllib.request.urlopen(req)\n\n  EmrBpa:\n    Type: Custom::EmrBpa\n    Properties:\n      ServiceToken: !GetAtt EmrBpaFunction.Arn  # Invokes Lambda to apply the setting\n```",
+      "Other": "1. 在 AWS 控制台进入 Amazon EMR\n2. 选择目标区域（右上角）\n3. 在左侧菜单 \"EMR on EC2\" 下点击 \"Block public access\"\n4. 点击 \"Edit\" 并选择 \"Turn on\"\n5. 点击 \"Save\"",
+      "Terraform": "```hcl\n# Enable EMR Block Public Access (account/Region level)\nresource \"aws_emr_block_public_access_configuration\" \"example_resource_name\" {\n  block_public_security_group_rules = true  # CRITICAL: enables Block Public Access\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "保持 EMR **Block Public Access** 处于启用状态并尽量减少例外；仅开放必需端口并限制来源。\n\n在安全组上实施**最小权限**，将集群部署在私有子网，并使用堡垒机或 Session Manager。结合 **VPC** 控制与监控实现**纵深防御**。",
+      "Url": "https://hub.prowler.com/check/emr_cluster_account_public_block_enabled"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

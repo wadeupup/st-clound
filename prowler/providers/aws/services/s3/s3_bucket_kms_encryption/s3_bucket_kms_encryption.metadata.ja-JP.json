@@ -1,0 +1,35 @@
+{
+  "Provider": "aws",
+  "CheckID": "s3_bucket_kms_encryption",
+  "CheckTitle": "S3バケットでKMS暗号化が有効になっているか確認してください。",
+  "CheckType": [
+    "データ保護"
+  ],
+  "ServiceName": "s3",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:s3:::bucket_name",
+  "Severity": "medium",
+  "ResourceType": "AwsS3Bucket",
+  "ResourceGroup": "storage",
+  "Description": "S3バケットでKMS暗号化が有効になっているか確認してください。",
+  "Risk": "Amazon S3 KMS 暗号化は、管理キーを使用して S3 バケットの暗号化動作を設定する方法を提供します。これにより、保存データが暗号化されることが保証されます。",
+  "RelatedUrl": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/UsingKMSEncryption.html",
+  "Remediation": {
+    "Code": {
+      "CLI": "aws put-bucket-encryption --bucket <BUCKET_NAME> --server-side-encryption-configuration '{\"Rules\":[{\"ApplyServerSideEncryptionByDefault\":{\"SSEAlgorithm\":\"aws:kms\",\"KMSMasterKeyID\":\"arn:aws:kms:<REGION>:<ACCOUNT_ID>:key/<KEY_ID>\"}}]}'",
+      "NativeIaC": "https://www.trendmicro.com/cloudoneconformity-staging/knowledge-base/aws/S3/encrypted-with-kms-customer-master-keys.html",
+      "Other": "https://www.trendmicro.com/cloudoneconformity-staging/knowledge-base/aws/S3/encrypted-with-kms-customer-master-keys.html",
+      "Terraform": "https://docs.prowler.com/checks/aws/general-policies/ensure-that-s3-buckets-are-encrypted-with-kms-by-default#terraform"
+    },
+    "Recommendation": {
+      "Text": "S3 バケットで、KMS を使用した保存時の暗号化が有効になっていることを確認してください。",
+      "Url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/UsingKMSEncryption.html"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

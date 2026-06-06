@@ -1,0 +1,52 @@
+{
+  "Provider": "aws",
+  "CheckID": "apigateway_restapi_public_with_authorizer",
+  "CheckTitle": "パブリックエンドポイントを持つ API Gateway REST API に承認者が設定されています",
+  "CheckType": [
+    "ソフトウェアと設定チェック/AWS セキュリティベストプラクティス/ネットワーク到達可能性",
+    "TTPs/初期アクセス/不正アクセス",
+    "影響/データ露出"
+  ],
+  "ServiceName": "apigateway",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsApiGatewayRestApi",
+  "ResourceGroup": "api_gateway",
+  "Description": "インターネットに公開されている**API Gateway REST API** は、メソッド呼び出し時に呼び出し元の ID（Lambda 承認者または Cognito ユーザープール）を強制する**承認者**が添付されているかどうかを評価されます。\n\n焦点は、パブリックエンドポイントが匿名呼び出しを受け入れるのではなく、認証されたリクエストを要求するかどうかにあります。",
+  "Risk": "パブリック API に**承認者**がない場合、匿名呼び出し元は以下を実行できます：\n- データの読み取りまたは変更（機密性/整合性）\n- バックエンドアクションのトリガー、システムへの影響\n- トラフィックの悪用、可用性の低下とコストの増加\n\nエンドポイントの列挙は、より広範な発見と横方向の移動も可能にします。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://support.icompaas.com/support/solutions/articles/62000233640-check-if-api-gateway-public-endpoint-has-an-authorizer-configured",
+    "https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-api-endpoint-types.html",
+    "https://api7.ai/blog/secure-rest-api-in-aws-api-gateway",
+    "https://supertokens.com/blog/lambda-authorizers",
+    "https://clerk.com/blog/how-to-secure-api-gateway-using-jwt-and-lambda-authorizers-with-clerk",
+    "https://aws.plainenglish.io/6-rest-api-security-best-practices-you-can-achieve-with-amazon-api-gateway-2-authentication-62b5171989bd",
+    "https://stackoverflow.com/questions/68512642/how-to-configure-aws-api-gateway-without-authorizer",
+    "https://auth0.com/docs/customize/integrations/aws/aws-api-gateway-custom-authorizers"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws apigateway create-authorizer --rest-api-id <rest_api_id> --name <example_resource_name> --type TOKEN --authorizer-uri arn:aws:apigateway:<region>:lambda:path/2015-03-31/functions/arn:aws:lambda:<region>:<account-id>:function:<example_resource_name>/invocations --identity-source 'method.request.header.Authorization'",
+      "NativeIaC": "```yaml\n# CloudFormation: パブリック REST API 用の最小限の Lambda TOKEN 承認者を作成します\nResources:\n  <example_resource_name>:\n    Type: AWS::ApiGateway::Authorizer\n    Properties:\n      Name: <example_resource_name>\n      RestApiId: <example_resource_id>\n      Type: TOKEN  # 重要：REST API に承認者を追加します\n      IdentitySource: method.request.header.Authorization  # 重要：トークンを読み取るヘッダー\n      AuthorizerUri: arn:aws:apigateway:<region>:lambda:path/2015-03-31/functions/arn:aws:lambda:<region>:<account-id>:function/<example_resource_name>/invocations  # 重要：Lambda 承認者関数 URI\n```",
+      "Other": "1. AWS コンソールで、API Gateway を開き、REST API を選択します\n2. 左側のペインで、Authorizers > Create authorizer をクリックします\n3. Lambda (TOKEN) または Cognito User Pool を選択します\n4. Lambda の場合：関数を選択し、Identity source を method.request.header.Authorization に設定します；Cognito の場合：ユーザープールを選択します\n5. Create authorizer をクリックして、API に追加します",
+      "Terraform": "```hcl\n# Terraform: API Gateway REST API 用の最小限の Lambda TOKEN 承認者\nresource \"aws_api_gateway_authorizer\" \"<example_resource_name>\" {\n  name            = \"<example_resource_name>\"\n  rest_api_id     = \"<example_resource_id>\"\n  type            = \"TOKEN\"  # 重要：REST API で Lambda 承認者を有効にします\n  identity_source = \"method.request.header.Authorization\"  # 重要：トークンを読み取るヘッダー\n  authorizer_uri  = \"arn:aws:apigateway:<region>:lambda:path/2015-03-31/functions/arn:aws:lambda:<region>:<account-id>:function/<example_resource_name>/invocations\"  # 重要：Lambda 承認者関数 URI\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "トークンとスコープを検証する**承認者**（Cognito ユーザープールまたは Lambda）を添付して、すべてのインターネット向け API で**認証**を強制します。\n\n多層防御を適用します：\n- 制限的なリソースポリシーと IP 制御\n- WAF、スロットリング、クォータ、レート制限\n- 最小権限のバックエンドアクセスと包括的なログ",
+      "Url": "https://hub.prowler.com/check/apigateway_restapi_public_with_authorizer"
+    }
+  },
+  "Categories": [
+    "internet-exposed",
+    "identity-access"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "",
+  "CheckAliases": [
+    "apigateway_public_with_authorizer"
+  ]
+}
+

@@ -1,0 +1,46 @@
+{
+  "Provider": "aws",
+  "CheckID": "storagegateway_fileshare_encryption_enabled",
+  "CheckTitle": "Storage Gateway ファイル共有は KMS CMK で暗号化されています",
+  "CheckType": [
+    "ソフトウェアと構成チェック/AWSセキュリティのベストプラクティス",
+    "ソフトウェアと設定のチェック/業界および規制基準/AWS 基盤セキュリティのベストプラクティス",
+    "ソフトウェアおよび構成チェック/業界および規制基準/NIST 800-53 管理策（米国）",
+    "ソフトウェアおよび設定チェック／業界および規制基準／PCI-DSS",
+    "ソフトウェアおよび構成のチェック／業界および規制基準／ISO 27001管理策",
+    "ソフトウェアおよび構成チェック/業界および規制基準/SOC 2",
+    "ソフトウェアおよび構成チェック/業界および規制基準/HIPAA管理策（米国）",
+    "影響／データ露出"
+  ],
+  "ServiceName": "storagegateway",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "storage",
+  "Description": "S3 に書き込まれるオブジェクトのサーバー側暗号化のために、**顧客管理 KMS キー (CMK)** で設定された Storage Gateway ファイル共有。\n\n明示的な KMS キー（例: `SSE-KMS` または `DSSE-KMS`）のないファイル共有が特定されます。",
+  "Risk": "**CMEK** がない場合、暗号化はプロバイダー管理鍵に依存するため、誰がいつ復号できるかに対する制御が低下します。これにより、鍵ポリシーの適用、失効、および監査可能な鍵使用が制限され、機密性が弱まり、盗まれた S3 認証情報や過度に許可されたロールによる露出が増加します。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://www.trendmicro.com/cloudoneconformity-staging/knowledge-base/aws/StorageGateway/file-shares-encrypted-with-cmk.html#",
+    "https://docs.aws.amazon.com/filegateway/latest/files3/encrypt-objects-stored-by-file-gateway-in-amazon-s3.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws storagegateway update-nfs-file-share --file-share-arn <example_resource_arn> --kms-encrypted --kms-key <example_kms_key_arn>",
+      "NativeIaC": "```yaml\n# CloudFormation: Storage Gateway NFS ファイル共有の KMS CMK 暗号化を有効にする\nResources:\n  <example_resource_name>:\n    Type: AWS::StorageGateway::NFSFileShare\n    Properties:\n      ClientToken: \"<example_resource_id>\"\n      GatewayARN: \"<example_resource_arn>\"\n      LocationARN: \"<example_resource_arn>\"\n      Role: \"<example_resource_arn>\"\n      KMSEncrypted: true  # 重要: ファイル共有のKMS CMK暗号化を有効にします\n      KMSKey: \"<example_kms_key_arn>\"  # 重大: 暗号化に使用されるCMK ARN\n```",
+      "Other": "1. AWS コンソールで、Storage Gateway > File shares に移動します\n2. 影響を受けるファイル共有を選択し、Edit をクリックします\n3. Encryption の下で、AWS KMS key を選択します\n4. 使用する CMK を選択します（またはその ARN を貼り付けます）\n5. 変更を保存します",
+      "Terraform": "```hcl\n# Storage Gateway NFS ファイル共有の KMS CMK 暗号化を有効にする\nresource \"aws_storagegateway_nfs_file_share\" \"<example_resource_name>\" {\n  client_list  = [\"<example_cidr_block>\"]\n  gateway_arn  = \"<example_resource_arn>\"\n  location_arn = \"<example_resource_arn>\"\n  role_arn     = \"<example_resource_arn>\"\n\n  kms_encrypted = true              # 重要: KMS CMK 暗号化を有効にします\n  kms_key_arn   = \"<example_kms_key_arn>\"  # 重大: 暗号化に使用されるCMK ARN\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "各ファイル共有のサーバー側暗号化には**顧客管理のKMSキー**を使用してください（`SSE-KMS`、多層の必要性がある場合は`DSSE-KMS`を*検討*）。キーへのアクセスには**最小権限**と**職務分掌**を適用し、キーをローテーションし、キーの使用状況を監視し、必要なプリンシパルとリージョンに範囲を制限してください。",
+      "Url": "https://hub.prowler.com/check/storagegateway_fileshare_encryption_enabled"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

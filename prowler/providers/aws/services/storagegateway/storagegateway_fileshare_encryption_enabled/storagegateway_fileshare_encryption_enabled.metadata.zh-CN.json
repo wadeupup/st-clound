@@ -1,0 +1,46 @@
+{
+  "Provider": "aws",
+  "CheckID": "storagegateway_fileshare_encryption_enabled",
+  "CheckTitle": "Storage Gateway 文件共享使用 KMS CMK 进行加密",
+  "CheckType": [
+    "软件和配置检查/AWS安全最佳实践",
+    "软件和配置检查/行业和监管标准/AWS 基础安全最佳实践",
+    "软件和配置检查/行业和监管标准/NIST 800-53 控制（美国）",
+    "软件和配置检查/行业和监管标准/PCI-DSS",
+    "软件和配置检查/行业和监管标准/ISO 27001 控制措施",
+    "软件和配置检查/行业和监管标准/SOC 2",
+    "软件和配置检查/行业和监管标准/HIPAA 控制（美国）",
+    "影响/数据暴露"
+  ],
+  "ServiceName": "storagegateway",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "storage",
+  "Description": "配置了**客户管理型 KMS 密钥（CMK）**的 Storage Gateway 文件共享，用于对写入 S3 的对象进行服务器端加密。\n\n会识别未显式指定 KMS 密钥（例如，`SSE-KMS` 或 `DSSE-KMS`）的文件共享。",
+  "Risk": "如果没有 **CMEK**，加密就依赖于由提供商管理的密钥，从而减少了对谁可以解密以及何时可以解密的控制。这会削弱机密性，因为它限制了密钥策略的执行、吊销以及可审计的密钥使用，从而增加了因 S3 凭证被盗或角色权限过宽而带来的暴露风险。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://www.trendmicro.com/cloudoneconformity-staging/knowledge-base/aws/StorageGateway/file-shares-encrypted-with-cmk.html#",
+    "https://docs.aws.amazon.com/filegateway/latest/files3/encrypt-objects-stored-by-file-gateway-in-amazon-s3.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws storagegateway update-nfs-file-share --file-share-arn <example_resource_arn> --kms-encrypted --kms-key <example_kms_key_arn>",
+      "NativeIaC": "```yaml\n# CloudFormation：为 Storage Gateway NFS 文件共享启用 KMS CMK 加密\nResources:\n  <example_resource_name>:\n    Type: AWS::StorageGateway::NFSFileShare\n    Properties:\n      ClientToken: \"<example_resource_id>\"\n      GatewayARN: \"<example_resource_arn>\"\n      LocationARN: \"<example_resource_arn>\"\n      Role: \"<example_resource_arn>\"\n      KMSEncrypted: true  # 关键：为文件共享启用 KMS CMK 加密\n      KMSKey: \"<example_kms_key_arn>\"  # 关键：用于加密的 CMK ARN\n```",
+      "Other": "1. 在 AWS 控制台中，转到 Storage Gateway > File shares\n2. 选择受影响的文件共享并点击 Edit\n3. 在 Encryption 下，选择 AWS KMS 密钥\n4. 选择要使用的 CMK（或粘贴其 ARN）\n5. 保存更改",
+      "Terraform": "```hcl\n# 为 Storage Gateway NFS 文件共享启用 KMS CMK 加密\nresource \"aws_storagegateway_nfs_file_share\" \"<example_resource_name>\" {\n  client_list  = [\"<example_cidr_block>\"]\n  gateway_arn  = \"<example_resource_arn>\"\n  location_arn = \"<example_resource_arn>\"\n  role_arn     = \"<example_resource_arn>\"\n\n  kms_encrypted = true              # 关键：启用 KMS CMK 加密\n  kms_key_arn   = \"<example_kms_key_arn>\"  # 关键：用于加密的 CMK ARN\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "对每个文件共享的服务器端加密使用**客户管理的 KMS 密钥**（`SSE-KMS`；对于多层需求，*可考虑* `DSSE-KMS`）。对密钥访问实施**最小权限**和**职责分离**，轮换密钥，监控密钥使用情况，并将范围限制为必要的主体和区域。",
+      "Url": "https://hub.prowler.com/check/storagegateway_fileshare_encryption_enabled"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

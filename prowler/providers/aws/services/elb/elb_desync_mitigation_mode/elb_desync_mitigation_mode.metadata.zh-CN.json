@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "elb_desync_mitigation_mode",
+  "CheckTitle": "Classic Load Balancer 的 desync 缓解模式为 defensive 或 strictest",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "TTPs/Initial Access",
+    "TTPs/Defense Evasion"
+  ],
+  "ServiceName": "elb",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsElbLoadBalancer",
+  "ResourceGroup": "network",
+  "Description": "评估 **Classic Load Balancer** 的 `desync_mitigation_mode`，以确定其是否配置为 **`defensive`** 或 **`strictest`**。其他模式（如 `monitor`）会被标记以供关注。",
+  "Risk": "若未启用严格的 desync 缓解，可能发生 **HTTP 请求走私**，从而导致：\n- 缓存/队列投毒（**完整性**）\n- 会话劫持和数据泄露（**机密性**）\n- 非预期后端操作和滥用（**可用性**）",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/elasticloadbalancing/latest/classic/config-desync-mitigation-mode.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/elb-controls.html#elb-14",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/ELB/enable-configure-desync-mitigation-mode.html",
+    "https://support.icompaas.com/support/solutions/articles/62000233337-ensure-classic-load-balancer-is-configured-with-defensive-or-strictest-desync-mitigation-mode"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws elb modify-load-balancer-attributes --load-balancer-name <load-balancer-name> --load-balancer-attributes '{\"AdditionalAttributes\":[{\"Key\":\"elb.http.desyncmitigationmode\",\"Value\":\"defensive\"}]}'",
+      "NativeIaC": "",
+      "Other": "1. 打开 AWS 管理控制台并进入 EC2\n2. 在 Load Balancing 下选择 Load Balancers\n3. 选择你的 Classic Load Balancer\n4. 在 Attributes 选项卡点击 Edit\n5. 将 Desync mitigation mode 设置为 Defensive 或 Strictest\n6. 点击 Save changes",
+      "Terraform": "```hcl\nresource \"aws_elb\" \"<example_resource_name>\" {\n  name               = \"<example_resource_name>\"\n  availability_zones = [\"<example_az>\"]\n\n  listener {\n    instance_port     = 80\n    instance_protocol = \"http\"\n    lb_port           = 80\n    lb_protocol       = \"http\"\n  }\n\n  desync_mitigation_mode = \"defensive\" # Critical: sets CLB desync mitigation to defensive to pass the check\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "将 CLB 的 desync 缓解模式设置为 **`defensive`**，在兼容情况下可使用 **`strictest`**。先在预发布环境验证以避免客户端中断。实施**纵深防御**：强制严格请求头处理，结合 WAF 控制，并监控不合规请求指标。",
+      "Url": "https://hub.prowler.com/check/elb_desync_mitigation_mode"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

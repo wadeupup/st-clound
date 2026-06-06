@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "elasticache_redis_cluster_automatic_failover_enabled",
+  "CheckTitle": "ElastiCache Redis 集群已启用自动故障转移",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices"
+  ],
+  "ServiceName": "elasticache",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "database",
+  "Description": "**Amazon ElastiCache (Redis OSS) 复制组**已将 **自动故障转移** 设置为 `enabled`，允许在主节点不可用时提升副本节点。",
+  "Risk": "**缺少自动故障转移**会降低 **可用性**：主节点或可用区中断可能停止写入并需要手动恢复，延长停机时间。\n\n由于 Redis 复制是异步的，延迟提升会增加 **丢失或过时写入**的可能性，影响 **数据完整性**并导致客户端超时。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://aws.amazon.com/blogs/database/testing-automatic-failover-to-a-read-replica-on-amazon-elasticache-for-redis/",
+    "https://docs.aws.amazon.com/AmazonElastiCache/latest/dg/AutoFailover.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws elasticache modify-replication-group --replication-group-id <example_resource_id> --automatic-failover-enabled --apply-immediately",
+      "NativeIaC": "```yaml\n# CloudFormation: enable automatic failover for a Redis replication group\nResources:\n  <example_resource_name>:\n    Type: AWS::ElastiCache::ReplicationGroup\n    Properties:\n      ReplicationGroupId: <example_resource_id>\n      ReplicationGroupDescription: \"<description>\"\n      NumCacheClusters: 2\n      AutomaticFailoverEnabled: true  # Critical: turns on automatic failover so the check passes\n      Engine: redis\n```",
+      "Other": "1. 打开 AWS 控制台并转到 ElastiCache\n2. 选择您的 Redis 复制组（<example_resource_id>）\n3. 点击修改\n4. 将自动故障转移设置为已启用\n5. 勾选立即应用\n6. 点击保存更改",
+      "Terraform": "```hcl\n# Terraform: enable automatic failover for a Redis replication group\nresource \"aws_elasticache_replication_group\" \"<example_resource_name>\" {\n  replication_group_id          = \"<example_resource_id>\"\n  replication_group_description = \"<description>\"\n  node_type                     = \"cache.t3.small\"\n  number_cache_clusters         = 2\n  automatic_failover_enabled    = true  # Critical: turns on automatic failover so the check passes\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "启用 **自动故障转移** 和 **多可用区**，确保每个分片在不同可用区中至少有一个副本。定期*测试故障转移*并监控复制延迟。\n\n设计具有重试和退避功能的客户端以实现弹性，以容忍短暂的角色变更，与 **容错性**和 **纵深防御**保持一致。",
+      "Url": "https://hub.prowler.com/check/elasticache_redis_cluster_automatic_failover_enabled"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "vpc_endpoint_connections_trust_boundaries",
+  "CheckTitle": "VPC 端点策略仅允许来自受信任 AWS 账户的访问",
+  "CheckType": [
+    "软件和配置检查/AWS安全最佳实践",
+    "行业与监管标准/AWS 基础安全最佳实践",
+    "TTPs/初始访问"
+  ],
+  "ServiceName": "vpc",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsEc2VpcEndpointService",
+  "ResourceGroup": "network",
+  "Description": "**VPC 终端节点策略** 会被评估，以检查是否限制为已配置的 **受信任 AWS 账户**。如果 `Principal` 值（包括 `*`）或账户 ARN 允许非受信任主体，或者条件限制不够严格，则会识别出该终端节点。*不含可编辑策略的终端节点将被排除。*",
+  "Risk": "使用您的端点的不受信任主体可以像从您的 VPC 发出一样访问 AWS 服务，从而削弱隔离。这会使对与该端点绑定的资源进行未经授权的读取/写入以及数据外泄成为可能，损害**机密性**和**完整性**，并可能增加**成本**。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/vpc/latest/privatelink/vpc-endpoints-access.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws ec2 modify-vpc-endpoint --vpc-endpoint-id <example_resource_id> --policy-document '{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"*\",\"Resource\":\"*\",\"Condition\":{\"StringEquals\":{\"aws:PrincipalAccount\":[\"<TRUSTED_ACCOUNT_ID_1>\",\"<TRUSTED_ACCOUNT_ID_2>\"]}}}]}'",
+      "NativeIaC": "```yaml\n#CloudFormation：将 VPC 端点访问限制为仅受信任账户\nResources:\n  <example_resource_name>:\n    Type: AWS::EC2::VPCEndpoint\n    Properties:\n      VpcId: <example_resource_id>\n      ServiceName: com.amazonaws.<region>.<service>\n      PolicyDocument:\n        Version: '2012-10-17'\n        Statement:\n          - Effect: Allow\n            Principal: \"*\"\n            Action: \"*\"\n            Resource: \"*\"\n            Condition:                  #关键：按受信任的账户进行限制\n              StringEquals:             #关键：仅允许指定的账户\n                \"aws:PrincipalAccount\":   #关键：将使用限制为这些账户\n                  - \"<TRUSTED_ACCOUNT_ID_1>\"\n                  - \"<TRUSTED_ACCOUNT_ID_2>\"\n```",
+      "Other": "1. 打开 AWS 控制台并前往 VPC > Endpoints\n2. 选择该 endpoint，然后依次选择 Actions > Manage policy\n3. 选择 Custom 并粘贴此最小策略，将其替换为你信任的账户 ID：\n   ```json\n   {\n     \"Version\": \"2012-10-17\",\n     \"Statement\": [\n       {\n         \"Effect\": \"Allow\",\n         \"Principal\": \"*\",\n         \"Action\": \"*\",\n         \"Resource\": \"*\",\n         \"Condition\": {\n           \"StringEquals\": {\n             \"aws:PrincipalAccount\": [\n               \"<TRUSTED_ACCOUNT_ID_1>\",\n               \"<TRUSTED_ACCOUNT_ID_2>\"\n             ]\n           }\n         }\n       }\n     ]\n   }\n   ```\n4. 点击 Save",
+      "Terraform": "```hcl\n#将此添加到现有的 VPC 端点资源中以限制访问\nresource \"aws_vpc_endpoint\" \"<example_resource_name>\" {\n  #...该端点现有的必需参数...\n\n  policy = jsonencode({\n    Version = \"2012-10-17\"\n    Statement = [{\n      Effect    = \"Allow\"\n      Principal = \"*\"\n      Action    = \"*\"\n      Resource  = \"*\"\n      Condition = {                       #关键：按受信任的账户进行限制\n        StringEquals = {\n          \"aws:PrincipalAccount\" = [      #关键：只有这些账户可以使用该端点\n            \"<TRUSTED_ACCOUNT_ID_1>\",\n            \"<TRUSTED_ACCOUNT_ID_2>\"\n          ]\n        }\n      }\n    }]\n  })\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "应用**最小权限**：将终端节点策略限制为你的账户以及明确允许列表中的**受信任账户**。避免使用 `*` 主体，除非配合严格的条件。防止信任通过网络链接进行传递，并使用资源策略和监控作为**纵深防御**来限制终端节点的使用。",
+      "Url": "https://hub.prowler.com/check/vpc_endpoint_connections_trust_boundaries"
+    }
+  },
+  "Categories": [
+    "trust-boundaries",
+    "identity-access"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

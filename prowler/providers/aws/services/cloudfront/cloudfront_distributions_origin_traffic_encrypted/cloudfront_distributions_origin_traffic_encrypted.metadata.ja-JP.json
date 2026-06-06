@@ -1,0 +1,45 @@
+{
+  "Provider": "aws",
+  "CheckID": "cloudfront_distributions_origin_traffic_encrypted",
+  "CheckTitle": "CloudFrontディストリビューションがカスタムオリジンへのトラフィックを暗号化している",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices/Network Security",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Effects/Data Exposure"
+  ],
+  "ServiceName": "cloudfront",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsCloudFrontDistribution",
+  "ResourceGroup": "network",
+  "Description": "**CloudFrontディストリビューション**は**オリジンへのTLS**について評価されます。このチェックは、カスタムオリジンが`origin_protocol_policy`=`https-only`を使用するか、ビューアープロトコルポリシーがHTTPを禁止する場合にのみ`match-viewer`を使用することを保証します。S3オリジンの場合、ビューアープロトコルポリシーを検査し、`allow-all`を非暗号化パスを許可するものとしてフラグ付けします。",
+  "Risk": "暗号化されていないオリジンリンクにより、パス上のインターセプトと操作が可能になります。シークレット、Cookie、PIIが公開され、応答が変更される可能性があり、**機密性**と**整合性**が弱まります。これにより、セッションハイジャック、キャッシュポイズニング、悪意のあるコンテンツ注入の可能性が増加します。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/using-https.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/CloudFront/cloudfront-traffic-to-origin-unencrypted.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/cloudfront-controls.html#cloudfront-9",
+    "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/using-https-cloudfront-to-custom-origin.html",
+    "https://docs.aws.amazon.com/whitepapers/latest/secure-content-delivery-amazon-cloudfront/custom-origin-with-cloudfront.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws cloudfront get-distribution-config --id <DISTRIBUTION_ID> --output json > current-config.json && echo 'Manually edit current-config.json to change Origins[].CustomOriginConfig.OriginProtocolPolicy to https-only', then run:' && echo 'aws cloudfront update-distribution --id <DISTRIBUTION_ID> --distribution-config file://current-config.json --if-match $(aws cloudfront get-distribution-config --id <DISTRIBUTION_ID> --query \"ETag\" --output text)'",
+      "NativeIaC": "```yaml\n# CloudFormation：CloudFrontオリジンをHTTPSのみに設定\nResources:\n  <example_resource_name>:\n    Type: AWS::CloudFront::Distribution\n    Properties:\n      DistributionConfig:\n        Enabled: true\n        Origins:\n          - Id: <example_origin_id>\n            DomainName: <example_origin_domain>\n            CustomOriginConfig:\n              OriginProtocolPolicy: https-only  # 修正：CloudFrontからオリジンへのHTTPSのみを強制\n        DefaultCacheBehavior:\n          TargetOriginId: <example_origin_id>\n          ViewerProtocolPolicy: allow-all\n          ForwardedValues:\n            QueryString: false\n```",
+      "Other": "1. AWSコンソールで、CloudFrontを開き、ディストリビューションを選択\n2. オリジンタブに移動し、カスタムオリジンを選択して編集をクリック\n3. プロトコルをHTTPSのみに設定（オリジンプロトコルポリシー = HTTPSのみ）\n4. 変更を保存し、ディストリビューションのデプロイを待つ",
+      "Terraform": "```hcl\n# Terraform：CloudFrontオリジンをHTTPSのみに設定\nresource \"aws_cloudfront_distribution\" \"<example_resource_name>\" {\n  enabled = true\n\n  origin {\n    domain_name = \"<example_origin_domain>\"\n    origin_id   = \"<example_origin_id>\"\n\n    custom_origin_config {\n      http_port              = 80\n      https_port             = 443\n      origin_protocol_policy = \"https-only\"   # 修正：CloudFrontからオリジンへのHTTPSのみを強制\n      origin_ssl_protocols   = [\"TLSv1.2\"]\n    }\n  }\n\n  default_cache_behavior {\n    target_origin_id       = \"<example_origin_id>\"\n    viewer_protocol_policy = \"allow-all\"\n    forwarded_values {\n      query_string = false\n      cookies { forward = \"none\" }\n    }\n  }\n\n  restrictions { geo_restriction { restriction_type = \"none\" } }\n  viewer_certificate { cloudfront_default_certificate = true }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "エンドツーエンドのHTTPSを強制します。`origin_protocol_policy`を`https-only`に設定し、ビューアーポリシーを`https-only`または`redirect-to-https`に設定します。信頼できる証明書とモダンなTLS（`TLSv1.2+`）を使用し、弱いプロトコルを無効化します。直接オリジンアクセスを制限し、プライベート接続を優先することで**最小権限**と**多層防御**を適用します。",
+      "Url": "https://hub.prowler.com/check/cloudfront_distributions_origin_traffic_encrypted"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

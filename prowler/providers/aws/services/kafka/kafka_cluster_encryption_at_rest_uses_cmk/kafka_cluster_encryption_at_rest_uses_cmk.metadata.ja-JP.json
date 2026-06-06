@@ -1,0 +1,44 @@
+{
+  "Provider": "aws",
+  "CheckID": "kafka_cluster_encryption_at_rest_uses_cmk",
+  "CheckTitle": "Kafka クラスターは、顧客管理キー (CMK) を使用して保存時の暗号化が有効になっているか、サーバーレスです。",
+  "CheckType": [
+    "ソフトウェアと構成のチェック/AWS セキュリティベストプラクティス/データ暗号化",
+    "業界および規制基準/AWS 基礎セキュリティベストプラクティス",
+    "業界および規制基準/NIST 800-53 コントロール (米国)",
+    "業界および規制基準/PCI-DSS",
+    "影響/データの露出"
+  ],
+  "ServiceName": "kafka",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsMskCluster",
+  "ResourceGroup": "messaging",
+  "Description": "Amazon MSK クラスターは、データボリュームの保存時の暗号化に **顧客管理 KMS キー** を使用しているかどうかを検査されます。サーバーレスクラスターは本質的に暗号化されています。プロビジョニングされたクラスターは、構成された `DataVolumeKMSKeyId` が顧客管理キーに対応する場合にのみ認識されます。",
+  "Risk": "サービス管理キーに依存すると、**機密性** と **説明責任** が弱まります。詳細なキー ポリシー、職務分離、独立したローテーションを強制することはできません。これにより、インシデント対応 (例: 暗号シュレッディングのためのキーの無効化) が制限され、監査可能性が低下し、資格情報の誤用やブローカーの侵害の影響が増大します。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/msk/latest/developerguide/msk-encryption.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/MSK/msk-encryption-at-rest-with-cmk.html",
+    "https://docs.aws.amazon.com/msk/latest/developerguide/msk-working-with-encryption.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation: 保存時の暗号化に顧客管理 KMS キーを使用する MSK クラスター\nResources:\n  <example_resource_name>:\n    Type: AWS::MSK::Cluster\n    Properties:\n      ClusterName: <example_resource_name>\n      KafkaVersion: <KAFKA_VERSION>\n      NumberOfBrokerNodes: 2\n      BrokerNodeGroupInfo:\n        InstanceType: kafka.m5.large\n        ClientSubnets:\n          - <example_subnet_id_a>\n          - <example_subnet_id_b>\n        SecurityGroups:\n          - <example_security_group_id>\n      EncryptionInfo:\n        EncryptionAtRest:\n          DataVolumeKMSKeyId: <example_kms_key_arn>  # 重要: 保存時の CMK 暗号化を有効にするために顧客管理 KMS キー ARN を使用します。\n```",
+      "Other": "1. AWS コンソールで、Amazon MSK > クラスターに移動します。\n2. クラスターを作成をクリックします。\n3. プロビジョニング済みを選択します (または、デフォルトでパスするためにサーバーレスを選択します)。\n4. 暗号化設定で、保存時の暗号化に顧客管理キーを選択し、CMK を選択します (alias/aws/kafka ではありません)。\n5. クラスターを作成し、クライアントを移行してから、AWS 管理キーを使用していた古いクラスターを削除します。",
+      "Terraform": "```hcl\n# 保存時の暗号化に顧客管理 KMS キーを使用する MSK クラスター\nresource \"aws_msk_cluster\" \"<example_resource_name>\" {\n  cluster_name           = \"<example_resource_name>\"\n  kafka_version          = \"<KAFKA_VERSION>\"\n  number_of_broker_nodes = 2\n\n  broker_node_group_info {\n    instance_type  = \"kafka.m5.large\"\n    client_subnets = [\"<example_subnet_id_a>\", \"<example_subnet_id_b>\"]\n    security_groups = [\"<example_security_group_id>\"]\n  }\n\n  encryption_info {\n    encryption_at_rest_kms_key_arn = \"<example_kms_key_arn>\" # 重要: チェックを通過するための顧客管理 KMS キー\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "MSK の保存時の暗号化には **顧客管理 KMS キー** を使用します。キー ポリシーと付与に **最小特権** を適用し、**キーのローテーション** を有効にし、監査のためにキーの使用をログに記録します。MSK 管理者と KMS キー管理者の間で **職務分離** を強制し、アクセス、エイリアス、および削除保留状態を定期的に確認します。",
+      "Url": "https://hub.prowler.com/check/kafka_cluster_encryption_at_rest_uses_cmk"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

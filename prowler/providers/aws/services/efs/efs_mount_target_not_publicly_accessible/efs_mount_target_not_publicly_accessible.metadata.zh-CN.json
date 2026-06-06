@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "efs_mount_target_not_publicly_accessible",
+  "CheckTitle": "EFS 文件系统没有可公开访问的挂载目标",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices/Network Reachability",
+    "TTPs/Initial Access",
+    "Effects/Data Exposure"
+  ],
+  "ServiceName": "efs",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsEfsFileSystem",
+  "ResourceGroup": "storage",
+  "Description": "识别与自动分配公共 IPv4 地址（`mapPublicIpOnLaunch=true`）的 VPC 子网关联的 **EFS 挂载目标**（按文件系统）。\n\n评估重点是与每个挂载目标关联的子网属性。",
+  "Risk": "可公开寻址的挂载目标使 NFS 暴露于互联网扫描和利用尝试。\n- **机密性**：未经授权的读取\n- **完整性**：非法写入或删除\n- **可用性**：DDoS/资源耗尽\n\n*即使有严格的规则*，公共 IP 也会削弱隔离性并便于侦察。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/efs-controls.html#efs-6",
+    "https://docs.aws.amazon.com/efs/latest/ug/accessing-fs.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# Create an EFS mount target in a private subnet\nResources:\n  <example_resource_name>:\n    Type: AWS::EFS::MountTarget\n    Properties:\n      FileSystemId: <example_resource_id>\n      SubnetId: <example_resource_id>  # FIX: Use a private subnet (no route to an Internet Gateway)\n      SecurityGroups:\n        - <example_resource_id>  # Required SG for the mount target\n```",
+      "Other": "1. 打开 AWS 控制台 > EFS > 文件系统 > 选择您的文件系统\n2. 转到网络并点击创建挂载目标\n3. 选择一个私有子网（没有到 Internet Gateway 的路由）并选择一个安全组\n4. 点击创建\n5. 在网络中，选择公共子网中的任何挂载目标并点击删除以移除它们",
+      "Terraform": "```hcl\n# Create an EFS mount target in a private subnet\nresource \"aws_efs_mount_target\" \"<example_resource_name>\" {\n  file_system_id  = \"<example_resource_id>\"\n  subnet_id       = \"<example_resource_id>\"  # FIX: Use a private subnet (no route to an Internet Gateway)\n  security_groups = [\"<example_resource_id>\"]\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "将挂载目标放置在不会自动分配公共 IP（`mapPublicIpOnLaunch=false`）的 **私有子网** 中。应用 **最小权限**：通过安全组将 NFS 限制为已知源，避免互联网路由，并使用 NACL 实现 **纵深防御**。优先使用私有连接（VPN/Direct Connect 或对等连接）进行访问。",
+      "Url": "https://hub.prowler.com/check/efs_mount_target_not_publicly_accessible"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "vm_ensure_unattached_disks_encrypted_with_cmk",
+  "CheckTitle": "「未接続ディスク」が「Customer Managed Key」（CMK）で暗号化されていることを確認する",
+  "CheckType": [],
+  "ServiceName": "vm",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Microsoft.Compute/virtualMachines",
+  "ResourceGroup": "compute",
+  "Description": "サブスクリプション内の未接続ディスクが Customer Managed Key（CMK）で暗号化されていることを確認します。",
+  "Risk": "マネージドディスクは既定で Platform-managed keys により暗号化されています。Customer-managed keys を使用すると、追加のセキュリティレベルを提供したり、組織の規制要件を満たしたりできます。マネージドディスクを暗号化することで、キーなしではディスク内容全体を復元できなくなり、不正な読み取りから保護できます。ディスクがどの VM にも接続されていない場合でも、VM サービスへの管理アクセスを持つユーザーアカウントが侵害されると、これらのデータディスクをマウント/接続され、機密情報の漏えいや改ざんにつながるリスクがあります。",
+  "RelatedUrl": "https://docs.microsoft.com/en-us/azure/security/fundamentals/azure-disk-encryption-vms-vmss",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/VirtualMachines/sse-unattached-disk-cmk.html#",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "ディスクに保存されたデータが不要になった場合は、以下の Azure ドキュメントを参照して未接続データディスクを削除してください: https://learn.microsoft.com/en-us/rest/api/compute/disks/delete?view=rest-compute-2023-10-02&tabs=HTTP",
+      "Url": "https://learn.microsoft.com/en-us/azure/security/fundamentals/data-encryption-best-practices#protect-data-at-rest"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "この機能を利用するには、Key Vault を事前に設定しておく必要があります。暗号化は Standard レベルの VM でのみ利用可能です。コストが増加する可能性があります。Customer-managed keys の利用と維持には、キーの作成、保護、ローテーションに追加作業が必要です。"
+}

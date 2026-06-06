@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "storage_geo_redundant_enabled",
+  "CheckTitle": "确保关键 Azure 存储账户已启用异地冗余存储（GRS）",
+  "CheckType": [],
+  "ServiceName": "storage",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AzureStorageAccount",
+  "ResourceGroup": "storage",
+  "Description": "关键 Azure 存储账户必须启用异地冗余存储（GRS），以确保在区域性中断发生时的数据持久性与可用性。GRS 会在主区域内复制数据，并异步复制到次要区域，从而提升韧性并支持灾难恢复策略。",
+  "Risk": "若未启用 GRS，关键数据在区域性中断期间可能丢失或不可用，从而削弱数据持久性和灾难恢复能力。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/storage/common/storage-redundancy",
+  "Remediation": {
+    "Code": {
+      "CLI": "az storage account update --name <storage-account-name> --resource-group <resource-group-name> --sku Standard_GRS",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/StorageAccounts/enable-geo-redundant-storage.html",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "为关键 Azure 存储账户启用异地冗余存储（GRS），以确保在跨区域故障场景下的数据持久性和可用性。",
+      "Url": "https://learn.microsoft.com/en-us/azure/storage/common/storage-redundancy"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

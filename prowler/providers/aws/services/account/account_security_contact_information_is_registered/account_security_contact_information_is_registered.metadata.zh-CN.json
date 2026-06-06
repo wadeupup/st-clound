@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "account_security_contact_information_is_registered",
+  "CheckTitle": "AWS 账户已注册安全备用联系人",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践",
+    "软件和配置检查/行业和监管标准/AWS 基础安全最佳实践"
+  ],
+  "ServiceName": "account",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "governance",
+  "Description": "账户设置在备用联系人中包含**安全备用联系人**（姓名、`EmailAddress`、`PhoneNumber`），用于接收定向的 AWS 安全通知。",
+  "Risk": "缺失或过时的**安全联系人**可能会延迟或阻止 AWS 安全公告到达响应人员，增加以下风险：\n- 机密性：未检测到的泄露导致的数据泄露\n- 完整性：未授权更改持续更长时间\n- 可用性：资源滥用（例如，加密货币挖矿）和中断",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/account_alternate_contact",
+    "https://docs.prowler.com/checks/aws/iam-policies/iam_19/",
+    "https://support.icompaas.com/support/solutions/articles/62000234161-1-2-ensure-security-contact-information-is-registered-manual-",
+    "https://www.plerion.com/cloud-knowledge-base/ensure-security-contact-information-is-registered",
+    "https://repost.aws/articles/ARDFbpt-bvQ8iuErnqVVcCXQ/managing-aws-organization-alternate-contacts-via-csv"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws account put-alternate-contact --alternate-contact-type SECURITY --email-address <EMAIL_ADDRESS> --name <CONTACT_NAME> --phone-number <PHONE_NUMBER>",
+      "NativeIaC": "",
+      "Other": "1. 以根用户或具有 account:PutAlternateContact 权限的管理员身份登录 AWS 管理控制台\n2. 单击您的账户名称（右上角）并选择 My Account（或 Account）\n3. 滚动到 Alternate Contacts，在 Security 部分单击 Edit\n4. 输入 Security Email、Name 和 Phone Number\n5. 单击 Update（或 Save changes）",
+      "Terraform": "```hcl\n# 为当前 AWS 账户设置 SECURITY 备用联系人\nresource \"aws_account_alternate_contact\" \"<example_resource_name>\" {\n  alternate_contact_type = \"SECURITY\"  # 关键：设置安全联系人类型\n  email_address          = \"security@example.com\"  # 联系人电子邮件\n  name                   = \"Security Team\"         # 联系人姓名\n  phone_number           = \"+1-555-0100\"          # 联系人电话\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "定义并维护**安全备用联系人**：\n- 使用受监控的别名（例如，`security@domain`）和团队电话\n- 应用于每个账户（首选组织范围的自动化）\n- 在组织/人员变更后审查并测试交付\n- 记录所有权和升级路径\n与**事件响应**和**最小权限**原则保持一致。",
+      "Url": "https://hub.prowler.com/check/account_security_contact_information_is_registered"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

@@ -1,0 +1,44 @@
+{
+  "Provider": "aws",
+  "CheckID": "apigateway_restapi_authorizers_enabled",
+  "CheckTitle": "API Gateway REST API に API レベルで承認者がいるか、すべてのメソッドが承認されています",
+  "CheckType": [
+    "ソフトウェアと設定チェック/AWS セキュリティベストプラクティス",
+    "ソフトウェアと設定チェック/業界および規制基準/AWS 基礎セキュリティベストプラクティス",
+    "TTPs/初期アクセス"
+  ],
+  "ServiceName": "apigateway",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsApiGatewayRestApi",
+  "ResourceGroup": "api_gateway",
+  "Description": "**API Gateway REST API** は**アクセス制御**について評価されます：**API レベルの承認者**が存在するか、すべてのリソースメソッドが承認メカニズムを使用しています。`NONE` とマークされたメソッドは、認証されていないアクセスを示します。",
+  "Risk": "**認証されていない API メソッド**により以下が可能になります：\n- データを露出する任意の読み取り（**機密性**）\n- バックエンドに対する不正なアクション（**整合性**）\n- 悪用と高トラフィックによるコストの急増または中断（**可用性**）\n\n攻撃者は、トークンなしでエンドポイントを列挙し、統合を呼び出すことができます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-use-lambda-authorizer.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation: メソッドの承認を設定して、パブリックにしないようにします\nResources:\n  <example_resource_name>:\n    Type: AWS::ApiGateway::Method\n    Properties:\n      RestApiId: <example_resource_id>\n      ResourceId: <example_resource_id>\n      HttpMethod: GET\n      AuthorizationType: AWS_IAM  # 重要：メソッドを承認します（NONE ではありません）\n```",
+      "Other": "1. AWS コンソールで、API Gateway > APIs (REST) に移動し、API を選択します\n2. Resources を開き、リソースを選択してから、メソッド（例：GET）を選択します\n3. Method Request をクリックします\n4. Authorization を AWS_IAM（または既存の Cognito/Lambda 承認者）に設定します\n5. すべてのメソッドについて繰り返し、Authorization = NONE が表示されないようにします\n6. API をデプロイして変更を適用します",
+      "Terraform": "```hcl\n# Terraform: メソッドの承認を設定して、パブリックにしないようにします\nresource \"aws_api_gateway_method\" \"<example_resource_name>\" {\n  rest_api_id  = \"<example_resource_id>\"\n  resource_id  = \"<example_resource_id>\"\n  http_method  = \"GET\"\n  authorization = \"AWS_IAM\" # 重要：メソッドを承認します（NONE ではありません）\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "すべてのメソッドで**認証**を要求します：**Cognito ユーザープール**、**Lambda 承認者**、または**IAM** を使用します；`NONE` を避けます。\n- スコープ付きポリシーで**最小権限**を強制します\n- 内部 API には**プライベートエンドポイント**またはリソースポリシーを使用します\n- 多層防御のために**レート制限**と**WAF**を追加します",
+      "Url": "https://hub.prowler.com/check/apigateway_restapi_authorizers_enabled"
+    }
+  },
+  "Categories": [
+    "identity-access"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "",
+  "CheckAliases": [
+    "apigateway_authorizers_enabled"
+  ]
+}
+

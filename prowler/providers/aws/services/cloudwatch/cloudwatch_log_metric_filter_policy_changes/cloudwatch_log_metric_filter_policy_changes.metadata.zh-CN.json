@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "cloudwatch_log_metric_filter_policy_changes",
+  "CheckTitle": "已为 IAM 策略更改配置 CloudWatch Logs 度量过滤器和告警",
+  "CheckType": [
+    "Software and Configuration Checks/Industry and Regulatory Standards/CIS AWS Foundations Benchmark",
+    "TTPs/Privilege Escalation"
+  ],
+  "ServiceName": "cloudwatch",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsCloudWatchAlarm",
+  "ResourceGroup": "monitoring",
+  "Description": "CloudWatch 使用度量过滤器和告警来跟踪由 CloudTrail 记录的 **IAM 策略更改**（例如 `CreatePolicy`、`DeletePolicy`、版本变更、内联策略编辑、策略附加/分离）。该检查结果反映 CloudTrail 日志组上是否存在相应的过滤器及其关联告警。",
+  "Risk": "如果缺少对 **IAM 策略更改** 的告警，权限修改可能在未被察觉的情况下发生，从而导致**权限提升**、隐藏后门或权限撤销。这会威胁到系统的**机密性**和**完整性**，并且在关键访问被删除或配置错误时也可能影响**可用性**。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudwatch-alarms-for-cloudtrail.html",
+    "https://www.clouddefense.ai/compliance-rules/cis-v140/monitoring/cis-v140-4-4",
+    "https://www.intelligentdiscovery.io/controls/cloudwatch/cloudwatch-alarm-iam-policy-change"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation：为 IAM 策略更改创建度量过滤器和告警\nResources:\n  IAMPolicyChangeMetricFilter:\n    Type: AWS::Logs::MetricFilter\n    Properties:\n      LogGroupName: <example_resource_name>  # 重要：需要监控的 CloudTrail 日志组\n      # 关键：匹配本检查所需的 IAM 策略更改事件\n      FilterPattern: '{($.eventName=DeleteGroupPolicy)||($.eventName=DeleteRolePolicy)||($.eventName=DeleteUserPolicy)||($.eventName=PutGroupPolicy)||($.eventName=PutRolePolicy)||($.eventName=PutUserPolicy)||($.eventName=CreatePolicy)||($.eventName=DeletePolicy)||($.eventName=CreatePolicyVersion)||($.eventName=DeletePolicyVersion)||($.eventName=AttachRolePolicy)||($.eventName=DetachRolePolicy)||($.eventName=AttachUserPolicy)||($.eventName=DetachUserPolicy)||($.eventName=AttachGroupPolicy)||($.eventName=DetachGroupPolicy)}'\n      MetricTransformations:\n        - MetricName: <example_resource_name>   # 关键：由过滤器创建的度量\n          MetricNamespace: CISBenchmark        # 关键：度量命名空间\n          MetricValue: \"1\"\n\n  IAMPolicyChangeAlarm:\n    Type: AWS::CloudWatch::Alarm\n    Properties:\n      AlarmName: <example_resource_name>\n      # 关键：当发生 ≥1 次事件时，对上述度量触发告警\n      MetricName: <example_resource_name>\n      Namespace: CISBenchmark\n      Statistic: Sum\n      Period: 300\n      EvaluationPeriods: 1\n      Threshold: 1\n      ComparisonOperator: GreaterThanOrEqualToThreshold\n```",
+      "Other": "1. 打开 CloudWatch 控制台，进入 Logs > Log groups 并选择 CloudTrail 日志组\n2. 创建度量过滤器：\n   - Filter pattern：{($.eventName=DeleteGroupPolicy)||($.eventName=DeleteRolePolicy)||($.eventName=DeleteUserPolicy)||($.eventName=PutGroupPolicy)||($.eventName=PutRolePolicy)||($.eventName=PutUserPolicy)||($.eventName=CreatePolicy)||($.eventName=DeletePolicy)||($.eventName=CreatePolicyVersion)||($.eventName=DeletePolicyVersion)||($.eventName=AttachRolePolicy)||($.eventName=DetachRolePolicy)||($.eventName=AttachUserPolicy)||($.eventName=DetachUserPolicy)||($.eventName=AttachGroupPolicy)||($.eventName=DetachGroupPolicy)}\n   - Metric name：<example_resource_name>\n   - Namespace：CISBenchmark\n   - Metric value：1\n3. 在 Metric filters 选项卡中选择新建过滤器并点击“Create alarm”（创建告警）\n4. 设置：Statistic=Sum，Period=5 minutes，Threshold type=Static，条件=Greater/Equal，Threshold=1，Evaluation periods=1\n5. 创建告警",
+      "Terraform": "```hcl\n# Terraform：用于 IAM 策略更改的度量过滤器和告警\nresource \"aws_cloudwatch_log_metric_filter\" \"<example_resource_name>\" {\n  name           = \"<example_resource_name>\"\n  log_group_name = \"<example_resource_name>\"  # CloudTrail 日志组\n\n  # 关键：匹配本检查所需的 IAM 策略更改事件\n  pattern = \"{($.eventName=DeleteGroupPolicy)||($.eventName=DeleteRolePolicy)||($.eventName=DeleteUserPolicy)||($.eventName=PutGroupPolicy)||($.eventName=PutRolePolicy)||($.eventName=PutUserPolicy)||($.eventName=CreatePolicy)||($.eventName=DeletePolicy)||($.eventName=CreatePolicyVersion)||($.eventName=DeletePolicyVersion)||($.eventName=AttachRolePolicy)||($.eventName=DetachRolePolicy)||($.eventName=AttachUserPolicy)||($.eventName=DetachUserPolicy)||($.eventName=AttachGroupPolicy)||($.eventName=DetachGroupPolicy)}\"\n\n  metric_transformation {\n    name      = \"<example_resource_name>\"      # 关键：由过滤器创建的度量\n    namespace = \"CISBenchmark\"                 # 关键：度量命名空间\n    value     = \"1\"\n  }\n}\n\nresource \"aws_cloudwatch_metric_alarm\" \"<example_resource_name>\" {\n  alarm_name          = \"<example_resource_name>\"\n  # 关键：当发生 ≥1 次事件时对该度量告警\n  metric_name         = aws_cloudwatch_log_metric_filter.<example_resource_name>.metric_transformation[0].name\n  namespace           = aws_cloudwatch_log_metric_filter.<example_resource_name>.metric_transformation[0].namespace\n  statistic           = \"Sum\"\n  period              = 300\n  evaluation_periods  = 1\n  threshold           = 1\n  comparison_operator = \"GreaterThanOrEqualToThreshold\"\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "为 IAM 策略的创建/更新/删除以及策略附加/分离事件创建度量过滤器，并配置 **告警** 以通知响应人员。\n- 对策略变更实施**最小权限原则**和职责分离\n- 要求审批并在跨区域/跨账户集中记录日志\n- 将告警集成到事件响应流程中",
+      "Url": "https://hub.prowler.com/check/cloudwatch_log_metric_filter_policy_changes"
+    }
+  },
+  "Categories": [
+    "logging"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "日志记录与监控"
+}
+
+

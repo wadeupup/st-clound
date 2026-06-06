@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "storage_cross_tenant_replication_disabled",
+  "CheckTitle": "确保已禁用跨租户复制",
+  "CheckType": [],
+  "ServiceName": "storage",
+  "SubServiceName": "account",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AzureStorageAccount",
+  "ResourceGroup": "storage",
+  "Description": "确保 Azure 存储账户未启用跨租户复制，以防止数据在租户边界之间发生非预期复制。",
+  "Risk": "若启用了跨租户复制，敏感数据可能会被意外复制到其他租户，增加数据泄露、未授权访问或违反数据治理与隐私策略的风险。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/storage/blobs/object-replication-prevent-cross-tenant-policies?tabs=portal",
+  "Remediation": {
+    "Code": {
+      "CLI": "az storage account update --name <storage-account-name> --resource-group <resource-group> --default-to-oauth-authentication true --allow-cross-tenant-replication false",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity-staging/knowledge-base/azure/StorageAccounts/disable-cross-tenant-replication.html",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "在存储账户上禁用跨租户复制，确保数据保留在租户边界内（除非明确共享），从而降低数据泄露和未授权访问风险。",
+      "Url": "https://learn.microsoft.com/en-us/azure/storage/blobs/object-replication-prevent-cross-tenant-policies?tabs=portal"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "app_function_application_insights_enabled",
+  "CheckTitle": "确保 Function App 已配置 Application Insights",
+  "CheckType": [],
+  "ServiceName": "app",
+  "SubServiceName": "function",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Microsoft.Web/sites",
+  "ResourceGroup": "serverless",
+  "Description": "Application Insights 是用于监控 Azure Function App 性能与运行状况的强大工具。它能够提供异常、性能问题和使用模式等关键信息，从而帮助及时发现并解决问题。",
+  "Risk": "如果未启用 Application Insights，你可能会错过 Function App 中的关键错误、性能下降或异常行为，进而影响可用性和用户体验。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/azure-monitor/app/app-insights-overview",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/Functions/function-app-insights-on.html",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "为你的 Azure Function App 启用 Application Insights，以监控其性能和运行状况。",
+      "Url": "https://learn.microsoft.com/en-us/azure/azure-monitor/app/monitor-functions"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

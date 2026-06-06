@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "kafka_cluster_enhanced_monitoring_enabled",
+  "CheckTitle": "Amazon MSK クラスターには拡張モニタリングが有効になっています",
+  "CheckType": [
+    "ソフトウェアと構成のチェック/AWS セキュリティベストプラクティス",
+    "ソフトウェアと構成のチェック/業界および規制基準/AWS 基礎セキュリティベストプラクティス"
+  ],
+  "ServiceName": "kafka",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsMskCluster",
+  "ResourceGroup": "messaging",
+  "Description": "**Amazon MSK クラスター**は、`DEFAULT`を超える**拡張モニタリング**レベル（例：`PER_BROKER`、`PER_TOPIC_PER_BROKER`、`PER_TOPIC_PER_PARTITION`）について評価されます。\n\n*サーバーレスクラスター*は設計上、拡張モニタリングを含んでいます。プロビジョニングされたクラスターは、設定されたモニタリングレベルによって評価されます。",
+  "Risk": "不十分なメトリクスは、**ブローカーの健全性**、**レプリケーション状態**、および**コンシューマーラグ**の可視性を制限し、インシデントへの対応を遅らせます。\n\nこれにより、**可用性の損失**（飽和、スロットリング）のリスクが増加し、アンダーレプリケートされたパーティションなどの**整合性の問題**を隠す可能性があり、障害時のデータ損失の影響を高めます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/msk/latest/developerguide/metrics-details.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/MSK/enable-enhanced-monitoring-for-apache-kafka-brokers.html#",
+    "https://docs.aws.amazon.com/msk/latest/developerguide/monitoring.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws kafka update-monitoring --cluster-arn <CLUSTER_ARN> --current-version <CURRENT_VERSION> --enhanced-monitoring PER_BROKER",
+      "NativeIaC": "```yaml\n# CloudFormation: MSK クラスターで拡張モニタリングを有効にする\nResources:\n  <example_resource_name>:\n    Type: AWS::MSK::Cluster\n    Properties:\n      ClusterName: <example_resource_name>\n      KafkaVersion: <example_kafka_version>\n      NumberOfBrokerNodes: 2\n      BrokerNodeGroupInfo:\n        ClientSubnets:\n          - <example_subnet_id_1>\n          - <example_subnet_id_2>\n        InstanceType: kafka.t3.small\n      EnhancedMonitoring: PER_BROKER  # 重要: チェックを通過するために DEFAULT を超える拡張モニタリングを設定します\n```",
+      "Other": "1. AWS コンソールを開き、Amazon MSK に移動します\n2. プロビジョニングされたクラスターを選択します\n3. 編集をクリックします\n4. モニタリングの下で、拡張モニタリングを PER_BROKER（またはそれ以上）に設定します\n5. 変更を保存し、更新が完了するのを待ちます",
+      "Terraform": "```hcl\n# Terraform: MSK クラスターで拡張モニタリングを有効にする\nresource \"aws_msk_cluster\" \"<example_resource_name>\" {\n  cluster_name           = \"<example_resource_name>\"\n  kafka_version          = \"<example_kafka_version>\"\n  number_of_broker_nodes = 2\n\n  broker_node_group_info {\n    instance_type  = \"kafka.t3.small\"\n    client_subnets = [\"<example_subnet_id_1>\", \"<example_subnet_id_2>\"]\n  }\n\n  enhanced_monitoring = \"PER_BROKER\" # 重要: チェックを通過するために DEFAULT を超えるモニタリングを設定します\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "拡張レベル（例：`PER_BROKER` またはそれ以上）を選択し、**可観測性**を確立します：ブローカーリソース、レプリケーションの健全性、コンシューマーラグのテレメトリを優先します。SLO に合わせたアラートとダッシュボードを設定し、プロアクティブなスケーリングと迅速なインシデント封じ込めを可能にします。*粒度とコストのバランスを取ります*。",
+      "Url": "https://hub.prowler.com/check/kafka_cluster_enhanced_monitoring_enabled"
+    }
+  },
+  "Categories": [
+    "logging"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

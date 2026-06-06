@@ -1,0 +1,33 @@
+{
+  "Provider": "aws",
+  "CheckID": "s3_multi_region_access_point_public_access_block",
+  "CheckTitle": "已在多区域访问点上启用阻止公共访问设置。",
+  "CheckType": [
+    "软件和配置检查/行业和监管标准/AWS 基础安全最佳实践"
+  ],
+  "ServiceName": "s3",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:aws:s3:region:account-id:accesspoint/access-point-name",
+  "Severity": "high",
+  "ResourceType": "AwsS3AccessPoint",
+  "ResourceGroup": "storage",
+  "Description": "确保在 S3 访问点上阻止公共访问。",
+  "Risk": "在 AWS 中将 S3 多区域访问点向公众开放可能导致数据暴露、数据泄露、合规违规、未经授权的访问以及数据完整性问题。",
+  "RelatedUrl": "https://aws.amazon.com/es/getting-started/hands-on/getting-started-with-amazon-s3-multi-region-access-points/",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://docs.aws.amazon.com/securityhub/latest/userguide/s3-controls.html#s3-24",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "确保 S3 多区域访问点默认保持私有，实施严格的访问控制，并定期审核权限，以防止未经授权的公共访问。",
+      "Url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/multi-region-access-point-block-public-access.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "sagemaker_notebook_instance_vpc_settings_configured",
+  "CheckTitle": "Amazon SageMaker ノートブックインスタンスには VPC 設定が構成されています",
+  "CheckType": [
+    "ソフトウェアおよび設定のチェック/AWS セキュリティのベストプラクティス/ネットワーク到達可能性",
+    "ソフトウェアと設定のチェック/業界および規制基準/AWS 基盤セキュリティのベストプラクティス"
+  ],
+  "ServiceName": "sagemaker",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsSageMakerNotebookInstance",
+  "ResourceGroup": "ai_ml",
+  "Description": "**SageMaker ノートブックインスタンス** は **VPC アタッチメント** について評価されます。VPC（`subnet_id` とセキュリティグループを介して）で設定されたインスタンスはプライベートネットワーキングを使用し、VPC 設定のないインスタンスはパブリックネットワーキングに依存します。",
+  "Risk": "VPC がないと、ノートブックは**ネットワーク分離**を失います。AWS サービスへのトラフィックがパブリックインターネットを経由する可能性があり、**送信制御**や**プライベートエンドポイント**が制限され、データの流出や傍受を可能にし、横方向の移動を容易にして、**機密性**と**完全性**に影響を及ぼします。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/SageMaker/notebook-instance-in-vpc.html",
+    "https://docs.aws.amazon.com/sagemaker/latest/dg/studio-notebooks-and-internet-access.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation: VPC設定付きのSageMakerノートブックインスタンス\nResources:\n  <example_resource_name>:\n    Type: AWS::SageMaker::NotebookInstance\n    Properties:\n      InstanceType: ml.t3.medium\n      RoleArn: <example_resource_id>\n      SubnetId: <example_resource_id>  # 重要: ノートブックをVPCサブネット内に配置して、このチェックが通るようにします\n```",
+      "Other": "1. AWS コンソールで、SageMaker > ノートブックインスタンス に移動します\n2. 失敗しているノートブックインスタンスを選択し、[停止]、次に [削除] を選択します\n3. [ノートブックインスタンスの作成] をクリックし、同じ名前を使用します\n4. [ネットワーク] で、VPC とサブネットを選択します（必要なセキュリティグループを選択してください）\n5. ノートブックインスタンスを作成します\n6. ステータスが InService になったら、チェックを再実行します",
+      "Terraform": "```hcl\nresource \"aws_sagemaker_notebook_instance\" \"<example_resource_name>\" {\n  name          = \"<example_resource_name>\"\n  role_arn      = \"<example_resource_id>\"\n  instance_type = \"ml.t3.medium\"\n  subnet_id     = \"<example_resource_id>\" # 重要: チェックに合格するためにノートブックがVPCサブネット内にあることを保証します\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "ノートブックは**プライベートVPC**内で実行し、**最小権限**のセキュリティグループと**ネットワーク分離**を適用します。AWSサービスには**VPCエンドポイント**を優先して使用し、**多層防御**を徹底するために、送信トラフィックを承認済みの宛先のみに制限します。",
+      "Url": "https://hub.prowler.com/check/sagemaker_notebook_instance_vpc_settings_configured"
+    }
+  },
+  "Categories": [
+    "internet-exposed",
+    "gen-ai"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

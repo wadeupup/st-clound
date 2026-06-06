@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "cloudwatch_cross_account_sharing_disabled",
+  "CheckTitle": "CloudWatch でクロスアカウント共有が許可されていない",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Effects/Data Exposure"
+  ],
+  "ServiceName": "cloudwatch",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsIamRole",
+  "ResourceGroup": "IAM",
+  "Description": "`CloudWatch-CrossAccountSharingRole` を介した **Amazon CloudWatch** のクロスアカウント共有により、他の AWS アカウントはメトリクス、ダッシュボード、アラームを閲覧できます。このロールの存在は、共有が有効であることを示します。",
+  "Risk": "他アカウントに可観測性データの可視性を与えると **機密性** が低下し、**偵察** を可能にします。攻撃者や権限過大なパートナーはアーキテクチャをマッピングし、ワークロードをプロファイルし、アラートの抜け穴を特定できるため、**横方向の移動** や **回避** の成功率が高まります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/Cross-Account-Cross-Region.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws cloudformation delete-stack --stack-name CloudWatch-CrossAccountSharingRole",
+      "NativeIaC": "",
+      "Other": "1. AWS マネジメントコンソールにサインインし、IAM を開きます\n2. [ロール] に移動します\n3. \"CloudWatch-CrossAccountSharingRole\" という名前のロールを探して選択します\n4. [削除] をクリックして確認します\n5. CloudFormation によって管理されているため削除がブロックされる場合：CloudFormation を開き、\"CloudWatch-CrossAccountSharingRole\" という名前のスタックを選択し、[削除] をクリックします",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "**クロスアカウント共有** は、厳密に必要な場合を除き無効にします。必要な場合は、アクセスを特定の信頼されたアカウントに制限し、読み取り専用権限を必要なリソースのみにスコープし、専用の監視アカウントを使用します。**最小権限の原則** と **職務分離** を適用し、ロールの信頼ポリシーとアクセスパターンを定期的に監査します。",
+      "Url": "https://hub.prowler.com/check/cloudwatch_cross_account_sharing_disabled"
+    }
+  },
+  "Categories": [
+    "trust-boundaries",
+    "identity-access"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+
+

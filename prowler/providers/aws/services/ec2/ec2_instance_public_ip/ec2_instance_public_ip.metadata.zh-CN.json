@@ -1,0 +1,36 @@
+{
+  "Provider": "aws",
+  "CheckID": "ec2_instance_public_ip",
+  "CheckTitle": "检查具有公共 IP 的 EC2 实例",
+  "CheckType": [
+    "Infrastructure Security"
+  ],
+  "ServiceName": "ec2",
+  "SubServiceName": "instance",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "medium",
+  "ResourceType": "AwsEc2Instance",
+  "ResourceGroup": "compute",
+  "Description": "检查具有公共 IP 的 EC2 实例",
+  "Risk": "将 EC2 直接暴露到互联网会增加攻击面，从而增加被入侵的风险",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "https://docs.prowler.com/checks/aws/public-policies/public_12#cloudformation",
+      "Other": "https://docs.prowler.com/checks/aws/public-policies/public_12#aws-console",
+      "Terraform": "https://docs.prowler.com/checks/aws/public-policies/public_12#terraform"
+    },
+    "Recommendation": {
+      "Text": "使用 ALB 并应用 WAF ACL。",
+      "Url": "https://aws.amazon.com/blogs/aws/aws-web-application-firewall-waf-for-application-load-balancers/"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

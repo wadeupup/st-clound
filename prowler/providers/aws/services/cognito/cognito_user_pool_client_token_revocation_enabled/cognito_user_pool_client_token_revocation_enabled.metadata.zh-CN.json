@@ -1,0 +1,32 @@
+{
+  "Provider": "aws",
+  "CheckID": "cognito_user_pool_client_token_revocation_enabled",
+  "CheckTitle": "确保为 Amazon Cognito 用户池启用令牌撤销",
+  "CheckType": [],
+  "ServiceName": "cognito",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:aws:cognito-idp:region:account:userpool/userpool-id",
+  "Severity": "medium",
+  "ResourceType": "AwsCognitoUserPoolClient",
+  "ResourceGroup": "IAM",
+  "Description": "令牌撤销是一项安全功能，允许您撤销用户的令牌并结束会话。启用令牌撤销后，Amazon Cognito 会自动撤销已注销或被删除的用户的令牌。这有助于保护用户数据并防止对资源的未经授权访问。",
+  "Risk": "如果未启用令牌撤销，用户注销或被删除时，其令牌将不会被撤销。这可能导致对资源的未经授权访问。",
+  "RelatedUrl": "https://docs.aws.amazon.com/cognito/latest/developerguide/token-revocation.html",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "要为 Amazon Cognito 用户池启用令牌撤销，请使用 Amazon Cognito 控制台或 AWS CLI。有关更多信息，请参阅 Amazon Cognito 文档。",
+      "Url": "https://docs.aws.amazon.com/cognito/latest/developerguide/token-revocation.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

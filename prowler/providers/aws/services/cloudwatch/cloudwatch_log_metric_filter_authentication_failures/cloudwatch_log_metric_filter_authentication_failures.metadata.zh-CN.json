@@ -1,0 +1,46 @@
+{
+  "Provider": "aws",
+  "CheckID": "cloudwatch_log_metric_filter_authentication_failures",
+  "CheckTitle": "账户具有用于 AWS 管理控制台身份验证失败的 CloudWatch Logs 指标过滤器和告警",
+  "CheckType": [
+    "Software and Configuration Checks/Industry and Regulatory Standards/CIS AWS Foundations Benchmark",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Software and Configuration Checks/AWS Security Best Practices/Runtime Behavior Analysis",
+    "TTPs/Initial Access",
+    "TTPs/Credential Access"
+  ],
+  "ServiceName": "cloudwatch",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsCloudWatchAlarm",
+  "ResourceGroup": "monitoring",
+  "Description": "用于 **AWS 管理控制台身份验证失败** 的 CloudWatch Logs 指标过滤器和告警，来源于 CloudTrail（`eventName=ConsoleLogin`，`errorMessage=\"Failed authentication\"`）。\n\n识别这些失败是否被转换为指标并通过告警进行主动监控。",
+  "Risk": "缺少对失败控制台登录的可见性，使未检测到的 **暴力破解** 和 **凭据填充** 尝试成为可能，延长攻击者驻留时间。\n\n成功的猜测可以授予控制台访问权限，通过破坏性更改危及数据机密性、配置完整性和可用性。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudwatch-alarms-for-cloudtrail.html",
+    "https://www.intelligentdiscovery.io/controls/cloudwatch/cloudwatch-alarm-signin-failures",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/CloudWatchLogs/console-sign-in-failures-alarm.html",
+    "https://newsletter.simpleaws.dev/p/cloudtrail-cloudwatch-logs-login-detection-alert"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation: Metric filter and alarm for console authentication failures\nResources:\n  MetricFilter:\n    Type: AWS::Logs::MetricFilter\n    Properties:\n      LogGroupName: \"<example_resource_name>\"\n      FilterPattern: '{ ($.eventName = ConsoleLogin) && ($.errorMessage = \"Failed authentication\") }'  # Critical: matches failed console login events\n      MetricTransformations:\n        - MetricValue: \"1\"\n          MetricNamespace: \"<example_resource_name>\"  # Critical: creates metric namespace\n          MetricName: \"<example_resource_name>\"       # Critical: creates metric name\n\n  Alarm:\n    Type: AWS::CloudWatch::Alarm\n    Properties:\n      MetricName: \"<example_resource_name>\"   # Critical: alarm targets metric from filter\n      Namespace: \"<example_resource_name>\"    # Critical: must match metric's namespace\n      ComparisonOperator: GreaterThanOrEqualToThreshold\n      EvaluationPeriods: 1\n      Period: 300\n      Statistic: Sum\n      Threshold: 1\n```",
+      "Other": "1. 在 AWS 控制台中，打开 CloudWatch\n2. 转到 Logs > Log groups，选择接收事件的 CloudTrail 日志组\n3. 打开 Metric filters 选项卡 > Create metric filter\n   - 过滤模式：{ ($.eventName = ConsoleLogin) && ($.errorMessage = \"Failed authentication\") }\n   - 分配任何指标名称和命名空间，值 1，然后创建\n4. 在创建的指标过滤器上，选择它并选择 Create alarm\n   - 统计：Sum，周期：5 分钟，阈值类型：Static，阈值：>= 1\n   - 创建告警",
+      "Terraform": "```hcl\n# Metric filter and alarm for console authentication failures\nresource \"aws_cloudwatch_log_metric_filter\" \"metric\" {\n  name           = \"<example_resource_name>\"\n  log_group_name = \"<example_resource_name>\"\n  pattern        = \"{($.eventName = ConsoleLogin) && ($.errorMessage = \\\"Failed authentication\\\") }\" # Critical: detects failed console logins\n\n  metric_transformation {\n    name      = \"<example_resource_name>\"   # Critical: metric created by filter\n    namespace = \"<example_resource_name>\"   # Critical: metric namespace\n    value     = \"1\"\n  }\n}\n\nresource \"aws_cloudwatch_metric_alarm\" \"alarm\" {\n  metric_name          = aws_cloudwatch_log_metric_filter.metric.metric_transformation[0].name   # Critical: alarm references the filter's metric\n  namespace            = aws_cloudwatch_log_metric_filter.metric.metric_transformation[0].namespace # Critical: must match\n  comparison_operator  = \"GreaterThanOrEqualToThreshold\"\n  evaluation_periods   = 1\n  period               = 300\n  statistic            = \"Sum\"\n  threshold            = 1\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "为 `ConsoleLogin` 失败实施日志指标过滤器，并附加具有可操作通知的 **CloudWatch 告警**。调整阈值以减少噪音，并将告警路由到事件响应。\n\n应用 **最小权限** 并强制执行 **MFA** 以限制影响，并将告警与源 IP 和用户上下文关联。",
+      "Url": "https://hub.prowler.com/check/cloudwatch_log_metric_filter_authentication_failures"
+    }
+  },
+  "Categories": [
+    "logging"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "Logging and Monitoring"
+}
+

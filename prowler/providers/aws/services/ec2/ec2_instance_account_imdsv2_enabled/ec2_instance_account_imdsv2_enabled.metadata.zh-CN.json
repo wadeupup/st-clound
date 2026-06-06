@@ -1,0 +1,37 @@
+{
+  "Provider": "aws",
+  "CheckID": "ec2_instance_account_imdsv2_enabled",
+  "CheckTitle": "确保在账户级别为 EC2 实例强制执行实例元数据服务版本 2 (IMDSv2)，以防范 SSRF 漏洞",
+  "CheckType": [
+    "Data Protection"
+  ],
+  "ServiceName": "ec2",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id",
+  "Severity": "high",
+  "ResourceType": "AwsAccount",
+  "ResourceGroup": "governance",
+  "Description": "确保在账户级别为 EC2 实例强制执行实例元数据服务版本 2 (IMDSv2)，以防范 SSRF 漏洞",
+  "Risk": "使用 IMDSv1 的 EC2 实例容易受到 SSRF 攻击",
+  "RelatedUrl": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/configuring-IMDS-new-instances.html#set-imdsv2-account-defaults",
+  "Remediation": {
+    "Code": {
+      "CLI": "aws ec2 modify-instance-metadata-defaults --region <region> --http-tokens required --http-put-response-hop-limit 2",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "在 EC2 实例上启用实例元数据服务版本 2 (IMDSv2)。在每个 AWS 区域的账户级别应用此配置以设置默认实例元数据版本。",
+      "Url": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/configuring-IMDS-new-instances.html#set-imdsv2-account-defaults"
+    }
+  },
+  "Categories": [
+    "internet-exposed",
+    "ec2-imdsv1"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

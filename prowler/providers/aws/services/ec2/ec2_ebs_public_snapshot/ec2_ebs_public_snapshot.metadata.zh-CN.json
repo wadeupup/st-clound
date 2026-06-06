@@ -1,0 +1,36 @@
+{
+  "Provider": "aws",
+  "CheckID": "ec2_ebs_public_snapshot",
+  "CheckTitle": "确保没有 EBS 快照设置为公共",
+  "CheckType": [
+    "Data Protection"
+  ],
+  "ServiceName": "ec2",
+  "SubServiceName": "snapshot",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "critical",
+  "ResourceType": "Other",
+  "ResourceGroup": "compute",
+  "Description": "确保没有 EBS 快照设置为公共",
+  "Risk": "当您共享快照时，您正在授予其他人访问快照上所有数据的权限。仅与您想要共享所有快照数据的人员共享快照。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "aws ec2 modify-snapshot-attribute --region <REGION> --snapshot-id <EC2_SNAPSHOT_ID> --attribute createVolumePermission --operation remove --user-ids all",
+      "NativeIaC": "",
+      "Other": "https://docs.prowler.com/checks/aws/public-policies/public_7",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "确保快照应该被共享。",
+      "Url": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-modifying-snapshot-permissions.html"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

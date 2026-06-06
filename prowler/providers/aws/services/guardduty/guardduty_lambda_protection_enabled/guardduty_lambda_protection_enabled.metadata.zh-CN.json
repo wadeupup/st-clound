@@ -1,0 +1,39 @@
+{
+  "Provider": "aws",
+  "CheckID": "guardduty_lambda_protection_enabled",
+  "CheckTitle": "GuardDuty detector 已启用 Lambda Protection",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices/Runtime Behavior Analysis",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices"
+  ],
+  "ServiceName": "guardduty",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsGuardDutyDetector",
+  "ResourceGroup": "security",
+  "Description": "启用 **Lambda Protection** 的 **Amazon GuardDuty detectors** 会分析账号范围内的 **Lambda 调用网络活动日志**。\n\n该评估用于判断 detector 是否已开启 `Lambda Protection`。",
+  "Risk": "若未启用 **Lambda Protection**，Lambda 网络流量将无法被检测，从而可能导致：\n- **C2 回连**与数据外泄（机密性）\n- 恶意代码篡改数据或配置（完整性）\n- 横向移动或滥用引发服务中断（可用性）",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/guardduty-controls.html#guardduty-6",
+    "https://docs.aws.amazon.com/guardduty/latest/ug/configure-lambda-protection-standalone-acc.html",
+    "https://docs.aws.amazon.com/guardduty/latest/ug/lambda-protection.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws guardduty update-detector --detector-id <detector-id> --features '[{\"Name\":\"LAMBDA_NETWORK_LOGS\",\"Status\":\"ENABLED\"}]'",
+      "NativeIaC": "```yaml\nResources:\n  <example_resource_name>:\n    Type: AWS::GuardDuty::Detector\n    Properties:\n      Enable: true\n      Features:\n        - Name: LAMBDA_NETWORK_LOGS  # Critical: selects Lambda Protection feature\n          Status: ENABLED            # Critical: enables Lambda Protection\n```",
+      "Other": "1. 打开 AWS Console 并进入 GuardDuty\n2. 在左侧面板选择 Settings > Lambda Protection\n3. 点击 Enable\n4. 点击 Confirm 保存",
+      "Terraform": "```hcl\nresource \"aws_guardduty_detector\" \"<example_resource_name>\" {\n  enable = true\n  features {\n    name   = \"LAMBDA_NETWORK_LOGS\"  # Critical: selects Lambda Protection feature\n    status = \"ENABLED\"               # Critical: enables Lambda Protection\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "在所有活跃 Region 和账号的 detector 上启用 **Lambda Protection**。\n\n对 Lambda 角色实施**最小权限**，通过网络控制限制出站访问，并将发现结果接入告警与响应流程，实现**纵深防御**。*在多账号场景下*，请进行集中管理以确保覆盖一致。",
+      "Url": "https://hub.prowler.com/check/guardduty_lambda_protection_enabled"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

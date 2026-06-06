@@ -1,0 +1,35 @@
+{
+  "Provider": "aws",
+  "CheckID": "s3_bucket_server_access_logging_enabled",
+  "CheckTitle": "检查 S3 存储桶是否已启用服务器访问日志记录",
+  "CheckType": [
+    "日志记录和监控"
+  ],
+  "ServiceName": "s3",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:s3:::bucket_name",
+  "Severity": "medium",
+  "ResourceType": "AwsS3Bucket",
+  "ResourceGroup": "storage",
+  "Description": "检查 S3 存储桶是否已启用服务器访问日志记录",
+  "Risk": "服务器访问日志可以帮助您进行安全和访问审计，帮助您了解您的客户群，并理解您的 Amazon S3 账单。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "aws s3api put-bucket-logging --bucket <BUCKET_NAME> --bucket-logging-status <LOGGING_FILE_JSON>",
+      "NativeIaC": "",
+      "Other": "https://docs.prowler.com/checks/aws/s3-policies/s3_13-enable-logging",
+      "Terraform": "https://docs.prowler.com/checks/aws/s3-policies/s3_13-enable-logging#terraform"
+    },
+    "Recommendation": {
+      "Text": "确保已为 S3 存储桶启用日志记录。可以使用 CloudTrail 数据事件来替代 S3 存储桶日志记录。如果是这种情况，则此发现可视为误报。",
+      "Url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/security-best-practices.html"
+    }
+  },
+  "Categories": [
+    "forensics-ready"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

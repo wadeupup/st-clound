@@ -1,0 +1,35 @@
+{
+  "Provider": "aws",
+  "CheckID": "iam_securityaudit_role_created",
+  "CheckTitle": "セキュリティ監査を実施するためのセキュリティ監査ロールが作成されていることを確認します",
+  "CheckType": [
+    "ソフトウェアと構成のチェック",
+    "業界および規制の標準",
+    "CIS AWS Foundations ベンチマーク"
+  ],
+  "ServiceName": "iam",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "low",
+  "ResourceType": "AwsIamRole",
+  "ResourceGroup": "IAM",
+  "Description": "セキュリティ監査を実施するためのセキュリティ監査ロールが作成されていることを確認します",
+  "Risk": "セキュリティ監査ポリシーを持つIAMロールを作成することで、組織内のセキュリティチームと他のチームとの職務分離が明確になります。これにより、セキュリティ関連の活動が適切な専門知識とアクセス権限を持つ認可された個人によって実行されることが保証されます。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "AWSでセキュリティ監査を実施するためのIAMロールを作成します。",
+      "Url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_job-functions.html#jf_security-auditor"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

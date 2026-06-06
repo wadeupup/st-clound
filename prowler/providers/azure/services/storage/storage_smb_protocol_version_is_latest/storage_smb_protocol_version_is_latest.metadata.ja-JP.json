@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "storage_smb_protocol_version_is_latest",
+  "CheckTitle": "ファイル共有の SMB プロトコル バージョンが最新バージョンに設定されていることを確認する。",
+  "CheckType": [],
+  "ServiceName": "storage",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "/subscriptions/{subscription_id}/resourceGroups/{resource_group}/providers/Microsoft.Storage/storageAccounts/{storageAccountName}/fileServices/default",
+  "Severity": "medium",
+  "ResourceType": "AzureStorageAccount",
+  "ResourceGroup": "storage",
+  "Description": "SMB ファイル共有が最新の SMB プロトコル バージョンのみを使用するよう構成されていることを確認します。",
+  "Risk": "古い SMB プロトコル バージョンを許可すると、既知の脆弱性やセキュリティリスクにファイル共有がさらされる可能性があります。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/storage/files/files-smb-protocol#smb-security-settings",
+  "Remediation": {
+    "Code": {
+      "CLI": "az storage account file-service-properties update --resource-group <resource-group> --account-name <storage-account> --versions <latest-version>",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "Azure Storage Account のファイル共有が最新の SMB プロトコル バージョンのみを許可するよう構成してください。",
+      "Url": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/StorageAccounts/latest-smb-protocol-version.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

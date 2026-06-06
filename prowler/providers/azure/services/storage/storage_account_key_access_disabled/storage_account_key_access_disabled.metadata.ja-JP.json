@@ -1,0 +1,33 @@
+{
+  "Provider": "azure",
+  "CheckID": "storage_account_key_access_disabled",
+  "CheckTitle": "storage account key access の許可が無効化されていることを確認する",
+  "CheckType": [],
+  "ServiceName": "storage",
+  "SubServiceName": "account",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AzureStorageAccount",
+  "ResourceGroup": "storage",
+  "Description": "アカウント キーを使用した Azure Storage Accounts へのアクセスが無効化され、認証に Microsoft Entra ID（旧 Azure AD）の利用が強制されていることを確認します。",
+  "Risk": "storage account key は高い権限を持ち、そのアクセス監査が困難なため、Shared Key 認可の使用はセキュリティ リスクとなります。Shared Key アクセスを無効化することで、Microsoft Entra ID による ID ベース認証を強制でき、セキュリティと追跡性が向上します。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/storage/common/shared-key-authorization-prevent",
+  "Remediation": {
+    "Code": {
+      "CLI": "az storage account update --name <storage-account-name> --resource-group <resource-group> --allow-shared-key-access false",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity-staging/knowledge-base/azure/StorageAccounts/disable-shared-key-authorization.html",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "storage accounts で Shared Key 認可を無効化し、Microsoft Entra ID を使用した安全で監査可能なアクセスを強制します。",
+      "Url": "https://learn.microsoft.com/en-us/azure/storage/common/shared-key-authorization-prevent"
+    }
+  },
+  "Categories": [
+    "e3"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

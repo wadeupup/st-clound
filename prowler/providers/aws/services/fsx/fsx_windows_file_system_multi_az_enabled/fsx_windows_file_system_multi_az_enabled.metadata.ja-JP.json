@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "fsx_windows_file_system_multi_az_enabled",
+  "CheckTitle": "FSx Windows ファイルシステムが Multi-AZ 配置で構成されていること",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Effects/Denial of Service"
+  ],
+  "ServiceName": "fsx",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "low",
+  "ResourceType": "Other",
+  "ResourceGroup": "storage",
+  "Description": "**FSx for Windows File Server** ファイルシステムについて、**Multi-AZ 配置**かを評価します。`SubnetIds` に異なる Availability Zone の 2 つ以上のサブネットが含まれる場合、Multi-AZ と判定します。",
+  "Risk": "**Single-AZ** の利用は **単一障害点** を生みます。AZ 障害、サーバー障害、メンテナンスによりファイル共有の長時間停止が発生し、可用性に影響します。クラッシュ時にはデータ不整合が生じ **完全性** を損ない、復旧がバックアップ依存となることで **RTO/RPO** が悪化します。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/fsx/latest/WindowsGuide/dfs-r.html",
+    "https://docs.aws.amazon.com/fsx/latest/APIReference/API_WindowsFileSystemConfiguration.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/fsx-controls.html",
+    "https://docs.aws.amazon.com/fsx/latest/WindowsGuide/high-availability-multiAZ.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation: Create FSx for Windows File Server with Multi-AZ\nResources:\n  <example_resource_name>:\n    Type: AWS::FSx::FileSystem\n    Properties:\n      FileSystemType: WINDOWS\n      StorageCapacity: 32\n      SubnetIds:\n        - <example_subnet_id_1>  # CRITICAL: two subnets -> Multi-AZ across AZs\n        - <example_subnet_id_2>  # CRITICAL: two subnets -> Multi-AZ across AZs\n      WindowsConfiguration:\n        ThroughputCapacity: 8\n        DeploymentType: MULTI_AZ_1  # CRITICAL: enables Multi-AZ deployment\n        PreferredSubnetId: <example_subnet_id_1>\n```",
+      "Other": "1. AWS コンソールで FSx > Create file system > Amazon FSx for Windows File Server に移動します\n2. Deployment type を Multi-AZ に設定します\n3. 異なる Availability Zone の 2 つのサブネットを選択します\n4. 最小限必要な容量/スループットを設定して作成します\n5. 新しいファイルシステムへデータ移行し、クライアント接続先をその DNS 名へ切り替えます\n6. 旧 Single-AZ ファイルシステムを削除します",
+      "Terraform": "```hcl\n# Terraform: FSx for Windows File Server configured for Multi-AZ\nresource \"aws_fsx_windows_file_system\" \"<example_resource_name>\" {\n  storage_capacity    = 32\n  subnet_ids          = [\"<example_subnet_id_1>\", \"<example_subnet_id_2>\"] # CRITICAL: two subnets in different AZs\n  throughput_capacity = 8\n  deployment_type     = \"MULTI_AZ_1\"                                      # CRITICAL: enables Multi-AZ deployment\n  preferred_subnet_id = \"<example_subnet_id_1>\"\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "本番では `MULTI_AZ_1` を優先し、**高可用性** を維持して AZ レベルの単一障害点を回避してください。**レジリエンス** と **多層防御** を適用し、AZ 障害耐性設計、フェイルオーバー容量計画、定期的なフェイルオーバーテストを実施します。*Single-AZ が不可避な場合* は、非重要またはアプリ側複製済みワークロードに限定し、頻繁かつ検証済みバックアップを維持してください。",
+      "Url": "https://hub.prowler.com/check/fsx_windows_file_system_multi_az_enabled"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

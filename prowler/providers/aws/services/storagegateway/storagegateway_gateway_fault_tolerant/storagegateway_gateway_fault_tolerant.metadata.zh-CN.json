@@ -1,0 +1,40 @@
+{
+  "Provider": "aws",
+  "CheckID": "storagegateway_gateway_fault_tolerant",
+  "CheckTitle": "AWS存储网关网关未托管在EC2上",
+  "CheckType": [
+    "软件和配置检查/AWS安全最佳实践",
+    "影响/拒绝服务"
+  ],
+  "ServiceName": "storagegateway",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "storage",
+  "Description": "通过评估每个网关的托管环境来标记托管在**EC2实例**上的AWS存储网关，将**单实例EC2**部署与可以利用平台级高可用性的**非EC2**平台区分开来。",
+  "Risk": "**单个EC2托管网关**集中了故障风险。实例或AZ中断、重新启动或网络故障可能会停止文件访问，导致停机和写入停滞。这会降低**可用性**，并可能通过部分操作或缓存去同步影响**完整性**。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/filegateway/latest/files3/resource-vm-setup.html",
+    "https://docs.aws.amazon.com/filegateway/latest/files3/disaster-recovery-resiliency.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "1.在AWS控制台中，转到存储网关，然后单击创建网关\n2.选择网关类型，然后在主机平台下选择VMware ESXi、Microsoft Hyper-V、Linux KVM或硬件设备（不要选择Amazon EC2）\n3.在主机上下载并部署虚拟机，打开电源，并记下其IP地址\n4.在控制台中，连接并激活新网关\n5.在新网关上重新创建等效资源（共享/卷/磁带），并更新客户端以使用新网关IP/DNS\n6.在存储网关>网关中，删除旧的EC2托管网关\n7.验证新网关的详细信息是否显示主机平台不等于Amazon EC2",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "为**高可用性**而设计：避免为关键工作负载使用单实例网关。首选**EFS**或**FSx**等托管多AZ服务，或使用具有客户端故障转移和弹性命名的多个网关。应用**深度防御**，定期验证故障转移，并监控运行状况以防止中断。",
+      "Url": "https://hub.prowler.com/check/storagegateway_gateway_fault_tolerant"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

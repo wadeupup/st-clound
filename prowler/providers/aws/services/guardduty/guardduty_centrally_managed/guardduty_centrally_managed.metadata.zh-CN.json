@@ -1,0 +1,37 @@
+{
+  "Provider": "aws",
+  "CheckID": "guardduty_centrally_managed",
+  "CheckTitle": "GuardDuty detector 由管理员账号统一管理，或该账号本身为包含成员账号的管理员",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices"
+  ],
+  "ServiceName": "guardduty",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsGuardDutyDetector",
+  "ResourceGroup": "security",
+  "Description": "当 Amazon GuardDuty detector 关联到委派管理员账号，或 detector 所在账号作为带有成员账号的**管理员**时，即处于**集中管理**状态。",
+  "Risk": "缺少集中管理会导致跨账号和跨区域的**可见性**割裂，并拖慢**事件响应**。攻击者可能在未被察觉的情况下持续驻留、进行**横向移动**、外泄数据并篡改配置，进而损害**机密性**、**完整性**和**可用性**。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/guardduty/latest/ug/guardduty_accounts.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws guardduty enable-organization-admin-account --admin-account-id <ADMIN_ACCOUNT_ID>",
+      "NativeIaC": "",
+      "Other": "1. 登录 AWS Organizations 管理账号\n2. 打开 AWS Organizations 控制台\n3. 进入 Services > Amazon GuardDuty\n4. 点击 Register delegated administrator\n5. 输入管理员账号 ID 并点击 Register",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "指定一个**委派管理员**（建议通过 *AWS Organizations*），并将所有账号纳入为**成员**。为新账号启用自动加入，在所需区域统一 detector 配置，并将发现结果汇总到集中监控。落实**最小权限**与**职责分离**。",
+      "Url": "https://hub.prowler.com/check/guardduty_centrally_managed"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

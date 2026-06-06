@@ -1,0 +1,32 @@
+{
+  "Provider": "aws",
+  "CheckID": "codepipeline_project_repo_private",
+  "CheckTitle": "CodePipeline プロジェクトがソースとしてパブリック GitHub または GitLab リポジトリを使用していないことを確認する",
+  "CheckType": [],
+  "ServiceName": "codepipeline",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "devops",
+  "Description": "CodePipeline プロジェクトがソースとしてパブリック GitHub または GitLab リポジトリを使用していないことを確認します。",
+  "Risk": "CodePipeline プロジェクトでパブリック Git リポジトリを使用すると、機密のデプロイ設定が公開され、サプライチェーン攻撃のリスクが増加する可能性があります。",
+  "RelatedUrl": "https://docs.aws.amazon.com/codepipeline/latest/userguide/connections-github.html",
+  "Remediation": {
+    "Code": {
+      "CLI": "aws codestar-connections create-connection --provider-type GitHub|GitLab --connection-name <connection-name>",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "CodePipeline ソースにプライベート Git リポジトリを使用し、AWS CodeStar Connections を使用して適切な認証が設定されていることを確認します。機密コードについては、AWS CodeCommit またはその他のプライベートリポジトリソリューションの使用を検討してください。",
+      "Url": "https://docs.aws.amazon.com/codepipeline/latest/userguide/connections"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "このチェックは CodeStar Connections を通じて GitHub と GitLab リポジトリの両方をサポートします"
+}
+

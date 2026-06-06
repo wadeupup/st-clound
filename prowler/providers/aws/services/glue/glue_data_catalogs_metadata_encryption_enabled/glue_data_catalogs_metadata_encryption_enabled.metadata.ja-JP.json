@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "glue_data_catalogs_metadata_encryption_enabled",
+  "CheckTitle": "Glue Data Catalog メタデータが KMS で暗号化されていること",
+  "CheckType": [
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/CIS AWS Foundations Benchmark"
+  ],
+  "ServiceName": "glue",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "analytics",
+  "Description": "**AWS Glue Data Catalog** のメタデータは、カタログ設定で KMS キーを用いた **SSE-KMS** を使用する場合に保存時暗号化されます。\n\nメタデータに `SSE-KMS` が設定されていないカタログは未暗号化と見なされます。",
+  "Risk": "未暗号化のカタログメタデータはスキーマ、パーティション、データロケーションを露出し、**機密性** を低下させます。\n\n攻撃者や過剰権限ユーザーが **偵察** や横展開計画を行え、定義改ざんによりクエリや結果が破壊され **完全性** に影響します。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/glue/latest/dg/encrypt-glue-data-catalog.html",
+    "https://docs.amazonaws.cn/en_us/athena/latest/ug/encryption.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/Glue/data-catalog-encryption-at-rest-with-cmk.html",
+    "https://support.icompaas.com/support/solutions/articles/62000233381-ensure-glue-data-catalogs-are-not-publicly-accessible-"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws glue put-data-catalog-encryption-settings --data-catalog-encryption-settings '{\"EncryptionAtRest\":{\"CatalogEncryptionMode\":\"SSE-KMS\"}}'",
+      "NativeIaC": "```yaml\n# Enable Glue Data Catalog metadata encryption with KMS\nResources:\n  <example_resource_name>:\n    Type: AWS::Glue::DataCatalogEncryptionSettings\n    Properties:\n      DataCatalogEncryptionSettings:\n        EncryptionAtRest:\n          CatalogEncryptionMode: SSE-KMS  # Critical: enables KMS encryption for catalog metadata\n```",
+      "Other": "1. AWS コンソールで AWS Glue に移動します\n2. Data Catalog > Settings を開きます\n3. Security configuration and encryption で Metadata encryption を有効化します\n4. 既定の AWS 管理キーを使用するか KMS キーを選択します\n5. Save をクリックします",
+      "Terraform": "```hcl\n# Enable Glue Data Catalog metadata encryption with KMS\nresource \"aws_glue_data_catalog_encryption_settings\" \"<example_resource_name>\" {\n  data_catalog_encryption_settings {\n    encryption_at_rest {\n      catalog_encryption_mode = \"SSE-KMS\" # Critical: turns on KMS encryption for catalog metadata\n    }\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "**`SSE-KMS`** によるメタデータ暗号化を有効化し、管理性とローテーション性のため **カスタマーマネージド KMS キー** を優先してください。\n\nKMS とカタログアクセスには **最小権限** を適用し、設定変更可能者を制限し、キー利用を監視します。関連する分析資産を一貫して暗号化し **多層防御** を実現してください。",
+      "Url": "https://hub.prowler.com/check/glue_data_catalogs_metadata_encryption_enabled"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "Data Protection"
+}

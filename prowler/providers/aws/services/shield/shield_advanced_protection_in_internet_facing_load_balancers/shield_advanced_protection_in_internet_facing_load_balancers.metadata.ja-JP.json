@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "shield_advanced_protection_in_internet_facing_load_balancers",
+  "CheckTitle": "インターネット向けの Application Load Balancer は AWS Shield Advanced によって保護されています",
+  "CheckType": [
+    "ソフトウェアおよび設定のチェック/AWS セキュリティのベストプラクティス/ネットワーク到達可能性",
+    "サービスへの影響/拒否"
+  ],
+  "ServiceName": "shield",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsElbv2LoadBalancer",
+  "ResourceGroup": "network",
+  "Description": "**インターネット向け**の**Application Load Balancers**は、関連付けられた**AWS Shield Advanced**保護について評価されます。スコープには、外部公開されている application タイプの ALB が含まれます。",
+  "Risk": "強化された DDoS 保護がない場合、インターネット向け ALB は大規模な L3/L4 フラッドや HTTP L7 フラッドにさらされ、停止やレイテンシの急増によって **可用性** が損なわれます。急激なスケーリングは **コスト** を増加させる可能性があり、可視性の低下と対応サポートの不足によって、依存するサービス全体にわたって障害が長引きます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://aws.amazon.com/documentation-overview/shield/",
+    "https://docs.aws.amazon.com/waf/latest/developerguide/configure-new-protection.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws shield create-protection --name <ALB_NAME> --resource-arn <ALB_ARN>",
+      "NativeIaC": "```yaml\nResources:\n  ShieldProtection:\n    Type: AWS::Shield::Protection\n    Properties:\n      Name: \"<example_resource_name>\"\n      ResourceArn: \"<example_resource_id>\" # 重要: ALB ARN に設定すると、その Shield Advanced 保護が有効になります\n```",
+      "Other": "1. AWS コンソールで、AWS WAF と Shield を開きます\n2. Shield > Protected resources に移動します\n3. Add resources to protect をクリックします\n4. リージョンとリソースタイプの Application Load Balancer を選択します\n5. インターネット向けの ALB を選択します\n6. Protect with Shield Advanced をクリックします",
+      "Terraform": "```hcl\nresource \"aws_shield_protection\" \"protect\" {\n  name         = \"<example_resource_name>\"\n  resource_arn = \"<example_resource_id>\" # 重大: ALB ARN; これを作成すると、ALB で Shield Advanced が有効になります\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "インターネット向けALBを**Shield Advanced protected resources**として登録し、**可用性**を強化します。多層防御を使用してください。**AWS WAF**と組み合わせてL7フィルタリングとレート制限を行い、関連するアセットをグループ化し、ヘルスベースの検出とプロアクティブなエンゲージメントを有効にし、継続的な監視とともに最小権限のIAMを徹底します。",
+      "Url": "https://hub.prowler.com/check/shield_advanced_protection_in_internet_facing_load_balancers"
+    }
+  },
+  "Categories": [
+    "internet-exposed",
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

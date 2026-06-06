@@ -1,0 +1,39 @@
+{
+  "Provider": "aws",
+  "CheckID": "shield_advanced_protection_in_cloudfront_distributions",
+  "CheckTitle": "CloudFront 分发受 AWS Shield Advanced 保护",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践/网络可达性",
+    "影响/拒绝服务"
+  ],
+  "ServiceName": "shield",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsCloudFrontDistribution",
+  "ResourceGroup": "network",
+  "Description": "**CloudFront 分配**与 **AWS Shield Advanced** 关联，作为受保护资源。\n\n此评估会识别缺少此保护映射的分配。",
+  "Risk": "缺少 **Shield Advanced** 会使分配暴露于大规模 **DDoS** 攻击之下，这些攻击会通过 L3/L4 洪泛和 L7 请求激增降低 **可用性**。其影响包括边缘饱和、延迟和中断，以及失去 **成本保护** 和专家支持，从而导致意外支出和更长的恢复时间。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/waf/latest/developerguide/configure-new-protection.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws shield create-protection --region us-east-1 --name <example_resource_name> --resource-arn <example_resource_arn>",
+      "NativeIaC": "```yaml\n# CloudFormation：为 CloudFront 分配添加 Shield Advanced 保护\nResources:\n  ShieldProtection:\n    Type: AWS::Shield::Protection\n    Properties:\n      Name: <example_resource_name>\n      ResourceArn: <example_resource_arn>  # 关键：将 Shield Advanced 保护关联到 CloudFront 分配 ARN\n```",
+      "Other": "1. 在 AWS 控制台中，打开 WAF 和 Shield\n2. 前往 AWS Shield > Protected resources\n3. 点击 Add resources to protect\n4. 将 Scope 设置为 Global 并选择 CloudFront distributions，然后点击 Load resources\n5. 选择目标 distribution\n6. 点击 Protect with Shield Advanced",
+      "Terraform": "```hcl\n# 为 CloudFront 分配添加 Shield Advanced 保护\nresource \"aws_shield_protection\" \"example\" {\n  name         = \"<example_resource_name>\"\n  resource_arn = \"<example_resource_arn>\"  # 关键：将 Shield Advanced 保护关联到 CloudFront 分配 ARN\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "将关键的 CloudFront 分配注册到 **AWS Shield Advanced** 中，并将其持续列为受保护资源。\n\n采用分层防御：**AWS WAF**、速率限制和持续监控。维护 DDoS 运行手册并使用 DRT 支持。对可以修改防护措施的人员应用**最小权限**。",
+      "Url": "https://hub.prowler.com/check/shield_advanced_protection_in_cloudfront_distributions"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

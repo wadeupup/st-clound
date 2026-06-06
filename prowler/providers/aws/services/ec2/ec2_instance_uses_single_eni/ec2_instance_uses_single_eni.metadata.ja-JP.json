@@ -1,0 +1,36 @@
+{
+  "Provider": "aws",
+  "CheckID": "ec2_instance_uses_single_eni",
+  "CheckTitle": "Amazon EC2 インスタンスは複数の ENI を使用すべきではない",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices"
+  ],
+  "ServiceName": "ec2",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:instance/resource-id",
+  "Severity": "low",
+  "ResourceType": "AwsEc2Instance",
+  "ResourceGroup": "compute",
+  "Description": "このコントロールは、EC2 インスタンスが複数の Elastic Network Interface (ENI) または Elastic Fabric Adapter (EFA) を使用しているかをチェックします。単一のネットワークアダプターが使用されている場合、コントロールはパスします。このコントロールには、許可された ENI を識別するためのオプションのパラメータリストが含まれています。Amazon EKS クラスターに属する EC2 インスタンスが複数の ENI を使用している場合、このコントロールも失敗します。EC2 インスタンスが Amazon EKS クラスターの一部として複数の ENI を持つ必要がある場合は、これらのコントロール検出を抑制できます。",
+  "Risk": "複数の ENI は、デュアルホームインスタンス（複数のサブネットを持つインスタンス）を引き起こす可能性があります。これにより、ネットワークセキュリティの複雑さが増加し、意図しないネットワークパスとアクセスが導入される可能性があります。",
+  "RelatedUrl": "https://docs.aws.amazon.com/config/latest/developerguide/ec2-instance-multiple-eni-check.html",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://docs.aws.amazon.com/securityhub/latest/userguide/ec2-controls.html#ec2-17",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "EC2 インスタンスからネットワークインターフェースをデタッチするには、Amazon EC2 ユーザーガイドの手順に従ってください。",
+      "Url": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-eni.html#detach_eni"
+    }
+  },
+  "Categories": [
+    "trust-boundaries"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

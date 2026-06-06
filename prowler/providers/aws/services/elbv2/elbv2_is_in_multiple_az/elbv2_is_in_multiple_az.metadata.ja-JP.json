@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "elbv2_is_in_multiple_az",
+  "CheckTitle": "ELBv2 ロードバランサーが複数の Availability Zone にまたがって構成されていること",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Effects/Denial of Service"
+  ],
+  "ServiceName": "elbv2",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsElbv2LoadBalancer",
+  "ResourceGroup": "network",
+  "Description": "ELBv2 ロードバランサー（Application、Network、Gateway）が複数 **Availability Zones** に分散されているかを評価します。各ロードバランサーが設定された最小 AZ 数（既定 `2`）以上にまたがっているかを判定します。",
+  "Risk": "ロードバランサーを 1 つの AZ に限定すると単一障害点になります。AZ 障害、ゾーン劣化、ターゲット容量の偏りにより、停止、接続断、デプロイリスクが発生し、サービスの **可用性** とレジリエンスが損なわれます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/elasticloadbalancing/latest/network/availability-zones.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/ELBv2/enable-multi-az.html",
+    "https://docs.aws.amazon.com/elasticloadbalancing/latest/userguide/how-elastic-load-balancing-works.html#availability-zones"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws elbv2 set-subnets --load-balancer-arn <LOAD_BALANCER_ARN> --subnets <SUBNET_ID_A> <SUBNET_ID_B>",
+      "NativeIaC": "```yaml\n# CloudFormation: ensure the ELBv2 spans at least two AZs by specifying two subnets\nResources:\n  <example_resource_name>:\n    Type: AWS::ElasticLoadBalancingV2::LoadBalancer\n    Properties:\n      Subnets:\n        - <subnet_id_a>  # critical: add a second AZ/subnet\n        - <subnet_id_b>  # critical: ensures the load balancer spans >=2 AZs\n```",
+      "Other": "1. AWS コンソール > EC2 > Load Balancers を開きます\n2. 対象のロードバランサーを選択します\n3. Network mapping タブで Edit subnets をクリックします\n4. 2 つの AZ それぞれで 1 つずつサブネットを選び、少なくとも 2 つの Availability Zones を有効化します\n5. Save changes をクリックします",
+      "Terraform": "```hcl\n# Ensure ELBv2 spans at least two Availability Zones\nresource \"aws_lb\" \"<example_resource_name>\" {\n  subnets = [\n    \"<subnet_id_a>\",  # critical: add a second AZ/subnet\n    \"<subnet_id_b>\"   # critical: ensures the load balancer spans >=2 AZs\n  ]\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "各ロードバランサーを少なくとも **2 つの AZ** で運用し、有効化した各 AZ に健全でスケール可能なターゲットを配置してください。\n- AZ ごとに容量を分散し、オートスケーリングを使用\n- ヘルスチェックを有効に維持\n- バースト吸収のためクロスゾーン負荷分散を検討\n- 定期的にフェイルオーバーテストを実施",
+      "Url": "https://hub.prowler.com/check/elbv2_is_in_multiple_az"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

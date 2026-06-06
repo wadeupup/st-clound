@@ -1,0 +1,32 @@
+{
+  "Provider": "aws",
+  "CheckID": "ec2_instance_with_outdated_ami",
+  "CheckTitle": "古い AMI を使用している EC2 インスタンスを確認",
+  "CheckType": [],
+  "ServiceName": "ec2",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:instance/resource-id",
+  "Severity": "high",
+  "ResourceType": "AwsEc2Instance",
+  "ResourceGroup": "compute",
+  "Description": "このチェックは、インスタンスを監査して AMI ID を収集し、それらを最新の利用可能なバージョンと比較し、サポートとセキュリティ更新のステータスを検証し、非推奨をチェックすることで、古い Amazon Machine Images (AMI) を使用している EC2 インスタンスを識別します。",
+  "Risk": "古い AMI を使用すると、EC2 インスタンスがセキュリティの脆弱性、サポートの欠如、重要な更新の欠落にさらされ、悪用のリスクが増加する可能性があります。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "aws ec2 describe-images --image-ids <ami-id>",
+      "NativeIaC": "",
+      "Other": "https://repost.aws/knowledge-center/ec2-find-deprecated-ami",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "EC2 インスタンスを定期的に更新して、最新の AMI を使用し、最新のセキュリティパッチと更新を受信できるようにします。",
+      "Url": "https://repost.aws/knowledge-center/ec2-find-deprecated-ami"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

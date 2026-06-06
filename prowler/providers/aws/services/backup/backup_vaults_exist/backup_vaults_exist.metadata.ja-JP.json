@@ -1,0 +1,40 @@
+{
+  "Provider": "aws",
+  "CheckID": "backup_vaults_exist",
+  "CheckTitle": "少なくとも1つのAWS Backupボルトが存在する",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices"
+  ],
+  "ServiceName": "backup",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "low",
+  "ResourceType": "AwsBackupBackupVault",
+  "ResourceGroup": "storage",
+  "Description": "アカウント/リージョン内の**AWS Backup**には、バックアップ計画とコピーで使用する回復ポイントを保存および整理する少なくとも1つの**バックアップボルト**が含まれています。",
+  "Risk": "ボルトがない場合、回復ポイントをAWS Backupで作成または保持できず、**可用性**と**整合性**が低下します。データは削除、ランサムウェア、または設定ミスの後に回復不能になる可能性があり、インシデント中にRPO/RTO目標を達成できない可能性があります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/aws-backup/latest/devguide/vaults.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws backup create-backup-vault --backup-vault-name <example_resource_name>",
+      "NativeIaC": "```yaml\n# CloudFormation：バックアップボルトを作成\nResources:\n  BackupVault:\n    Type: AWS::Backup::BackupVault\n    Properties:\n      VaultName: <example_resource_name>  # 重要：チェックを満たすためにバックアップボルトを作成\n```",
+      "Other": "1. AWS管理コンソールにサインインし、AWS Backupコンソールを開く\n2. 左側のナビゲーションパネルで、バックアップボルトを選択\n3. バックアップボルトの作成をクリック\n4. 名前を入力（例：<example_resource_name>）\n5. バックアップボルトの作成をクリック",
+      "Terraform": "```hcl\n# バックアップボルトを作成\nresource \"aws_backup_vault\" \"<example_resource_name>\" {\n  name = \"<example_resource_name>\" # 重要：少なくとも1つのバックアップボルトが存在することを保証\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "必要な各リージョンで**バックアップボルト**を作成し、維持します。**最小権限**アクセスを強制し、**KMS CMK**で暗号化し、**ボルトロック**を有効にして改ざんを防止します。ライフサイクルルールとクロスリージョン/クロスアカウントコピーを使用し、**多層防御**のために定期的に復元をテストします。",
+      "Url": "https://hub.prowler.com/check/backup_vaults_exist"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

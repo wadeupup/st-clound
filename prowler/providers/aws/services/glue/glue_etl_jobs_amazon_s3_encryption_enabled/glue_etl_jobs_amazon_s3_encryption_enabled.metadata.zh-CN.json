@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "glue_etl_jobs_amazon_s3_encryption_enabled",
+  "CheckTitle": "Glue 作业已启用 S3 加密",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/CIS AWS Foundations Benchmark",
+    "Effects/Data Exposure"
+  ],
+  "ServiceName": "glue",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Other",
+  "ResourceGroup": "analytics",
+  "Description": "会验证 **AWS Glue ETL 作业**在写入输出时是否使用 **Amazon S3 静态加密**（`SSE-S3` 或 `SSE-KMS`），可通过关联的安全配置或作业参数实现。缺少安全配置或禁用 S3 加密的作业会被识别。",
+  "Risk": "若将作业输出存储到 S3 时未启用**静态加密**，会削弱**机密性**。明文对象可能因存储桶策略配置错误、凭据泄露或介质复用而暴露，同时缺少 **KMS 密钥控制**、轮换和审计轨迹，进而妨碍事件响应与合规。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/glue/latest/dg/console-security-configurations.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/Glue/s3-encryption-enabled.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation: Attach a Security Configuration with S3 encryption to a Glue job\nResources:\n  GlueSecurityConfiguration:\n    Type: AWS::Glue::SecurityConfiguration\n    Properties:\n      Name: <example_resource_name>\n      EncryptionConfiguration:\n        S3Encryptions:\n          - S3EncryptionMode: SSE-S3  # CRITICAL: Enables S3 encryption for Glue outputs\n\n  GlueJob:\n    Type: AWS::Glue::Job\n    Properties:\n      Name: <example_resource_name>\n      Role: <example_role_arn>\n      Command:\n        Name: glueetl\n        ScriptLocation: s3://<example_resource_name>/script.py\n      SecurityConfiguration: !Ref GlueSecurityConfiguration  # CRITICAL: Applies encrypted security configuration to the job\n```",
+      "Other": "1. 在 AWS 控制台进入 AWS Glue > Security configurations > Create security configuration\n2. 启用 S3 encryption，并选择 SSE-S3（或使用你的密钥选择 SSE-KMS）\n3. 保存该配置\n4. 进入 AWS Glue > Jobs > 选择你的作业 > Edit\n5. 在 Job details 下，将 Security configuration 设置为你创建的加密配置\n6. 保存作业",
+      "Terraform": "```hcl\n# Terraform: Attach a Security Configuration with S3 encryption to a Glue job\nresource \"aws_glue_security_configuration\" \"sec\" {\n  name = \"<example_resource_name>\"\n\n  s3_encryption {\n    s3_encryption_mode = \"SSE-S3\"  # CRITICAL: Enables S3 encryption for Glue outputs\n  }\n}\n\nresource \"aws_glue_job\" \"job\" {\n  name     = \"<example_resource_name>\"\n  role_arn = \"<example_role_arn>\"\n\n  command {\n    script_location = \"s3://<example_resource_name>/script.py\"\n  }\n\n  security_configuration = aws_glue_security_configuration.sec.name  # CRITICAL: Applies encrypted security configuration to the job\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "要求所有 Glue 作业通过安全配置启用 **S3 加密**，并优先使用 **SSE-KMS**。对 KMS 密钥实施**最小权限**，限制密钥使用并定期轮换。通过要求加密写入的存储桶策略实现纵深防御，并结合密钥与 S3 访问日志进行监控。",
+      "Url": "https://hub.prowler.com/check/glue_etl_jobs_amazon_s3_encryption_enabled"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "Data Protection"
+}

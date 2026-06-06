@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "network_flow_log_more_than_90_days",
+  "CheckTitle": "确保网络安全组流日志保留期为 0、90 天或更长",
+  "CheckType": [],
+  "ServiceName": "network",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Network",
+  "ResourceGroup": "network",
+  "Description": "应启用网络安全组流日志，并将保留期设置为大于或等于 90 天。",
+  "Risk": "流日志可捕获流入和流出网络安全组的 IP 流量信息。日志可用于检查异常并为疑似入侵提供洞察。",
+  "RelatedUrl": " https://docs.microsoft.com/en-us/azure/network-watcher/network-watcher-nsg-flow-logging-overview",
+  "Remediation": {
+    "Code": {
+      "CLI": "az network watcher flow-log configure --nsg <NameorID of the Network Security Group> --enabled true --resource-group <resourceGroupName> --retention 91 -- storage-account <NameorID of the storage account to save flow logs>",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity-staging/knowledge-base/azure/Network/sufficient-nsg-flow-log-retention-period.html",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-logging-policies/bc_azr_logging_1#terraform"
+    },
+    "Recommendation": {
+      "Text": "通过 Azure Portal：1. 进入 Network Watcher。2. 在 Logs 区域选择 NSG flow logs。3. 从列表中逐个选择网络安全组。4. 确保 Status 设置为 On。5. 确保 Retention (days) 大于 90 天。6. 在 Storage account 字段选择你的存储账户。7. 选择 Save。通过 Azure CLI：启用 NSG 流日志并将 Retention (days) 设置为大于或等于 90 天。az network watcher flow-log configure --nsg <NameorID of the Network Security Group> --enabled true --resource-group <resourceGroupName> --retention 91 --storage-account <NameorID of the storage account to save flow logs>",
+      "Url": "https://docs.microsoft.com/en-us/cli/azure/network/watcher/flow-log?view=azure-cli-latest"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "这将使 IP 流量日志保留超过 90 天。作为二级基线控制，请先评估你的数据保留需求，再在此应用配置。由于数据存储时间更长，月度存储成本会随数据使用量增加。"
+}

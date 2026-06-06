@@ -1,0 +1,40 @@
+{
+  "Provider": "aws",
+  "CheckID": "directoryservice_directory_monitor_notifications",
+  "CheckTitle": "Directory Service 目录已启用 SNS 通知",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices"
+  ],
+  "ServiceName": "directoryservice",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "IAM",
+  "Description": "**AWS Directory Service** 目录与 **Amazon SNS 主题**关联，以发送状态更改通知（例如，`Active`  `Impaired`）。\n\n评估查找已配置 SNS 事件主题以进行监控告警的目录。",
+  "Risk": "缺少目录通知会降低对健康状态更改的可见性，导致对 `Impaired` 状态的响应延迟。这会威胁身份验证、Kerberos/LDAP 查找和域加入的可用性；增加 MTTR；并可能导致静默复制或信任失败，影响依赖工作负载的完整性。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/directoryservice/latest/admin-guide/ms_ad_enable_notifications.html",
+    "https://support.icompaas.com/support/solutions/articles/62000233533-ensure-directory-service-has-sns-notifications-enabled"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws ds register-event-topic --directory-id <DIRECTORY_ID> --topic-name <SNS_TOPIC_NAME>",
+      "NativeIaC": "",
+      "Other": "1. 打开 AWS 控制台 > Directory Service > Directories 并选择您的目录\n2. 转到 Maintenance 或 Monitoring/Notifications 部分\n3. 点击 Actions > Create notification（或 Set up notifications）\n4. 选择现有的 SNS 主题（或创建一个）并保存",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "配置 **AWS Directory Service** 以将目录状态更改发布到 **SNS 主题**，并订阅您的运营渠道以获取及时告警。\n\n对主题权限应用**最小权限**，将告警与事件响应集成，并通过将通知与日志和仪表板配对来使用**纵深防御**。",
+      "Url": "https://hub.prowler.com/check/directoryservice_directory_monitor_notifications"
+    }
+  },
+  "Categories": [
+    "logging"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

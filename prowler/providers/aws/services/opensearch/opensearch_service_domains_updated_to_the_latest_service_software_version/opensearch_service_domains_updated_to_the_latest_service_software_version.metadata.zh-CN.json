@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "opensearch_service_domains_updated_to_the_latest_service_software_version",
+  "CheckTitle": "Amazon OpenSearch Service 域已更新到最新的服务软件版本",
+  "CheckType": [
+    "软件和配置检查/补丁管理",
+    "软件和配置检查/AWS 安全最佳实践"
+  ],
+  "ServiceName": "opensearch",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsOpenSearchServiceDomain",
+  "ResourceGroup": "database",
+  "Description": "**OpenSearch Service 域**会被评估是否有待处理的**服务软件更新**。这主要关注内部平台更新，与引擎版本升级不同。",
+  "Risk": "**缺失的服务软件更新**可能导致已知漏洞未被修补，威胁数据机密性和索引完整性。\n\n错过所需更新可能导致 AWS 隔离域，造成**中断**，如果时间过长，可能导致**永久删除**。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/opensearch-service/latest/developerguide/service-software.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/Elasticsearch/version.html",
+    "https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-service-software.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws opensearch start-service-software-update --domain-name <DOMAIN_NAME>",
+      "NativeIaC": "",
+      "Other": "1. 登录 AWS 控制台并打开 Amazon OpenSearch Service\n2. 选择目标域\n3. 点击操作 > 更新\n4. 选择立即应用更新\n5. 点击确认以开始服务软件更新",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "及时应用最新的**服务软件更新**。在域的**非高峰时段**安排更新或启用自动更新。监控控制台或**EventBridge**通知，并在预备环境中测试更改，以支持**深度防御**同时最小化停机时间。",
+      "Url": "https://hub.prowler.com/check/opensearch_service_domains_updated_to_the_latest_service_software_version"
+    }
+  },
+  "Categories": [
+    "vulnerabilities"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

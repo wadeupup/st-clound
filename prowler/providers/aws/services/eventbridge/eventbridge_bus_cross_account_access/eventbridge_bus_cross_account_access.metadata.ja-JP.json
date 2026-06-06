@@ -1,0 +1,44 @@
+{
+  "Provider": "aws",
+  "CheckID": "eventbridge_bus_cross_account_access",
+  "CheckTitle": "AWS EventBridge イベントバスでクロスアカウントアクセスを許可しないこと",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "TTPs/Initial Access/Unauthorized Access",
+    "Effects/Data Exposure"
+  ],
+  "ServiceName": "eventbridge",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsEventsEventbus",
+  "ResourceGroup": "messaging",
+  "Description": "**EventBridge イベントバス**の **リソースポリシー** が、アカウント外プリンシパルに **クロスアカウントイベント配信** を許可しており、広範または公開アクセスを含む状態です。\n\n焦点は、外部アカウントによるイベント送信を許可するポリシーを持つバスです。",
+  "Risk": "**クロスアカウントイベント注入** は **完全性** と **可用性** を損ないます。偽装イベントがルールを発火し下流ターゲットを呼び出すことで、意図しない操作、ターゲット経由のデータ露出、過剰権限ロールを介した横展開、イベント洪水によるコスト増やサービス中断を引き起こします。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/CloudWatchEvents/event-bus-cross-account-access.html",
+    "https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/CWE_GettingStarted.html",
+    "https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/CloudWatchEvents-CrossAccountEventDelivery.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws events remove-permission --event-bus-name <event_bus_name> --statement-id <statement_id>",
+      "NativeIaC": "```yaml\n# CloudFormation: restrict EventBridge event bus to same account only\nResources:\n  <example_resource_name>:\n    Type: AWS::Events::EventBusPolicy\n    Properties:\n      StatementId: <example_resource_id>\n      Action: events:PutEvents\n      Principal: !Ref AWS::AccountId  # Critical: allows only this AWS account, blocking cross-account access\n      EventBusName: <example_resource_name>\n```",
+      "Other": "1. AWS コンソールで Amazon EventBridge > Event buses に移動します\n2. 対象イベントバス（<event_bus_name>）を選択します\n3. Permissions タブを開き Edit をクリックします\n4. 他アカウント、組織、または \"*\" を許可するステートメントを削除します\n5. 変更を保存します",
+      "Terraform": "```hcl\n# Terraform: restrict EventBridge event bus to same account only\nresource \"aws_cloudwatch_event_permission\" \"<example_resource_name>\" {\n  statement_id   = \"<example_resource_id>\"\n  action         = \"events:PutEvents\"\n  principal      = \"<example_resource_id>\" # Critical: set to your own AWS account ID to block cross-account access\n  event_bus_name = \"<example_resource_name>\"\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "イベントバスのリソースポリシーに **最小権限** を適用してください。特定のアカウント ID または組織スコープ（例: `aws:PrincipalOrgID`）のみ許可し、ワイルドカード `Principal` や `*` を避けます。\n\n`account` フィールドと信頼済み送信元でルールを制約し、監視とスロットリングを追加して **多層防御** を実装してください。",
+      "Url": "https://hub.prowler.com/check/eventbridge_bus_cross_account_access"
+    }
+  },
+  "Categories": [
+    "identity-access",
+    "trust-boundaries"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

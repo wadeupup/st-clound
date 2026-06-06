@@ -1,0 +1,39 @@
+{
+  "Provider": "aws",
+  "CheckID": "networkfirewall_deletion_protection",
+  "CheckTitle": "Network Firewall で削除保護が有効化されていること",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices"
+  ],
+  "ServiceName": "networkfirewall",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsNetworkFirewallFirewall",
+  "ResourceGroup": "network",
+  "Description": "**AWS Network Firewall ファイアウォール**で **削除保護**（`DeleteProtection=true`）が有効化されていることを確認します。",
+  "Risk": "削除保護がない場合、ファイアウォールは誤って、または侵害された ID により削除される可能性があり、トラフィックが検査とログ記録を迂回するおそれがあります。\n\nこれにより、未フィルタアクセスを通じて **機密性** と **完全性** が脅かされ、ルーティング中断や境界防御の喪失により **可用性** も損なわれます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/networkfirewall-controls.html#networkfirewall-9"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws network-firewall update-firewall-delete-protection --firewall-name <FIREWALL_NAME> --delete-protection",
+      "NativeIaC": "```yaml\n# CloudFormation: enable deletion protection on a Network Firewall\nResources:\n  <example_resource_name>:\n    Type: AWS::NetworkFirewall::Firewall\n    Properties:\n      FirewallName: <example_resource_name>  # Required: unique name for the firewall\n      FirewallPolicyArn: <example_resource_id>\n      VpcId: <example_resource_id>\n      SubnetMappings:\n        - SubnetId: <example_resource_id>\n      DeleteProtection: true  # Critical: enables deletion protection to pass the check\n```",
+      "Other": "1. AWS コンソールを開き、VPC > Network Firewall > Firewalls に移動します\n2. 対象のファイアウォールを選択します\n3. Firewall details で Edit（または Change protections）を選択します\n4. Deletion protection を有効化します\n5. 変更を保存します",
+      "Terraform": "```hcl\n# Terraform: enable deletion protection on a Network Firewall\nresource \"aws_networkfirewall_firewall\" \"<example_resource_name>\" {\n  name                = \"<example_resource_name>\"\n  firewall_policy_arn = \"<example_resource_id>\"\n  vpc_id              = \"<example_resource_id>\"\n\n  subnet_mapping {\n    subnet_id = \"<example_resource_id>\"\n  }\n\n  delete_protection = true  # Critical: prevents deletion to pass the check\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "すべてのファイアウォールで **削除保護**（`DeleteProtection=true`）を有効化してください。削除操作を防ぐために **最小権限** を徹底し、ファイアウォール変更には **変更承認** を必須化し、policy-as-code によるガードレールを実装します。ファイアウォールが変更された場合でも代替制御でトラフィックを抑制できるよう、**多層防御** を適用してください。",
+      "Url": "https://hub.prowler.com/check/networkfirewall_deletion_protection"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

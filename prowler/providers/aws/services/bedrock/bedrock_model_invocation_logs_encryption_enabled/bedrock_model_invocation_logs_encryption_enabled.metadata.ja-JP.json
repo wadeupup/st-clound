@@ -1,0 +1,36 @@
+{
+  "Provider": "aws",
+  "CheckID": "bedrock_model_invocation_logs_encryption_enabled",
+  "CheckTitle": "Amazon Bedrockモデル呼び出しログがKMSで暗号化されていることを確認",
+  "CheckType": [],
+  "ServiceName": "bedrock",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:bedrock:region:account-id:model/resource-id",
+  "Severity": "high",
+  "ResourceType": "Other",
+  "ResourceGroup": "ai_ml",
+  "Description": "すべてのモデル呼び出しのリクエストおよび応答ログ内の機密データを保護するために、Amazon Bedrockモデル呼び出しログがAWS KMSを使用して暗号化されていることを確認します。",
+  "Risk": "Amazon Bedrockモデル呼び出しログが暗号化されていない場合、プロンプト、応答、トークン使用状況などの機密データが不正な当事者に公開される可能性があります。これにより、データ侵害、セキュリティの脆弱性、または機密情報の意図しない使用が発生する可能性があります。",
+  "RelatedUrl": "https://docs.aws.amazon.com/bedrock/latest/userguide/data-protection.html",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "機密ログデータへの不正アクセスを防ぐために、Amazon Bedrockのモデル呼び出しログがAWS KMSを使用して暗号化されていることを確認します。",
+      "Url": "hhttps://docs.aws.amazon.com/bedrock/latest/userguide/data-protection.html"
+    }
+  },
+  "Categories": [
+    "encryption",
+    "logging",
+    "gen-ai"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

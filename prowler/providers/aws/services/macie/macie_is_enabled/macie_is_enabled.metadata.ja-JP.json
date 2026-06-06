@@ -1,0 +1,40 @@
+{
+  "Provider": "aws",
+  "CheckID": "macie_is_enabled",
+  "CheckTitle": "Amazon Macie が有効になっています",
+  "CheckType": [
+    "ソフトウェアと構成のチェック/業界および規制基準/AWS 基礎セキュリティベストプラクティス",
+    "ソフトウェアと構成のチェック/AWS セキュリティベストプラクティス"
+  ],
+  "ServiceName": "macie",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "security",
+  "Description": "**Amazon Macie** のステータスは、**S3** が存在する各リージョンで評価され、機密データの検出が運用されているかどうかを判断します。結果は、Macie がアクティブであるか、アカウントおよびリージョンに対して `PAUSED`/無効状態であるかを反映します。",
+  "Risk": "Macie がアクティブでない場合、**S3** 内の機密データは分類されずに露出したままになる可能性があります。誤ったアクセス設定や公開バケットが検出されず、データの流出や秘密の漏洩を引き起こす可能性があります。これにより、機密性が低下し、機密データが存在する場所への可視性が低下することで、侵害の影響範囲が広がります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://aws.amazon.com/macie/getting-started/"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws macie2 enable-macie --region <REGION>",
+      "NativeIaC": "```yaml\n# CloudFormation: このリージョンで Amazon Macie を有効にします\nResources:\n  MacieSession:\n    Type: AWS::Macie::Session\n    Properties:\n      Status: ENABLED  # 重要: このリージョンでアカウントの Macie を有効にします\n```",
+      "Other": "1. AWS マネジメントコンソールにサインインし、対象のリージョンに切り替えます\n2. Amazon Macie を開きます\n3. 「開始する」または「Macie を有効にする」をクリックします\n4. Macie が「一時停止中/停止中」と表示されている場合は、「Macie を再開」をクリックします\n5. 必要に応じて、S3 バケットがある各リージョンで繰り返します",
+      "Terraform": "```hcl\n# このリージョンで Amazon Macie を有効にします\nresource \"aws_macie2_account\" \"main\" {\n  # 重要: このリソースを作成すると、このリージョンでアカウントの Macie が有効になります\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "**Amazon Macie** を **S3** データをホストするすべてのリージョンで有効にし、維持します。継続的な機密データの検出を使用し、データタイプに合わせたカスタム分類を適用し、検出結果を監視にルーティングします。Macie へのアクセスには最小特権を適用し、制限的なバケットポリシーとアクセス制御で防御を強化します。",
+      "Url": "https://hub.prowler.com/check/macie_is_enabled"
+    }
+  },
+  "Categories": [
+    "secrets",
+    "forensics-ready"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

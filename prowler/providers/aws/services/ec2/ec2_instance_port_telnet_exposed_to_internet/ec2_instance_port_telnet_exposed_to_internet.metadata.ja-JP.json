@@ -1,0 +1,36 @@
+{
+  "Provider": "aws",
+  "CheckID": "ec2_instance_port_telnet_exposed_to_internet",
+  "CheckTitle": "EC2 インスタンスがインターネットからの TCP ポート 23 (Telnet) へのインバウンドを許可していないことを確認",
+  "CheckType": [
+    "Infrastructure Security"
+  ],
+  "ServiceName": "ec2",
+  "SubServiceName": "instance",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "critical",
+  "ResourceType": "AwsEc2Instance",
+  "ResourceGroup": "compute",
+  "Description": "EC2 インスタンスがインターネットからの TCP ポート 23 (Telnet) へのインバウンドを許可していないことを確認",
+  "Risk": "Telnet は、データをプレーンテキストで送信する安全でないプロトコルです。Telnet サービスをインターネットに公開すると、EC2 インスタンスへの不正アクセスにつながる可能性があります。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "EC2 インスタンスに関連付けられたセキュリティグループを変更して、インターネットからの TCP ポート 23 へのインバウンドを許可するルールを削除します。",
+      "Url": "https://docs.aws.amazon.com/vpc/latest/userguide/VPC_SecurityGroups.html"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

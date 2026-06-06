@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "elbv2_nlb_tls_termination_enabled",
+  "CheckTitle": "ELBv2 Network Load Balancer で TLS 終端が有効化されていること",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/PCI-DSS",
+    "Software and Configuration Checks/Industry and Regulatory Standards/NIST 800-53 Controls (USA)"
+  ],
+  "ServiceName": "elbv2",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsElbv2LoadBalancer",
+  "ResourceGroup": "network",
+  "Description": "`TLS` プロトコルのリスナーを持つ **Network Load Balancer** は、ロードバランサーで **TLS 終端** を実施していることを示します。この評価では、少なくとも 1 つの `TLS` リスナーを持つ NLB と、平文 `TCP`/`UDP` のみ、または暗号化をターゲット側に委ねている NLB を識別します。",
+  "Risk": "NLB レベルの TLS 終端がない場合、転送データが未暗号化となる、またはインスタンス側で暗号化管理が不統一になる可能性があり、**機密性** と **完全性** を損ないます。また、ハンドシェイク CPU 負荷がターゲット側に移り、**可用性** が低下し、接続フラッドやダウングレード攻撃、弱い暗号スイート露出の影響を受けやすくなります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/elasticloadbalancing/latest/network/listener-update-rules.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/ELBv2/network-load-balancer-listener-security.html#"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws elbv2 create-listener --load-balancer-arn <nlb_arn> --protocol TLS --port 443 --ssl-policy ELBSecurityPolicy-TLS13-1-2-2021-06 --certificates CertificateArn=<certificate_arn> --default-actions Type=forward,TargetGroupArn=<target_group_arn>",
+      "NativeIaC": "```yaml\n# CloudFormation: Add a TLS listener to enable TLS termination on the NLB\nResources:\n  \"<example_resource_name>\":\n    Type: AWS::ElasticLoadBalancingV2::Listener\n    Properties:\n      LoadBalancerArn: \"<example_resource_arn>\"\n      Protocol: TLS  # critical: enables TLS termination on the NLB\n      Port: 443\n      SslPolicy: ELBSecurityPolicy-TLS13-1-2-2021-06  # critical: required when Protocol is TLS\n      Certificates:\n        - CertificateArn: \"<example_resource_arn>\"  # critical: server certificate for TLS termination\n      DefaultActions:\n        - Type: forward\n          TargetGroupArn: \"<example_resource_arn>\"\n```",
+      "Other": "1. AWS コンソールで EC2 > Load Balancers に移動し、対象の Network Load Balancer を選択します\n2. Listeners タブを開き Add listener をクリックします\n3. Protocol を TLS、Port を 443 に設定します\n4. ACM 証明書とセキュリティポリシーを選択します\n5. Default action をターゲットグループへの Forward に設定します\n6. Save changes をクリックします",
+      "Terraform": "```hcl\n# Terraform: Add a TLS listener to enable TLS termination on the NLB\nresource \"aws_lb_listener\" \"<example_resource_name>\" {\n  load_balancer_arn = \"<example_resource_arn>\"\n  port              = 443\n  protocol          = \"TLS\"  # critical: enables TLS termination\n  ssl_policy        = \"ELBSecurityPolicy-TLS13-1-2-2021-06\"  # critical: required for TLS\n  certificate_arn   = \"<example_resource_arn>\"  # critical: server certificate for TLS termination\n\n  default_action {\n    type             = \"forward\"\n    target_group_arn = \"<example_resource_arn>\"\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "**TLS リスナー**を有効化して NLB でクライアント暗号化を終端し、最新暗号ポリシーと証明書ローテーションを一元適用してください。必要に応じてターゲット再暗号化を行い、バックエンドアクセスを NLB に限定し、安全な保管と監視で証明書ライフサイクルと旧式プロトコル管理を自動化する **多層防御** を実装します。",
+      "Url": "https://hub.prowler.com/check/elbv2_nlb_tls_termination_enabled"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

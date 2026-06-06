@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "sqs_queues_not_publicly_accessible",
+  "CheckTitle": "SQSキューポリシーはパブリックアクセスを許可していません",
+  "CheckType": [
+    "ソフトウェアおよび設定のチェック/AWS セキュリティのベストプラクティス/ネットワーク到達可能性",
+    "ソフトウェアと設定のチェック/業界および規制基準/AWS 基盤セキュリティのベストプラクティス",
+    "TTPs/初期アクセス/不正アクセス",
+    "影響／データ露出"
+  ],
+  "ServiceName": "sqs",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "critical",
+  "ResourceType": "AwsSqsQueue",
+  "ResourceGroup": "messaging",
+  "Description": "Amazon SQS キューポリシーは、**パブリックアクセス**について評価されます。この検出結果は、所有アカウントまたは明示的に信頼されたプリンシパルにのみアクセスを許可するキューと比較して、制限的な条件なしでワイルドカード `Principal` を使用する `Allow` ステートメントを持つキューを強調表示します。",
+  "Risk": "**公開された SQS アクセス** は、メッセージデータを露出させ（**機密性**）、未承認の送信/受信や改ざんを可能にし（**完全性**）、処理を妨げる purge/delete 操作を許可する可能性があります（**可用性**）。また、無制限のメッセージ取り込みを引き起こし、コストの急増やコンシューマーの過負荷を招くおそれもあります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/SQS/sqs-queue-exposed.html",
+    "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-basic-examples-of-sqs-policies.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws sqs set-queue-attributes --queue-url <example_queue_url> --attributes Policy='{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"<example_account_id>\"},\"Action\":\"sqs:*\",\"Resource\":\"<example_queue_arn>\"}]}'",
+      "NativeIaC": "```yaml\n# CloudFormation: SQS ポリシーを特定のプリンシパルに制限する（パブリックではない）\nResources:\n  QueuePolicy:\n    Type: AWS::SQS::QueuePolicy\n    Properties:\n      Queues:\n        - \"<example_queue_url>\"\n      PolicyDocument:\n        Version: \"2012-10-17\"\n        Statement:\n          - Effect: Allow\n            Principal:\n              AWS: \"<example_account_id>\" # 重大: 特定のアカウントへのアクセスに制限します（公開の「*」を削除）\n            Action: \"sqs:*\"\n            Resource: \"<example_queue_arn>\"\n```",
+      "Other": "1. Amazon SQS コンソールを開き、キューを選択します\n2. Permissions（Access policy）に移動し、Edit をクリックします\n3. JSON ポリシーで、\"Principal\": \"*\" を \"Principal\": { \"AWS\": \"<your_account_id>\" } に置き換えるか、それらの公開ステートメントを削除します\n4. 変更を保存します",
+      "Terraform": "```hcl\n# 特定のプリンシパルにSQSポリシーを制限する（公開しない）\nresource \"aws_sqs_queue_policy\" \"<example_resource_name>\" {\n  queue_url = \"<example_queue_url>\"\n  policy    = jsonencode({\n    Version   = \"2012-10-17\"\n    Statement = [{\n      Effect    = \"Allow\"\n      Principal = { AWS = \"<example_account_id>\" } # 重大: 特定のプリンシパルに制限する（公開の「*」を削除）\n      Action    = \"sqs:*\"\n      Resource  = \"<example_queue_arn>\"\n    }]\n  })\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "SQS リソースポリシーには**最小権限**を適用してください:\n- `Principal: *` は避け、特定のアカウント、ロール、またはサービスにのみアクセスを許可する\n- アクセス範囲を厳密に限定するために、制限的な条件を追加する\n- プライベート接続と多層防御のコントロールを優先する\n- ドリフトを防ぐために、ポリシーを見直し、アクティビティを定期的に監査する",
+      "Url": "https://hub.prowler.com/check/sqs_queues_not_publicly_accessible"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

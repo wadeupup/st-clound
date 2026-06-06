@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "kinesis_stream_encrypted_at_rest",
+  "CheckTitle": "Kinesis 流在静态时使用 KMS 加密",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践",
+    "软件和配置检查/行业和法规标准/AWS 基础安全最佳实践",
+    "软件和配置检查/行业和监管标准/NIST 800-53 控制"
+  ],
+  "ServiceName": "kinesis",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsKinesisStream",
+  "ResourceGroup": "messaging",
+  "Description": "**Amazon Kinesis Data Streams** 使用 **服务器端加密** 和 **AWS KMS** 来保护静态记录。评估确定流是否配置了带有 KMS 密钥的 `SSE-KMS`；识别缺乏基于 KMS 的静态加密的流。",
+  "Risk": "没有 **SSE-KMS**，如果存储、备份或分析导出被访问，分片中的记录可能会以明文形式暴露，从而破坏**机密性**。缺乏 KMS 控制还会通过移除密钥策略、轮换和审计跟踪来降低**完整性**和监督，可能导致隐蔽的数据泄露或内部滥用。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/kinesis-controls.html#kinesis-1",
+    "https://docs.aws.amazon.com/streams/latest/dev/getting-started-with-sse.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/Kinesis/server-side-encryption.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws kinesis start-stream-encryption --stream-name <KINESIS_STREAM_NAME> --encryption-type KMS --key-id alias/aws/kinesis",
+      "NativeIaC": "```yaml\n# CloudFormation：在 Kinesis 流上启用 KMS 加密\nResources:\n  <example_resource_name>:\n    Type: AWS::Kinesis::Stream\n    Properties:\n      ShardCount: 1\n      StreamEncryption:\n        EncryptionType: KMS  # 关键：启用静态 KMS 加密\n        KeyId: alias/aws/kinesis  # 关键：使用 AWS 管理的 Kinesis KMS 密钥\n```",
+      "Other": "1. 打开 AWS 控制台并转到 Amazon Kinesis > 数据流\n2. 选择流\n3. 在“详情”选项卡上，点击“服务器端加密”中的“编辑”\n4. 选择“启用”\n5. 选择（默认）aws/kinesis KMS 密钥\n6. 点击“保存”",
+      "Terraform": "```hcl\n# 在 Kinesis 流上启用 KMS 加密\nresource \"aws_kinesis_stream\" \"<example_resource_name>\" {\n  name            = \"<example_resource_name>\"\n  shard_count     = 1\n  encryption_type = \"KMS\"            # 关键：启用静态 KMS 加密\n  kms_key_id      = \"alias/aws/kinesis\" # 关键：使用 AWS 管理的 Kinesis KMS 密钥\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "在所有流上启用 **SSE-KMS**。\n- 使用 **客户管理的密钥** 进行轮换和所有权\n- 在 KMS 授权上实施 **最小特权**；限制跨账户使用\n- 监控密钥使用情况，并在 CI/CD 中要求加密",
+      "Url": "https://hub.prowler.com/check/kinesis_stream_encrypted_at_rest"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

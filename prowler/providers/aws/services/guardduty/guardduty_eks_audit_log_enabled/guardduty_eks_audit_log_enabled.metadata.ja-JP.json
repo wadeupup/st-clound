@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "guardduty_eks_audit_log_enabled",
+  "CheckTitle": "GuardDuty detector で EKS 監査ログ監視が有効化されていること",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices/Runtime Behavior Analysis",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices"
+  ],
+  "ServiceName": "guardduty",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsGuardDutyDetector",
+  "ResourceGroup": "security",
+  "Description": "**Amazon GuardDuty detectors** で **EKS 監査ログ監視**（`EKS_AUDIT_LOGS`）が有効かを評価し、**Amazon EKS** クラスターの Kubernetes 監査アクティビティを分析できる状態かを確認します。",
+  "Risk": "これが無効だと、**Kubernetes API の悪用**が見逃され、CIA に影響します：\n- シークレットアクセスとデータ流出\n- RBAC 変更による権限昇格\n- 永続化/暗号資産マイニングのための不正デプロイ\n\n攻撃者は窃取した認証情報で AWS 環境へ横方向に移動する可能性があります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/guardduty/latest/ug/eks-protection-enable-standalone-account.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/guardduty-controls.html#guardduty-5",
+    "https://docs.aws.amazon.com/guardduty/latest/ug/kubernetes-protection.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws guardduty update-detector --detector-id <detector-id> --features '[{\"Name\":\"EKS_AUDIT_LOGS\",\"Status\":\"ENABLED\"}]'",
+      "NativeIaC": "```yaml\n# CloudFormation: Enable EKS Audit Log Monitoring on GuardDuty detector\nResources:\n  GuardDutyDetector:\n    Type: AWS::GuardDuty::Detector\n    Properties:\n      Enable: true\n      DataSources:\n        Kubernetes:\n          AuditLogs:\n            Enable: true  # CRITICAL: Enables EKS Audit Log Monitoring\n```",
+      "Other": "1. AWS Console を開き Amazon GuardDuty に移動します\n2. 有効化したい Region を選択します\n3. 左メニューで EKS Protection をクリックします\n4. Enable をクリックして確認します\n5. AWS Organizations を利用している場合は、委任された GuardDuty 管理者アカウントで実施します",
+      "Terraform": "```hcl\n# Enable EKS Audit Log Monitoring on GuardDuty detector\nresource \"aws_guardduty_detector\" \"example\" {\n  enable = true\n\n  features {\n    name   = \"EKS_AUDIT_LOGS\"\n    status = \"ENABLED\"  # CRITICAL: Enables EKS Audit Log Monitoring\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "必要なすべての Region の detector で **EKS 監査ログ監視**を有効化し、GuardDuty 管理者による一元管理を行ってください。\n- 検出結果をアラート/インシデント対応ワークフローへ連携する\n- 検出結果と設定へのアクセスに**最小権限**を適用する\n- **多層防御**として RBAC 強化とランタイム監視を組み合わせる",
+      "Url": "https://hub.prowler.com/check/guardduty_eks_audit_log_enabled"
+    }
+  },
+  "Categories": [
+    "cluster-security"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

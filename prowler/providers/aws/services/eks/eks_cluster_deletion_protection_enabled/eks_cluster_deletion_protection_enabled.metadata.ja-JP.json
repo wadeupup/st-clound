@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "eks_cluster_deletion_protection_enabled",
+  "CheckTitle": "EKS クラスターで削除保護が有効になっている",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Effects/Data Destruction"
+  ],
+  "ServiceName": "eks",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsEksCluster",
+  "ResourceGroup": "container",
+  "Description": "**Amazon EKS クラスター**で**削除保護**が有効になっており、保護が明示的に無効になるまでクラスターの削除をブロックします。",
+  "Risk": "**削除保護**がない場合、自動化エラーや侵害された管理者がクラスターコントロールプレーンを削除でき、即座に**可用性**の損失とダウンタイムを引き起こします。破壊的なアクションは、デプロイの**整合性**に影響を与え、孤立したリソースを残し、回復を妨げ、**運用コスト**を増加させる可能性があります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/eks/latest/APIReference/API_UpdateClusterConfig.html",
+    "https://docs.aws.amazon.com/eks/latest/userguide/deletion-protection.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws eks update-cluster-config --name <cluster_name> --region <region_name> --deletion-protection",
+      "NativeIaC": "```yaml\n# CloudFormation: enable deletion protection on the EKS cluster\nResources:\n  <example_resource_name>:\n    Type: AWS::EKS::Cluster\n    Properties:\n      RoleArn: <example_role_arn>\n      ResourcesVpcConfig:\n        SubnetIds: [<example_subnet_id_1>, <example_subnet_id_2>]\n      DeletionProtection: true  # critical: prevents cluster deletion until disabled\n```",
+      "Other": "1. AWS 管理コンソールを開き、Amazon EKS に移動します\n2. クラスターを選択します\n3. 設定タブに移動し、編集をクリックします\n4. 削除保護を有効化します\n5. 変更を保存をクリックします",
+      "Terraform": "```hcl\n# Enable deletion protection for the EKS cluster\nresource \"aws_eks_cluster\" \"<example_resource_name>\" {\n  name     = \"<example_resource_name>\"\n  role_arn = \"<example_role_arn>\"\n\n  vpc_config {\n    subnet_ids = [\"<subnet_id_1>\", \"<subnet_id_2>\"]\n  }\n\n  deletion_protection = true  # critical: prevents cluster deletion until disabled\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "重要なクラスターで**削除保護**を有効化します（`deletionProtection=true`）。**最小権限**を適用し、範囲が狭いロールのみがクラスターを無効化または削除できるようにします。承認を伴う**変更管理**と**職務分離**を要求し、広範な削除権限を防ぐためのガードレールを適用します。",
+      "Url": "https://hub.prowler.com/check/eks_cluster_deletion_protection_enabled"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

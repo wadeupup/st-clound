@@ -1,0 +1,47 @@
+{
+  "Provider": "aws",
+  "CheckID": "cloudtrail_threat_detection_llm_jacking",
+  "CheckTitle": "CloudTrail 中未检测到潜在的 LLM 劫持活动",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices/Runtime Behavior Analysis",
+    "TTPs/Discovery",
+    "TTPs/Execution",
+    "TTPs/Defense Evasion",
+    "Effects/Resource Consumption",
+    "Unusual Behaviors/User"
+  ],
+  "ServiceName": "cloudtrail",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "critical",
+  "ResourceType": "AwsCloudTrailTrail",
+  "ResourceGroup": "monitoring",
+  "Description": "按身份分析 **CloudTrail Bedrock 活动**，查找高度多样化的 LLM 相关 API 调用（例如 `InvokeModel`、`InvokeModelWithResponseStream`、`GetFoundationModelAvailability`）。*如果某个身份在最近窗口内这些操作的占比超过配置的阈值*，则将其标记为潜在的 **LLM 劫持** 行为。",
+  "Risk": "此类模式表明使用 **被盗凭据** 滥用来驱动 LLM 使用。\n- 可用性：成本耗尽和服务中断\n- 机密性：提示/输出和模型设置的泄露\n- 完整性：滥用权限以获得更广泛的访问\n攻击者可能使用反向代理来转售访问并混淆来源。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://furkangungor.medium.com/automating-anomaly-detection-in-aws-cloudtrail-logs-4efb2ad9b958",
+    "https://help.sumologic.com/docs/integrations/amazon-aws/amazon-bedrock/",
+    "https://dzone.com/articles/ai-powered-aws-cloudtrail-analysis-strands-agent-bedrock"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation SCP that blocks all Amazon Bedrock actions to stop LLM jacking\nResources:\n  <example_resource_name>:\n    Type: AWS::Organizations::Policy\n    Properties:\n      Name: <example_resource_name>\n      Type: SERVICE_CONTROL_POLICY\n      TargetIds:\n        - \"<example_resource_id>\"  # CRITICAL: Attach SCP to the root/OU/account to enforce the deny\n      Content:\n        Version: \"2012-10-17\"\n        Statement:\n          - Sid: DenyBedrock\n            Effect: Deny\n            Action: \"bedrock:*\"  # CRITICAL: Denies all Bedrock APIs (Invoke/Converse/list/entitlements/etc.)\n            Resource: \"*\"        # CRITICAL: Apply deny to all resources\n```",
+      "Other": "1. 在 AWS 控制台中，转到组织 > 策略 > 服务控制策略\n2. 单击创建策略\n3. 将名称设置为 <example_resource_name>\n4. 在策略中，粘贴对 Bedrock 的拒绝：\n   {\n     \"Version\": \"2012-10-17\",\n     \"Statement\": [{\"Sid\":\"DenyBedrock\",\"Effect\":\"Deny\",\"Action\":\"bedrock:*\",\"Resource\":\"*\"}]\n   }\n5. 保存策略并单击附加\n6. 选择目标（根、OU 或受影响的账户 ID <example_resource_id>）并附加策略\n7. 等待传播；不会再有 Bedrock 调用发生，检测窗口过期后，发现将清除",
+      "Terraform": "```hcl\n# SCP denying all Amazon Bedrock actions; attach it to the root/OU/account to halt LLM jacking\nresource \"aws_organizations_policy\" \"main\" {\n  name = \"<example_resource_name>\"\n  type = \"SERVICE_CONTROL_POLICY\"\n\n  content = jsonencode({\n    Version   = \"2012-10-17\"\n    Statement = [{\n      Sid      = \"DenyBedrock\"\n      Effect   = \"Deny\"\n      Action   = \"bedrock:*\"   // CRITICAL: blocks all Bedrock APIs (prevents further suspicious activity)\n      Resource = \"*\"            // CRITICAL: deny across all resources\n    }]\n  })\n}\n\nresource \"aws_organizations_policy_attachment\" \"attach\" {\n  policy_id = aws_organizations_policy.main.id\n  target_id = \"<example_resource_id>\"  // CRITICAL: attach to the affected account/OU/root to enforce the deny\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "对 Bedrock 应用 **最小权限原则**；仅将 `Invoke*` 限制为必需的角色，并在未使用的地方通过 **SCP** 广泛拒绝。强制执行 **MFA** 和短期凭据；轮换/删除暴露的密钥。启用 **模型调用日志记录** 和预算/配额。持续监控 Bedrock 枚举和调用突发。在身份和网络之间使用 **纵深防御**。",
+      "Url": "https://hub.prowler.com/check/cloudtrail_threat_detection_llm_jacking"
+    }
+  },
+  "Categories": [
+    "threat-detection",
+    "gen-ai"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

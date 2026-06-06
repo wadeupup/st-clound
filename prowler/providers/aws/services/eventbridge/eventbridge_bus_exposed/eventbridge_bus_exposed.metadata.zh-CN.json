@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "eventbridge_bus_exposed",
+  "CheckTitle": "AWS EventBridge 事件总线策略不允许公共访问",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices/Network Reachability",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "TTPs/Initial Access/Unauthorized Access"
+  ],
+  "ServiceName": "eventbridge",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsEventsEventbus",
+  "ResourceGroup": "messaging",
+  "Description": "会评估 EventBridge 事件总线资源策略是否存在**公共访问**，例如 `Principal: \"*\"` 或过于宽泛的条件，导致任意 AWS 账户可向总线发布事件或管理规则。",
+  "Risk": "可公共访问的事件总线会导致**事件注入**和未授权规则变更，削弱**完整性**并助长**横向移动**。攻击者可触发下游目标，引发**数据暴露**、服务中断，以及通过高频事件造成的意外**成本**。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/CloudWatchEvents-CrossAccountEventDelivery.html",
+    "https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/CWE_GettingStarted.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/CloudWatchEvents/event-bus-exposed.html",
+    "https://aws.amazon.com/blogs/compute/simplifying-cross-account-access-with-amazon-eventbridge-resource-policies/"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws events remove-permission --event-bus-name <event_bus_name> --statement-id <statement_id>",
+      "NativeIaC": "```yaml\n# CloudFormation: restrict EventBridge event bus access to a specific account (not public)\nResources:\n  <example_resource_name>:\n    Type: AWS::Events::EventBusPolicy\n    Properties:\n      StatementId: AllowSpecificAccount\n      Action: events:PutEvents\n      Principal: arn:aws:iam::<example_account_id>:root  # CRITICAL: limit access to a specific AWS account to prevent public access\n      # Omitting EventBusName applies this to the default event bus\n```",
+      "Other": "1. 在 AWS 控制台进入 EventBridge > Event buses\n2. 选择目标事件总线并打开 Permissions 标签\n3. 点击 Edit policy\n4. 删除任何 Principal 为 \"*\" 或 AWS 为 \"*\" 的策略语句\n5. 如有需要，新增仅允许受信任账户 ID 作为 Principal 的策略语句（arn:aws:iam::<ACCOUNT_ID>:root）\n6. 保存更改",
+      "Terraform": "```hcl\nresource \"aws_cloudwatch_event_bus_policy\" \"<example_resource_name>\" {\n  # CRITICAL: Principal is a specific AWS account, not \"*\", preventing public access\n  policy = <<POLICY\n{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [{\n    \"Sid\": \"AllowSpecificAccount\",\n    \"Effect\": \"Allow\",\n    \"Principal\": {\"AWS\": \"arn:aws:iam::<example_account_id>:root\"},\n    \"Action\": \"events:PutEvents\",\n    \"Resource\": \"arn:aws:events:<example_region>:<example_account_id>:event-bus/default\"\n  }]\n}\nPOLICY\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "对资源策略实施**最小权限**：将主体限制为特定账户或你的组织，并约束动作与事件属性（如 `source`、`detail-type`）。避免 `Principal: \"*\"`。\n\n采用**纵深防御**，在规则模式中包含期望的 `account`。同时监控策略变更与总线活动。",
+      "Url": "https://hub.prowler.com/check/eventbridge_bus_exposed"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

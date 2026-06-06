@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "defender_container_images_scan_enabled",
+  "CheckTitle": "确保使用 Azure Defender 镜像扫描或第三方提供商进行镜像漏洞扫描",
+  "CheckType": [],
+  "ServiceName": "defender",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Microsoft.Security",
+  "ResourceGroup": "security",
+  "Description": "对部署到 Azure（AKS）的镜像进行漏洞扫描。Azure Security Center 已普遍提供对存储在 Azure Container Registry 中镜像的漏洞扫描能力。该能力由信息安全领域领先提供商 Qualys 提供支持。当你将镜像推送到 Container Registry 时，Security Center 会自动扫描该镜像，并检查文件中定义的软件包或依赖项中的已知漏洞。扫描完成后（约 10 分钟），Security Center 会提供每个检测到漏洞的详情与安全分级，并给出如何修复问题及保护易受攻击面的指导。",
+  "Risk": "软件包中的漏洞可能被黑客或恶意用户利用，从而获取对本地云资源的未授权访问。Azure Defender 及其他第三方产品允许对镜像进行已知漏洞扫描。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/container-registry/container-registry-check-health",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "",
+      "Url": "https://learn.microsoft.com/en-us/azure/container-registry/scan-images-defender"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "使用 Azure 容器注册表时，偶尔可能会遇到问题。例如，由于本地环境中的 Docker 问题，你可能无法拉取容器镜像；或由于网络问题而无法连接到注册表。"
+}

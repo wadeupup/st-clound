@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "kafka_cluster_in_transit_encryption_enabled",
+  "CheckTitle": "Kafka クラスターは転送中の暗号化が有効になっています",
+  "CheckType": [
+    "ソフトウェアと構成のチェック/AWS セキュリティベストプラクティス",
+    "ソフトウェアと構成のチェック/業界および規制基準/AWS 基礎セキュリティベストプラクティス"
+  ],
+  "ServiceName": "kafka",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsMskCluster",
+  "ResourceGroup": "messaging",
+  "Description": "**Amazon MSK クラスター**は、**転送中の暗号化**が両方のパスで評価されます: **client-broker** が `TLS` のみで設定され、**inter-broker** 暗号化が有効です。*サーバーレスクラスターはこれをデフォルトで提供します*。\n\nこの検出は、クライアント-ブローカー間のトラフィックが `TLS` のみでないか、またはブローカー間の暗号化がオフになっているクラスターを強調します。",
+  "Risk": "暗号化されていない、または混在した (`TLS_PLAINTEXT`/`PLAINTEXT`) トラフィックは、レコード、資格情報、およびメタデータの傍受を可能にし、**MITM**、リプレイ、およびメッセージ改ざんをサポートします。\n\nプレーンテキストのブローカー間リンクは、VPC 内のレプリケーションデータを露出させ、**横方向の移動**とトピックの汚染を可能にし、データの**機密性**と**整合性**を低下させます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/msk/latest/developerguide/msk-encryption.html",
+    "https://docs.aws.amazon.com/msk/latest/developerguide/msk-working-with-encryption.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/MSK/encryption-in-transit-for-msk.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation: 転送中の暗号化が強制された MSK クラスター\nResources:\n  <example_resource_name>:\n    Type: AWS::MSK::Cluster\n    Properties:\n      ClusterName: <example_resource_name>\n      KafkaVersion: <VERSION>\n      NumberOfBrokerNodes: 3\n      BrokerNodeGroupInfo:\n        ClientSubnets:\n          - <example_resource_id>\n          - <example_resource_id>\n        InstanceType: kafka.m5.large\n      EncryptionInfo:\n        EncryptionInTransit:\n          ClientBroker: TLS  # 重要: クライアント-ブローカー TLS のみを強制します\n          InCluster: true    # 重要: ブローカー間暗号化を有効にします\n```",
+      "Other": "1. AWS コンソールで、Amazon MSK > クラスターに移動し、クラスターを選択します\n2. 編集 (セキュリティ) をクリックします\n3. 転送中の暗号化の下で、クライアント-ブローカーを TLS のみに設定します\n4. 変更を保存します\n5. ブローカー間 (クラスター内) 暗号化が有効であることを確認します。無効 (不変) の場合は、新しいクラスターを作成します:\n   - 転送中の暗号化: クライアント-ブローカー = TLS のみ、ブローカー間暗号化 = 有効\n   - クライアントを新しいクラスターに移行し、古いクラスターを廃止します",
+      "Terraform": "```hcl\n# Terraform: 転送中の暗号化が強制された MSK クラスター\nresource \"aws_msk_cluster\" \"<example_resource_name>\" {\n  cluster_name           = \"<example_resource_name>\"\n  kafka_version          = \"<VERSION>\"\n  number_of_broker_nodes = 3\n\n  broker_node_group_info {\n    instance_type  = \"kafka.m5.large\"\n    client_subnets = [\n      \"subnet-<example_resource_id>\",\n      \"subnet-<example_resource_id>\",\n    ]\n  }\n\n  encryption_info {\n    encryption_in_transit {\n      client_broker = \"TLS\"  # 重要: クライアント-ブローカー TLS のみを強制します\n      in_cluster    = true    # 重要: ブローカー間暗号化を有効にします\n    }\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "エンドツーエンドの輸送保護を強制します:\n- すべてのクライアントに `client_broker=TLS` を要求します\n- ブローカー間リンクに `in_cluster=true` を有効にします\n\n**多層防御**を適用します: ネットワークパスを制限し、プライベート接続を優先し、強力なクライアント認証と**最小特権**の承認を使用して影響範囲を制限します。",
+      "Url": "https://hub.prowler.com/check/kafka_cluster_in_transit_encryption_enabled"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

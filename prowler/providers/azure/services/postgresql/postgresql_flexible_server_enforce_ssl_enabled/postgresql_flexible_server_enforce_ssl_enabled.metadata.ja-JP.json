@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "postgresql_flexible_server_enforce_ssl_enabled",
+  "CheckTitle": "PostgreSQL Database Server の 'Enforce SSL connection' が 'ENABLED' に設定されていることを確認する",
+  "CheckType": [],
+  "ServiceName": "postgresql",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "PostgreSQL",
+  "ResourceGroup": "database",
+  "Description": "PostgreSQL サーバーで SSL 接続を有効化します。",
+  "Risk": "SSL 接続は、Secure Sockets Layer（SSL）を使用してデータベース サーバーとクライアント アプリケーションを接続することで、新たなセキュリティ層を提供します。データベース サーバーとクライアント アプリケーション間の SSL 接続を強制することで、サーバーとアプリケーション間のデータ ストリームが暗号化され、「中間者攻撃」への対策に役立ちます。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/postgresql/single-server/concepts-ssl-connection-security",
+  "Remediation": {
+    "Code": {
+      "CLI": "az postgres server update --resource-group <resourceGroupName> --name <serverName> --ssl-enforcement Enabled",
+      "NativeIaC": "",
+      "Other": "https://docs.prowler.com/checks/azure/azure-networking-policies/bc_azr_networking_10",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-networking-policies/bc_azr_networking_10#terraform"
+    },
+    "Recommendation": {
+      "Text": "Azure Portal から 1. https://portal.azure.com で Azure Portal にログインします。2. Azure Database for PostgreSQL server に移動します。3. 各データベースで Connection security をクリックします。4. SSL settings で ENABLED をクリックして SSL 接続を強制します。5. Save をクリックします。Azure CLI から PostgreSQL Database で SSL 接続を強制するには次のコマンドを使用します。az postgres server update --resource-group <resourceGroupName> --name <serverName> --ssl-enforcement Enabled。PowerShell から Update-AzPostgreSqlServer -ResourceGroupName <ResourceGroupName > -ServerName <ServerName> -SslEnforcement Enabled",
+      "Url": "https://learn.microsoft.com/en-us/azure/postgresql/single-server/concepts-ssl-connection-security"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "."
+}

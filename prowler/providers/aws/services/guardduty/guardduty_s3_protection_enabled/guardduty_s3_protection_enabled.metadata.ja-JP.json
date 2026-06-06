@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "guardduty_s3_protection_enabled",
+  "CheckTitle": "GuardDuty detector で S3 Protection が有効化されていること",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices/Runtime Behavior Analysis",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Effects/Data Exfiltration"
+  ],
+  "ServiceName": "guardduty",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsGuardDutyDetector",
+  "ResourceGroup": "security",
+  "Description": "Amazon GuardDuty detector で **S3 Protection** が有効かを評価します。これは CloudTrail の S3 データイベントを分析し、アカウントおよび Region 内の S3 バケットに対する**オブジェクトレベル API アクティビティ**（`GetObject`、`PutObject`、`DeleteObject`）を監視します。",
+  "Risk": "S3 Protection がない場合、**オブジェクトレベル S3 アクティビティ**が分析されず、以下を許します：\n- 大量読み取り/コピーによる**データ流出**\n- **破壊的削除**\n- **ポリシー/ACL 改ざん**\n\n検知されない操作により、データの機密性・完全性・可用性が低下します。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.amazonaws.cn/en_us/guardduty/latest/ug/guardduty_finding-types-s3.html",
+    "https://docs.aws.amazon.com/guardduty/latest/ug/s3_detection.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/GuardDuty/enable-s3-protection.html",
+    "https://docs.aws.amazon.com/guardduty/latest/ug/s3-protection.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/guardduty-controls.html#guardduty-10"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws guardduty update-detector --detector-id <detector-id> --data-sources S3Logs={Enable=true}",
+      "NativeIaC": "```yaml\n# CloudFormation: Enable S3 Protection on a GuardDuty detector\nResources:\n  <example_resource_name>:\n    Type: AWS::GuardDuty::Detector\n    Properties:\n      Enable: true\n      DataSources:\n        S3Logs:\n          Enable: true  # Critical: Enables GuardDuty S3 Protection\n```",
+      "Other": "1. AWS Management Console を開き GuardDuty に移動します\n2. 左メニューで Settings を選択します\n3. S3 Protection セクションを見つけて Enable（または On に切替）をクリックします\n4. Save をクリックします",
+      "Terraform": "```hcl\n# Enable S3 Protection on a GuardDuty detector\nresource \"aws_guardduty_detector\" \"<example_resource_name>\" {\n  enable = true\n\n  datasources {\n    s3_logs {\n      enable = true  # Critical: Enables GuardDuty S3 Protection\n    }\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "すべてのアカウントと Region で **S3 Protection** を有効化し、S3 の**多層防御**を強化してください。IAM とバケットポリシーには**最小権限**を適用し、**Block Public Access** を維持し、検出結果をアラートへ統合して、異常を定期レビューしデータ損失と改ざんを防止します。",
+      "Url": "https://hub.prowler.com/check/guardduty_s3_protection_enabled"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

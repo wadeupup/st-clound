@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "sqlserver_azuread_administrator_enabled",
+  "CheckTitle": "SQL Server に Azure Active Directory 管理者が構成されていることを確認する",
+  "CheckType": [],
+  "ServiceName": "sqlserver",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "SQLServer",
+  "ResourceGroup": "database",
+  "Description": "Azure Active Directory 管理者が構成されていることを確認します",
+  "Risk": "Azure Active Directory は ID を一元管理する方法を提供します。ローカル SQL 管理者 ID を使用すると、ユーザー アカウント管理が難しくなります。さらに、Azure Active Directory からユーザーへセキュリティ ポリシーを一元的に適用できます。",
+  "RelatedUrl": "https://docs.microsoft.com/en-us/azure/sql-database/sql-database-aad-authentication",
+  "Remediation": {
+    "Code": {
+      "CLI": "az sql server ad-admin create --resource-group resource_group_name --server server_name --display-name display_name --object-id user_object_id",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/Sql/active-directory-admin.html",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-general-policies/ensure-that-azure-active-directory-admin-is-configured#terraform"
+    },
+    "Recommendation": {
+      "Text": "Azure Active Directory 管理者を有効化します",
+      "Url": ""
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

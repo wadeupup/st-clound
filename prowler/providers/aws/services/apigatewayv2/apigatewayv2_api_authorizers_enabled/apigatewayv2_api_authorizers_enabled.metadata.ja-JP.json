@@ -1,0 +1,46 @@
+{
+  "Provider": "aws",
+  "CheckID": "apigatewayv2_api_authorizers_enabled",
+  "CheckTitle": "API Gateway V2 API に承認者が設定されています",
+  "CheckAliases": [
+    "apigatewayv2_authorizers_enabled"
+  ],
+  "CheckType": [
+    "ソフトウェアと設定チェック/AWS セキュリティベストプラクティス",
+    "TTPs/初期アクセス",
+    "影響/データ露出"
+  ],
+  "ServiceName": "apigatewayv2",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsApiGatewayV2Api",
+  "ResourceGroup": "api_gateway",
+  "Description": "**API Gateway v2 API** は、リクエストを認証するために**承認者**（JWT/Cognito または Lambda）を使用します。この評価は、API にルートへのアクセスを制御する承認者が設定されているかどうかを評価します。",
+  "Risk": "承認者がない場合、誰でもルートを呼び出すことができます。\n- 機密性：データとメタデータの露出\n- 整合性：不正な状態変更またはアクション\n- 可用性/コスト：バックエンドの自動悪用、トラフィックの急増、予期しない支出",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-use-lambda-authorizer.html",
+    "https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-lambda-authorizer.html",
+    "https://support.icompaas.com/support/solutions/articles/62000127114-ensure-api-gateway-has-configured-authorizers"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws apigatewayv2 create-authorizer --api-id <API_ID> --authorizer-type REQUEST --name <example_resource_name> --authorizer-uri arn:aws:apigateway:<REGION>:lambda:path/2015-03-31/functions/<LAMBDA_FUNCTION_ARN>/invocations --identity-source '$request.header.Authorization'",
+      "NativeIaC": "```yaml\n# CloudFormation: API Gateway v2 用の最小限の Lambda 承認者を作成します\nResources:\n  <example_resource_name>:\n    Type: AWS::ApiGatewayV2::Authorizer\n    Properties:\n      ApiId: <example_resource_id>\n      AuthorizerType: REQUEST  # 重要：API で Lambda REQUEST 承認者を有効にします\n      AuthorizerUri: arn:aws:apigateway:<REGION>:lambda:path/2015-03-31/functions/<LAMBDA_FUNCTION_ARN>/invocations  # 重要：呼び出す Lambda 承認者関数\n      IdentitySource:  # 重要：認証トークンを読み取る場所\n        - \"$request.header.Authorization\"\n      Name: <example_resource_name>\n```",
+      "Other": "1. AWS コンソールで、API Gateway > APIs に移動し、HTTP/WebSocket API を選択します\n2. 左側のナビゲーションで、Authorizers > Create authorizer をクリックします\n3. 承認者タイプとして Lambda を選択し、Lambda 関数を選択します\n4. Identity source を次のように設定します：$request.header.Authorization\n5. Create をクリックして承認者を追加します",
+      "Terraform": "```hcl\n# 最小限の AWS API Gateway v2 Lambda 承認者\nresource \"aws_apigatewayv2_authorizer\" \"<example_resource_name>\" {\n  api_id           = \"<example_resource_id>\"\n  name             = \"<example_resource_name>\"\n  authorizer_type  = \"REQUEST\"  # 重要：Lambda REQUEST 承認者を作成します\n  authorizer_uri   = \"arn:aws:apigateway:<REGION>:lambda:path/2015-03-31/functions/<LAMBDA_FUNCTION_ARN>/invocations\"  # 重要：呼び出す Lambda\n  identity_sources = [\"$request.header.Authorization\"]  # 重要：承認の ID ソース\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "**承認者**（JWT/Cognito または Lambda）を有効にして、認証されたプリンシパルのみがルートを呼び出せるようにします。\n- スコープ/クレームまたはポリシー決定で**最小権限**を強制します\n- リソースポリシー、スロットリング、WAF で**多層防御**を適用します\n- 明示的に必要な場合を除き、パブリックルートを避けます",
+      "Url": "https://hub.prowler.com/check/apigatewayv2_api_authorizers_enabled"
+    }
+  },
+  "Categories": [
+    "identity-access"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

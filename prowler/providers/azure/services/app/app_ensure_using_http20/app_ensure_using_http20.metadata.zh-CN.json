@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "app_ensure_using_http20",
+  "CheckTitle": "如果 Web 应用使用 HTTP，确保“HTTP 版本”为最新",
+  "CheckType": [],
+  "ServiceName": "app",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "low",
+  "ResourceType": "Microsoft.Web/sites",
+  "ResourceGroup": "serverless",
+  "Description": "HTTP 会定期发布新版本，以修复安全缺陷或提供更多功能。建议 Web 应用使用最新 HTTP 版本，以便利用安全修复（如有）和/或新版本提供的新功能。",
+  "Risk": "新版本可能包含安全增强和附加功能。建议使用最新版本以获得增强能力和新特性。每次软件安装时，组织都需要评估给定更新是否满足自身要求。同时还必须验证所选更新版本与任何附加软件之间的兼容性及支持情况。HTTP 2.0 针对旧版 HTTP 的队头阻塞问题提供了额外的性能改进，并支持头部压缩和请求优先级。HTTP 2.0 不再支持 HTTP 1.1 的分块传输编码机制，因为它提供了自有且更高效的数据流传输机制。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/app-service/configure-common?tabs=portal#general-settings",
+  "Remediation": {
+    "Code": {
+      "CLI": "az webapp config set --resource-group <RESOURCE_GROUP_NAME> --name <APP_NAME> --http20-enabled true",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/AppService/enable-http-2-for-app-service-web-applications.html",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "1. 使用 https://portal.azure.com 登录 Azure 门户 2. 进入 App Services 3. 点击每个应用 4. 在 Setting 部分点击 Configuration 5. 在 General settings 下将 HTTP version 设置为 2.0",
+      "Url": "https://azure.microsoft.com/en-us/blog/announcing-http-2-support-in-azure-app-service/"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "https://learn.microsoft.com/en-us/security/benchmark/azure/security-controls-v3-posture-vulnerability-management#pv-7-rapidly-and-automatically-remediate-software-vulnerabilities"
+}

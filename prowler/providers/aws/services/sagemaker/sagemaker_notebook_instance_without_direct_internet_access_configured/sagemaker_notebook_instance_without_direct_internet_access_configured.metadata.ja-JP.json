@@ -1,0 +1,44 @@
+{
+  "Provider": "aws",
+  "CheckID": "sagemaker_notebook_instance_without_direct_internet_access_configured",
+  "CheckTitle": "Amazon SageMaker ノートブックインスタンスでは直接インターネットアクセスが無効になっています",
+  "CheckType": [
+    "ソフトウェアおよび設定のチェック/AWS セキュリティのベストプラクティス/ネットワーク到達可能性",
+    "ソフトウェアと設定のチェック/業界および規制基準/AWS 基盤セキュリティのベストプラクティス",
+    "影響／データ露出",
+    "影響／データ流出"
+  ],
+  "ServiceName": "sagemaker",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsSageMakerNotebookInstance",
+  "ResourceGroup": "ai_ml",
+  "Description": "Amazon SageMaker ノートブックインスタンスは、`DirectInternetAccess` 設定について評価されます。\n\nこれが無効になっているインスタンスは VPC 接続のみを使用します。これが有効になっているインスタンスは、インターネットへの直接のアウトバウンドアクセスを許可します。",
+  "Risk": "ノートブックからのインターネットへの直接アクセスは、**送信制御**を弱め、**機密性**と**完全性**を危険にさらします。\n\n攻撃者や未審査のコードは、データを流出させたり、マルウェアをダウンロードしたり、コマンド＆コントロールを実行したりできます。公開パッケージのインストールは検査を回避し、サプライチェーンの改ざんや侵害されたセッションからの**ラテラルムーブメント**を可能にします。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/SageMaker/notebook-direct-internet-access.html",
+    "https://docs.aws.amazon.com/sagemaker/latest/dg/interface-vpc-endpoint.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation: 直接インターネットアクセスを無効にしたSageMakerノートブック\nResources:\n  <example_resource_name>:\n    Type: AWS::SageMaker::NotebookInstance\n    Properties:\n      NotebookInstanceName: <example_resource_name>\n      InstanceType: ml.t3.medium\n      RoleArn: <example_role_arn>\n      SubnetId: <example_subnet_id>               # 直接インターネットアクセスを無効にする場合は必須\n      SecurityGroupIds:                           # 直接インターネットアクセスを無効にする場合は必須\n        - <example_security_group_id>\n      DirectInternetAccess: \"Disabled\"            # 重要: チェックに合格するために直接インターネットアクセスを無効にする\n```",
+      "Other": "1. AWS コンソールで、SageMaker > ノートブックインスタンス に移動します\n2. ノートブックインスタンスを選択し、[停止] を選んで、ステータスが [Stopped] になるまで待ちます\n3. [編集] をクリックします\n4. [Direct internet access] を [Disabled] に設定します\n5. 求められた場合は、サブネットと少なくとも 1 つのセキュリティグループを選択します（無効化時は VPC が必要です）\n6. [更新] をクリックし、次に [開始] を選んでインスタンスを再びオンラインにします",
+      "Terraform": "```hcl\n# 直接インターネットアクセスを無効にした SageMaker ノートブック\nresource \"aws_sagemaker_notebook_instance\" \"<example_resource_name>\" {\n  name                = \"<example_resource_name>\"\n  role_arn            = \"<example_role_arn>\"\n  instance_type       = \"ml.t3.medium\"\n  subnet_id           = \"<example_subnet_id>\"          # 直接インターネットアクセスを無効にする場合は必須\n  security_groups     = [\"<example_security_group_id>\"] # 直接インターネットアクセスを無効にする場合は必須\n\n  direct_internet_access = \"Disabled\" # 重要: チェックに合格するために直接インターネットアクセスを無効にする\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "直接のインターネットアクセス（`DirectInternetAccess: Disabled`）を無効にし、ノートブックをプライベートサブネットに配置します。\n\n必要なサービスには**VPCエンドポイント/PrivateLink**を使用し、許可リストと**最小権限**のセキュリティグループで送信トラフィックを制限し、ネットワーク分離と送信トラフィックの監視による**多層防御**を適用します。",
+      "Url": "https://hub.prowler.com/check/sagemaker_notebook_instance_without_direct_internet_access_configured"
+    }
+  },
+  "Categories": [
+    "internet-exposed",
+    "trust-boundaries",
+    "gen-ai"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

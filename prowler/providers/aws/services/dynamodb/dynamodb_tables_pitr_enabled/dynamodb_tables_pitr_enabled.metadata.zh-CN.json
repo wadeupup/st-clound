@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "dynamodb_tables_pitr_enabled",
+  "CheckTitle": "DynamoDB 表已启用时间点恢复 (PITR)",
+  "CheckType": [
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Effects/Data Destruction"
+  ],
+  "ServiceName": "dynamodb",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsDynamoDbTable",
+  "ResourceGroup": "database",
+  "Description": "**DynamoDB 表**已启用**时间点恢复**（`PITR`）",
+  "Risk": "如果没有**PITR**，意外或恶意的写入/删除无法精确回滚，导致永久性数据丢失和状态损坏。由有缺陷的部署、被入侵的凭据或错误的批处理作业导致的故障会降低数据**完整性**和**可用性**，并延长事件恢复和取证分析时间。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/PointInTimeRecovery_Howitworks.html",
+    "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/PointInTimeRecovery.Tutorial.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws dynamodb update-continuous-backups --table-name <table_name> --point-in-time-recovery-specification PointInTimeRecoveryEnabled=true",
+      "NativeIaC": "```yaml\n# CloudFormation: enable PITR on a DynamoDB table\nResources:\n  <example_resource_name>:\n    Type: AWS::DynamoDB::Table\n    Properties:\n      PointInTimeRecoverySpecification:\n        PointInTimeRecoveryEnabled: true  # Critical: enables Point-in-Time Recovery (PITR)\n```",
+      "Other": "1. 打开 AWS 管理控制台并前往 DynamoDB\n2. 选择您的表并打开 Backups 选项卡\n3. 在 Point-in-time recovery 部分点击 Edit，选择 Turn on point-in-time recovery\n4. 点击 Save",
+      "Terraform": "```hcl\n# Enable PITR on a DynamoDB table\nresource \"aws_dynamodb_table\" \"<example_resource_name>\" {\n  name         = \"<example_resource_name>\"\n  billing_mode = \"PAY_PER_REQUEST\"\n  hash_key     = \"id\"\n\n  attribute {\n    name = \"id\"\n    type = \"S\"\n  }\n\n  point_in_time_recovery {\n    enabled = true  # Critical: enables PITR\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "在关键表上启用**PITR**，并设置与您的 RPO 一致的恢复窗口（1-35 天）。对可以修改备份设置的人员强制执行**最小权限**。定期测试恢复并监控备份状态。将 PITR 嵌入到 IaC 和变更控制中以保持一致性，并对关键里程碑使用按需备份以实现**纵深防御**。",
+      "Url": "https://hub.prowler.com/check/dynamodb_tables_pitr_enabled"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "Data Protection"
+}
+

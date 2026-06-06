@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "kafka_cluster_is_public",
+  "CheckTitle": "Kafka クラスターはパブリックにアクセス可能ではありません",
+  "CheckType": [
+    "ソフトウェアと構成のチェック/AWS セキュリティベストプラクティス/ネットワーク到達可能性",
+    "TTPs/初期アクセス",
+    "影響/データの露出"
+  ],
+  "ServiceName": "kafka",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "critical",
+  "ResourceType": "AwsMskCluster",
+  "ResourceGroup": "messaging",
+  "Description": "**Amazon MSK クラスター**はブローカーエンドポイントが**パブリックインターネットに公開**されています。\n\nサーバーレスクラスターはデフォルトでプライベートです。プロビジョニングされたクラスターはその`public access`設定が評価されます。",
+  "Risk": "パブリックブローカーは**CIA**を侵食します:\n- **機密性**: 不正なコンシューマーがトピックを読み取る可能性\n- **完全性**: 不正なプロデューサーがイベントを注入または変更する可能性\n- **可用性**: フラッドやスキャンがブローカーに負荷をかける可能性\n\nこれにより、メタデータの列挙、データの流出、ストリームの汚染、コストのかかるエグレスが可能になります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/msk/latest/developerguide/public-access.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/MSK/public-access-msk-cluster.html",
+    "https://docs.aws.amazon.com/msk/latest/developerguide/client-access.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws kafka update-connectivity --cluster-arn <CLUSTER_ARN> --current-version <CURRENT_CLUSTER_VERSION> --connectivity-info '{\"PublicAccess\":{\"Type\":\"DISABLED\"}}'",
+      "NativeIaC": "```yaml\n# CloudFormation: MSK クラスターがパブリックにアクセス可能でないことを確認します\nResources:\n  <example_resource_name>:\n    Type: AWS::MSK::Cluster\n    Properties:\n      ClusterName: <example_resource_name>\n      KafkaVersion: \"2.8.1\"\n      NumberOfBrokerNodes: 2\n      BrokerNodeGroupInfo:\n        ClientSubnets:\n          - <example_subnet_id_1>\n          - <example_subnet_id_2>\n        InstanceType: kafka.t3.small\n        ConnectivityInfo:\n          PublicAccess:\n            Type: DISABLED  # 重要: ブローカーへのパブリックアクセスを無効にします\n```",
+      "Other": "1. Amazon MSK コンソールを開く\n2. クラスターを選択し、プロパティタブに移動\n3. ネットワーク設定で、パブリックアクセスを編集をクリック\n4. パブリックアクセスを無効 (オフ) に設定\n5. 変更を保存をクリック",
+      "Terraform": "```hcl\n# Terraform: MSK クラスターがパブリックにアクセス可能でないことを確認します\nresource \"aws_msk_cluster\" \"<example_resource_name>\" {\n  cluster_name           = \"<example_resource_name>\"\n  kafka_version          = \"2.8.1\"\n  number_of_broker_nodes = 2\n\n  broker_node_group_info {\n    client_subnets = [\n      \"<example_subnet_id_1>\",\n      \"<example_subnet_id_2>\",\n    ]\n    instance_type = \"kafka.t3.small\"\n\n    connectivity_info {\n      public_access {\n        type = \"DISABLED\"  # 重要: ブローカーへのパブリックアクセスを無効にします\n      }\n    }\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "ブローカーを VPC 内でプライベートに保ち、パブリックアクセスを無効にして信頼できるネットワークへの露出を制限します。\n\n強力な認証 (SASL/IAM、SASL/SCRAM、または mTLS) を強制し、TLS を要求し、Kafka ACL を適用します。VPN、バスチオン、またはプライベートネットワーキング (ピアリング/トランジットゲートウェイ) を介してアクセスを提供します。**最小特権**を適用し、ブローカー接続を監視します。",
+      "Url": "https://hub.prowler.com/check/kafka_cluster_is_public"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

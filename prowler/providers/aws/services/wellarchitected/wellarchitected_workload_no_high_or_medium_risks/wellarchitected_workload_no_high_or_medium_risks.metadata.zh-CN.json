@@ -1,0 +1,39 @@
+{
+  "Provider": "aws",
+  "CheckID": "wellarchitected_workload_no_high_or_medium_risks",
+  "CheckTitle": "AWS Well-Architected Tool 工作负载无高风险或中风险项",
+  "CheckType": [
+    "软件与配置检查 / AWS 安全最佳实践"
+  ],
+  "ServiceName": "wellarchitected",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "governance",
+  "Description": "**AWS Well-Architected 工作负载**会评估各框架支柱中标记为 `HIGH` 或 `MEDIUM` 的风险是否存在及其数量。结果用于指示该工作负载是否仍记录有此类风险。",
+  "Risk": "`HIGH` / `MEDIUM` 风险表示存在可能导致以下问题的缺口：\n- **机密性**丧失（数据公开、权限过宽）\n- **完整性**问题（控制薄弱、变更缺乏监控）\n- **可用性**故障（弹性不足、恢复能力差）\n攻击者可利用开放端点和宽泛权限进行权限提升、数据外泄及业务中断。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://aws.amazon.com/architecture/well-architected/",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/WellArchitected/findings.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "1. 在 AWS 控制台中，打开“服务” > “Well-Architected Tool”\n2. 选择需要修复的工作负载\n3. 打开“改进计划”（Improvement plan）或“回答问题”（Answer questions），并筛选“高风险（High）”和“中风险（Medium）”\n4. 对于列表中的每个问题，逐项打开，并将答案修改为 AWS 推荐的最佳实践选项，直到该问题的风险显示为“低（Low）”或“无（None）”，然后点击“保存（Save）”\n5. 重复以上操作，直到不再存在高风险或中风险项\n6. 返回工作负载概览页面，确认 High = 0 且 Medium = 0",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "修复检查结果，优先处理 `HIGH`，其次处理 `MEDIUM`。\n实施**最小权限原则**、强化**加密**以及持续的**日志记录/告警**；通过**纵深防御**尽量减少公网暴露；通过经过验证的恢复机制构建**弹性架构**。在 SDLC 中纳入定期审查，并通过自动化防护措施确保一致性。",
+      "Url": "https://hub.prowler.com/check/wellarchitected_workload_no_high_or_medium_risks"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

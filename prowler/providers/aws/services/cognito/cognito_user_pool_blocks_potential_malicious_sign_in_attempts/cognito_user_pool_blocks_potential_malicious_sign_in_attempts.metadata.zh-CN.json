@@ -1,0 +1,32 @@
+{
+  "Provider": "aws",
+  "CheckID": "cognito_user_pool_blocks_potential_malicious_sign_in_attempts",
+  "CheckTitle": "确保您的 Amazon Cognito 用户池阻止潜在的恶意登录尝试",
+  "CheckType": [],
+  "ServiceName": "cognito",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:aws:cognito-idp:region:account:userpool/userpool-id",
+  "Severity": "medium",
+  "ResourceType": "AwsCognitoUserPool",
+  "ResourceGroup": "IAM",
+  "Description": "Amazon Cognito 提供自适应身份验证，通过评估与每次用户登录相关的风险并提供适当的安全级别来缓解该风险，帮助保护您的应用程序免受恶意行为者和泄露凭据的侵害。自适应身份验证是您可以为用户池启用的高级安全功能。启用自适应身份验证后，Amazon Cognito 会评估与每次用户登录相关的风险，并提供适当的安全级别来缓解该风险。您可以将自适应身份验证配置为阻止可能是恶意的登录尝试。",
+  "Risk": "如果未启用将自动风险响应设置为阻止登录的自适应身份验证，您的用户池可能无法阻止可能是恶意的登录尝试。",
+  "RelatedUrl": "https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pool-settings-advanced-security.html",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "要启用将自动风险响应设置为阻止登录的自适应身份验证，请执行以下操作：",
+      "Url": "https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pool-settings-advanced-security.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

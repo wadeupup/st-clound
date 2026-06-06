@@ -1,0 +1,33 @@
+{
+  "Provider": "azure",
+  "CheckID": "storage_ensure_minimum_tls_version_12",
+  "CheckTitle": "确保存储账户的“Minimum TLS version”设置为“Version 1.2”",
+  "CheckType": [],
+  "ServiceName": "storage",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AzureStorageAccount",
+  "ResourceGroup": "storage",
+  "Description": "确保存储账户的“Minimum TLS version”设置为“Version 1.2”",
+  "Risk": "TLS 1.0 和 1.1 已知易受某些通用漏洞与披露（CVE）弱点及攻击影响，例如 POODLE 和 BEAST。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://docs.prowler.com/checks/azure/azure-storage-policies/bc_azr_storage_2",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-storage-policies/bc_azr_storage_2#terraform"
+    },
+    "Recommendation": {
+      "Text": "确保所有 Microsoft Azure 存储账户都使用 TLS 协议的最新可用版本。",
+      "Url": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/StorageAccounts/minimum-tls-version.html"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

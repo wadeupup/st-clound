@@ -1,0 +1,36 @@
+{
+  "Provider": "aws",
+  "CheckID": "ec2_instance_uses_single_eni",
+  "CheckTitle": "Amazon EC2 实例不应使用多个 ENI",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices"
+  ],
+  "ServiceName": "ec2",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:instance/resource-id",
+  "Severity": "low",
+  "ResourceType": "AwsEc2Instance",
+  "ResourceGroup": "compute",
+  "Description": "此控制检查 EC2 实例是否使用多个弹性网络接口 (ENI) 或弹性结构适配器 (EFA)。如果使用单个网络适配器，则控制通过。该控制包括一个可选参数列表来标识允许的 ENI。如果属于 Amazon EKS 集群的 EC2 实例使用多个 ENI，此控制也会失败。如果您的 EC2 实例需要作为 Amazon EKS 集群的一部分拥有多个 ENI，您可以抑制这些控制发现。",
+  "Risk": "多个 ENI 可能导致双宿主实例，即具有多个子网的实例。这可能会增加网络安全复杂性并引入意外的网络路径和访问。",
+  "RelatedUrl": "https://docs.aws.amazon.com/config/latest/developerguide/ec2-instance-multiple-eni-check.html",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://docs.aws.amazon.com/securityhub/latest/userguide/ec2-controls.html#ec2-17",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "要从 EC2 实例分离网络接口，请按照 Amazon EC2 用户指南中的说明操作。",
+      "Url": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-eni.html#detach_eni"
+    }
+  },
+  "Categories": [
+    "trust-boundaries"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

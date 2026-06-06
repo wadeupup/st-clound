@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "vm_ensure_attached_disks_encrypted_with_cmk",
+  "CheckTitle": "「OS およびデータ」ディスクが Customer Managed Key（CMK）で暗号化されていることを確認する",
+  "CheckType": [],
+  "ServiceName": "vm",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Microsoft.Compute/virtualMachines",
+  "ResourceGroup": "compute",
+  "Description": "OS ディスク（ブートボリューム）およびデータディスク（非ブートボリューム）が CMK（Customer Managed Keys）で暗号化されていることを確認します。Customer Managed Keys は ADE または Server Side Encryption（SSE）を使用できます。",
+  "Risk": "IaaS VM の OS ディスク（ブートボリューム）およびデータディスク（非ブートボリューム）を暗号化することで、キーなしでは内容全体を復元できない状態となり、不要な読み取りからボリュームを保護できます。Azure 管理ディスクでは PMK（Platform Managed Keys）が既定で有効であり、保存データの暗号化を提供します。CMK は、ディスクの暗号化/復号に使用する特定のキーを顧客が制御できるため推奨されます。顧客はキーを変更したり、PMK のように固定されたキーに依存せずキーを無効化することでセキュリティを向上できます。さらに自動ローテーションキーを使用することで、ディスクへのアクセスをより制限しセキュリティを強化できます。組織は、ディスクに保存されるデータに対する自社のセキュリティ要件を評価すべきです。高リスクデータには追加の保護を提供する CMK の使用が必須です。低リスクデータであれば、既定で有効な PMK で十分なデータ保護を提供できます。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/virtual-machines/disk-encryption-overview",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/VirtualMachines/sse-boot-disk-cmk.html#",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-general-policies/bc_azr_general_1#terraform"
+    },
+    "Recommendation": {
+      "Text": "注: 暗号化を変更するには、ディスクを VM からデタッチする必要があります。1. Virtual machines に移動します。2. 各仮想マシンで Settings に移動します。3. Disks をクリックします。4. 省略記号（...）をクリックし、Detach をクリックしてディスクを VM から切り離します。5. Disks を検索して未接続ディスクを特定します。6. 対象ディスクをクリックし、Encryption を選択します。7. 暗号化タイプを変更し、暗号化セットを選択します。8. Save をクリックします。9. VM に戻り、ディスクを再接続します。",
+      "Url": "https://learn.microsoft.com/en-us/azure/security/fundamentals/data-encryption-best-practices#protect-data-at-rest"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "CMK/BYOK を使用すると、キー管理の追加運用が必要になります。"
+}

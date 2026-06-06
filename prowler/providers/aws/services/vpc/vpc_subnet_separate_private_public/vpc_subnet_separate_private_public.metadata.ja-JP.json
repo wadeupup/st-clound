@@ -1,0 +1,38 @@
+{
+  "Provider": "aws",
+  "CheckID": "vpc_subnet_separate_private_public",
+  "CheckTitle": "VPC にはパブリックサブネットとプライベートサブネットの両方があります",
+  "CheckType": [
+    "ソフトウェアおよび設定のチェック/AWS セキュリティのベストプラクティス/ネットワーク到達可能性"
+  ],
+  "ServiceName": "vpc",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsEc2Subnet",
+  "ResourceGroup": "network",
+  "Description": "**Amazon VPC** はネットワークセグメンテーションについて評価されます: 少なくとも 1 つの **public subnet**（インターネットにルーティング可能）と 1 つの **private subnet**（インターネットにルーティング不可能）。\n\nサブネットがない VPC、public subnet のみの VPC、または private subnet のみの VPC にフラグを付けます。",
+  "Risk": "サブネットの分離が欠如すると、**セグメンテーション**が損なわれます。\n- パブリックのみ: ワークロードがインターネットにさらされ、スキャン、ブルートフォース、ラテラルムーブメントを可能にし、**機密性**と**完全性**を脅かします。\n- プライベートのみ: 制御された外向き通信がないと、パッチ適用や依存関係に支障をきたし、**可用性**に影響します。\n- サブネットなし: 設定ミスによりサービスが到達不能になります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/vpc/latest/userguide/VPC_Scenario2.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation: VPC に 1 つのパブリックサブネットと 1 つのプライベートサブネットを追加する\nResources:\n  InternetGateway:\n    Type: AWS::EC2::InternetGateway\n\n  VPCGatewayAttachment:\n    Type: AWS::EC2::VPCGatewayAttachment\n    Properties:\n      VpcId: <example_resource_id>\n      InternetGatewayId: !Ref InternetGateway\n\n  PublicSubnet:\n    Type: AWS::EC2::Subnet\n    Properties:\n      VpcId: <example_resource_id>\n      CidrBlock: 10.0.1.0/24  # ルート経由でパブリックにするためのサブネットを作成します\n\n  PrivateSubnet:\n    Type: AWS::EC2::Subnet\n    Properties:\n      VpcId: <example_resource_id>\n      CidrBlock: 10.0.2.0/24  # IGW ルートを持たないプライベートなままのサブネットを作成します\n\n  PublicRouteTable:\n    Type: AWS::EC2::RouteTable\n    Properties:\n      VpcId: <example_resource_id>\n\n  PublicDefaultRoute:\n    Type: AWS::EC2::Route\n    DependsOn: VPCGatewayAttachment\n    Properties:\n      RouteTableId: !Ref PublicRouteTable\n      DestinationCidrBlock: 0.0.0.0/0  # 重大: インターネットへのルートを作成します\n      GatewayId: !Ref InternetGateway    # 重要: インターネットゲートウェイ経由\n\n  PublicAssociation:\n    Type: AWS::EC2::SubnetRouteTableAssociation\n    Properties:\n      SubnetId: !Ref PublicSubnet\n      RouteTableId: !Ref PublicRouteTable  # 重大: このサブネットをパブリックとしてマークします\n\n  PrivateRouteTable:\n    Type: AWS::EC2::RouteTable\n    Properties:\n      VpcId: <example_resource_id>\n\n  PrivateAssociation:\n    Type: AWS::EC2::SubnetRouteTableAssociation\n    Properties:\n      SubnetId: !Ref PrivateSubnet\n      RouteTableId: !Ref PrivateRouteTable  # 重大: IGW ルートがない -> プライベートサブネット\n```",
+      "Other": "1. AWS コンソールで、VPC > Your VPCs に移動し、失敗している VPC を選択します\n2. 存在しない場合は Internet Gateway をアタッチします: Internet Gateways > Create > Attach to the VPC\n3. 2 つのサブネットを作成します: Subnets > Create subnet\n   - Subnet A（public）: CIDR 例: 10.0.1.0/24\n   - Subnet B（private）: CIDR 例: 10.0.2.0/24\n4. public サブネット用のルートテーブルを作成します: Route tables > Create\n   - ルートを追加: 0.0.0.0/0 -> Internet Gateway (IGW)\n   - このルートテーブルを Subnet A（public）に関連付けます\n5. private サブネット用のルートテーブルを作成します: Route tables > Create\n   - Internet Gateway へのルートは追加しないでください\n   - このルートテーブルを Subnet B（private）に関連付けます\n6. VPC に、IGW ルートありのサブネット（public）と、IGW ルートなしのサブネット（private）が少なくとも 1 つずつあることを確認します",
+      "Terraform": "```hcl\n# Terraform: VPC に 1 つのパブリックサブネットと 1 つのプライベートサブネットを追加する\nresource \"aws_internet_gateway\" \"<example_resource_name>\" {\n  vpc_id = \"<example_resource_id>\"\n}\n\nresource \"aws_subnet\" \"public_<example_resource_name>\" {\n  vpc_id     = \"<example_resource_id>\"\n  cidr_block = \"10.0.1.0/24\"\n}\n\nresource \"aws_subnet\" \"private_<example_resource_name>\" {\n  vpc_id     = \"<example_resource_id>\"\n  cidr_block = \"10.0.2.0/24\"\n}\n\nresource \"aws_route_table\" \"public_<example_resource_name>\" {\n  vpc_id = \"<example_resource_id>\"\n  route {                         # 重大: IGW経由でサブネットをパブリック化します\n    cidr_block = \"0.0.0.0/0\"      # インターネットへのデフォルトルート\n    gateway_id = aws_internet_gateway.<example_resource_name>.id\n  }\n}\n\nresource \"aws_route_table_association\" \"public_assoc_<example_resource_name>\" {\n  subnet_id      = aws_subnet.public_<example_resource_name>.id\n  route_table_id = aws_route_table.public_<example_resource_name>.id  # 重大\n}\n\nresource \"aws_route_table\" \"private_<example_resource_name>\" {\n  vpc_id = \"<example_resource_id>\"  # 重要: IGW ルートがないため、サブネットはプライベートのままです\n}\n\nresource \"aws_route_table_association\" \"private_assoc_<example_resource_name>\" {\n  subnet_id      = aws_subnet.private_<example_resource_name>.id\n  route_table_id = aws_route_table.private_<example_resource_name>.id  # 重大\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "各VPCをセグメント化してください：インターネット向けのエンドポイントは**public subnets**に配置し、内部ワークロードは**private subnets**に配置します。厳格なルートテーブル、NACL、セキュリティグループでingress/egressを制限し、`0.0.0.0/0`を最小限に抑えます。**最小権限**と**多層防御**を適用してください。マネージドegressを介してprivate subnetsに制御されたアウトバウンドを提供し、強化された管理者アクセスパターンを使用してください。",
+      "Url": "https://hub.prowler.com/check/vpc_subnet_separate_private_public"
+    }
+  },
+  "Categories": [
+    "trust-boundaries"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

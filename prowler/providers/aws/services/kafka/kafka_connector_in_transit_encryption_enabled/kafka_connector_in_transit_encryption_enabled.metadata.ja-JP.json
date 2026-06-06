@@ -1,0 +1,40 @@
+{
+  "Provider": "aws",
+  "CheckID": "kafka_connector_in_transit_encryption_enabled",
+  "CheckTitle": "MSK Connect コネクタは転送中の暗号化が有効になっています",
+  "CheckType": [
+    "ソフトウェアと構成のチェック/AWS セキュリティベストプラクティス",
+    "ソフトウェアと構成のチェック/業界および規制基準/AWS 基礎セキュリティベストプラクティス"
+  ],
+  "ServiceName": "kafka",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Other",
+  "ResourceGroup": "messaging",
+  "Description": "**MSK Connect コネクタ**は、Kafka ブローカーおよび接続されたシステムへのクライアント接続で `TLS` を使用した**転送中の暗号化**について評価されます。",
+  "Risk": "**TLS**がない場合、データストリームは転送中に**傍受**または**改ざん**される可能性があります。経路上の攻撃者は、**中間者攻撃**、リプレイ、またはメッセージの**改ざん**を行い、レコードや秘密情報を露出させる可能性があります。これにより、**機密性**と**完全性**が低下し、下流システムへの不正アクセスが可能になることがあります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/msk/latest/developerguide/msk-connect.html",
+    "https://docs.aws.amazon.com/msk/latest/developerguide/mkc-create-connector-intro.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation: 転送中の暗号化が有効な MSK Connect コネクタ\nResources:\n  <example_resource_name>:\n    Type: AWS::KafkaConnect::Connector\n    Properties:\n      ConnectorName: <example_resource_name>\n      KafkaCluster:\n        ApacheKafkaCluster:\n          BootstrapServers: <BOOTSTRAP_SERVERS>\n          Vpc:\n            SecurityGroups: [<example_resource_id>]\n            Subnets: [<example_resource_id>]\n      KafkaClusterClientAuthentication:\n        AuthenticationType: NONE\n      KafkaClusterEncryptionInTransit:\n        EncryptionType: TLS  # 重要: 転送中の TLS 暗号化を有効にします\n      KafkaConnectVersion: <KAFKA_CONNECT_VERSION>\n      Plugins:\n        - CustomPlugin:\n            CustomPluginArn: <example_resource_id>\n            Revision: 1\n      Capacity:\n        ProvisionedCapacity:\n          McuCount: 1\n          WorkerCount: 1\n      ServiceExecutionRoleArn: <example_resource_id>\n      ConnectorConfiguration:\n        connector.class: <CONNECTOR_CLASS>\n        tasks.max: \"1\"\n```",
+      "Other": "1. AWS コンソールで、Amazon MSK > MSK Connect > コネクタに移動します\n2. 非 TLS コネクタを選択し、削除を選択します（暗号化設定は変更できません）\n3. コネクタの作成を選択し、カスタムプラグインとクラスターを選択します\n4. セキュリティセクションで、転送中の暗号化を TLS（必須）に設定します\n5. 他の必須フィールドを入力し、コネクタを作成します",
+      "Terraform": "```hcl\n# Terraform: 転送中の暗号化が有効な MSK Connect コネクタ\nresource \"aws_mskconnect_connector\" \"<example_resource_name>\" {\n  name                  = \"<example_resource_name>\"\n  kafkaconnect_version  = \"<KAFKA_CONNECT_VERSION>\"\n\n  kafka_cluster {\n    apache_kafka_cluster {\n      bootstrap_servers = \"<BOOTSTRAP_SERVERS>\"\n      vpc {\n        security_groups = [\"<example_resource_id>\"]\n        subnets         = [\"<example_resource_id>\"]\n      }\n    }\n  }\n\n  kafka_cluster_client_authentication {\n    authentication_type = \"NONE\"\n  }\n\n  kafka_cluster_encryption_in_transit {\n    encryption_type = \"TLS\"  # 重要: 転送中の TLS 暗号化を有効にします\n  }\n\n  capacity {\n    provisioned_capacity {\n      mcu_count    = 1\n      worker_count = 1\n    }\n  }\n\n  service_execution_role_arn = \"<example_resource_id>\"\n\n  connector_configuration = {\n    \"connector.class\" = \"<CONNECTOR_CLASS>\"\n    \"tasks.max\"       = \"1\"\n  }\n\n  plugin {\n    custom_plugin {\n      arn      = \"<example_resource_id>\"\n      revision = 1\n    }\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "すべてのコネクタ通信に**TLS**を要求し、プレーンテキストを許可しないでください。プライベート接続を優先し、証明書を検証し、最新の暗号スイートを使用してください。**相互認証**と**最小特権**の役割を組み合わせて、防御を強化します。定期的にコネクタの設定を確認し、非 TLS エンドポイントを避けてください。",
+      "Url": "https://hub.prowler.com/check/kafka_connector_in_transit_encryption_enabled"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

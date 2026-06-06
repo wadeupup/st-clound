@@ -1,0 +1,44 @@
+{
+  "Provider": "aws",
+  "CheckID": "apigateway_restapi_authorizers_enabled",
+  "CheckTitle": "API Gateway REST API 在 API 级别具有授权器，或所有方法都已授权",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践",
+    "软件和配置检查/行业和监管标准/AWS 基础安全最佳实践",
+    "TTPs/初始访问"
+  ],
+  "ServiceName": "apigateway",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsApiGatewayRestApi",
+  "ResourceGroup": "api_gateway",
+  "Description": "**API Gateway REST API** 根据**访问控制**进行评估：存在**API 级别的授权器**，或者所有资源方法都使用授权机制。标记为 `NONE` 的方法表示未认证的访问。",
+  "Risk": "**未认证的 API 方法**可能导致：\n- 任意读取暴露数据（**机密性**）\n- 对后端的未授权操作（**完整性**）\n- 滥用和高流量导致成本激增或中断（**可用性**）\n\n攻击者可以在没有令牌的情况下枚举端点并调用集成。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-use-lambda-authorizer.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation: 设置方法授权，使其不是公共的\nResources:\n  <example_resource_name>:\n    Type: AWS::ApiGateway::Method\n    Properties:\n      RestApiId: <example_resource_id>\n      ResourceId: <example_resource_id>\n      HttpMethod: GET\n      AuthorizationType: AWS_IAM  # 关键：授权该方法（不是 NONE）\n```",
+      "Other": "1. 在 AWS 控制台中，转到 API Gateway > APIs (REST) 并选择您的 API\n2. 打开 Resources，选择一个资源，然后选择一个方法（例如，GET）\n3. 单击 Method Request\n4. 将 Authorization 设置为 AWS_IAM（或现有的 Cognito/Lambda 授权器）\n5. 对每个方法重复此操作，确保没有方法显示 Authorization = NONE\n6. 部署 API 以应用更改",
+      "Terraform": "```hcl\n# Terraform: 设置方法授权，使其不是公共的\nresource \"aws_api_gateway_method\" \"<example_resource_name>\" {\n  rest_api_id  = \"<example_resource_id>\"\n  resource_id  = \"<example_resource_id>\"\n  http_method  = \"GET\"\n  authorization = \"AWS_IAM\" # 关键：授权该方法（不是 NONE）\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "要求每个方法都进行**身份验证**：使用**Cognito 用户池**、**Lambda 授权器**或**IAM**；避免使用 `NONE`。\n- 使用范围策略强制执行**最小权限**\n- 对于内部 API，使用**私有端点**或资源策略\n- 添加**速率限制**和**WAF**以实现纵深防御",
+      "Url": "https://hub.prowler.com/check/apigateway_restapi_authorizers_enabled"
+    }
+  },
+  "Categories": [
+    "identity-access"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "",
+  "CheckAliases": [
+    "apigateway_authorizers_enabled"
+  ]
+}
+

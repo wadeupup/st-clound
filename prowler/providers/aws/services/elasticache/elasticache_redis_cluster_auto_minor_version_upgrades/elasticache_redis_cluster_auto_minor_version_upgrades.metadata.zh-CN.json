@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "elasticache_redis_cluster_auto_minor_version_upgrades",
+  "CheckTitle": "ElastiCache Redis 缓存集群已启用自动次要版本升级",
+  "CheckType": [
+    "Software and Configuration Checks/Patch Management",
+    "Software and Configuration Checks/AWS Security Best Practices"
+  ],
+  "ServiceName": "elasticache",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Other",
+  "ResourceGroup": "database",
+  "Description": "**ElastiCache for Redis** 复制组配置为使用 `AutoMinorVersionUpgrade` 应用 **自动次要引擎升级**。",
+  "Risk": "如果没有 **自动次要版本升级**，Redis 节点可能运行具有已知 CVE 和稳定性错误的版本，从而启用未经授权的访问、复制不一致或崩溃。延迟修补会扩大攻击窗口并延长维护时间，降低机密性、完整性和可用性。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/AmazonElastiCache/latest/dg/VersionManagementConsiderations.html",
+    "https://support.icompaas.com/support/solutions/articles/62000233595-ensure-elasticache-redis-cache-clusters-have-automatic-minor-upgrades-enabled",
+    "https://docs.aws.amazon.com/AmazonElastiCache/latest/dg/engine-versions.html",
+    "https://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/VersionManagement.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws elasticache modify-replication-group --replication-group-id <replication_group_id> --auto-minor-version-upgrade --apply-immediately",
+      "NativeIaC": "```yaml\n# CloudFormation: enable auto minor version upgrades on a Replication Group\nResources:\n  <example_resource_name>:\n    Type: AWS::ElastiCache::ReplicationGroup\n    Properties:\n      ReplicationGroupDescription: \"<example_description>\"\n      CacheNodeType: \"<example_node_type>\"\n      NumCacheClusters: 1\n      AutoMinorVersionUpgrade: true  # CRITICAL: turns on automatic minor version upgrades\n      # This ensures new minor engine versions are applied automatically\n```",
+      "Other": "1. 打开 AWS 控制台并转到 ElastiCache\n2. 选择复制组，选择目标组\n3. 点击修改\n4. 启用自动次要版本升级\n5. 勾选立即应用并点击修改以保存",
+      "Terraform": "```hcl\n# Enable auto minor version upgrades on an ElastiCache replication group\nresource \"aws_elasticache_replication_group\" \"<example_resource_name>\" {\n  replication_group_id       = \"<example_resource_id>\"\n  description                = \"<example_description>\"\n  node_type                  = \"<example_node_type>\"\n  num_cache_clusters         = 1\n  auto_minor_version_upgrade = true  # CRITICAL: automatically applies minor engine upgrades\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "为 Redis 复制组启用 `AutoMinorVersionUpgrade`，并使用维护窗口管理更新。应用 **补丁管理**和 **纵深防御**：在暂存环境中验证，保留最近的备份，使用 Multi-AZ 以提高弹性，并监控发布说明以确保及时、低影响的更新。",
+      "Url": "https://hub.prowler.com/check/elasticache_redis_cluster_auto_minor_version_upgrades"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

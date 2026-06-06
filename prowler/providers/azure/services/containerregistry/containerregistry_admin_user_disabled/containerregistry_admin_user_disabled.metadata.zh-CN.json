@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "containerregistry_admin_user_disabled",
+  "CheckTitle": "确保 Azure Container Registry 已禁用管理员用户",
+  "CheckType": [],
+  "ServiceName": "containerregistry",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "ContainerRegistry",
+  "ResourceGroup": "container",
+  "Description": "确保禁用管理员用户，并改用基于角色的访问控制（RBAC），因为管理员用户可能授予对注册表的不受限制访问。",
+  "Risk": "如果启用了管理员用户，可能导致对容器注册表及其资源的未授权访问，从而破坏其中镜像的机密性、完整性和可用性。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/container-registry/container-registry-authentication?tabs=azure-cli#admin-account",
+  "Remediation": {
+    "Code": {
+      "CLI": "az acr update --name <RegistryName> --resource-group <ResourceGroupName> --admin-enabled false",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "通过 Azure 门户禁用 Azure Container Registry 的管理员用户：1. 导航到你的 Container Registry。2. 在设置中选择“Access keys”。3. 确保“Admin user”复选框未勾选。对于所有依赖注册表访问的操作，改用基于角色的访问控制（RBAC）。",
+      "Url": "https://learn.microsoft.com/en-us/azure/container-registry/container-registry-authentication?tabs=azure-cli#admin-account"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "从管理员用户迁移到 RBAC 将形成更安全且更易管理的访问模型，从而最大限度降低对容器镜像的未授权访问风险。"
+}

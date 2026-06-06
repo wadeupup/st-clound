@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "sqlserver_unrestricted_inbound_access",
+  "CheckTitle": "Azure SQL Databases で 0.0.0.0/0（ANY IP）からの受信を許可していないことを確認する",
+  "CheckType": [],
+  "ServiceName": "sqlserver",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "critical",
+  "ResourceType": "SQLServer",
+  "ResourceGroup": "database",
+  "Description": "0.0.0.0-255.255.255.255 からのトラフィックを許可するファイアウォール ルールがないことを確認します",
+  "Risk": "Azure SQL サーバーには、既定でインターネット接続をすべてブロックするファイアウォールがあります。ルール（0.0.0.0-255.255.255.255）を使用すると、サーバーはインターネット上の任意の送信元からアクセス可能となり、SQL Server の攻撃対象領域が大幅に拡大します。より細かい粒度のファイアウォール ルールを使用することが推奨されます。",
+  "RelatedUrl": "https://docs.microsoft.com/en-us/azure/sql-database/sql-database-vnet-service-endpoint-rule-overview",
+  "Remediation": {
+    "Code": {
+      "CLI": "az sql server firewall-rule delete --resource-group resource_group_name --server sql_server_name --name rule_name",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/Sql/unrestricted-sql-database-access.html",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-networking-policies/bc_azr_networking_4#terraform"
+    },
+    "Recommendation": {
+      "Text": "すべての送信元を許可するファイアウォール ルールを削除し、代わりにより細かいルールを使用します",
+      "Url": ""
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

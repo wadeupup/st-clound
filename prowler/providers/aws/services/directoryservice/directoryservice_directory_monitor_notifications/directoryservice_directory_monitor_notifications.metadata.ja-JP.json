@@ -1,0 +1,40 @@
+{
+  "Provider": "aws",
+  "CheckID": "directoryservice_directory_monitor_notifications",
+  "CheckTitle": "Directory Service ディレクトリで SNS 通知が有効になっている",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices"
+  ],
+  "ServiceName": "directoryservice",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "IAM",
+  "Description": "**AWS Directory Service** ディレクトリは、状態変更通知（例：`Active`  `Impaired`）を送信するために **Amazon SNS トピック**に関連付けられています。\n\n評価では、監視アラート用に SNS イベントトピックが設定されているディレクトリを検索します。",
+  "Risk": "ディレクトリ通知がないと、ヘルス状態変更の可視性が低下し、`Impaired` 状態への対応が遅れます。これにより、認証、Kerberos/LDAP ルックアップ、ドメイン参加の可用性が脅かされ、MTTR が増加し、依存するワークロード全体の整合性に影響を与えるサイレントレプリケーションまたは信頼の失敗を引き起こす可能性があります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/directoryservice/latest/admin-guide/ms_ad_enable_notifications.html",
+    "https://support.icompaas.com/support/solutions/articles/62000233533-ensure-directory-service-has-sns-notifications-enabled"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws ds register-event-topic --directory-id <DIRECTORY_ID> --topic-name <SNS_TOPIC_NAME>",
+      "NativeIaC": "",
+      "Other": "1. AWS コンソール > Directory Service > Directories を開き、ディレクトリを選択します\n2. Maintenance または Monitoring/Notifications セクションに移動します\n3. Actions > Create notification（または Set up notifications）をクリックします\n4. 既存の SNS トピックを選択（または作成）し、保存します",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "**AWS Directory Service** を設定して、ディレクトリの状態変更を **SNS トピック**に公開し、運用チャネルを購読してタイムリーなアラートを取得します。\n\nトピックの権限に**最小権限**を適用し、アラートをインシデント対応と統合し、通知をログとダッシュボードと組み合わせて**多層防御**を使用します。",
+      "Url": "https://hub.prowler.com/check/directoryservice_directory_monitor_notifications"
+    }
+  },
+  "Categories": [
+    "logging"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

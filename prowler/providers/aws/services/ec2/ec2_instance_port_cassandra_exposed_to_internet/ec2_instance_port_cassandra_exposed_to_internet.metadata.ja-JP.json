@@ -1,0 +1,36 @@
+{
+  "Provider": "aws",
+  "CheckID": "ec2_instance_port_cassandra_exposed_to_internet",
+  "CheckTitle": "EC2 インスタンスがインターネットからの Cassandra ポート（TCP 7000、7001、7199、9042、9160）へのインバウンドを許可していないことを確認",
+  "CheckType": [
+    "Infrastructure Security"
+  ],
+  "ServiceName": "ec2",
+  "SubServiceName": "instance",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "critical",
+  "ResourceType": "AwsEc2Instance",
+  "ResourceGroup": "compute",
+  "Description": "EC2 インスタンスがインターネットからの Cassandra ポート（TCP 7000、7001、7199、9042、9160）へのインバウンドを許可していないことを確認",
+  "Risk": "Cassandra は、多くの汎用サーバーにわたって大量のデータを処理し、単一障害点なしで高可用性を提供するように設計された分散データベース管理システムです。Cassandra ポートをインターネットに公開すると、データベースへの不正アクセス、データ流出、データ損失につながる可能性があります。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "セキュリティグループを変更して、インターネットからの TCP ポート 7000、7001、7199、9042、または 9160 へのインバウンドを許可するルールを削除します。",
+      "Url": "https://docs.aws.amazon.com/vpc/latest/userguide/VPC_SecurityGroups.html"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

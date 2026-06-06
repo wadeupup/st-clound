@@ -1,0 +1,44 @@
+{
+  "Provider": "aws",
+  "CheckID": "emr_cluster_master_nodes_no_public_ip",
+  "CheckTitle": "EMR 集群不使用公网 IP。",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices/Network Reachability",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "TTPs/Initial Access"
+  ],
+  "ServiceName": "emr",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "compute",
+  "Description": "会评估处于未终止状态的 **Amazon EMR 集群**节点（主节点与工作节点）是否分配了**公网 IP**。该检查会识别通过公网 IP 可达、而非仅通过 VPC 私网地址可达的集群实例。",
+  "Risk": "**可公网访问的 EMR 节点**会将管理界面和 SSH 暴露到互联网，带来暴力破解和服务漏洞利用风险。若主节点被攻陷，攻击者可篡改作业并从 S3/HDFS 外泄数据，损害**机密性**与**完整性**，并中断工作负载，影响**可用性**。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-plan-vpc-subnet.html",
+    "https://aws.amazon.com/blogs/aws/new-launch-amazon-emr-clusters-in-private-subnets/",
+    "https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-block-public-access.html",
+    "https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-clusters-in-a-vpc.html",
+    "https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-vpc-launching-job-flows.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation: Launch EMR in a private subnet (no public IPs)\nResources:\n  <example_resource_name>:\n    Type: AWS::EMR::Cluster\n    Properties:\n      Name: <example_resource_name>\n      ReleaseLabel: emr-6.10.0\n      ServiceRole: EMR_DefaultRole\n      JobFlowRole: EMR_EC2_DefaultRole\n      Instances:\n        Ec2SubnetId: <example_resource_id>  # CRITICAL: use a PRIVATE subnet to prevent public IPs\n        InstanceGroups:\n          - InstanceRole: MASTER\n            InstanceType: m5.xlarge\n            InstanceCount: 1\n          - InstanceRole: CORE\n            InstanceType: m5.xlarge\n            InstanceCount: 1\n```",
+      "Other": "1. 在 AWS 控制台进入 EMR > Clusters，选择不合规集群（带公网 IP）并执行 Terminate。\n2. 点击 Create cluster。\n3. 在 Networking 下选择你的 VPC，并选择私有子网（不自动分配公网 IPv4）。\n4. 创建集群。其实例将不带公网 IP 启动。",
+      "Terraform": "```hcl\n# Terraform: Launch EMR in a private subnet (no public IPs)\nresource \"aws_emr_cluster\" \"<example_resource_name>\" {\n  name                = \"<example_resource_name>\"\n  release_label       = \"emr-6.10.0\"\n  master_instance_type = \"m5.xlarge\"\n  core_instance_type   = \"m5.xlarge\"\n\n  service_role = \"EMR_DefaultRole\"\n  ec2_attributes {\n    instance_profile = \"EMR_EC2_DefaultRole\"\n    subnet_id        = \"<example_resource_id>\"  # CRITICAL: private subnet ensures no public IPs\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "在**私有子网**中运行 EMR，避免公网 IP。为 AWS 服务使用 **VPC endpoint**，仅在必要时使用 **NAT**。对安全组实施**最小权限**，避免 `0.0.0.0/0`，并优先通过 **SSM** 或堡垒机进行管理访问。保持 **EMR block public access** 启用，并优先采用对外依赖的**私有连接**。",
+      "Url": "https://hub.prowler.com/check/emr_cluster_master_nodes_no_public_ip"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

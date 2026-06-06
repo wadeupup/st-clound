@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "monitor_alert_create_policy_assignment",
+  "CheckTitle": "Create Policy Assignment に対するアクティビティ ログ アラートが存在することを確認する",
+  "CheckType": [],
+  "ServiceName": "monitor",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Monitor",
+  "ResourceGroup": "monitoring",
+  "Description": "Create Policy Assignment イベント用のアクティビティ ログ アラートを作成します。",
+  "Risk": "create policy assignment イベントを監視することで、'Azure policy - assignments' に対する変更を把握でき、意図しない変更の検出時間を短縮できます。",
+  "RelatedUrl": "https://azure.microsoft.com/en-us/updates/classic-alerting-monitoring-retirement",
+  "Remediation": {
+    "Code": {
+      "CLI": "az monitor activity-log alert create --resource-group '<resource group name>' --condition category=Administrative and operationName=Microsoft.Authorization/policyAssignments/write and level=<verbose | information | warning | error | critical> --scope '/subscriptions/<subscription ID>' --name '<activity log rule name>' -- subscription <subscription ID> --action-group <action group ID> --location global",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity-staging/knowledge-base/azure/ActivityLog/create-alert-for-create-policy-assignment-events.html#trendmicro",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "1. Monitor ブレードに移動します。2. Alerts を選択します。3. Create を選択します。4. Alert rule を選択します。5. Filter by subscription でサブスクリプションを選択します。6. Filter by resource type で Policy assignment (policyAssignments) を選択します。7. Filter by location で All を選択します。8. 結果からサブスクリプションを選択します。9. Done を選択します。10. Condition タブを選択します。11. Signal name で Create policy assignment (Microsoft.Authorization/policyAssignments) をクリックします。12. Actions タブを選択します。13. 既存のアクション グループを使用する場合は elect action groups をクリックします。新しいアクション グループを作成する場合は Create action group をクリックし、必要な情報を入力します。14. Details タブを選択します。15. Resource group を選択し、Alert rule 名と任意の説明を入力します。16. Review + create をクリックします。17. Create をクリックします。",
+      "Url": "https://docs.microsoft.com/en-in/azure/azure-monitor/platform/alerts-activity-log"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "既定では監視アラートは作成されません。"
+}

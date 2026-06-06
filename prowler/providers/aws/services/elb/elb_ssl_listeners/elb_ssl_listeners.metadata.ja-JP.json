@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "elb_ssl_listeners",
+  "CheckTitle": "Elastic Load Balancer が HTTPS または SSL リスナーのみを使用していること",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices/Network Reachability",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/PCI-DSS",
+    "Effects/Data Exposure"
+  ],
+  "ServiceName": "elb",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsElbLoadBalancer",
+  "ResourceGroup": "network",
+  "Description": "**Elastic Load Balancer** のクライアント向けリスナープロトコルを評価します。`HTTPS` または `SSL` のみを暗号化と見なし、`HTTP` または `TCP` リスナーはクライアントとロードバランサー間が平文であることを示します。",
+  "Risk": "平文リスナーはネットワーク盗聴やコンテンツ注入を可能にし、**機密性** と **完全性** を損ないます。公開または信頼できない経路上の攻撃者は MITM により認証情報やセッショントークンを取得したり、トラフィックを改ざんしたりして、データ露出や不正アクセスを引き起こす可能性があります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/ELB/elb-listener-security.html",
+    "https://docs.aws.amazon.com/elasticloadbalancing/latest/classic/elb-security-policy-table.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws elb delete-load-balancer-listeners --load-balancer-name <lb_name> --load-balancer-ports 80",
+      "NativeIaC": "```yaml\n# CloudFormation: Classic ELB with only encrypted (HTTPS) listener\nResources:\n  <example_resource_name>:\n    Type: AWS::ElasticLoadBalancing::LoadBalancer\n    Properties:\n      AvailabilityZones:\n        - <example_az>\n      Listeners:\n        - Protocol: HTTPS           # CRITICAL: enforce encrypted listener\n          LoadBalancerPort: 443\n          InstanceProtocol: HTTP\n          InstancePort: 80\n          SSLCertificateId: <certificate_arn>  # CRITICAL: required for HTTPS termination\n```",
+      "Other": "1. AWS コンソールで EC2 > Load Balancers（Classic）へ移動します\n2. 対象ロードバランサーを選択し、Listeners タブを開きます\n3. Edit をクリックし、Protocol が HTTP または TCP のリスナーを削除します\n4. Protocol が HTTPS（ポート 443）のリスナーを追加し、SSL 証明書を選択します\n5. 変更を保存します",
+      "Terraform": "```hcl\n# Classic ELB with only encrypted (HTTPS) listener\nresource \"aws_elb\" \"<example_resource_name>\" {\n  availability_zones = [\"<example_az>\"]\n\n  listener {\n    lb_port            = 443\n    lb_protocol        = \"https\"   # CRITICAL: enforce encrypted listener\n    instance_port      = 80\n    instance_protocol  = \"http\"\n    ssl_certificate_id = \"<certificate_arn>\"  # CRITICAL: required for HTTPS/SSL\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "`HTTPS`/`TLS` リスナーのみを使用して **転送中暗号化** を強制してください。`HTTP` は `HTTPS` へリダイレクトし、平文リスナーを廃止します。信頼できる証明書（例: ACM）と最新 TLS ポリシーを使用し、**ゼロトラスト** と **多層防御** に整合させてください。*必要に応じて* ターゲットまでのエンドツーエンド TLS を採用し、証明書状態を監視します。",
+      "Url": "https://hub.prowler.com/check/elb_ssl_listeners"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

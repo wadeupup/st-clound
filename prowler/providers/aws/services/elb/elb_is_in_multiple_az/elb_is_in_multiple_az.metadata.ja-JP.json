@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "elb_is_in_multiple_az",
+  "CheckTitle": "Classic Load Balancer が複数の Availability Zone に配置されていること",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Effects/Denial of Service"
+  ],
+  "ServiceName": "elb",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsElbLoadBalancer",
+  "ResourceGroup": "network",
+  "Description": "**Classic Load Balancer** が、設定された最小数以上の **Availability Zones** にまたがっていることを確認します。\n\nこの評価では、指定された最小値より少ない AZ で有効化されているロードバランサーを特定します。",
+  "Risk": "AZ 数が少なすぎる構成では、ロードバランサーが **単一障害点** になります。AZ 障害やゾーン劣化により **サービス停止**、接続切断、容量不均衡が発生し、アプリケーションの **可用性** とレジリエンスが低下し、復旧時間が長引く可能性があります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/ELB/ec2-instances-distribution-across-availability-zones.html",
+    "https://docs.aws.amazon.com/elasticloadbalancing/latest/classic/enable-disable-crosszone-lb.html",
+    "https://docs.aws.amazon.com/elasticloadbalancing/latest/classic/introduction.html#classic-load-balancer-overview"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation: Ensure CLB spans at least two Availability Zones by adding two subnets\nResources:\n  <example_resource_name>:\n    Type: AWS::ElasticLoadBalancing::LoadBalancer\n    Properties:\n      Subnets:\n        - <example_subnet_id_a>  # Critical: add a subnet in AZ A to ensure multiple AZs\n        - <example_subnet_id_b>  # Critical: add a subnet in a different AZ (>=2 AZs total)\n      Listeners:\n        - LoadBalancerPort: 80\n          InstancePort: 80\n          Protocol: HTTP\n```",
+      "Other": "1. Amazon EC2 コンソールを開き、Load Balancers に移動します\n2. 対象の Classic Load Balancer（type: classic）を選択します\n3. Edit subnets（または Subnets タブ > Edit）を選択します\n4. 既存とは異なる Availability Zone のサブネットを追加します（少なくとも 2 AZ）\n5. Save をクリックします\n6. CLB が EC2-Classic の場合は Edit Availability Zones を使用し、追加 AZ を選択して保存します",
+      "Terraform": "```hcl\n# Terraform: Ensure CLB spans at least two Availability Zones by adding two subnets\nresource \"aws_elb\" \"<example_resource_name>\" {\n  name    = \"<example_resource_name>\"\n  subnets = [\n    \"<example_subnet_id_a>\", # Critical: subnet in AZ A to ensure multiple AZs\n    \"<example_subnet_id_b>\"  # Critical: subnet in different AZ (>=2 AZs total)\n  ]\n\n  listener {\n    lb_port        = 80\n    lb_protocol    = \"http\"\n    instance_port  = 80\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "**マルチ AZ 高可用性** を前提に設計してください：\n- ロードバランサーごとに少なくとも `2` AZ を有効化\n- ターゲットを AZ 間で均等配置し、AZ 跨ぎの Auto Scaling を使用\n- 不均衡緩和のため **cross-zone load balancing** を有効化\n- フェイルオーバーとヘルス閾値を定期的にテスト\n\n**障害分離** と **多層防御** の原則を適用してください。",
+      "Url": "https://hub.prowler.com/check/elb_is_in_multiple_az"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

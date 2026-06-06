@@ -1,0 +1,45 @@
+{
+  "Provider": "aws",
+  "CheckID": "codebuild_project_s3_logs_encrypted",
+  "CheckTitle": "CodeBuild 项目 S3 日志已启用静态加密",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Effects/Data Exposure"
+  ],
+  "ServiceName": "codebuild",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "low",
+  "ResourceType": "AwsCodeBuildProject",
+  "ResourceGroup": "devops",
+  "Description": "评估具有 **S3 日志传递**的 **CodeBuild 项目**的 S3 日志对象的**静态加密**。只有将日志写入 S3 的项目在范围内。",
+  "Risk": "未加密的构建日志会危及**机密性**。日志可能包含密钥、环境数据和错误跟踪。如果存储桶配置错误或存储被访问，攻击者可以收集凭据并映射管道，从而进行**横向移动**和构建篡改，影响**完整性**。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/codebuild/latest/userguide/change-project.html#change-project-console-logs",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/codebuild-controls.html#codebuild-3",
+    "https://support.icompaas.com/support/solutions/articles/62000233685-ensure-s3-logs-for-codebuild-projects-are-encrypted-at-rest",
+    "https://hub.powerpipe.io/mods/turbot/steampipe-mod-aws-compliance/benchmarks/control.codebuild_project_s3_logs_encryption_enabled"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws codebuild update-project --name <project-name> --logs-config s3Logs={status=ENABLED,location=<bucket-name>/<path>,encryptionDisabled=false}",
+      "NativeIaC": "```yaml\nResources:\n  <example_resource_name>:\n    Type: AWS::CodeBuild::Project\n    Properties:\n      Name: <example_resource_name>\n      ServiceRole: <example_role_arn>\n      Artifacts:\n        Type: NO_ARTIFACTS\n      Environment:\n        Type: LINUX_CONTAINER\n        ComputeType: BUILD_GENERAL1_SMALL\n        Image: aws/codebuild/amazonlinux2-x86_64-standard:5.0\n      Source:\n        Type: NO_SOURCE\n      LogsConfig:\n        S3Logs:\n          Status: ENABLED\n          Location: <bucket-name>/<path>\n          EncryptionDisabled: false  # Critical: ensures S3 logs are encrypted at rest\n```",
+      "Other": "1. 打开 AWS CodeBuild 控制台并选择您的项目\n2. 选择编辑，然后打开日志部分\n3. 在 S3 日志下，选择启用并选择存储桶/路径\n4. 确保未勾选禁用 S3 日志加密（已启用加密）\n5. 保存更改",
+      "Terraform": "```hcl\nresource \"aws_codebuild_project\" \"<example_resource_name>\" {\n  name         = \"<example_resource_name>\"\n  service_role = \"<example_role_arn>\"\n\n  artifacts { type = \"NO_ARTIFACTS\" }\n\n  environment {\n    compute_type = \"BUILD_GENERAL1_SMALL\"\n    image        = \"aws/codebuild/amazonlinux2-x86_64-standard:5.0\"\n    type         = \"LINUX_CONTAINER\"\n  }\n\n  source { type = \"NO_SOURCE\" }\n\n  logs_config {\n    s3_logs {\n      status              = \"ENABLED\"\n      location            = \"<bucket-name>/<path>\"\n      encryption_disabled = false  # Critical: enables encryption for S3 logs\n    }\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "为 CodeBuild 项目的 S3 日志启用静态加密。优先使用客户管理的密钥的 `SSE-KMS` 来控制访问和轮换。通过存储桶策略强制加密，对日志访问应用**最小权限**，并监控访问模式。*如果需要*，隔离日志并保持其私有。",
+      "Url": "https://hub.prowler.com/check/codebuild_project_s3_logs_encrypted"
+    }
+  },
+  "Categories": [
+    "encryption",
+    "logging"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

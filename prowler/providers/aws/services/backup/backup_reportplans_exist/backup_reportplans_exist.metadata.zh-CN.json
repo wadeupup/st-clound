@@ -1,0 +1,40 @@
+{
+  "Provider": "aws",
+  "CheckID": "backup_reportplans_exist",
+  "CheckTitle": "至少存在一个 AWS Backup 报告计划",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices"
+  ],
+  "ServiceName": "backup",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "low",
+  "ResourceType": "AwsBackupBackupPlan",
+  "ResourceGroup": "storage",
+  "Description": "具有现有备份计划的**AWS Backup** 环境会被评估是否存在至少一个生成 `jobs` 或 `compliance` 报告的**报告计划**。",
+  "Risk": "没有报告计划，备份失败和错过的恢复可能不会被注意到，损害**可用性**和恢复目标。保留、计划或加密控制中的差距可能持续未被报告，削弱跨账户和区域的**完整性**和可审计性，增加违反 SLA 的可能性。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/aws-backup/latest/devguide/create-report-plan-console.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws backup create-report-plan --report-plan-name <REPORT_PLAN_NAME> --report-delivery-channel s3BucketName=<S3_BUCKET_NAME>,formats=CSV --report-setting reportTemplate=BACKUP_JOB_REPORT",
+      "NativeIaC": "```yaml\nResources:\n  <example_resource_name>:\n    Type: AWS::Backup::ReportPlan\n    Properties:\n      ReportPlanName: <example_resource_name> # 关键：创建通过检查所需的报告计划\n      ReportDeliveryChannel:\n        S3BucketName: <example_resource_name> # 关键：报告的目标存储桶\n        Formats:\n          - CSV # 关键：有效的报告文件格式\n      ReportSetting:\n        ReportTemplate: BACKUP_JOB_REPORT # 关键：启用作业报告的最小模板\n```",
+      "Other": "1. 打开 AWS Backup 控制台并转到报告\n2. 点击创建报告计划\n3. 选择备份作业（作业报告）模板\n4. 输入报告计划名称并选择 S3 存储桶\n5. 选择 CSV 作为文件格式\n6. 点击创建报告计划",
+      "Terraform": "```hcl\nresource \"aws_backup_report_plan\" \"<example_resource_name>\" {\n  name = \"<example_resource_name>\" # 关键：创建至少一个报告计划\n\n  report_delivery_channel {\n    s3_bucket_name = \"<example_resource_name>\" # 关键：报告的目标存储桶\n    formats        = [\"CSV\"] # 关键：有效的报告文件格式\n  }\n\n  report_setting {\n    report_template = \"BACKUP_JOB_REPORT\" # 关键：最小作业报告模板\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "建立并维护**报告计划**以持续监控备份活动和策略遵守情况。\n- 对报告存储应用最小权限\n- 包含相关账户和区域以实现覆盖\n- 定期审查报告并对异常情况发出警报\n- 强制执行备份管理员和审计员之间的职责分离",
+      "Url": "https://hub.prowler.com/check/backup_reportplans_exist"
+    }
+  },
+  "Categories": [
+    "logging"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

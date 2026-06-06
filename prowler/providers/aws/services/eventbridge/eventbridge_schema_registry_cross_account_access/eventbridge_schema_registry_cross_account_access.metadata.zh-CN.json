@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "eventbridge_schema_registry_cross_account_access",
+  "CheckTitle": "AWS EventBridge schema registry 不允许跨账户访问",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "TTPs/Initial Access/Unauthorized Access",
+    "Effects/Data Exposure"
+  ],
+  "ServiceName": "eventbridge",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsEventSchemasRegistry",
+  "ResourceGroup": "messaging",
+  "Description": "会评估 **EventBridge schema registry** 资源策略中的**跨账户访问**。该检查会识别向外部或公共主体（如 `Principal: *` 或其他账户）授予访问 registry 及其 schema 权限的策略语句。",
+  "Risk": "未知的跨账户访问会暴露 schema 定义，便于侦察并泄露数据模型（**机密性**）。过度权限还可能让外部主体修改或删除 schema，破坏代码绑定并中断集成（**完整性** 和 **可用性**）。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://aws.amazon.com/about-aws/whats-new/2021/09/cross-account-discovery-amazon-eventbridge-schema/",
+    "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-schema.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws schemas put-resource-policy --registry-name <example_resource_name> --policy '{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::<example_account_id>:root\"},\"Action\":\"schemas:*\",\"Resource\":\"*\"}]}'",
+      "NativeIaC": "```yaml\n# CloudFormation: Restrict EventBridge Schema Registry policy to same account only\nResources:\n  <example_resource_name>RegistryPolicy:\n    Type: AWS::EventSchemas::RegistryPolicy\n    Properties:\n      RegistryName: <example_resource_name>\n      # Critical: Principal limited to this AWS account to prevent cross-account access\n      Policy: !Sub |\n        {\n          \"Version\": \"2012-10-17\",\n          \"Statement\": [\n            {\n              \"Effect\": \"Allow\",\n              \"Principal\": { \"AWS\": \"arn:${AWS::Partition}:iam::${AWS::AccountId}:root\" },\n              \"Action\": \"schemas:*\",\n              \"Resource\": \"*\"\n            }\n          ]\n        }\n```",
+      "Other": "1. 打开 Amazon EventBridge 控制台\n2. 进入 Schemas > Registries 并选择 <example_resource_name>\n3. 打开 Permissions 标签并点击 Edit\n4. 删除所有 Principal 为 \"*\" 或非本账户 AWS 账号的策略语句\n5. 添加一条 Allow 语句，Principal = arn:aws:iam::<your_account_id>:root\n6. 保存更改",
+      "Terraform": "```hcl\n# Restrict EventBridge Schema Registry policy to same account only\nresource \"aws_schemas_registry_policy\" \"<example_resource_name>\" {\n  registry_name = \"<example_resource_name>\"\n\n  # Critical: Principal limited to same account to remove cross-account access\n  policy = jsonencode({\n    Version = \"2012-10-17\"\n    Statement = [{\n      Effect    = \"Allow\"\n      Principal = { AWS = \"arn:aws:iam::<example_account_id>:root\" }\n      Action    = \"schemas:*\"\n      Resource  = \"*\"\n    }]\n  })\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "对 registry 资源策略应用**最小权限**：\n- 避免 `Principal: *` 等公共主体\n- 仅允许受信任账户 ARN 或组织 ID\n- 授予最小动作，优先只读\n- 实施**职责分离**并记录变更日志\n\n*若确需跨账户访问*，请严格收敛范围并定期复查。",
+      "Url": "https://hub.prowler.com/check/eventbridge_schema_registry_cross_account_access"
+    }
+  },
+  "Categories": [
+    "trust-boundaries",
+    "identity-access"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

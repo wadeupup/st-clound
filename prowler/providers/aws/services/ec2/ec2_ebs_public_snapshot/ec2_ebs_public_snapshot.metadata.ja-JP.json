@@ -1,0 +1,36 @@
+{
+  "Provider": "aws",
+  "CheckID": "ec2_ebs_public_snapshot",
+  "CheckTitle": "EBS スナップショットがパブリックに設定されていないことを確認",
+  "CheckType": [
+    "Data Protection"
+  ],
+  "ServiceName": "ec2",
+  "SubServiceName": "snapshot",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "critical",
+  "ResourceType": "Other",
+  "ResourceGroup": "compute",
+  "Description": "EBS スナップショットがパブリックに設定されていないことを確認",
+  "Risk": "スナップショットを共有すると、他のユーザーにスナップショット上のすべてのデータへのアクセス権を付与することになります。すべてのスナップショットデータを共有したいユーザーとのみスナップショットを共有してください。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "aws ec2 modify-snapshot-attribute --region <REGION> --snapshot-id <EC2_SNAPSHOT_ID> --attribute createVolumePermission --operation remove --user-ids all",
+      "NativeIaC": "",
+      "Other": "https://docs.prowler.com/checks/aws/public-policies/public_7",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "スナップショットが共有されるべきであることを確認してください。",
+      "Url": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-modifying-snapshot-permissions.html"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

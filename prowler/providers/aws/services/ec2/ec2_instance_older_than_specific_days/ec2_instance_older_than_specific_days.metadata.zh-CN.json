@@ -1,0 +1,34 @@
+{
+  "Provider": "aws",
+  "CheckID": "ec2_instance_older_than_specific_days",
+  "CheckTitle": "检查超过特定天数的 EC2 实例",
+  "CheckType": [
+    "Infrastructure Security"
+  ],
+  "ServiceName": "ec2",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "medium",
+  "ResourceType": "AwsEc2Instance",
+  "ResourceGroup": "compute",
+  "Description": "检查超过特定天数的 EC2 实例",
+  "Risk": "在 AWS 账户中拥有旧实例可能会增加存在易受攻击软件的风险",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/EC2/ec2-instance-too-old.html",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "检查实例中运行的软件是否是最新的并已相应打补丁。使用 AWS Systems Manager 为实例打补丁并查看补丁合规性信息。",
+      "Url": "https://docs.aws.amazon.com/systems-manager/latest/userguide/viewing-patch-compliance-results.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

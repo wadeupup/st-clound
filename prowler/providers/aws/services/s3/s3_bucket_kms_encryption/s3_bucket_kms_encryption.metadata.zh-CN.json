@@ -1,0 +1,35 @@
+{
+  "Provider": "aws",
+  "CheckID": "s3_bucket_kms_encryption",
+  "CheckTitle": "检查 S3 存储桶是否已启用 KMS 加密。",
+  "CheckType": [
+    "数据保护"
+  ],
+  "ServiceName": "s3",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:s3:::bucket_name",
+  "Severity": "medium",
+  "ResourceType": "AwsS3Bucket",
+  "ResourceGroup": "storage",
+  "Description": "检查 S3 存储桶是否已启用 KMS 加密。",
+  "Risk": "Amazon S3 KMS 加密提供了一种使用托管密钥为 S3 存储桶设置加密行为的方法。这将确保静态数据被加密。",
+  "RelatedUrl": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/UsingKMSEncryption.html",
+  "Remediation": {
+    "Code": {
+      "CLI": "aws put-bucket-encryption --bucket <BUCKET_NAME> --server-side-encryption-configuration '{\"Rules\":[{\"ApplyServerSideEncryptionByDefault\":{\"SSEAlgorithm\":\"aws:kms\",\"KMSMasterKeyID\":\"arn:aws:kms:<REGION>:<ACCOUNT_ID>:key/<KEY_ID>\"}}]}'",
+      "NativeIaC": "https://www.trendmicro.com/cloudoneconformity-staging/knowledge-base/aws/S3/encrypted-with-kms-customer-master-keys.html",
+      "Other": "https://www.trendmicro.com/cloudoneconformity-staging/knowledge-base/aws/S3/encrypted-with-kms-customer-master-keys.html",
+      "Terraform": "https://docs.prowler.com/checks/aws/general-policies/ensure-that-s3-buckets-are-encrypted-with-kms-by-default#terraform"
+    },
+    "Recommendation": {
+      "Text": "确保 S3 存储桶已启用使用 KMS 的静态加密。",
+      "Url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/UsingKMSEncryption.html"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

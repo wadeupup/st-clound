@@ -1,0 +1,44 @@
+{
+  "Provider": "aws",
+  "CheckID": "cloudfront_distributions_s3_origin_access_control",
+  "CheckTitle": "CloudFrontディストリビューションがすべてのS3オリジンに対してOrigin Access Control（OAC）を使用している",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Effects/Data Exposure"
+  ],
+  "ServiceName": "cloudfront",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsCloudFrontDistribution",
+  "ResourceGroup": "network",
+  "Description": "**Amazon S3オリジン**を持つ**CloudFrontディストリビューション**は、各S3オリジンで**Origin Access Control**（`OAC`）を使用することが期待されます。\n\n評価では、`s3_origin_config`を含むディストリビューションを検査し、関連するOACを欠くS3オリジンを識別します。",
+  "Risk": "**OAC**がない場合、S3オブジェクトはCloudFrontの外部からアクセス可能になり、エッジ制御をバイパスし、**機密性**と**整合性**を弱めます。\n- 直接アクセスによりデータ漏洩が可能\n- WAF、レート制限、詳細ログの損失；コストの悪用\n- 署名付き書き込みと**SSE-KMS**のサポートが限定的で、改ざんリスクが増加",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/CloudFront/s3-origin.html",
+    "https://repost.aws/knowledge-center/cloudfront-access-to-amazon-s3",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/cloudfront-controls.html#cloudfront-13",
+    "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/private-content-restricting-access-to-s3.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws cloudfront create-origin-access-control --origin-access-control-config '{Name\":\"<example_resource_name>\",\"SigningProtocol\":\"sigv4\",\"SigningBehavior\":\"always\",\"OriginAccessControlOriginType\":\"s3\"}' && aws cloudfront get-distribution-config --id <DISTRIBUTION_ID> --output json > current-config.json && echo 'Manually edit current-config.json to add OriginAccessControlId to S3 origins, then run:' && echo 'aws cloudfront update-distribution --id <DISTRIBUTION_ID> --distribution-config file://current-config.json --if-match $(aws cloudfront get-distribution-config --id <DISTRIBUTION_ID> --query \"ETag\" --output text)'",
+      "NativeIaC": "```yaml\n# CloudFormation：CloudFrontディストリビューションのS3オリジンにOACを添付\nResources:\n  ExampleOAC:\n    Type: AWS::CloudFront::OriginAccessControl\n    Properties:\n      OriginAccessControlConfig:\n        Name: <example_resource_name>\n        OriginAccessControlOriginType: s3\n        SigningBehavior: always\n        SigningProtocol: sigv4\n\n  ExampleDistribution:\n    Type: AWS::CloudFront::Distribution\n    Properties:\n      DistributionConfig:\n        Enabled: true\n        Origins:\n          - Id: s3-<example_resource_id>\n            DomainName: <example_bucket>.s3.amazonaws.com\n            OriginAccessControlId: !Ref ExampleOAC  # 重要：S3オリジンにOACを添付してチェックを満たす\n            S3OriginConfig:\n              OriginAccessIdentity: \"\"             # 重要：OACを使用する場合はOAIを無効化\n        DefaultCacheBehavior:\n          TargetOriginId: s3-<example_resource_id>\n          ViewerProtocolPolicy: redirect-to-https\n          CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6\n```",
+      "Other": "1. AWSコンソールで、CloudFrontを開き、セキュリティ > オリジンアクセス > Origin access control（OAC）に移動。コントロール設定の作成をクリックし、オリジンタイプS3を選択し、リクエストの署名を保持してOACを作成します。\n2. CloudFrontディストリビューションを開き、オリジンタブに移動します。\n3. 各S3オリジンについて：編集をクリックし、Origin access control settings（推奨）を選択し、ステップ1で作成したOACを選択して変更を保存します。\n4. ディストリビューション内のすべてのS3オリジンについてステップ3を繰り返します。",
+      "Terraform": "```hcl\n# Terraform：CloudFrontディストリビューションのS3オリジンにOACを添付\nresource \"aws_cloudfront_origin_access_control\" \"oac\" {\n  name                              = \"<example_resource_name>\"\n  origin_access_control_origin_type = \"s3\"\n  signing_behavior                  = \"always\"\n  signing_protocol                  = \"sigv4\"\n}\n\nresource \"aws_cloudfront_distribution\" \"dist\" {\n  enabled = true\n\n  origin {\n    domain_name = \"<example_bucket>.s3.amazonaws.com\"\n    origin_id   = \"s3-<example_resource_id>\"\n\n    origin_access_control_id = aws_cloudfront_origin_access_control.oac.id  # 重要：S3オリジンにOACを添付してチェックを満たす\n\n    s3_origin_config {\n      origin_access_identity = \"\"  # 重要：OACを使用する場合はOAIを無効化\n    }\n  }\n\n  default_cache_behavior {\n    target_origin_id       = \"s3-<example_resource_id>\"\n    viewer_protocol_policy = \"redirect-to-https\"\n    cache_policy_id        = \"658327ea-f89d-4fab-a63d-7e88639e58f6\"\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "すべてのS3オリジンに対して**Origin Access Control**を有効にし、バケットを非公開のままにします。\n\n**最小権限**を適用：バケットとキーの権限をCloudFrontと意図されたディストリビューションにスコープします。オリジンリクエストが署名されていることを確認し、レガシーOAIから移行し、WAFと監視による**多層防御**を使用してアクセスを保護および監視します。",
+      "Url": "https://hub.prowler.com/check/cloudfront_distributions_s3_origin_access_control"
+    }
+  },
+  "Categories": [
+    "trust-boundaries"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

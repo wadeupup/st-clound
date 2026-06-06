@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "storage_ensure_azure_services_are_trusted_to_access_is_enabled",
+  "CheckTitle": "storage accounts で 'Allow trusted Microsoft services to access this storage account' が有効化されていることを確認する",
+  "CheckType": [],
+  "ServiceName": "storage",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AzureStorageAccount",
+  "ResourceGroup": "storage",
+  "Description": "Azure Storage account の構成設定で 'Allow trusted Microsoft services to access this storage account' が有効であり、信頼されたクラウド サービスにアクセス権を付与していることを確認します。",
+  "Risk": "Azure サービスによるストレージ アカウントへのアクセスを許可しない場合、次のサービスはストレージ アカウントへのアクセス権を持てません: Azure Backup、Azure Event Grid、Azure Site Recovery、Azure DevTest Labs、Azure Event Hubs、Azure Networking、Azure Monitor、Azure SQL Data Warehouse（サブスクリプションで登録されている場合）。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "az storage account update --name <StorageAccountName> --resource-group <resourceGroupName> --bypass AzureServices",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/StorageAccounts/enable-trusted-microsoft-services.html",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-networking-policies/enable-trusted-microsoft-services-for-storage-account-access#terraform"
+    },
+    "Recommendation": {
+      "Text": "これらの Azure サービスが想定どおりに動作し、ストレージ アカウント リソースへアクセスできるようにするには、信頼された Microsoft Azure サービスがネットワーク ルールをバイパスできる例外を追加する必要があります。",
+      "Url": ""
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

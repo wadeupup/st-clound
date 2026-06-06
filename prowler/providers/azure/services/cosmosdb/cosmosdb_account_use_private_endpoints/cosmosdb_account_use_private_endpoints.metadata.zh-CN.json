@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "cosmosdb_account_use_private_endpoints",
+  "CheckTitle": "确保在可行时使用专用终结点",
+  "CheckType": [],
+  "ServiceName": "cosmosdb",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "CosmosDB",
+  "ResourceGroup": "database",
+  "Description": "专用终结点可将网络流量限制为已批准来源。",
+  "Risk": "对于敏感数据，专用终结点可以细粒度控制哪些服务能够与 Cosmos DB 通信，并确保该网络流量为私有。你需要针对每个希望连接的服务逐项进行配置。",
+  "RelatedUrl": "https://docs.microsoft.com/en-us/azure/cosmos-db/how-to-configure-private-endpoints",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "1. 打开门户菜单。2. 选择 Azure Cosmos DB 边栏。3. 选择 Azure Cosmos DB 账户。4. 选择 Networking。5. 选择 Private access。6. 点击 + Private Endpoint。7. 提供名称。8. 点击 Next。9. 在 Resource type 下拉框中选择 Microsoft.AzureCosmosDB/databaseAccounts。10. 在 Resource 下拉框中选择该 Cosmos DB 账户。11. 点击 Next。12. 提供合适的 Virtual Network 详细信息。13. 点击 Next。14. 提供合适的 DNS 详细信息。15. 点击 Next。16. 可选地提供 Tags。17. 点击 Next : Review + create。18. 点击 Create。",
+      "Url": "https://docs.microsoft.com/en-us/azure/private-link/tutorial-private-endpoint-cosmosdb-portal"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "只有加入白名单的服务才能与 Cosmos DB 通信。"
+}

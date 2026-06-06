@@ -1,0 +1,45 @@
+{
+  "Provider": "aws",
+  "CheckID": "dms_endpoint_redis_in_transit_encryption_enabled",
+  "CheckTitle": "Redis OSS 用 DMS エンドポイントで通信経路の暗号化が有効になっていることを確認する",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices/Encryption in Transit",
+    "Software and Configuration Checks/Industry and Regulatory Standards/NIST 800-53 Controls (USA)",
+    "Software and Configuration Checks/Industry and Regulatory Standards/PCI-DSS",
+    "Software and Configuration Checks/Industry and Regulatory Standards/ISO 27001 Controls"
+  ],
+  "ServiceName": "dms",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsDmsEndpoint",
+  "ResourceGroup": "database",
+  "Description": "**DMS Redis OSS エンドポイント** では、`ssl-encryption` などのエンドポイント設定を確認し、DMS レプリケーションインスタンスと Redis 間の接続で **TLS** による通信経路の暗号化が有効になっているかを評価します。",
+  "Risk": "**TLS** が有効でない場合、DMS と Redis 間のトラフィックは傍受や改ざんを受ける可能性があり、データの **機密性** と **完全性** を損ないます。\n\n攻撃者は **中間者攻撃** を実行し、認証トークンを盗み取ったり、移行データを注入・破壊したりすることができます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/dms-controls.html#dms-12",
+    "https://docs.aws.amazon.com/dms/latest/userguide/CHAP_Target.Redis.html#CHAP_Target.Redis.EndpointSettings",
+    "https://support.icompaas.com/support/solutions/articles/62000233450-ensure-encryption-in-transit-for-dms-endpoints-for-redis-oss"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation: Redis OSS DMS エンドポイントで TLS を有効化する\nResources:\n  <example_resource_name>:\n    Type: AWS::DMS::Endpoint\n    Properties:\n      EndpointIdentifier: <example_resource_name>\n      EndpointType: target\n      EngineName: redis\n      RedisSettings:\n        ServerName: <example_resource_name>\n        Port: 6379\n        AuthType: none\n        SslSecurityProtocol: ssl-encryption  # 重要: 通信経路の暗号化のために TLS を有効化\n```",
+      "Other": "1. AWS コンソールで Database Migration Service > Endpoints に移動します\n2. Redis OSS エンドポイントを選択し、「Modify」をクリックします\n3. SSL security protocol（Encryption in transit）を \"SSL encryption\" に設定します\n4. 変更を保存します",
+      "Terraform": "```hcl\n# Redis OSS DMS エンドポイントで TLS を有効化する\nresource \"aws_dms_endpoint\" \"<example_resource_name>\" {\n  endpoint_id   = \"<example_resource_id>\"\n  endpoint_type = \"target\"\n  engine_name   = \"redis\"\n\n  redis_settings {\n    server_name           = \"<example_resource_name>\"\n    port                  = 6379\n    auth_type             = \"none\"\n    ssl_security_protocol = \"ssl-encryption\" # 重要: 通信経路の暗号化のために TLS を有効化\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "Redis OSS エンドポイントで **TLS**（例：`ssl-encryption`）を有効化し、サーバー証明書の検証を必須としてください。平文接続を禁止し、プライベートネットワークを優先して使用するとともに、DMS ロールには **最小特権** を適用して、全体としての **多層防御（Defense in Depth）** を強化してください。",
+      "Url": "https://hub.prowler.com/check/dms_endpoint_redis_in_transit_encryption_enabled"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+
+

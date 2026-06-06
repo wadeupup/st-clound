@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "apigateway_restapi_tracing_enabled",
+  "CheckTitle": "API Gateway REST API 阶段已启用 X-Ray 跟踪",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践/运行时行为分析",
+    "软件和配置检查/行业和监管标准/AWS 基础安全最佳实践"
+  ],
+  "ServiceName": "apigateway",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "low",
+  "ResourceType": "AwsApiGatewayStage",
+  "ResourceGroup": "api_gateway",
+  "Description": "**API Gateway REST API 阶段**已启用**AWS X-Ray 活动跟踪**，以采样传入请求并在连接的服务之间生成分布式跟踪。",
+  "Risk": "没有 X-Ray 跟踪，您将失去端到端的可见性，阻碍对超时、错误和异常延迟的检测。\n\n这会延迟事件响应和根本原因分析，增加 MTTR（平均修复时间），并存在部分中断（可用性）和未检测到的集成故障（完整性）的风险。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/apigateway-controls.html#apigateway-3",
+    "https://docs.aws.amazon.com/xray/latest/devguide/xray-services-apigateway.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/APIGateway/tracing.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws apigateway update-stage --rest-api-id <restapi-id> --stage-name <stage-name> --patch-operations op=replace,path=/tracingEnabled,value=true",
+      "NativeIaC": "```yaml\n# CloudFormation: 在 API Gateway REST API 阶段启用 X-Ray 跟踪\nResources:\n  <example_resource_name>:\n    Type: AWS::ApiGateway::Stage\n    Properties:\n      RestApiId: <example_resource_id>\n      DeploymentId: <example_resource_id>\n      StageName: <example_resource_name>\n      TracingEnabled: true  # 关键：为此阶段启用 AWS X-Ray 跟踪\n```",
+      "Other": "1. 打开 AWS 控制台并转到 API Gateway\n2. 选择您的 REST API 并选择 Stages\n3. 选择目标阶段\n4. 打开 Logs/Tracing 选项卡，选中 Enable X-Ray Tracing\n5. 单击 Save",
+      "Terraform": "```hcl\n# 在 API Gateway REST API 阶段启用 X-Ray 跟踪\nresource \"aws_api_gateway_stage\" \"example\" {\n  rest_api_id = \"<example_resource_id>\"\n  deployment_id = \"<example_resource_id>\"\n  stage_name  = \"<example_resource_name>\"\n  xray_tracing_enabled = true  # 关键：为此阶段启用 AWS X-Ray 跟踪\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "在所有 API Gateway 阶段启用**X-Ray 活动跟踪**，并通过下游服务传播跟踪上下文。\n\n使用谨慎的采样，将跟踪与日志/指标关联，并对错误/延迟发出警报。对 X-Ray 访问应用**最小权限**，并使用**纵深防御**来实现可观测性。",
+      "Url": "https://hub.prowler.com/check/apigateway_restapi_tracing_enabled"
+    }
+  },
+  "Categories": [
+    "logging"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

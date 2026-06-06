@@ -1,0 +1,44 @@
+{
+  "Provider": "aws",
+  "CheckID": "dms_replication_task_target_logging_enabled",
+  "CheckTitle": "DMS レプリケーションタスクで TARGET_APPLY と TARGET_LOAD のログが有効化され、少なくとも Default 重大度になっている",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "TTPs/Defense Evasion"
+  ],
+  "ServiceName": "dms",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsDmsReplicationTask",
+  "ResourceGroup": "database",
+  "Description": "**AWS DMS レプリケーションタスク** でターゲット側のログが有効化されており、`TARGET_APPLY` と `TARGET_LOAD` がそれぞれ少なくとも `LOGGER_SEVERITY_DEFAULT` に設定されていることを確認します。",
+  "Risk": "ターゲットログが不十分であると、ロード／適用処理に対する可視性が制限され、障害や異常が見逃されるおそれがあります。これにより、**データ完全性**（サイレントなドリフトや部分ロード）や **可用性**（インシデント解決時間の増大）が損なわれ、移行イベントの**監査性**も低下します。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://repost.aws/knowledge-center/dms-debug-logging",
+    "https://docs.aws.amazon.com/dms/latest/userguide/CHAP_Tasks.CustomizingTasks.TaskSettings.Logging.html",
+    "https://stackoverflow.com/questions/46913913/aws-dms-with-cloudformation-enabling-logging-needs-a-log-group",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/dms-controls.html#dms-7"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws dms modify-replication-task --replication-task-arn <task-arn> --replication-task-settings '{\"Logging\":{\"EnableLogging\":true,\"LogComponents\":[{\"Id\":\"TARGET_APPLY\",\"Severity\":\"LOGGER_SEVERITY_DEFAULT\"},{\"Id\":\"TARGET_LOAD\",\"Severity\":\"LOGGER_SEVERITY_DEFAULT\"}]}}'",
+      "NativeIaC": "```yaml\n# CloudFormation: ターゲットコンポーネント向けに DMS タスクログを有効化\nResources:\n  <example_resource_name>:\n    Type: AWS::DMS::ReplicationTask\n    Properties:\n      ReplicationInstanceArn: <example_resource_arn>\n      SourceEndpointArn: <example_resource_arn>\n      TargetEndpointArn: <example_resource_arn>\n      MigrationType: full-load\n      TableMappings: |\n        {\"rules\":[{\"rule-type\":\"selection\",\"rule-id\":\"1\",\"rule-name\":\"1\",\"object-locator\":{\"schema-name\":\"%\",\"table-name\":\"%\"},\"rule-action\":\"include\"}]}\n      ReplicationTaskSettings: |\n        {\"Logging\":{\"EnableLogging\":true, \"LogComponents\":[\n          {\"Id\":\"TARGET_APPLY\",\"Severity\":\"LOGGER_SEVERITY_DEFAULT\"},  # 重要：TARGET_APPLY のログを少なくともデフォルトに設定\n          {\"Id\":\"TARGET_LOAD\",\"Severity\":\"LOGGER_SEVERITY_DEFAULT\"}    # 重要：TARGET_LOAD のログを少なくともデフォルトに設定\n        ]}}\n```",
+      "Other": "1. AWS DMS コンソールを開き、Database migration tasks に移動します\n2. レプリケーションタスクを選択し、Modify を選択します\n3. Task settings (JSON) または Logging を展開します\n4. CloudWatch ログを有効化します（EnableLogging = true）\n5. ログコンポーネントを設定します：\n   - TARGET_APPLY 重大度：DEFAULT\n   - TARGET_LOAD 重大度：DEFAULT\n6. 変更を保存（Modify task）し、必要に応じてタスクを再実行します",
+      "Terraform": "```hcl\n# ターゲットコンポーネント向けに DMS タスクログを有効化\nresource \"aws_dms_replication_task\" \"<example_resource_name>\" {\n  replication_task_id      = \"<example_resource_id>\"\n  replication_instance_arn = \"<example_resource_arn>\"\n  source_endpoint_arn      = \"<example_resource_arn>\"\n  target_endpoint_arn      = \"<example_resource_arn>\"\n  migration_type           = \"full-load\"\n  table_mappings           = jsonencode({ rules = [{\n    \"rule-type\" : \"selection\", \"rule-id\" : \"1\", \"rule-name\" : \"1\",\n    \"object-locator\" : { \"schema-name\" : \"%\", \"table-name\" : \"%\" },\n    \"rule-action\" : \"include\"\n  }]} )\n\n  # 重要：ログを有効化し、TARGET_APPLY と TARGET_LOAD を必要な最小重大度に設定\n  replication_task_settings = jsonencode({\n    Logging = {\n      EnableLogging = true\n      LogComponents = [\n        { Id = \"TARGET_APPLY\", Severity = \"LOGGER_SEVERITY_DEFAULT\" },\n        { Id = \"TARGET_LOAD\",  Severity = \"LOGGER_SEVERITY_DEFAULT\" }\n      ]\n    }\n  })\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "ターゲットコンポーネントに対して `LOGGER_SEVERITY_DEFAULT` 以上で **CloudWatch ログ** を有効化し、維持してください。\n- `TARGET_APPLY` と `TARGET_LOAD` を構成\n- ログアクセスに最小権限を適用\n- ログ／アラートを監視して異常を検知\n- タスク設定を標準化し、データ検証を行うことで**多層防御（Defense in Depth）**を強化します",
+      "Url": "https://hub.prowler.com/check/dms_replication_task_target_logging_enabled"
+    }
+  },
+  "Categories": [
+    "logging"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+
+

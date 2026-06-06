@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "entra_policy_ensure_default_user_cannot_create_apps",
+  "CheckTitle": "「Users Can Register Applications」が「No」に設定されていることを確認する",
+  "CheckType": [],
+  "ServiceName": "entra",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "#microsoft.graph.authorizationPolicy",
+  "ResourceGroup": "IAM",
+  "Description": "サードパーティ アプリケーションの登録を、管理者または適切に委任されたユーザーに限定します。",
+  "Risk": "カスタム開発アプリケーションの登録は管理者のみに許可することが推奨されます。これにより、Azure Active Directory データを公開する前に、アプリケーションが正式なセキュリティレビューと承認プロセスを経ることが保証されます。開発者など申請頻度の高いユーザーには、管理者待ちを避けるために権限委任することもできます。組織はポリシーを見直し、要件を決定してください。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/entra/identity-platform/how-applications-are-added#who-has-permission-to-add-applications-to-my-azure-ad-instance",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/ActiveDirectory/users-can-register-applications.html",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "1. Azure Home から Portal Menu を選択します 2. Azure Active Directory を選択します 3. Users を選択します 4. User settings を選択します 5. Users can register applications が No に設定されていることを確認します",
+      "Url": "https://learn.microsoft.com/en-us/entra/identity/role-based-access-control/delegate-app-roles#restrict-who-can-create-applications"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "この設定を強制すると、管理者が対応すべき承認リクエストが増加します。権限を委任した場合、ユーザーが悪意あるサードパーティ アプリを承認し、データへのアクセスを許してしまう可能性があります。"
+}

@@ -1,0 +1,35 @@
+{
+  "Provider": "azure",
+  "CheckID": "apim_threat_detection_llm_jacking",
+  "CheckTitle": "Azure API Management が LLM Jacking 攻撃から保護されていることを確認する",
+  "CheckType": [],
+  "ServiceName": "apim",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Azure API Management Instance",
+  "ResourceGroup": "api_gateway",
+  "Description": "このチェックは、Log Analytics 内の Azure API Management 診断ログを分析し、設定可能な時間枠内で単一 IP アドレスからの LLM 関連操作（ImageGenerations_Create、ChatCompletions_Create、Completions_Create）の頻度を監視することで、潜在的な LLM Jacking 攻撃を検出します。",
+  "Risk": "LLM Jacking 攻撃は、AI モデルへの不正アクセス、潜在的なデータ流出、コスト増加、AI サービスの悪用につながる可能性があります。攻撃者はこれらのエンドポイントを悪用してコンテンツ生成、レート制限の回避、または適切な認可なしでプレミアム AI 機能へアクセスする可能性があります。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/api-management/monitor-api-management",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "LLM Jacking 攻撃から保護するために: 1. APIM インスタンスで診断ログを有効化し、ログを Log Analytics ワークスペースに送信する 2. LLM 操作頻度の監視に適切なしきい値を設定する 3. 不審なアクティビティ パターンに対するアラートを設定する 4. 機密性の高い AI エンドポイントにレート制限と IP 許可リストを実装する 5. APIM アクセスログの異常を定期的に確認・分析する",
+      "Url": "https://learn.microsoft.com/en-us/azure/api-management/monitor-api-management"
+    }
+  },
+  "Categories": [
+    "threat-detection",
+    "monitoring",
+    "logging"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "このチェックには次が必要です: 1. APIM 診断ログが有効化され、Log Analytics ワークスペースへ送信するよう構成されていること 2. 監査設定で Log Analytics ワークスペース ID とキーが構成されていること 3. Log Analytics ワークスペースをクエリするための適切な権限があること"
+}

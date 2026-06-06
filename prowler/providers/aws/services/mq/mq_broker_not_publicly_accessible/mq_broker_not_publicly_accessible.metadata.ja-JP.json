@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "mq_broker_not_publicly_accessible",
+  "CheckTitle": "Amazon MQ ブローカーはパブリックにアクセス可能ではありません",
+  "CheckType": [
+    "ソフトウェアと構成のチェック/AWS セキュリティベストプラクティス/ネットワーク到達可能性",
+    "ソフトウェアと構成のチェック/業界および規制基準/AWS 基礎セキュリティベストプラクティス",
+    "ソフトウェアと構成のチェック/業界および規制基準/NIST 800-53 コントロール",
+    "TTPs/初期アクセス",
+    "影響/データの露出"
+  ],
+  "ServiceName": "mq",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsAmazonMQBroker",
+  "ResourceGroup": "messaging",
+  "Description": "**Amazon MQ ブローカー**は、ブローカーがパブリックエンドポイントを公開しているか、またはその `publicly accessible` 設定を通じて VPC のみの接続に制限されているかを判断するために、**パブリックアクセス可能性**が評価されます。",
+  "Risk": "**パブリックに到達可能なブローカー**は露出を拡大します: インターネットホストはプロトコルやコンソールを調査し、資格情報スプレーを試み、メッセージを公開/消費し、接続を氾濫させることができます。これは、**機密性**（データ漏洩）、**完全性**（メッセージ改ざん）、および**可用性**（DoS/リソース枯渇）を脅かします。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/amazon-mq/latest/developer-guide/using-amazon-mq-securely.html#prefer-brokers-without-public-accessibility",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/MQ/publicly-accessible.html#"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation: パブリックアクセス可能性のない Amazon MQ ブローカー\nResources:\n  <example_resource_name>:\n    Type: AWS::AmazonMQ::Broker\n    Properties:\n      BrokerName: <example_resource_name>\n      EngineType: ACTIVEMQ\n      EngineVersion: <example_engine_version>\n      HostInstanceType: <example_instance_type>\n      PubliclyAccessible: false  # 重要: パブリックインターネットアクセスを無効にします\n      Users:\n        - Username: <example_username>\n          Password: <example_password>\n      SubnetIds:\n        - <example_subnet_id>\n      SecurityGroups:\n        - <example_security_group_id>\n      AutoMinorVersionUpgrade: true\n```",
+      "Other": "1. AWS コンソールを開き、Amazon MQ に移動します\n2. 新しいブローカーを作成し、パブリックアクセス可能性を無効/いいえに設定します\n3. クライアントを新しいブローカーのプライベートエンドポイントに向けます\n4. 古いパブリックにアクセス可能なブローカーを削除します",
+      "Terraform": "```hcl\n# パブリックアクセス可能性のない Amazon MQ ブローカー\nresource \"aws_mq_broker\" \"<example_resource_name>\" {\n  broker_name         = \"<example_resource_name>\"\n  engine_type         = \"ActiveMQ\"\n  engine_version      = \"<example_engine_version>\"\n  host_instance_type  = \"<example_instance_type>\"\n  publicly_accessible = false # 重要: パブリックインターネットアクセスを無効にします\n  security_groups     = [\"<example_security_group_id>\"]\n  subnet_ids          = [\"<example_subnet_id>\"]\n\n  user {\n    username = \"<example_username>\"\n    password = \"<example_password>\"\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "プライベートデプロイメントを優先します: `publicly_accessible=false` を設定し、ブローカーをプライベートサブネットに配置し、セキュリティグループを信頼できるプロデューサー/コンシューマーに制限します。プライベート接続（VPC エンドポイント、ピアリング、VPN/Direct Connect）を使用します。強力な認証と認可マップを強制し、必要なプロトコルポートのみを許可します。**最小特権**を適用します。",
+      "Url": "https://hub.prowler.com/check/mq_broker_not_publicly_accessible"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

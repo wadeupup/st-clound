@@ -1,0 +1,39 @@
+{
+  "Provider": "aws",
+  "CheckID": "route53_domains_transferlock_enabled",
+  "CheckTitle": "Route 53 ドメインで移管ロックが有効になっています",
+  "CheckType": [
+    "ソフトウェアと構成チェック/AWSセキュリティのベストプラクティス",
+    "TTPs/初期アクセス/不正アクセス"
+  ],
+  "ServiceName": "route53",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Other",
+  "ResourceGroup": "network",
+  "Description": "**Route 53 登録済みドメイン** は、ドメイン上の `clientTransferProhibited` ステータスによって示される、移管ロック状態について評価されます。",
+  "Risk": "**移管ロック**がないと、ドメインが不正に別のレジストラへ移され、**ドメインハイジャック**を招く可能性があります。攻撃者はDNSを改ざんし、トラフィックをリダイレクトし、認証情報を収集し、メールやアプリを妨害して、**機密性**、**完全性**、**可用性**を損なうおそれがあります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/domain-lock.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws route53domains enable-domain-transfer-lock --domain-name <example_domain_name>",
+      "NativeIaC": "",
+      "Other": "1. AWS マネジメントコンソールを開き、Route 53 に移動します\n2. 左側のペインで、[登録済みドメイン] を選択します\n3. ドメイン名 <example_domain_name> をクリックします\n4. [アクション] で、[転送ロックを有効にする] を選択します\n5. ロックを有効にすることを確認します",
+      "Terraform": "```hcl\nresource \"aws_route53domains_registered_domain\" \"<example_resource_name>\" {\n  domain_name   = \"<example_domain_name>\"\n  transfer_lock = true  # 移管ロックを有効にします（clientTransferProhibited を設定します）\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "ドメインで**移管ロック**を有効にして、不正なレジストラ移管を防止します。ドメイン管理には**最小権限**を適用し、**MFA**を必須とし、ステータス変更を監視します。*計画された移管*については、承認された変更管理の下でのみロックを解除し、その直後に再度有効化します。",
+      "Url": "https://hub.prowler.com/check/route53_domains_transferlock_enabled"
+    }
+  },
+  "Categories": [
+    "identity-access"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

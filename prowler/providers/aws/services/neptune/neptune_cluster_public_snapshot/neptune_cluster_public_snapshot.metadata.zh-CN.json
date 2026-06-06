@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "neptune_cluster_public_snapshot",
+  "CheckTitle": "NeptuneDB 集群快照未公开共享",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践/网络可达性",
+    "影响/数据暴露",
+    "TTPs/初始访问/未经授权的访问"
+  ],
+  "ServiceName": "neptune",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "critical",
+  "ResourceType": "AwsRdsDbClusterSnapshot",
+  "ResourceGroup": "database",
+  "Description": "Neptune DB 手动集群快照被评估以确定其恢复属性是否允许所有 AWS 账户（*公开*）访问。\n\n报告中的失败状态意味着快照是公开共享的，任何 AWS 账户都可以复制或恢复；**通过**意味着它未公开共享。",
+  "Risk": "**公开快照**会危及存储数据和元数据的机密性。\n\n攻击者或第三方可以：\n- 将快照复制或恢复到外部账户。\n- 访问快照中包含的敏感数据。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/neptune-controls.html#neptune-3",
+    "https://docs.aws.amazon.com/config/latest/developerguide/neptune-cluster-snapshot-public-prohibited.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws neptune modify-db-cluster-snapshot-attribute --db-cluster-snapshot-identifier <snapshot_id> --attribute-name restore --values-to-remove all",
+      "NativeIaC": "",
+      "Terraform": "",
+      "Other": "1. 登录 AWS 管理控制台并打开 Amazon RDS 控制台\n2. 在左侧导航中，选择 Snapshots > DB cluster snapshots\n3. 选择快照，选择 Actions > Manage snapshot permissions\n4. 在权限对话框中移除 Public/all-accounts 权限并点击保存"
+    },
+    "Recommendation": {
+      "Text": "避免公开共享，并在授予快照访问权限时应用**最小权限**：仅与特定 AWS 账户或角色共享。\n\n使用**加密**，强制执行自动化策略和定期审计，并应用**职责分离**和标记来控制和跟踪快照访问。",
+      "Url": "https://hub.prowler.com/check/neptune_cluster_public_snapshot"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

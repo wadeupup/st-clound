@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "iam_role_user_access_admin_restricted",
+  "CheckTitle": "「User Access Administrator」ロールが制限されていることを確認する",
+  "CheckType": [],
+  "ServiceName": "iam",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AzureIAMRoleassignment",
+  "ResourceGroup": "IAM",
+  "Description": "Azure サブスクリプションにおける高特権「User Access Administrator」ロールのアクティブな割り当てを確認します。",
+  "Risk": "このロールの恒久的な割り当ては、権限昇格や不正アクセスにつながり、セキュリティ侵害のリスクを高める可能性があります。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles/privileged#user-access-administrator",
+  "Remediation": {
+    "Code": {
+      "CLI": "az role assignment delete --role 'User Access Administrator' --scope '/subscriptions/<subscription_id>'",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "セキュリティ リスクを最小化するため、「User Access Administrator」ロールの割り当ては使用後すぐに削除してください。",
+      "Url": "https://learn.microsoft.com/en-us/azure/role-based-access-control/elevate-access-global-admin?tabs=azure-portal%2Centra-audit-logs"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

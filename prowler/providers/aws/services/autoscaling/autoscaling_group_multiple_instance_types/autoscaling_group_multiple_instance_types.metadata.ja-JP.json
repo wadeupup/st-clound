@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "autoscaling_group_multiple_instance_types",
+  "CheckTitle": "Auto Scaling グループが複数のアベイラビリティーゾーンにまたがり、アベイラビリティーゾーンごとに複数のインスタンスタイプがあります",
+  "CheckType": [
+    "ソフトウェアと設定チェック/AWS セキュリティベストプラクティス",
+    "影響/サービス拒否"
+  ],
+  "ServiceName": "autoscaling",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsAutoScalingAutoScalingGroup",
+  "ResourceGroup": "compute",
+  "Description": "**EC2 Auto Scaling グループ**は、各**アベイラビリティーゾーン**で**複数のインスタンスタイプ**を使用し、複数の AZ にまたがっているかどうかについて評価されます。\n\n各 AZ が少なくとも2つのインスタンスタイプを定義している場合、グループが識別されます；単一またはタイプなしの AZ を使用している、または1つの AZ に限定されているグループが記録されます。",
+  "Risk": "AZ ごとに1つのインスタンスタイプ、または単一の AZ に限定されている場合、**容量不足**中にスケーリングが停滞し、**フェイルオーバー**を妨げ、**可用性**を低下させる可能性があります（タイムアウト、バックログの増加）。高価な容量のみが利用可能な場合、コストが急増する可能性があります。多様性の低下により、ゾーンまたは市場の混乱中に長時間の中断の可能性が増加します。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/AutoScaling/asg-multiple-instance-type-az.html",
+    "https://docs.aws.amazon.com/autoscaling/ec2/userguide/ec2-auto-scaling-mixed-instances-groups.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/autoscaling-controls.html#autoscaling-6"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws autoscaling update-auto-scaling-group --auto-scaling-group-name <example_resource_name> --mixed-instances-policy '{\"LaunchTemplate\":{\"LaunchTemplateSpecification\":{\"LaunchTemplateName\":\"<example_resource_name>\",\"Version\":\"$Latest\"},\"Overrides\":[{\"InstanceType\":\"<INSTANCE_TYPE_1>\"},{\"InstanceType\":\"<INSTANCE_TYPE_2>\"}]}}' --vpc-zone-identifier \"<subnet_id_1>,<subnet_id_2>\"",
+      "NativeIaC": "```yaml\n# CloudFormation: ASG が複数の AZ で複数のインスタンスタイプを使用することを保証します\nResources:\n  <example_resource_name>:\n    Type: AWS::AutoScaling::AutoScalingGroup\n    Properties:\n      MinSize: \"1\"\n      MaxSize: \"1\"\n      VPCZoneIdentifier:\n        - <subnet_id_1>  # 重要：複数の AZ にまたがるために、異なる AZ のサブネットを使用します\n        - <subnet_id_2>  # 重要：少なくとも2つのアベイラビリティーゾーンを保証します\n      MixedInstancesPolicy:\n        LaunchTemplate:\n          LaunchTemplateSpecification:\n            LaunchTemplateName: <example_resource_name>\n            Version: $Latest\n          Overrides:\n            - InstanceType: <INSTANCE_TYPE_1>  # 重要：AZ ごとの複数のインスタンスタイプ\n            - InstanceType: <INSTANCE_TYPE_2>  # 重要：AZ ごとの複数のインスタンスタイプ\n```",
+      "Other": "1. AWS コンソールで、EC2 > Auto Scaling Groups に移動し、<example_resource_name> を選択します\n2. Edit をクリックします\n3. Network の下で、異なるアベイラビリティーゾーンに少なくとも2つのサブネットを追加します\n4. Launch options の下で、Mixed instance types を選択します\n5. Launch template を選択し、Version を $Latest に設定します\n6. Overrides に少なくとも2つの Instance types を追加します\n7. Update をクリックして保存します",
+      "Terraform": "```hcl\n# Terraform: ASG が複数の AZ で複数のインスタンスタイプを使用することを保証します\nresource \"aws_autoscaling_group\" \"<example_resource_name>\" {\n  name               = \"<example_resource_name>\"\n  min_size           = 1\n  max_size           = 1\n  vpc_zone_identifier = [\"<subnet_id_1>\", \"<subnet_id_2>\"] # 重要：異なる AZ のサブネット\n\n  mixed_instances_policy {\n    launch_template {\n      launch_template_specification {\n        launch_template_name = \"<example_resource_name>\"\n        version              = \"$Latest\"\n      }\n      override { instance_type = \"<INSTANCE_TYPE_1>\" } # 重要：AZ ごとの複数のインスタンスタイプ\n      override { instance_type = \"<INSTANCE_TYPE_2>\" } # 重要：AZ ごとの複数のインスタンスタイプ\n    }\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "レジリエンスのために**混合インスタンス**戦略を採用します：\n- AZ ごとに多様なインスタンスファミリーとサイズを使用します\n- 容量を複数の AZ に分散します\n- Spot/オンデマンドの不足に耐えられる割り当てアプローチを優先します\n**冗長性**と**フォールトトレランス**の原則を適用し、容量障害の単一ポイントを避けるためにスケーリングポリシーを検証します。",
+      "Url": "https://hub.prowler.com/check/autoscaling_group_multiple_instance_types"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

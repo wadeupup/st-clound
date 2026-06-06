@@ -1,0 +1,40 @@
+{
+  "Provider": "aws",
+  "CheckID": "ec2_securitygroup_allow_ingress_from_internet_to_tcp_port_ftp_20_21",
+  "CheckTitle": "いかなるセキュリティグループも 0.0.0.0/0 または ::/0 から FTP ポート 20 または 21 へのインバウンドを許可していないことを確認する",
+  "CheckAliases": [
+    "ec2_securitygroup_allow_ingress_from_internet_to_tcp_ftp_port_20_21"
+  ],
+  "CheckType": [
+    "Infrastructure Security"
+  ],
+  "ServiceName": "ec2",
+  "SubServiceName": "securitygroup",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "high",
+  "ResourceType": "AwsEc2SecurityGroup",
+  "ResourceGroup": "network",
+  "Description": "いかなるセキュリティグループも 0.0.0.0/0 または ::/0 から FTP ポート 20 または 21 へのインバウンドトラフィックを許可していないことを確認します。",
+  "Risk": "セキュリティグループが適切に設定されていない場合、攻撃対象領域が拡大します。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "ゼロトラストアプローチを採用し、インバウンドトラフィックを可能な限り絞り込みます。南北トラフィックだけでなく東西トラフィックについても制御を検討してください。",
+      "Url": "https://docs.aws.amazon.com/vpc/latest/userguide/VPC_SecurityGroups.html"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+
+

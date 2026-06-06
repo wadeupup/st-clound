@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "app_ensure_auth_is_set_up",
+  "CheckTitle": "确保在 Azure App Service 中为应用配置 App Service 身份验证",
+  "CheckType": [],
+  "ServiceName": "app",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Microsoft.Web/sites",
+  "ResourceGroup": "serverless",
+  "Description": "Azure App Service 身份验证是一项功能，可阻止匿名 HTTP 请求到达 Web 应用，或在请求到达应用前先使用令牌对其进行身份验证。如果浏览器发起匿名请求，App Service 会重定向到登录页面。为处理登录流程，可以从一组身份提供程序中进行选择，或实现自定义身份验证机制。",
+  "Risk": "启用 App Service 身份验证后，每个传入的 HTTP 请求在由应用代码处理前都会先经过该功能。同时它还负责使用指定提供程序（Azure Active Directory、Facebook、Google、Microsoft Account 和 Twitter）对用户进行身份验证、验证令牌、存储与刷新令牌、管理已认证会话，并将身份信息注入到请求标头中。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/app-service/overview-authentication-authorization",
+  "Remediation": {
+    "Code": {
+      "CLI": "az webapp auth update --resource-group <RESOURCE_GROUP_NAME> --name <APP_NAME> --enabled true",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/AppService/enable-app-service-authentication.html",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-general-policies/bc_azr_general_2#terraform"
+    },
+    "Recommendation": {
+      "Text": "1. 使用 https://portal.azure.com 登录 Azure 门户 2. 进入 App Services 3. 点击每个应用 4. 在 Setting 部分点击 Authentication 5. 如果尚未设置任何身份提供程序，点击 Add identity provider 6. 按需选择其他参数并点击 Add",
+      "Url": "https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles#website-contributor"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "仅对需要身份验证的 App Service 才有此要求。在营销或支持类网站上启用会阻止未认证访问，通常并不理想。添加身份验证要求会增加 App Service 成本，并需要额外的安全组件来支持身份验证。"
+}

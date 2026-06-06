@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "keyvault_rbac_enabled",
+  "CheckTitle": "为 Azure Key Vault 启用基于角色的访问控制（RBAC）",
+  "CheckType": [],
+  "ServiceName": "keyvault",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "KeyVault",
+  "ResourceGroup": "security",
+  "Description": "警告：当 Key Vault 被删除（软删除）并恢复后，角色分配会消失。之后需要重新创建所有角色分配。这是所有 Azure 服务中软删除功能的限制。",
+  "Risk": "Key Vault 的新 RBAC 权限模型，相比保管库访问策略，可对密钥保管库中的机密、密钥、证书等实现更细粒度的访问控制。进而可以在这些角色上使用特权身份管理（PIM），通过即时访问（JIT）管理来增强 Key Vault 安全性。",
+  "RelatedUrl": "https://docs.microsoft.com/en-gb/azure/key-vault/general/rbac-migration#vault-access-policy-to-azure-rbac-migration-steps",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "通过 Azure 门户，可在创建时将 Key Vault 配置为使用 Azure 基于角色的访问控制。对于现有 Key Vault：1. 在 Azure 首页，从左上角打开 Portal Menu。2. 选择 Key Vaults。3. 选择要审计的 Key Vault。4. 选择 Access configuration。5. 将 Permission model 单选按钮设置为 Azure role-based access control，并注意警告信息。6. 点击 Save。7. 选择 Access Control (IAM)。8. 选择 Role Assignments 选项卡。9. 按需将权限重新应用到组或用户。",
+      "Url": "https://docs.microsoft.com/en-gb/azure/role-based-access-control/role-assignments-portal?tabs=current"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "该实现需要从一开始就进行合理设计，因为这是访问/管理 Key Vault 方式的根本性变更。变更 Key Vault 权限时，在重新应用权限期间会导致服务中断。为尽量减少停机时间，请先将当前组和用户映射到其对应的权限需求。"
+}

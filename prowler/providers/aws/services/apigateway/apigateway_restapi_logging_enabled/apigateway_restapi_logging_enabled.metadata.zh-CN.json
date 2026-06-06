@@ -1,0 +1,51 @@
+{
+  "Provider": "aws",
+  "CheckID": "apigateway_restapi_logging_enabled",
+  "CheckTitle": "API Gateway REST API 阶段已启用日志记录",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践",
+    "软件和配置检查/行业和监管标准/AWS 基础安全最佳实践",
+    "TTPs/防御规避"
+  ],
+  "ServiceName": "apigateway",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsApiGatewayStage",
+  "ResourceGroup": "api_gateway",
+  "Description": "**API Gateway REST API 阶段**启用了**阶段日志记录**，以将执行或访问日志发送到 CloudWatch",
+  "Risk": "没有阶段日志记录，API 活动缺乏可见性，阻碍了滥用检测和事件响应。\n攻击者可以在没有痕迹的情况下探测端点、泄露数据或篡改集成，影响机密性、完整性和可用性，并阻碍取证调查。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/apigateway/latest/developerguide/security-monitoring.html",
+    "https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-logging.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/APIGateway/cloudwatch-logs.html",
+    "https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-logging.html",
+    "https://repost.aws/knowledge-center/api-gateway-cloudwatch-logs",
+    "https://repost.aws/knowledge-center/api-gateway-missing-cloudwatch-logs",
+    "https://docs.aws.amazon.com/apigateway/latest/developerguide/view-cloudwatch-log-events-in-cloudwatch-console.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws apigateway update-stage --rest-api-id <REST_API_ID> --stage-name <STAGE_NAME> --patch-operations op=replace,path='/*/*/logging/loglevel',value=ERROR",
+      "NativeIaC": "```yaml\n# CloudFormation: 在 REST API 阶段启用执行日志记录\nResources:\n  <example_resource_name>:\n    Type: AWS::ApiGateway::Stage\n    Properties:\n      StageName: <example_resource_name>\n      RestApiId: <example_resource_id>\n      DeploymentId: <example_resource_id>\n      MethodSettings:\n        - ResourcePath: \"/*\"\n          HttpMethod: \"*\"\n          LoggingLevel: ERROR  # 关键：为所有方法启用执行日志记录\n```",
+      "Other": "1. 在 API Gateway 控制台中，打开 Settings，如果提示，请设置 CloudWatch log role ARN\n2. 转到 APIs > 选择您的 REST API > Stages > 选择阶段\n3. 单击 Logs and tracing > CloudWatch Logs > 选择 Errors only（或 Errors and info）\n4. 保存更改",
+      "Terraform": "```hcl\n# 为 REST API 阶段中的所有方法启用执行日志记录\nresource \"aws_api_gateway_method_settings\" \"<example_resource_name>\" {\n  rest_api_id = \"<example_resource_id>\"\n  stage_name  = \"<example_resource_name>\"\n  method_path = \"*/*\"\n  settings {\n    logging_level = \"ERROR\"  # 关键：启用阶段执行日志记录\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "为所有 API Gateway 阶段启用**CloudWatch Logs**，根据需要使用 `ERROR` 或 `INFO`。包含请求 ID（例如，`$context.requestId`）。对日志强制执行**最小权限**，为异常设置**保留期**和**警报**。避免在日志中包含敏感数据，并使用**纵深防御**和跟踪。",
+      "Url": "https://hub.prowler.com/check/apigateway_restapi_logging_enabled"
+    }
+  },
+  "Categories": [
+    "logging",
+    "forensics-ready"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "",
+  "CheckAliases": [
+    "apigateway_logging_enabled"
+  ]
+}
+

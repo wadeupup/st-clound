@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "app_http_logs_enabled",
+  "CheckTitle": "Azure AppService の「HTTP ログ」ログ記録が有効化されていることを確認する",
+  "CheckType": [],
+  "ServiceName": "app",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "low",
+  "ResourceType": "Microsoft.Web/sites/config",
+  "ResourceGroup": "serverless",
+  "Description": "Azure App Service インスタンスで AppServiceHTTPLogs 診断ログ カテゴリを有効化し、すべての HTTP リクエストを取得して一元的に記録できるようにします。",
+  "Risk": "Web リクエストの取得は、監視やインシデント対応を行うセキュリティ アナリストにとって重要な補助情報となります。ログを有効化すると、これらのログを SIEM や組織内の他の中央集約基盤に取り込むことができます。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/security/benchmark/azure/mcsb-logging-threat-detection#lt-3-enable-logging-for-security-investigation",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-logging-policies/ensure-that-app-service-enables-http-logging#terraform"
+    },
+    "Recommendation": {
+      "Text": "1. App Services に移動します。各 App Service について: 2. Diagnostic Settings に移動します 3. Add Diagnostic Setting をクリックします 4. 「HTTP logs」のチェックボックスをオンにします 5. ログ利用要件に応じて送信先を構成します（例: Event Hub にストリームし、Event Hub ログを SIEM 連携で取り込む）。",
+      "Url": "https://docs.microsoft.com/en-us/azure/app-service/troubleshoot-diagnostic-logs"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "ログの利用および処理には追加コストが発生します。"
+}

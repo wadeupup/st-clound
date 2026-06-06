@@ -1,0 +1,40 @@
+{
+  "Provider": "aws",
+  "CheckID": "opensearch_service_domains_audit_logging_enabled",
+  "CheckTitle": "Amazon OpenSearch Service 域已启用审计日志",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践",
+    "软件和配置检查/行业和法规标准/AWS 基础安全最佳实践"
+  ],
+  "ServiceName": "opensearch",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsOpenSearchServiceDomain",
+  "ResourceGroup": "database",
+  "Description": "**Amazon OpenSearch Service 域**通过 `AUDIT_LOGS` 启用了**审计日志**",
+  "Risk": "没有审计日志，关键操作缺乏问责性，降低了**机密性**和**完整性**。\n\n未经授权的访问、权限滥用和索引篡改可能会**未被检测到**，阻碍**事件响应**和**取证**，并在没有可追溯性的情况下启用数据外泄和横向移动。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/audit-logs.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws opensearch update-domain-config --domain-name <example_resource_name> --log-publishing-options \"AUDIT_LOGS={CloudWatchLogsLogGroupArn=<CLOUDWATCH_LOG_GROUP_ARN>,Enabled=true}\"",
+      "NativeIaC": "```yaml\n# CloudFormation：为 OpenSearch 域启用 AUDIT_LOGS\nResources:\n  OpenSearchDomain:\n    Type: AWS::OpenSearchService::Domain\n    Properties:\n      DomainName: <example_resource_name>\n      LogPublishingOptions:\n        AUDIT_LOGS:\n          CloudWatchLogsLogGroupArn: <CLOUDWATCH_LOG_GROUP_ARN>  # 关键：审计日志的发送位置\n          Enabled: true  # 关键：启用 AUDIT_LOGS 以通过检查\n```",
+      "Other": "1. 打开 AWS 控制台并进入 OpenSearch Service\n2. 选择域 <example_resource_name>\n3. 打开日志选项卡，找到审计日志，然后点击启用\n4. 选择或创建一个 CloudWatch 日志组，并在提示时确认资源策略\n5. 点击保存更改以启用 AUDIT_LOGS\n6. 如果未启用细粒度访问控制，请先启用它，然后重复步骤 3-5",
+      "Terraform": "```hcl\n# 为 OpenSearch 域启用 AUDIT_LOGS\nresource \"aws_opensearch_domain\" \"example\" {\n  domain_name = \"<example_resource_name>\"\n\n  log_publishing_options {\n    log_type                 = \"AUDIT_LOGS\"\n    cloudwatch_log_group_arn = \"<CLOUDWATCH_LOG_GROUP_ARN>\"  # 关键：审计日志的目的地\n    enabled                  = true                           # 关键：启用 AUDIT_LOGS 以通过检查\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "为所有域启用 `AUDIT_LOGS` 并将其路由到集中、持久的日志存储。\n\n调整类别以记录身份验证失败和敏感索引操作。应用**最小权限**来访问日志，强制执行保留和不可变性，并集成警报以提供**深度防御**和及时响应。",
+      "Url": "https://hub.prowler.com/check/opensearch_service_domains_audit_logging_enabled"
+    }
+  },
+  "Categories": [
+    "logging",
+    "forensics-ready"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

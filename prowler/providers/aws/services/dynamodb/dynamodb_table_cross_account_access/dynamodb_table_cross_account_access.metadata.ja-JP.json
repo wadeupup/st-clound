@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "dynamodb_table_cross_account_access",
+  "CheckTitle": "DynamoDB テーブルのリソースベースポリシーがクロスアカウントアクセスを許可していないか",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "TTPs/Initial Access/Unauthorized Access",
+    "Effects/Data Exposure"
+  ],
+  "ServiceName": "dynamodb",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsDynamoDbTable",
+  "ResourceGroup": "database",
+  "Description": "**DynamoDB テーブル**について、クロスアカウントまたはパブリックプリンシパルを許可する**リソースベースポリシー**が評価されます。\n\nリソースポリシーがない、またはポリシーが同じアカウントに制限されているテーブルは、分離された設定として識別されます。",
+  "Risk": "他のアカウントがテーブルにアクセスできるようにすると、以下に影響を与えます：\n- **機密性**：不正な読み取り/データ流出\n- **完全性**：外部プリンシパルによる書き込みまたは削除\n- **可用性**：容量の枯渇とスロットリング\n- **コスト**：所有者が外部リクエストの費用を負担\n\nパブリックプリンシパルが許可されている場合、露出は無制限になる可能性があります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://support.icompaas.com/support/solutions/articles/62000233614-ensure-dynamodb-tables-should-not-be-accessible-from-other-aws-accounts",
+    "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/access-control-resource-based.html",
+    "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/rbac-bpa-rbp.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws dynamodb delete-resource-policy --resource-arn <resource-arn>",
+      "NativeIaC": "",
+      "Other": "1. AWS コンソールを開き、DynamoDB > Tables に移動します\n2. <example_resource_name> を選択し、Permissions タブを開きます\n3. Resource-based policy で、Delete policy をクリックして確認します\n4. 変更を保存して、クロスアカウントアクセスを削除します",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "**最小権限**を適用します：\n- クロスアカウントデータアクセスを避ける；*必要な場合*、指定されたプリンシパルのみを許可する\n- `aws:PrincipalOrgID`、`aws:SourceVpc`、`aws:PrincipalArn` で制約する；`Deny` ガードレールを追加する\n- **パブリックアクセスのブロック**を有効化し、**IAM Access Analyzer**で監視する",
+      "Url": "https://hub.prowler.com/check/dynamodb_table_cross_account_access"
+    }
+  },
+  "Categories": [
+    "trust-boundaries"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

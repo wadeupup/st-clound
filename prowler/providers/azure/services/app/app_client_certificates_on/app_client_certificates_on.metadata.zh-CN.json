@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "app_client_certificates_on",
+  "CheckTitle": "确保 Web 应用将“客户端证书（传入客户端证书）”设置为“开启”",
+  "CheckType": [],
+  "ServiceName": "app",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Microsoft.Web/sites/config",
+  "ResourceGroup": "serverless",
+  "Description": "客户端证书允许应用对传入请求要求提供证书。只有持有有效证书的客户端才能访问该应用。",
+  "Risk": "企业环境中的 TLS 双向认证技术可确保客户端对服务器的真实性。如果启用了传入客户端证书，则只有拥有有效证书并通过认证的客户端才能访问该应用。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/app-service/app-service-web-configure-tls-mutual-auth?tabs=azurecli",
+  "Remediation": {
+    "Code": {
+      "CLI": "az webapp update --resource-group <RESOURCE_GROUP_NAME> --name <APP_NAME> --set clientCertEnabled=true",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-networking-policies/bc_azr_networking_7#terraform"
+    },
+    "Recommendation": {
+      "Text": "1. 使用 https://portal.azure.com 登录 Azure 门户 2. 进入 App Services 3. 点击每个应用 4. 在 Settings 部分点击 Configuration，然后选择 General settings 5. 将 Incoming client certificates 下的 Client certificate mode 设为 Require",
+      "Url": "https://learn.microsoft.com/en-us/security/benchmark/azure/security-controls-v3-identity-management#im-4-authenticate-server-and-services"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "使用并维护客户端证书需要额外工作来进行证书获取、替换管理以及密钥轮换。"
+}

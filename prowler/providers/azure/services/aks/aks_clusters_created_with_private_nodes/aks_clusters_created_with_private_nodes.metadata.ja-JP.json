@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "aks_clusters_created_with_private_nodes",
+  "CheckTitle": "クラスターがプライベート ノードで作成されていることを確認する",
+  "CheckType": [],
+  "ServiceName": "aks",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Microsoft.ContainerService/ManagedClusters",
+  "ResourceGroup": "container",
+  "Description": "クラスター ノードのパブリック IP アドレスを無効化し、プライベート IP アドレスのみを持つようにします。プライベート ノードとは、パブリック IP アドレスを持たないノードです。",
+  "Risk": "クラスター ノードでパブリック IP アドレスを無効化すると、アクセスが内部ネットワークのみに制限され、攻撃者は基盤となる Kubernetes ホストの侵害を試みる前にローカル ネットワークへのアクセスを取得する必要があります。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/aks/private-clusters",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "",
+      "Url": "https://learn.microsoft.com/en-us/azure/aks/access-private-cluster"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

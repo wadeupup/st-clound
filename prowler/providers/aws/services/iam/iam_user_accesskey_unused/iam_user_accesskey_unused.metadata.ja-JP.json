@@ -1,0 +1,33 @@
+{
+  "Provider": "aws",
+  "CheckID": "iam_user_accesskey_unused",
+  "CheckTitle": "未使用のユーザーアクセスキーが無効化されていることを確認する",
+  "CheckType": [
+    "ソフトウェアと構成のチェック"
+  ],
+  "ServiceName": "iam",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "medium",
+  "ResourceType": "AwsIamUser",
+  "ResourceGroup": "IAM",
+  "Description": "未使用のユーザーアクセスキーが無効化されていることを確認する",
+  "Risk": "AWSアカウントのセキュリティを向上させるために、不要なIAMユーザーの認証情報（パスワードやアクセスキー）を削除します。例えば、ユーザーが組織を離れた場合やAWSへのアクセスが不要になった場合です。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "彼らが使用していた認証情報を見つけ、それがもう機能していないことを確認します。理想的には、不要になった認証情報は削除します。必要があれば後日再作成することができます。最低限、パスワードを変更するか、アクセスキーを無効化して、元のユーザーがアクセスできないようにするべきです。",
+      "Url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_finding-unused.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

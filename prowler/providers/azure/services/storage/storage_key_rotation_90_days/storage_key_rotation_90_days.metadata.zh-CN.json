@@ -1,0 +1,33 @@
+{
+  "Provider": "azure",
+  "CheckID": "storage_key_rotation_90_days",
+  "CheckTitle": "确保定期重新生成存储账户访问密钥",
+  "CheckType": [],
+  "ServiceName": "storage",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AzureStorageAccount",
+  "ResourceGroup": "storage",
+  "Description": "确保定期重新生成存储账户访问密钥",
+  "Risk": "若不定期重新生成访问密钥，意外泄露的可能性会增加，从而可能导致对存储账户资源的未授权访问。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/storage/common/storage-account-keys-manage?tabs=azure-portal",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity-staging/knowledge-base/azure/StorageAccounts/regenerate-storage-account-access-keys-periodically.html#",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "确保每 90 天重新生成一次 Azure 存储账户访问密钥，以降低意外泄露的可能性，并保护存储账户资源免受未授权访问。",
+      "Url": "https://learn.microsoft.com/en-us/azure/storage/common/storage-account-create?tabs=azure-portal#regenerate-storage-access-keys"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

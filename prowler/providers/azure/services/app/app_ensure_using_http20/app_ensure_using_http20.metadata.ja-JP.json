@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "app_ensure_using_http20",
+  "CheckTitle": "Web アプリで HTTP を使用する場合、「HTTP バージョン」が最新であることを確認する",
+  "CheckType": [],
+  "ServiceName": "app",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "low",
+  "ResourceType": "Microsoft.Web/sites",
+  "ResourceGroup": "serverless",
+  "Description": "HTTP は、セキュリティ上の欠陥対応や機能追加のために定期的に新しいバージョンがリリースされます。Web アプリで最新の HTTP バージョンを使用することで、必要に応じてセキュリティ修正や新機能の利点を得られます。",
+  "Risk": "新しいバージョンには、セキュリティ強化や追加機能が含まれる場合があります。強化点や新機能を活用するため、最新バージョンの使用が推奨されます。各ソフトウェア導入時には、組織はその更新が要件を満たすか判断する必要があります。また、選択した更新版に対して、追加ソフトウェアの互換性とサポートが提供されるかを検証する必要があります。HTTP 2.0 は、旧 HTTP バージョンのヘッドオブライン ブロッキング問題に対する性能改善に加え、ヘッダー圧縮や要求の優先順位付けを提供します。HTTP 2.0 は HTTP 1.1 のチャンク転送エンコーディングをサポートしません。データ ストリーミングのための独自のより効率的なメカニズムを提供するためです。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/app-service/configure-common?tabs=portal#general-settings",
+  "Remediation": {
+    "Code": {
+      "CLI": "az webapp config set --resource-group <RESOURCE_GROUP_NAME> --name <APP_NAME> --http20-enabled true",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/AppService/enable-http-2-for-app-service-web-applications.html",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "1. https://portal.azure.com で Azure Portal にログインします 2. App Services に移動します 3. 各アプリをクリックします 4. Setting セクションで Configuration をクリックします 5. General settings で HTTP version を 2.0 に設定します",
+      "Url": "https://azure.microsoft.com/en-us/blog/announcing-http-2-support-in-azure-app-service/"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "https://learn.microsoft.com/en-us/security/benchmark/azure/security-controls-v3-posture-vulnerability-management#pv-7-rapidly-and-automatically-remediate-software-vulnerabilities"
+}

@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "config_recorder_using_aws_service_role",
+  "CheckTitle": "AWS Config 记录器使用 AWSServiceRoleForConfig 服务链接角色",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices"
+  ],
+  "ServiceName": "config",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "monitoring",
+  "Description": "评估**AWS Config 记录器**是否使用链接到 `config.amazonaws.com` 的服务链接 IAM 角色 `AWSServiceRoleForConfig`，而不是自定义角色。\n\n评估检查活动记录器及其角色 ARN，以确认正在使用 AWS 管理的服务链接角色。",
+  "Risk": "使用自定义或错误的角色可能会中断记录或创建盲点，破坏配置历史的**完整性**和**可用性**。过度特权的角色削弱了**最小权限原则**，增加了未授权访问、隐蔽更改和延迟事件响应的风险。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/config-controls.html#config-1",
+    "https://docs.aws.amazon.com/config/latest/developerguide/using-service-linked-roles.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws configservice put-configuration-recorder --configuration-recorder name=<RECORDER_NAME>,roleARN=arn:<PARTITION>:iam::<ACCOUNT_ID>:role/aws-service-role/config.amazonaws.com/AWSServiceRoleForConfig",
+      "NativeIaC": "```yaml\nResources:\n  example_resource:\n    Type: AWS::Config::ConfigurationRecorder\n    Properties:\n      Name: example_resource\n      RoleARN: arn:<PARTITION>:iam::<ACCOUNT_ID>:role/aws-service-role/config.amazonaws.com/AWSServiceRoleForConfig  # 此行修复安全问题\n```",
+      "Other": "1. 打开 AWS 控制台并转到 AWS Config\n2. 选择设置（或记录）并点击编辑\n3. 对于 IAM 角色，选择使用服务链接角色（AWSServiceRoleForConfig）\n4. 保存更改",
+      "Terraform": "```hcl\nresource \"aws_config_configuration_recorder\" \"example_resource\" {\n  name     = \"example_resource\"\n  role_arn = \"arn:<PARTITION>:iam::<ACCOUNT_ID>:role/aws-service-role/config.amazonaws.com/AWSServiceRoleForConfig\"  # 此行修复安全问题\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "为所有记录器使用 AWS 管理的服务链接角色 `AWSServiceRoleForConfig`，以强制执行**最小权限原则**和一致的信任。\n\n避免使用自定义角色；限制谁可以修改记录器或角色；监控漂移并确保记录保持启用状态，作为**纵深防御**的一部分。",
+      "Url": "https://hub.prowler.com/check/config_recorder_using_aws_service_role"
+    }
+  },
+  "Categories": [
+    "identity-access"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

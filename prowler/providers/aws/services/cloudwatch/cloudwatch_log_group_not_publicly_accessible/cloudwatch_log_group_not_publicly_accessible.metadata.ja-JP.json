@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "cloudwatch_log_group_not_publicly_accessible",
+  "CheckTitle": "CloudWatch ロググループが公開アクセス可能ではない",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices/Network Reachability",
+    "TTPs/Initial Access/Unauthorized Access",
+    "Effects/Data Exposure"
+  ],
+  "ServiceName": "cloudwatch",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Other",
+  "ResourceGroup": "monitoring",
+  "Description": "任意のプリンシパルへのアクセスを許可するリソースポリシーを持つ **CloudWatch ロググループ** が特定されます。`Principal:\"*\"` を使用するステートメントや、ロググループ ARN を参照する際にワイルドカード `Resource` を使用するステートメントは、そのロググループが公開ポリシーによって露出していることを示します。",
+  "Risk": "ロググループへの公開アクセスにより、ログの不正読み取りが可能となり、シークレットや運用メタデータが露出し、**機密性** が損なわれます。広範なアクションが許可されている場合、攻撃者はサブスクリプションやログを変更し、**整合性** を損ね、監査証跡の **可用性** を阻害する可能性があります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/iam-access-control-overview-cwl.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws logs delete-resource-policy --policy-name <policy-name>",
+      "NativeIaC": "```yaml\nResources:\n  <example_resource_name>:\n    Type: AWS::Logs::ResourcePolicy\n    Properties:\n      PolicyName: <example_resource_name>\n      PolicyDocument:\n        Version: '2012-10-17'\n        Statement:\n          - Effect: Allow\n            Principal:\n              AWS: \"<example_account_id>\"  # FIX: restrict to specific account (not *) to prevent public access\n            Action: logs:PutSubscriptionFilter\n            Resource: \"arn:aws:logs:<region>:<account-id>:destination:<example_resource_name>\"\n```",
+      "Other": "1. CloudWatch コンソールを開きます\n2. Logs > Resource policies に移動します\n3. ロググループを公開しているポリシー（Principal が \"*\" または Resource が \"*\" のもの）を選択します\n4. [削除] をクリックして確認します",
+      "Terraform": "```hcl\nresource \"aws_cloudwatch_log_resource_policy\" \"<example_resource_name>\" {\n  policy_name     = \"<example_resource_name>\"\n  policy_document = jsonencode({\n    Version   = \"2012-10-17\"\n    Statement = [{\n      Effect    = \"Allow\"\n      Principal = { AWS = \"<example_account_id>\" } # FIX: restrict Principal (not \"*\") to avoid public access\n      Action    = \"logs:PutSubscriptionFilter\"\n      Resource  = \"arn:aws:logs:<region>:<account-id>:destination:<example_resource_name>\"\n    }]\n  })\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "ロググループのリソースポリシーから公開アクセスを削除します。`Principal:\"*\"` および `Resource:\"*\"` を、スコープの狭いプリンシパルと個別の ARN に置き換えます。必要なアクションのみを付与し、条件を使用して利用を制限し、定期的なポリシーレビューにより **最小権限の原則** と **職務分離** を徹底します。",
+      "Url": "https://hub.prowler.com/check/cloudwatch_log_group_not_publicly_accessible"
+    }
+  },
+  "Categories": [
+    "internet-exposed",
+    "identity-access"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+
+

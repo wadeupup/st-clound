@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "sagemaker_training_jobs_network_isolation_enabled",
+  "CheckTitle": "Amazon SageMaker 训练作业已启用网络隔离",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践/网络可达性",
+    "软件和配置检查/行业和监管标准/AWS 基础安全最佳实践",
+    "影响/数据外泄"
+  ],
+  "ServiceName": "sagemaker",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Other",
+  "ResourceGroup": "ai_ml",
+  "Description": "**SageMaker 训练作业**已启用**网络隔离**，防止训练容器在执行期间发起任何入站或出站网络调用",
+  "Risk": "如果没有`网络隔离`，训练代码就可以访问互联网或内部服务，从而导致：\n- 数据集和模型工件被**数据外泄**\n- 通过不受信任的下载造成**供应链入侵**\n- **C2信标**和资源滥用\n这会损害**机密性**和**完整性**，并且可能影响**可用性**。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/sagemaker/latest/dg/interface-vpc-endpoint.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation：启用了网络隔离的 SageMaker 训练作业\nResources:\n  <example_resource_name>:\n    Type: AWS::SageMaker::TrainingJob\n    Properties:\n      TrainingJobName: <example_resource_name>\n      RoleArn: <example_resource_id>\n      AlgorithmSpecification:\n        TrainingImage: <example_resource_id>\n        TrainingInputMode: File\n      OutputDataConfig:\n        S3OutputPath: s3://<example_resource_name>/\n      ResourceConfig:\n        InstanceType: ml.m5.large\n        InstanceCount: 1\n        VolumeSizeInGB: 10\n      StoppingCondition:\n        MaxRuntimeInSeconds: 3600\n      InputDataConfig:\n        - ChannelName: training\n          DataSource:\n            S3DataSource:\n              S3DataType: S3Prefix\n              S3Uri: s3://<example_resource_name>/input/\n      EnableNetworkIsolation: true  # 严重：阻止训练容器的所有网络访问\n```",
+      "Other": "1. 在 AWS 控制台中，打开 SageMaker > 训练作业\n2. 点击创建训练作业\n3. 填写必填字段（角色、镜像、输入/输出、资源）\n4. 启用该设置：启用网络隔离\n5. 创建作业\n\n注意：你不能编辑现有训练作业来启用此功能；请创建启用了网络隔离的新作业，并停用不合规的作业。",
+      "Terraform": "```hcl\n# 启用了网络隔离的 SageMaker 训练作业\nresource \"aws_sagemaker_training_job\" \"<example_resource_name>\" {\n  name     = \"<example_resource_name>\"\n  role_arn = \"<example_resource_id>\"\n\n  algorithm_specification {\n    training_image      = \"<example_resource_id>\"\n    training_input_mode = \"File\"\n  }\n\n  output_data_config {\n    s3_output_path = \"s3://<example_resource_name>/\"\n  }\n\n  resource_config {\n    instance_type  = \"ml.m5.large\"\n    instance_count = 1\n    volume_size_gb = 10\n  }\n\n  stopping_condition {\n    max_runtime_in_seconds = 3600\n  }\n\n  input_data_config {\n    channel_name = \"training\"\n    data_source {\n      s3_data_source {\n        s3_data_type = \"S3Prefix\"\n        s3_uri       = \"s3://<example_resource_name>/input/\"\n      }\n    }\n  }\n\n  enable_network_isolation = true # 严重：阻止训练容器的所有网络访问\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "默认对训练作业启用**网络隔离**。如果需要网络访问，则强制实施**最小权限**和**纵深防御**：\n- 使用私有网络和 `VPC 端点`\n- 限制出站流量并收窄 IAM 权限\n- 预先打包依赖项以避免外部下载",
+      "Url": "https://hub.prowler.com/check/sagemaker_training_jobs_network_isolation_enabled"
+    }
+  },
+  "Categories": [
+    "trust-boundaries",
+    "gen-ai"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

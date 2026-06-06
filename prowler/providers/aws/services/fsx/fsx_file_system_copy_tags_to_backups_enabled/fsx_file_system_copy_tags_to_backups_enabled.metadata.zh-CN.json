@@ -1,0 +1,40 @@
+{
+  "Provider": "aws",
+  "CheckID": "fsx_file_system_copy_tags_to_backups_enabled",
+  "CheckTitle": "FSx 文件系统已启用将标签复制到备份",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices"
+  ],
+  "ServiceName": "fsx",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "low",
+  "ResourceType": "AwsFSxFileSystem",
+  "ResourceGroup": "storage",
+  "Description": "会评估 **Amazon FSx 文件系统**是否通过 `copy_tags_to_backups` 设置将**资源标签**复制到其**备份**。",
+  "Risk": "缺少标签继承会导致备份未分类并游离于基于标签的控制之外，削弱机密性与可用性。基于标签的 IAM 与保留策略可能无法生效，进而造成未授权访问、误删，或形成孤立备份，增加恢复复杂度并推高成本。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/fsx-controls.html#fsx-2",
+    "https://docs.aws.amazon.com/fsx/latest/OpenZFSGuide/updating-file-system.html",
+    "https://docs.aws.amazon.com/config/latest/developerguide/fsx-lustre-copy-tags-to-backups.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws fsx update-file-system --file-system-id <file-system-id> --open-zfs-configuration CopyTagsToBackups=true",
+      "NativeIaC": "```yaml\n# CloudFormation: Enable copying tags to backups for FSx OpenZFS\nResources:\n  <example_resource_name>:\n    Type: AWS::FSx::FileSystem\n    Properties:\n      FileSystemType: OPENZFS\n      OpenZFSConfiguration:\n        CopyTagsToBackups: true  # Critical: ensures tags are copied to backups (passes the check)\n```",
+      "Other": "1. 打开 AWS 控制台并进入 Amazon FSx\n2. 选择你的 FSx 文件系统，然后点击 Actions > Update file system\n3. 启用 Copy tags to backups\n4. 点击 Update 保存",
+      "Terraform": "```hcl\n# Terraform: Enable copying tags to backups for FSx OpenZFS\nresource \"aws_fsx_openzfs_file_system\" \"<example_resource_name>\" {\n  subnet_ids          = [\"<subnet_id>\"]\n  deployment_type     = \"SINGLE_AZ_1\"\n  throughput_capacity = 64\n  storage_capacity    = 128\n\n  copy_tags_to_backups = true # Critical: ensures tags are copied to backups (passes the check)\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "为 FSx 备份启用标签复制，并标准化必填标签（owner、data classification、environment）。\n将**最小权限**和生命周期策略映射到这些标签，通过自动化与护栏强制执行，并定期审计以防止未打标签或错误分类的备份。",
+      "Url": "https://hub.prowler.com/check/fsx_file_system_copy_tags_to_backups_enabled"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

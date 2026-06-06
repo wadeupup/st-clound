@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "cloudtrail_threat_detection_privilege_escalation",
+  "CheckTitle": "CloudTrail で潜在的な権限昇格アクティビティが検出されない",
+  "CheckType": [
+    "TTPs/Privilege Escalation",
+    "Software and Configuration Checks/AWS Security Best Practices/Runtime Behavior Analysis"
+  ],
+  "ServiceName": "cloudtrail",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "critical",
+  "ResourceType": "AwsCloudTrailTrail",
+  "ResourceGroup": "monitoring",
+  "Description": "**CloudTrail** アクティビティは、**権限昇格** に関連する高リスクアクション（例：`Attach*Policy`、`PassRole`、`AssumeRole`、`CreateAccessKey`）を実行している **ID** を対象に分析されます。*最近の時間ウィンドウ* 内でこの種のイベントの占有率が設定可能なしきい値を超えた ID は、調査対象としてハイライトされます。",
+  "Risk": "権限昇格パターンは、より高い権限を付与し、次のことを可能にします。\n- 不正なデータ/シークレットアクセスによる機密性の喪失\n- IAM ポリシー/ロールの変更による整合性の侵害\n- ログやリソースの改ざんによる可用性への影響\nこれらはまた、横方向の移動や永続化を容易にします。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://rhinosecuritylabs.com/aws/aws-privilege-escalation-methods-mitigation/",
+    "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-concepts.html#cloudtrail-concepts-logging-data-events",
+    "https://signmycode.com/blog/what-is-privilege-escalation-in-aws-recommendations-to-prevent-it"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation: Organization SCP to block common IAM privilege-escalation actions\nResources:\n  <example_resource_name>:\n    Type: AWS::Organizations::Policy\n    Properties:\n      Name: deny-iam-privesc\n      Type: SERVICE_CONTROL_POLICY\n      # Critical: This SCP denies risky IAM actions often used for privilege escalation\n      # Explanation: Denying these actions organization-wide prevents future privesc activity detected by CloudTrail\n      Content: |\n        {\n          \"Version\": \"2012-10-17\",\n          \"Statement\": [\n            {\n              \"Effect\": \"Deny\",\n              \"Action\": [\n                \"iam:AttachUserPolicy\",\n                \"iam:AttachRolePolicy\",\n                \"iam:PutUserPolicy\",\n                \"iam:PutRolePolicy\",\n                \"iam:PutGroupPolicy\",\n                \"iam:AddUserToGroup\",\n                \"iam:CreateAccessKey\",\n                \"iam:CreateLoginProfile\",\n                \"iam:UpdateLoginProfile\",\n                \"iam:UpdateAssumeRolePolicy\",\n                \"iam:CreatePolicyVersion\",\n                \"iam:SetDefaultPolicyVersion\",\n                \"iam:PassRole\"\n              ],\n              \"Resource\": \"*\"\n            }\n          ]\n        }\n  <example_resource_name>Attachment:\n    Type: AWS::Organizations::PolicyAttachment\n    Properties:\n      # Critical: Attach the SCP so it is enforced\n      PolicyId: !Ref <example_resource_name>\n      TargetId: <example_resource_id>  # OU, Root, or Account ID\n```",
+      "Other": "1. AWS コンソールで IAM を開き、Prowler の検出結果に表示されている AWS ID（ユーザーまたはロール ARN）を特定します\n2. IAM ユーザーの場合：\n   - [セキュリティ認証情報] > [アクセスキー] に移動し、アクティブなキーのステータスを Inactive に変更します\n   - [アクセス許可] に移動し、すべてのマネージドポリシーをデタッチし、インラインポリシーを削除します\n   - [グループ] に移動し、特権グループからユーザーを削除します\n   - [コンソールパスワード] に移動し、ログインプロファイルを削除します\n3. IAM ロールの場合：\n   - [アクセス許可] に移動し、マネージドポリシーをデタッチし、インラインポリシーを削除します\n   - [信頼関係] に移動し、そのロールを引き受けるべきでないプリンシパルを削除して保存します\n4. 検出ウィンドウ経過後にスキャンを再実行し、これ以上の権限昇格アクティビティが検出されないことを確認します",
+      "Terraform": "```hcl\n# SCP to block common IAM privilege-escalation actions\nresource \"aws_organizations_policy\" \"<example_resource_name>\" {\n  name = \"deny-iam-privesc\"\n  type = \"SERVICE_CONTROL_POLICY\"\n\n  # Critical: Deny risky IAM actions to prevent future privesc\n  # Explanation: Blocks escalation techniques commonly seen in CloudTrail\n  content = jsonencode({\n    Version   = \"2012-10-17\",\n    Statement = [\n      {\n        Effect   = \"Deny\",\n        Action   = [\n          \"iam:AttachUserPolicy\",\n          \"iam:AttachRolePolicy\",\n          \"iam:PutUserPolicy\",\n          \"iam:PutRolePolicy\",\n          \"iam:PutGroupPolicy\",\n          \"iam:AddUserToGroup\",\n          \"iam:CreateAccessKey\",\n          \"iam:CreateLoginProfile\",\n          \"iam:UpdateLoginProfile\",\n          \"iam:UpdateAssumeRolePolicy\",\n          \"iam:CreatePolicyVersion\",\n          \"iam:SetDefaultPolicyVersion\",\n          \"iam:PassRole\"\n        ],\n        Resource = \"*\"\n      }\n    ]\n  })\n}\n\nresource \"aws_organizations_policy_attachment\" \"<example_resource_name>_attach\" {\n  # Critical: Attach the SCP so it takes effect\n  policy_id = aws_organizations_policy.<example_resource_name>.id\n  target_id = \"<example_resource_id>\" # OU, Root, or Account ID\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "**最小権限の原則** と **多層防御** を適用します。\n- `PassRole`、`Attach*Policy`、`UpdateAssumeRolePolicy`、`CreateAccessKey` を制限します\n- 権限境界と SCP を強制します\n- MFA と変更承認を必須にします\n- マルチリージョン CloudTrail、イミュータブルな保持、異常なシーケンスに対するアラートを利用します",
+      "Url": "https://hub.prowler.com/check/cloudtrail_threat_detection_privilege_escalation"
+    }
+  },
+  "Categories": [
+    "threat-detection"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+
+

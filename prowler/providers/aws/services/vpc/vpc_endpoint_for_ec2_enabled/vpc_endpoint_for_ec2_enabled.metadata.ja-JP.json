@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "vpc_endpoint_for_ec2_enabled",
+  "CheckTitle": "VPC には Amazon EC2 VPC エンドポイントがあります",
+  "CheckType": [
+    "ソフトウェアおよび設定のチェック/AWS セキュリティのベストプラクティス/ネットワーク到達可能性"
+  ],
+  "ServiceName": "vpc",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsEc2VpcEndpointService",
+  "ResourceGroup": "network",
+  "Description": "**Amazon VPC** は、**Amazon EC2 API**（`ec2`）への **interface VPC endpoint** について評価されます。これが存在することは、VPC 内で **AWS PrivateLink** を介したプライベートな EC2 API 接続を示します。",
+  "Risk": "プライベートEC2エンドポイントがない場合、EC2 APIトラフィックはIGW/NAT経由で外部に出ます。これにより、ネットワーク経路上の脅威（例：DNSハイジャック、MITM）への露出が拡大し、egress分離が弱まります。また、APIアクセスにインターネットegressへの依存が追加されるため、NAT/エッジ経路に障害が発生した場合の可用性が低下します。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/config/latest/developerguide/service-vpc-endpoint-enabled.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/ec2-controls.html#ec2-10",
+    "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/interface-vpc-endpoints.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws ec2 create-vpc-endpoint --vpc-id <VPC_ID> --service-name com.amazonaws.<REGION>.ec2 --vpc-endpoint-type Interface --subnet-ids <SUBNET_ID>",
+      "NativeIaC": "```yaml\n#CloudFormation: VPC 内に EC2 インターフェイス VPC エンドポイントを作成する\nResources:\n  VPCEndpoint:\n    Type: AWS::EC2::VPCEndpoint\n    Properties:\n      VpcId: \"<example_resource_id>\"                 #重大: エンドポイントの対象VPC\n      ServiceName: !Sub \"com.amazonaws.${AWS::Region}.ec2\"  #重大: EC2 インターフェイスエンドポイントサービス\n      VpcEndpointType: Interface                      #重大: インターフェイスエンドポイントを作成する\n      SubnetIds:                                      #重大: エンドポイント ENI を配置するサブネット\n        - \"<example_resource_id>\"\n```",
+      "Other": "1. AWS コンソールで、VPC > Endpoints に移動します\n2. Create endpoint をクリックします\n3. Service category では AWS services を選択し、Service name com.amazonaws.<region>.ec2 を選択します\n4. ご使用の VPC と少なくとも 1 つの subnet を選択します\n5. Create endpoint をクリックします",
+      "Terraform": "```hcl\n#EC2インターフェイスVPCエンドポイントを作成する\nresource \"aws_vpc_endpoint\" \"<example_resource_name>\" {\n  vpc_id            = \"<example_resource_id>\"           #重大: target VPC\n  service_name      = \"com.amazonaws.<region>.ec2\"      #重大: EC2 インターフェイスエンドポイントサービス\n  vpc_endpoint_type = \"Interface\"                       #重大: インターフェースエンドポイント\n  subnet_ids        = [\"<example_resource_id>\"]         #重大: エンドポイント ENI のサブネット\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "EC2 API アクセスを必要とする各 VPC では、EC2 サービス用の**インターフェイス VPC エンドポイント**を使用します。\n- AWS ネットワーク内で呼び出しを維持するために、**プライベート DNS**を有効にします\n- 制限的なエンドポイントポリシー（最小権限）を適用します\n- パブリックエグレスへの依存を減らし、**多層防御**のためにコントロールを重ねます",
+      "Url": "https://hub.prowler.com/check/vpc_endpoint_for_ec2_enabled"
+    }
+  },
+  "Categories": [
+    "internet-exposed",
+    "trust-boundaries"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

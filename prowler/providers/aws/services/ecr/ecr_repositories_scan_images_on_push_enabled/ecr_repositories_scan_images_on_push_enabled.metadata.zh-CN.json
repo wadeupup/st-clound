@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "ecr_repositories_scan_images_on_push_enabled",
+  "CheckTitle": "[已弃用] ECR 存储库已启用推送时镜像扫描",
+  "CheckType": [
+    "Software and Configuration Checks/Vulnerabilities/CVE",
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices"
+  ],
+  "ServiceName": "ecr",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsEcrRepository",
+  "ResourceGroup": "container",
+  "Description": "[已弃用]\n评估 **Amazon ECR 存储库** 是否启用了 **推送时镜像扫描**；当配置后，新镜像上传会自动触发漏洞扫描（`scan_on_push`）。",
+  "Risk": "没有 **推送时扫描**，包含已知 CVE 的镜像可能进入注册表并在运行时未被发现，通过可利用的软件包破坏 **完整性** 和 **机密性**。攻击者可能实现代码执行和横向移动。延迟检测会增加操作风险并延长修复时间线。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/ECR/scan-on-push.html",
+    "https://docs.aws.amazon.com/AmazonECR/latest/userguide/image-scanning-basic-enabling.html",
+    "https://docs.aws.amazon.com/AmazonECR/latest/userguide/image-scanning.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws ecr put-image-scanning-configuration --repository-name <repo_name> --image-scanning-configuration scanOnPush=true",
+      "NativeIaC": "```yaml\nResources:\n  <example_resource_name>:\n    Type: AWS::ECR::Repository\n    Properties:\n      ImageScanningConfiguration:\n        ScanOnPush: true  # Critical: enables image scanning on push for this repository\n```",
+      "Other": "1. 打开 AWS 控制台并转到 Amazon ECR\n2. 点击存储库并选择目标存储库\n3. 点击编辑\n4. 启用推送时扫描开关\n5. 点击保存",
+      "Terraform": "```hcl\nresource \"aws_ecr_repository\" \"<example_resource_name>\" {\n  name = \"<example_resource_name>\"\n\n  image_scanning_configuration {\n    scan_on_push = true # Critical: enables scanning on image push\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "为所有存储库启用 **推送时镜像扫描**（`scan_on_push`），并将发现结果用作推广门禁。优先使用 **持续/增强扫描** 以实现纵深防御，设置严重性阈值，并阻止或隔离不合规的镜像。将结果与 CI/CD 集成，并采用 **左移** 漏洞管理。",
+      "Url": "https://hub.prowler.com/check/ecr_repositories_scan_images_on_push_enabled"
+    }
+  },
+  "Categories": [
+    "container-security"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "dynamodb_table_deletion_protection_enabled",
+  "CheckTitle": "DynamoDB テーブルで削除保護が有効になっているか",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Effects/Data Destruction"
+  ],
+  "ServiceName": "dynamodb",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsDynamoDbTable",
+  "ResourceGroup": "database",
+  "Description": "**DynamoDB テーブル**は、`deletion protection` 設定により**削除保護**が有効になっており、削除操作にはまずこの設定を無効にする必要があることを意味します",
+  "Risk": "**削除保護**がない場合、テーブルは承認されたアクションや誤って設定された自動化によって削除される可能性があり、回復不可能なデータ損失とサービス中断を引き起こします。これは**整合性**と**可用性**に影響を与え、侵害された認証情報や誤ったランブックの影響範囲を拡大します。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/dynamodb-controls.html#dynamodb-6",
+    "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/WorkingWithTables.Basics.html#WorkingWithTables.Basics.DeletionProtection"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws dynamodb update-table --table-name <TABLE_NAME> --deletion-protection-enabled",
+      "NativeIaC": "```yaml\nResources:\n  <example_resource_name>:\n    Type: AWS::DynamoDB::Table\n    Properties:\n      DeletionProtectionEnabled: true  # CRITICAL: Enables deletion protection to prevent table deletion\n```",
+      "Other": "1. AWS 管理コンソールを開き、DynamoDB に移動します\n2. テーブルを選択します\n3. Additional settings を選択します\n4. Deletion protection を有効化します\n5. 変更を保存します",
+      "Terraform": "```hcl\nresource \"aws_dynamodb_table\" \"<example_resource_name>\" {\n  name     = \"<example_resource_name>\"\n  hash_key = \"id\"\n\n  attribute {\n    name = \"id\"\n    type = \"S\"\n  }\n\n  deletion_protection_enabled = true  # CRITICAL: Prevents accidental table deletion\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "重要なテーブルで**削除保護**を有効化します。\n- **最小権限**を適用して、この設定を変更できるユーザーを制限する\n- 計画された削除の前に、変更管理を要求して無効化する\n- **PITR**とバックアップと組み合わせて多層防御を実現する\n- 自動化を使用して、新規テーブルでこれをデフォルトにする",
+      "Url": "https://hub.prowler.com/check/dynamodb_table_deletion_protection_enabled"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

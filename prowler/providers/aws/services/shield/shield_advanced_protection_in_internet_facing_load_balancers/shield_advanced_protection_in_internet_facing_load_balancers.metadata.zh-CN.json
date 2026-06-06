@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "shield_advanced_protection_in_internet_facing_load_balancers",
+  "CheckTitle": "面向互联网的应用程序负载均衡器受 AWS Shield Advanced 保护",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践/网络可达性",
+    "影响/拒绝服务"
+  ],
+  "ServiceName": "shield",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsElbv2LoadBalancer",
+  "ResourceGroup": "network",
+  "Description": "**面向互联网**的**Application Load Balancers**会评估其是否关联了**AWS Shield Advanced**保护。范围包括具有外部暴露的 application 类型 ALB。",
+  "Risk": "如果没有增强型 DDoS 防护，面向互联网的 ALB 会暴露于大流量 L3/L4 洪泛攻击和 HTTP L7 洪泛攻击之下，从而通过中断和延迟飙升损害**可用性**。突然扩容可能会增加**成本**，而可见性和响应支持的降低会使依赖服务的中断时间延长。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://aws.amazon.com/documentation-overview/shield/",
+    "https://docs.aws.amazon.com/waf/latest/developerguide/configure-new-protection.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws shield create-protection --name <ALB_NAME> --resource-arn <ALB_ARN>",
+      "NativeIaC": "```yaml\nResources:\n  ShieldProtection:\n    Type: AWS::Shield::Protection\n    Properties:\n      Name: \"<example_resource_name>\"\n      ResourceArn: \"<example_resource_id>\" # 关键：将其设置为 ALB ARN 以为其启用 Shield Advanced 保护\n```",
+      "Other": "1. 在 AWS 控制台中，打开 AWS WAF & Shield\n2. 前往 Shield > Protected resources\n3. 点击 Add resources to protect\n4. 选择 Region 和资源类型 Application Load Balancer\n5. 选择你的面向互联网的 ALB\n6. 点击 Protect with Shield Advanced",
+      "Terraform": "```hcl\nresource \"aws_shield_protection\" \"protect\" {\n  name         = \"<example_resource_name>\"\n  resource_arn = \"<example_resource_id>\" # 关键：ALB ARN；创建此项会在该 ALB 上启用 Shield Advanced\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "将面向互联网的 ALB 注册为 **Shield Advanced 受保护资源**，以增强**可用性**。采用纵深防御：与 **AWS WAF** 搭配使用以进行 L7 过滤和速率限制，对相关资产进行分组，启用基于运行状况的检测和主动参与，并结合持续监控来实施最小权限 IAM。",
+      "Url": "https://hub.prowler.com/check/shield_advanced_protection_in_internet_facing_load_balancers"
+    }
+  },
+  "Categories": [
+    "internet-exposed",
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

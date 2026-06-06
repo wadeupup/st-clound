@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "elbv2_logging_enabled",
+  "CheckTitle": "ELBv2 Application Load Balancer で S3 へのアクセスログが設定されていること",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/CIS AWS Foundations Benchmark"
+  ],
+  "ServiceName": "elbv2",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsElbv2LoadBalancer",
+  "ResourceGroup": "network",
+  "Description": "**ELBv2 Application Load Balancer** で Amazon S3 への **アクセスログ** が有効化され、タイムスタンプ、クライアント IP、パス、レスポンスコードなどのリクエスト詳細が取得されていることを評価します。",
+  "Risk": "**ALB アクセスログ** がないと **可視性** が低下し、**インシデント検知** と **フォレンジック** が困難になります。ロードバランサー経由の悪意あるリクエスト、クレデンシャルスタッフィング、データ流出が見逃される可能性があり、**機密性** と **完全性** を損ない、**可用性** インシデントからの復旧を遅らせます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-access-logs.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/ELBv2/access-log.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws elbv2 modify-load-balancer-attributes --load-balancer-arn <lb_arn> --attributes Key=access_logs.s3.enabled,Value=true Key=access_logs.s3.bucket,Value=<bucket_name>",
+      "NativeIaC": "```yaml\n# CloudFormation: enable ALB access logs to S3\nResources:\n  <example_resource_name>:\n    Type: AWS::ElasticLoadBalancingV2::LoadBalancer\n    Properties:\n      Subnets:\n        - <subnet_id_1>\n        - <subnet_id_2>\n      SecurityGroups:\n        - <example_security_group_id>\n      LoadBalancerAttributes:\n        - Key: access_logs.s3.enabled  # critical: enable ALB access logging\n          Value: \"true\"\n        - Key: access_logs.s3.bucket   # critical: destination S3 bucket for logs\n          Value: \"<example_resource_name>\"\n```",
+      "Other": "1. AWS コンソールで EC2 > Load Balancers に移動し、対象の Application Load Balancer を選択します\n2. Attributes（または Edit attributes）を開き、Access logs を確認します\n3. Enable access logs を有効にし、配信先 S3 バケットを選択します\n4. 変更を保存します",
+      "Terraform": "```hcl\n# Terraform: enable ALB access logs to S3\nresource \"aws_lb\" \"<example_resource_name>\" {\n  name            = \"<example_resource_name>\"\n  security_groups = [\"<example_security_group_id>\"]\n  subnets         = [\"<subnet_id_1>\", \"<subnet_id_2>\"]\n\n  access_logs {\n    bucket  = \"<example_resource_name>\"  # critical: destination S3 bucket for logs\n    enabled = true                        # critical: enable ALB access logging\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "**ALB アクセスログ** を専用かつ暗号化された S3 バケットへ有効化してください。配信主体と閲覧主体には **最小権限** を適用し、保持のためライフサイクルポリシーを設定し、改ざん抑止として `Object Lock` の利用も検討します。ログは **SIEM** に集約し、異常をアラート化して **多層防御** の一部として運用してください。",
+      "Url": "https://hub.prowler.com/check/elbv2_logging_enabled"
+    }
+  },
+  "Categories": [
+    "logging"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

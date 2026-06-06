@@ -1,0 +1,37 @@
+{
+  "Provider": "aws",
+  "CheckID": "guardduty_centrally_managed",
+  "CheckTitle": "GuardDuty detector が管理者アカウントにより一元管理されている、または当該アカウントがメンバーを持つ管理者であること",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices"
+  ],
+  "ServiceName": "guardduty",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsGuardDutyDetector",
+  "ResourceGroup": "security",
+  "Description": "Amazon GuardDuty detector は、委任管理者アカウントに関連付けられている場合、または detector のアカウント自体がメンバーアカウントを持つ**管理者**である場合に、**集中管理**下にあります。",
+  "Risk": "集中管理がないと、アカウントやリージョンを横断した**可視性**が分断され、**インシデント対応**が遅れます。攻撃者は検知されずに潜伏し、**横方向移動**、データ流出、設定改ざんを行う可能性があり、**機密性**、**完全性**、**可用性**に悪影響を与えます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/guardduty/latest/ug/guardduty_accounts.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws guardduty enable-organization-admin-account --admin-account-id <ADMIN_ACCOUNT_ID>",
+      "NativeIaC": "",
+      "Other": "1. AWS Organizations の管理アカウントでサインインします\n2. AWS Organizations コンソールを開きます\n3. Services > Amazon GuardDuty に移動します\n4. Register delegated administrator をクリックします\n5. 管理者アカウント ID を入力して Register をクリックします",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "**委任管理者**（可能であれば *AWS Organizations* 経由）を指定し、全アカウントを**メンバー**として登録してください。新規アカウントの自動登録を有効化し、必要リージョンで detector 設定を標準化し、検出結果を中央監視へ集約します。**最小権限**と**職務分離**を適用してください。",
+      "Url": "https://hub.prowler.com/check/guardduty_centrally_managed"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

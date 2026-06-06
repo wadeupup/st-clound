@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "awslambda_function_not_publicly_accessible",
+  "CheckTitle": "Lambda関数のリソースベースポリシーがパブリックアクセスを許可していない",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices/Network Reachability",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices"
+  ],
+  "ServiceName": "awslambda",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "critical",
+  "ResourceType": "AwsLambdaFunction",
+  "ResourceGroup": "serverless",
+  "Description": "**AWS Lambda**関数のリソースベースポリシーは**パブリックアクセス**について評価されます。この検出結果は、`lambda:InvokeFunction`などのアクションを任意のプリンシパルに許可する、ワイルドカードまたは空の`Principal`を持つポリシーを識別します。",
+  "Risk": "**パブリック呼び出し**により、外部の人が関数のIAMロールの下でコードを実行できます。\n\n影響：\n- **機密性**：バックエンドアクセスによるデータ漏洩\n- **整合性**：副作用による不正な状態変更\n- **可用性/コスト**：呼び出しフラッドによるスロットリングと支出の急増",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/config/latest/developerguide/lambda-function-public-access-prohibited.html",
+    "https://docs.aws.amazon.com/lambda/latest/dg/access-control-resource-based.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/lambda-controls.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/Lambda/function-exposed.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws lambda remove-permission --function-name <example_function_name> --statement-id <example_statement_id>",
+      "NativeIaC": "```yaml\n# CloudFormation：Lambda権限を非パブリックプリンシパルに制限\nResources:\n  <example_resource_name>Permission:\n    Type: AWS::Lambda::Permission\n    Properties:\n      Action: lambda:InvokeFunction\n      FunctionName: <example_resource_name>\n      Principal: 123456789012  # 重要：\"*\"ではない; 呼び出し権限を特定のアカウントに制限してパブリックアクセスを防止\n```",
+      "Other": "1. AWS Lambdaコンソールを開き、関数を選択\n2. 設定 > 権限に移動\n3. リソースベースポリシーの下で、ポリシーステートメントを表示\n4. Principalが\"*\"（または{ \"AWS\": \"*\" }）に設定されているステートメントを見つける\n5. そのステートメントを削除して保存\n6. アクセスが必要な場合、特定のプリンシパル（例えば、AWSアカウントIDまたはサービスプリンシパル）のみの権限を再追加",
+      "Terraform": "```hcl\n# Lambda権限を非パブリックプリンシパルに制限\nresource \"aws_lambda_permission\" \"<example_resource_name>\" {\n  statement_id  = \"AllowSpecificPrincipal\"\n  action        = \"lambda:InvokeFunction\"\n  function_name = \"<example_resource_name>\"\n  principal     = \"123456789012\"  # 重要：\"*\"ではない; パブリックアクセスを防止\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "関数ポリシーからパブリックプリンシパルを削除します。固定ARNと**最小権限**を使用して、特定のアカウント、ロール、またはサービスのみにアクセスを許可します。`AWS:SourceAccount`や`AWS:SourceArn`などの条件を追加して、サービストリガーを制約します。**職務分離**を強制し、**多層防御**のためにアクセスを監視します。",
+      "Url": "https://hub.prowler.com/check/awslambda_function_not_publicly_accessible"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "関数がAWSアカウント内のALBやAPI Gatewayなどの他のパブリックリソースによってパブリックに公開され、ポリシーのプリンシパルがAWSアカウントIDに設定されている場合、誤検知が発生します。"
+}
+

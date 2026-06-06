@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "entra_user_with_vm_access_has_mfa",
+  "CheckTitle": "确保仅启用 MFA 的身份可访问特权虚拟机",
+  "CheckType": [],
+  "ServiceName": "entra",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "#microsoft.graph.users",
+  "ResourceGroup": "IAM",
+  "Description": "核查未启用 MFA 但可使用单独登录凭据登录特权虚拟机的身份。攻击者可利用该访问权限进行横向移动，并使用虚拟机的托管标识执行操作。请确保虚拟机仅具备必要权限，并依据最小权限原则撤销管理员级权限。",
+  "Risk": "托管磁盘默认在底层硬件上加密，因此基础保护通常不需要额外加密；如有更高要求也可提供额外加密。托管磁盘在设计上比存储账户更具弹性。对于通过 ARM 部署的虚拟机，Azure Advisor 在后续会从安全与成本管理角度建议将 VHD 迁移到托管磁盘。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "1. 登录 Azure 门户。降低附加到虚拟机的托管标识访问权限。2. 可通过为用户启用 MFA、移除用户访问，或：• 场景 I：为可访问虚拟机的用户启用 MFA。1. 在左侧进入 Azure AD，在 Manage 部分选择 Users。2. 在顶部菜单点击 Per-User MFA，选择 MULTI-FACTOR AUTH STATUS 为 Disabled 且可登录虚拟机的用户： 在右侧 quick steps 中选择 enable。 点击 enable multi-factor auth，并将链接分享给用户以按要求配置 MFA。• 场景 II：移除用户对虚拟机的访问。1. 选择 Subscription，然后点击 Access control (IAM)。2. 选择 Role assignments，搜索 Virtual Machine Administrator Login、Virtual Machine User Login 或任何可登录虚拟机的角色。3. 点击 Role Name，选择 Assignments，移除未配置 MFA 的身份。• 场景 III：降低附加到虚拟机的托管标识访问权限。1. 选择 Subscription，然后点击 Access control (IAM)。2. 在顶部菜单选择 Role Assignments，并将 Assignment type 过滤为 Privileged administrator roles、Type 过滤为 Virtual Machines。3. 点击 Role Name，选择 Assignments，移除相关身份访问，确保符合最小权限原则。",
+      "Url": ""
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "实施此建议需要 Azure AD P2 许可证。请确保为虚拟机配置的身份使用 RBAC/ABAC 组，并通过 Azure PIM 分配角色，且角色设置要求 MFA，或使用其他 PAM 方案（如 CyberArk）访问虚拟机。"
+}

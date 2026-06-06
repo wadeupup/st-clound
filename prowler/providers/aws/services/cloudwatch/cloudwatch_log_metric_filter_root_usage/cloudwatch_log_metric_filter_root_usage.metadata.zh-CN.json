@@ -1,0 +1,49 @@
+{
+  "Provider": "aws",
+  "CheckID": "cloudwatch_log_metric_filter_root_usage",
+  "CheckTitle": "账户已为 root 账户使用配置 CloudWatch Logs 度量过滤器和告警",
+  "CheckType": [
+    "Software and Configuration Checks/Industry and Regulatory Standards/CIS AWS Foundations Benchmark",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "TTPs/Privilege Escalation"
+  ],
+  "ServiceName": "cloudwatch",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsCloudWatchAlarm",
+  "ResourceGroup": "monitoring",
+  "Description": "存储在 CloudWatch 中的 **CloudTrail** 日志包含针对 **root 账户活动** 的度量过滤器（`{ $.userIdentity.type = \"Root\" && $.userIdentity.invokedBy NOT EXISTS && $.eventType != \"AwsServiceEvent\" }`），以及在该过滤器匹配时触发的关联 CloudWatch 告警。",
+  "Risk": "如果未对 **root 活动** 进行告警，拥有完全权限的操作可能在未被察觉的情况下执行，从而影响：\n- 通过数据访问/外泄影响机密性\n- 通过策略/配置篡改影响完整性\n- 通过删除或关停资源影响可用性\n告警延迟会扩大影响范围并增加攻击者在环境中的持续时间。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudwatch-alarms-for-cloudtrail.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/CloudWatchLogs/root-account-usage-alarm.html",
+    "https://asecure.cloud/a/root_account_login/",
+    "https://support.icompaas.com/support/solutions/articles/62000083624-ensure-a-log-metric-filter-and-alarm-exist-for-usage-of-root-account",
+    "https://www.intelligentdiscovery.io/controls/cloudwatch/cloudwatch-alarm-root-account-usage",
+    "https://aws.amazon.com/blogs/security/how-to-receive-notifications-when-your-aws-accounts-root-access-keys-are-used/",
+    "https://www.tenable.com/audits/items/CIS_Amazon_Web_Services_Foundations_v1.5.0_L1.audit:000adfb028a1475075a6b5d2117f53f4"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation：为 root 账户使用创建度量过滤器和告警\nResources:\n  RootUsageMetricFilter:\n    Type: AWS::Logs::MetricFilter\n    Properties:\n      LogGroupName: \"<example_resource_name>\"\n      FilterPattern: '{ $.userIdentity.type = \"Root\" && $.userIdentity.invokedBy NOT EXISTS && $.eventType != \"AwsServiceEvent\" }'  # 关键：检测非服务调用的 root 用户操作\n      MetricTransformations:\n        - MetricValue: \"1\"\n          MetricNamespace: \"<example_resource_name>\"  # 关键：告警使用的度量命名空间\n          MetricName: \"<example_resource_name>\"       # 关键：告警使用的度量名称\n\n  RootUsageAlarm:\n    Type: AWS::CloudWatch::Alarm\n    Properties:\n      ComparisonOperator: GreaterThanOrEqualToThreshold\n      EvaluationPeriods: 1\n      MetricName: \"<example_resource_name>\"   # 关键：对过滤器创建的度量触发告警\n      Namespace: \"<example_resource_name>\"\n      Period: 300\n      Statistic: Sum\n      Threshold: 1\n```",
+      "Other": "1. 在 AWS 控制台中，打开 CloudWatch > Logs > Log groups，并选择 CloudTrail 日志组\n2. 转到 Metric filters > Create metric filter\n3. 在 Filter pattern 中输入：{ $.userIdentity.type = \"Root\" && $.userIdentity.invokedBy NOT EXISTS && $.eventType != \"AwsServiceEvent\" }\n4. 单击 Next，设置任意 Filter name，设置 Metric namespace 和 Metric name，并将 Metric value 设为 1，然后创建度量过滤器\n5. 选中新建的度量过滤器并单击 Create alarm\n6. 将 Period 设置为 5 minutes，Statistic 设置为 Sum，Threshold type 选择 Static 且值为 1，Evaluation periods 为 1，然后创建告警",
+      "Terraform": "```hcl\n# 用于 root 账户使用的 CloudWatch Logs 度量过滤器\nresource \"aws_cloudwatch_log_metric_filter\" \"<example_resource_name>\" {\n  name           = \"<example_resource_name>\"\n  log_group_name = \"<example_resource_name>\"\n  pattern        = \"{ $.userIdentity.type = \\\"Root\\\" && $.userIdentity.invokedBy NOT EXISTS && $.eventType != \\\"AwsServiceEvent\\\" }\" # 关键：检测 root 用户操作\n\n  metric_transformation {\n    name      = \"<example_resource_name>\"     # 关键：供告警使用的度量\n    namespace = \"<example_resource_name>\"\n    value     = \"1\"\n  }\n}\n\n# 针对 root 使用度量的告警\nresource \"aws_cloudwatch_metric_alarm\" \"<example_resource_name>\" {\n  comparison_operator = \"GreaterThanOrEqualToThreshold\"\n  evaluation_periods  = 1\n  metric_name         = \"<example_resource_name>\"   # 关键：与度量过滤器匹配\n  namespace           = \"<example_resource_name>\"\n  period              = 300\n  statistic           = \"Sum\"\n  threshold           = 1\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "为 **root 活动** 启用实时告警，使用日志度量过滤器和高优先级告警，并配置通知。\n\n降低暴露：实施**最小权限原则**，将 root 账户仅用于 *破冰/紧急场景* 且启用 MFA，禁用 root 访问密钥，并将告警接入事件响应流程，形成**纵深防御**。",
+      "Url": "https://hub.prowler.com/check/cloudwatch_log_metric_filter_root_usage"
+    }
+  },
+  "Categories": [
+    "logging"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "日志记录与监控"
+}
+
+

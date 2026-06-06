@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "documentdb_cluster_multi_az_enabled",
+  "CheckTitle": "DocumentDB クラスターで Multi-AZ が有効になっているか",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices"
+  ],
+  "ServiceName": "documentdb",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsRdsDbCluster",
+  "ResourceGroup": "database",
+  "Description": "**Amazon DocumentDB クラスター**で **Multi-AZ**（`multi_az`）が有効な場合、プライマリと 1 つ以上のレプリカが複数のアベイラビリティーゾーンに分散配置されていることを示します。",
+  "Risk": "Multi-AZ を有効化していない場合、クラスターは単一の AZ/インスタンスに依存します。AZ やノードの障害（またはメンテナンス）により読み取りおよび書き込みが停止し、ダウンタイムやタイムアウト、SLA 違反を引き起こす可能性があります。可用性が低下し、RTO が増大し、代替キャパシティーが用意されるまでアプリケーションはトランザクション失敗やリトライの増加を経験するおそれがあります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/documentdb/latest/developerguide/failover.html",
+    "https://support.icompaas.com/support/solutions/articles/62000233690-ensure-documentdb-cluster-have-multi-az-enabled"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws docdb create-db-instance --db-instance-identifier <example_resource_id> --db-cluster-identifier <example_resource_id> --db-instance-class <INSTANCE_CLASS> --engine docdb --availability-zone <OTHER_AZ>",
+      "NativeIaC": "```yaml\n# CloudFormation: add a replica to enable Multi-AZ for an existing DocumentDB cluster\nResources:\n  DocDBReplica:\n    Type: AWS::DocDB::DBInstance\n    Properties:\n      DBClusterIdentifier: \"<example_resource_id>\"  # CRITICAL: adds a new instance to the cluster to achieve Multi-AZ\n      DBInstanceClass: \"<INSTANCE_CLASS>\"\n      AvailabilityZone: \"<OTHER_AZ>\"                # CRITICAL: place in a different AZ to provide Multi-AZ failover\n```",
+      "Other": "1. AWS コンソールで Amazon DocumentDB に移動し、対象クラスターを開きます\n2. Create instance をクリックします\n3. Instance class を設定し、プライマリとは異なるアベイラビリティーゾーンを選択します\n4. Create をクリックしてレプリカインスタンスを作成します\n5. クラスターで Multi-AZ が有効になっていることを確認します",
+      "Terraform": "```hcl\n# Add a replica to enable Multi-AZ for an existing DocumentDB cluster\nresource \"aws_docdb_cluster_instance\" \"<example_resource_name>\" {\n  cluster_identifier = \"<example_resource_id>\"  # CRITICAL: adds a new instance to the cluster to achieve Multi-AZ\n  instance_class     = \"<INSTANCE_CLASS>\"\n  availability_zone  = \"<OTHER_AZ>\"             # CRITICAL: different AZ ensures Multi-AZ failover\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "DocumentDB で **Multi-AZ** を有効化し、インスタンスを異なる AZ に分散配置します。\n- 少なくとも 1 台のレプリカインスタンスを維持する\n- フェイルオーバーを制御するため昇格優先度を設定する\n- 定期的にフェイルオーバーをテストし、クライアント側の堅牢なリトライを実装する\n\nこれにより**障害耐性**が高まり、サービス可用性が維持されます。",
+      "Url": "https://hub.prowler.com/check/documentdb_cluster_multi_az_enabled"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+
+

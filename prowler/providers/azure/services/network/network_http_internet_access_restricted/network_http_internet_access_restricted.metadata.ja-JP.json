@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "network_http_internet_access_restricted",
+  "CheckTitle": "インターネットからの HTTP(S) アクセスが評価され、制限されていることを確認する",
+  "CheckType": [],
+  "ServiceName": "network",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Network",
+  "ResourceGroup": "network",
+  "Description": "ネットワーク セキュリティ グループは、ポート設定ミスがないか定期的に評価する必要があります。特定のポートやプロトコルがインターネットに公開され得る場合、必要性を評価し、明確に必要で狭く構成されている場合を除いて制限すべきです。",
+  "Risk": "インターネット経由で HTTP(S) を使用する潜在的なセキュリティ問題は、攻撃者がさまざまなブルートフォース手法で Azure リソースへのアクセスを取得できることです。攻撃者がアクセスを取得すると、そのリソースを踏み台として Azure テナント内の他リソース侵害に利用される可能性があります。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/security/benchmark/azure/security-controls-v3-network-security#ns-1-establish-network-segmentation-boundaries",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity-staging/knowledge-base/azure/Network/unrestricted-http-access.html",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "ネットワーク セキュリティ グループに接続されたリソースで、HTTP(S) が明確に必要かつ最小限に構成されていない場合、Azure リソースへのインターネット レベルのアクセスは制限または排除すべきです。関連リソースへの内部アクセスには、次のような暗号化ネットワーク トンネルを構成します: ExpressRoute、Site-to-site VPN、Point-to-site VPN。",
+      "Url": ""
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

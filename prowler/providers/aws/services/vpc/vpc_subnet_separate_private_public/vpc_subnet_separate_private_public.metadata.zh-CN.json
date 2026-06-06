@@ -1,0 +1,38 @@
+{
+  "Provider": "aws",
+  "CheckID": "vpc_subnet_separate_private_public",
+  "CheckTitle": "VPC 同时具有公共和私有子网",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践/网络可达性"
+  ],
+  "ServiceName": "vpc",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsEc2Subnet",
+  "ResourceGroup": "network",
+  "Description": "**Amazon VPCs** 会根据网络分段进行评估：至少需要一个 **公共子网**（可通过互联网路由）和一个 **私有子网**（不可通过互联网路由）。\n\n它会标记没有子网、只有公共子网或只有私有子网的 VPC。",
+  "Risk": "缺少子网隔离会削弱**分段**。\n- 只有公有子网：工作负载面临互联网暴露，容易遭受扫描、暴力破解和横向移动，威胁**机密性**和**完整性**。\n- 只有私有子网：没有受控的出站访问会破坏补丁更新和依赖项，影响**可用性**。\n- 没有子网：配置错误会导致服务无法访问。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/vpc/latest/userguide/VPC_Scenario2.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation：向 VPC 添加一个公有子网和一个私有子网\nResources:\n  InternetGateway:\n    Type: AWS::EC2::InternetGateway\n\n  VPCGatewayAttachment:\n    Type: AWS::EC2::VPCGatewayAttachment\n    Properties:\n      VpcId: <example_resource_id>\n      InternetGatewayId: !Ref InternetGateway\n\n  PublicSubnet:\n    Type: AWS::EC2::Subnet\n    Properties:\n      VpcId: <example_resource_id>\n      CidrBlock: 10.0.1.0/24  # 创建一个将通过路由设为公共的子网\n\n  PrivateSubnet:\n    Type: AWS::EC2::Subnet\n    Properties:\n      VpcId: <example_resource_id>\n      CidrBlock: 10.0.2.0/24  # 创建一个保持私有的子网（无 IGW 路由）\n\n  PublicRouteTable:\n    Type: AWS::EC2::RouteTable\n    Properties:\n      VpcId: <example_resource_id>\n\n  PublicDefaultRoute:\n    Type: AWS::EC2::Route\n    DependsOn: VPCGatewayAttachment\n    Properties:\n      RouteTableId: !Ref PublicRouteTable\n      DestinationCidrBlock: 0.0.0.0/0  # 严重：创建通往互联网的路由\n      GatewayId: !Ref InternetGateway    # 关键：通过 Internet Gateway\n\n  PublicAssociation:\n    Type: AWS::EC2::SubnetRouteTableAssociation\n    Properties:\n      SubnetId: !Ref PublicSubnet\n      RouteTableId: !Ref PublicRouteTable  # 关键：将此子网标记为公共子网\n\n  PrivateRouteTable:\n    Type: AWS::EC2::RouteTable\n    Properties:\n      VpcId: <example_resource_id>\n\n  PrivateAssociation:\n    Type: AWS::EC2::SubnetRouteTableAssociation\n    Properties:\n      SubnetId: !Ref PrivateSubnet\n      RouteTableId: !Ref PrivateRouteTable  # 关键：没有 IGW 路由 -> 私有子网\n```",
+      "Other": "1. 在 AWS 控制台中，前往 VPC > Your VPCs 并选择故障的 VPC\n2. 如果不存在 Internet Gateway，则附加一个：Internet Gateways > Create > Attach to the VPC\n3. 创建两个子网：Subnets > Create subnet\n   - 子网 A（公有）：CIDR 例如 10.0.1.0/24\n   - 子网 B（私有）：CIDR 例如 10.0.2.0/24\n4. 为公有子网创建一个路由表：Route tables > Create\n   - 添加路由：0.0.0.0/0 -> Internet Gateway (IGW)\n   - 将此路由表关联到子网 A（公有）\n5. 为私有子网创建一个路由表：Route tables > Create\n   - 不要添加到 Internet Gateway 的路由\n   - 将此路由表关联到子网 B（私有）\n6. 验证该 VPC 现在至少具有一个带有 IGW 路由的子网（公有）和一个不带有 IGW 路由的子网（私有）",
+      "Terraform": "```hcl\n# Terraform：向 VPC 添加一个公有子网和一个私有子网\nresource \"aws_internet_gateway\" \"<example_resource_name>\" {\n  vpc_id = \"<example_resource_id>\"\n}\n\nresource \"aws_subnet\" \"public_<example_resource_name>\" {\n  vpc_id     = \"<example_resource_id>\"\n  cidr_block = \"10.0.1.0/24\"\n}\n\nresource \"aws_subnet\" \"private_<example_resource_name>\" {\n  vpc_id     = \"<example_resource_id>\"\n  cidr_block = \"10.0.2.0/24\"\n}\n\nresource \"aws_route_table\" \"public_<example_resource_name>\" {\n  vpc_id = \"<example_resource_id>\"\n  route {                         # 严重：通过 IGW 使子网变为公有\n    cidr_block = \"0.0.0.0/0\"      # 到互联网的默认路由\n    gateway_id = aws_internet_gateway.<example_resource_name>.id\n  }\n}\n\nresource \"aws_route_table_association\" \"public_assoc_<example_resource_name>\" {\n  subnet_id      = aws_subnet.public_<example_resource_name>.id\n  route_table_id = aws_route_table.public_<example_resource_name>.id  # 关键\n}\n\nresource \"aws_route_table\" \"private_<example_resource_name>\" {\n  vpc_id = \"<example_resource_id>\"  # 关键：没有 IGW 路由会使子网保持私有\n}\n\nresource \"aws_route_table_association\" \"private_assoc_<example_resource_name>\" {\n  subnet_id      = aws_subnet.private_<example_resource_name>.id\n  route_table_id = aws_route_table.private_<example_resource_name>.id  # 关键\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "对每个 VPC 进行分段：将面向互联网的端点放入**公有子网**，将内部工作负载放入**私有子网**。使用严格的路由表、NACL 和安全组限制入站/出站流量，尽量减少 `0.0.0.0/0`。应用**最小权限**和**纵深防御**。通过受管的出站机制为私有子网提供受控的出站访问，并使用加固的管理访问模式。",
+      "Url": "https://hub.prowler.com/check/vpc_subnet_separate_private_public"
+    }
+  },
+  "Categories": [
+    "trust-boundaries"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

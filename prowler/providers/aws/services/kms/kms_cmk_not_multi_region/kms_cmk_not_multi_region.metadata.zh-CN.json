@@ -1,0 +1,40 @@
+{
+  "Provider": "aws",
+  "CheckID": "kms_cmk_not_multi_region",
+  "CheckTitle": "AWS KMS 客户管理密钥是单区域的",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践",
+    "软件和配置检查/行业和法规标准/AWS 基础安全最佳实践"
+  ],
+  "ServiceName": "kms",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsKmsKey",
+  "ResourceGroup": "security",
+  "Description": "**AWS KMS 客户管理密钥**在`启用`状态下会被评估`多区域`设置。该发现突出显示了启用了`多区域`属性的密钥。",
+  "Risk": "跨区域共享密钥材料允许一个区域的访问解密来自另一个区域的数据，削弱了**机密性**和**数据驻留**。配置错误的策略或副本中的较弱控制会扩大影响范围。对于签名/HMAC 密钥，妥协会导致跨区域签名伪造，影响**完整性**和**可审计性**。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/kms/latest/developerguide/multi-region-keys-overview.html#multi-region-concepts",
+    "https://docs.aws.amazon.com/kms/latest/developerguide/mrk-when-to-use.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation：创建单区域 KMS 密钥\nResources:\n  ExampleKmsKey:\n    Type: AWS::KMS::Key\n    Properties:\n      MultiRegion: false  # 关键：确保密钥是单区域的以通过检查\n      KeyPolicy:          # 创建密钥所需的最小策略\n        Version: '2012-10-17'\n        Statement:\n          - Effect: Allow\n            Principal:\n              AWS: !Sub arn:aws:iam::${AWS::AccountId}:root\n            Action: 'kms:*'\n            Resource: '*'\n```",
+      "Other": "1. 在 AWS 控制台中，转到密钥管理服务 (KMS) > 客户管理密钥\n2. 识别显示多区域：是的密钥（这些未通过检查）\n3. 点击创建密钥并确保未选择多区域（单区域）\n4. 更新您的服务/别名以使用新的单区域密钥\n5. 在需要的地方重新加密或旋转数据到新密钥\n6. 迁移后，禁用旧的多区域密钥并安排其删除",
+      "Terraform": "```hcl\n# Terraform：创建单区域 KMS 密钥\nresource \"aws_kms_key\" \"example\" {\n  multi_region = false  # 关键：创建单区域密钥以通过检查\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "默认情况下优先使用**单区域密钥**；仅在有记录需求时使用**多区域**。应用**最小权限**和**职责分离**；限制谁可以创建或复制此类密钥。按区域/租户/工作负载隔离，在各区域标准化策略和日志记录，并在不必要时淘汰多区域密钥。",
+      "Url": "https://hub.prowler.com/check/kms_cmk_not_multi_region"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "多区域密钥应仅在绝对必要时使用，例如用于跨区域灾难恢复，并应通过严格的访问控制进行仔细管理。"
+}

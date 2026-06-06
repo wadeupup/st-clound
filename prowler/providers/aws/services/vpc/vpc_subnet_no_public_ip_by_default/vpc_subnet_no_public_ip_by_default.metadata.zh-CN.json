@@ -1,0 +1,39 @@
+{
+  "Provider": "aws",
+  "CheckID": "vpc_subnet_no_public_ip_by_default",
+  "CheckTitle": "默认情况下，VPC 子网不会分配公有 IP 地址",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践/网络可达性",
+    "软件和配置检查/行业和监管标准/AWS 基础安全最佳实践"
+  ],
+  "ServiceName": "vpc",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsEc2Subnet",
+  "ResourceGroup": "network",
+  "Description": "将 `MapPublicIpOnLaunch` 设置为 `true` 的 **VPC 子网** 会在实例启动时自动分配一个公有 IPv4 地址。\n\n这会识别出已配置为默认分配公有 IP 的子网。",
+  "Risk": "**暴露在互联网上的实例**默认会变得可访问，从而使端口扫描、SSH/RDP 暴力破解和漏洞利用尝试成为可能。成功访问可能导致数据外泄（**机密性**）、未经授权的更改（**完整性**），以及通过滥用或 DDoS 造成的中断（**可用性**）。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/config/latest/developerguide/subnet-auto-assign-public-ip-disabled.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws ec2 modify-subnet-attribute --subnet-id <SUBNET_ID> --no-map-public-ip-on-launch",
+      "NativeIaC": "```yaml\n# CloudFormation：禁用自动分配公有 IP 的子网\nResources:\n  ExampleSubnet:\n    Type: AWS::EC2::Subnet\n    Properties:\n      VpcId: <example_resource_id>\n      CidrBlock: 10.0.1.0/24\n      MapPublicIpOnLaunch: false  # 关键：在实例启动时禁用自动分配公共 IPv4】【。\n```",
+      "Other": "1. 打开 AWS 控制台并进入 VPC\n2. 点击 Subnets 并选择目标子网\n3. 选择 Actions > Edit subnet settings（或 Modify auto-assign IP settings）\n4. 取消选中 Enable auto-assign public IPv4 address\n5. 保存更改",
+      "Terraform": "```hcl\n# 子网已禁用公共 IP 自动分配\nresource \"aws_subnet\" \"example\" {\n  vpc_id     = \"<example_resource_id>\"\n  cidr_block = \"10.0.1.0/24\"\n\n  map_public_ip_on_launch = false  # 严重：默认情况下会阻止分配公共 IP 地址\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "禁用子网自动分配，以强制执行**最小权限暴露**。将工作负载放置在**私有子网**中，使用受控出口（NAT 或私有端点），并优先使用堡垒机或 SSM 进行管理。\n\n*当必须进行公共访问时*，显式分配 IP，并使用严格的安全组和路由进行限制，以实现**纵深防御**。",
+      "Url": "https://hub.prowler.com/check/vpc_subnet_no_public_ip_by_default"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

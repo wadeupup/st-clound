@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "network_watcher_enabled",
+  "CheckTitle": "确保 Azure 订阅中所有位置的 Network Watcher 均为“Enabled”",
+  "CheckType": [],
+  "ServiceName": "network",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Network",
+  "ResourceGroup": "network",
+  "Description": "为 Azure 订阅启用 Network Watcher。",
+  "Risk": "Network Watcher 提供的网络诊断与可视化工具可帮助用户理解、诊断并洞察 Azure 网络。",
+  "RelatedUrl": "https://docs.microsoft.com/en-us/azure/network-watcher/network-watcher-monitoring-overview",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity-staging/knowledge-base/azure/Network/enable-network-watcher.html",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "选择退出 Network Watcher 自动启用是永久性变更。退出后，如不联系支持将无法重新加入。",
+      "Url": "https://learn.microsoft.com/en-us/security/benchmark/azure/security-controls-v2-logging-threat-detection#lt-3-enable-logging-for-azure-network-activities"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "运行和存储网络数据会产生按交易计费的额外成本。对于高流量网络，这些费用会很快累积。"
+}

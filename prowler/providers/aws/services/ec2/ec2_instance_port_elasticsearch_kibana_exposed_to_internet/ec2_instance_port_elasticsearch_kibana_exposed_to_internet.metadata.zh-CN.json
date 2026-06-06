@@ -1,0 +1,36 @@
+{
+  "Provider": "aws",
+  "CheckID": "ec2_instance_port_elasticsearch_kibana_exposed_to_internet",
+  "CheckTitle": "确保没有 EC2 实例允许从互联网入站访问 Elasticsearch 和 Kibana 端口（TCP 9200、9300、5601）",
+  "CheckType": [
+    "Infrastructure Security"
+  ],
+  "ServiceName": "ec2",
+  "SubServiceName": "instance",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "critical",
+  "ResourceType": "AwsEc2Instance",
+  "ResourceGroup": "compute",
+  "Description": "确保没有 EC2 实例允许从互联网入站访问 Elasticsearch 和 Kibana 端口（TCP 9200、9300、5601）",
+  "Risk": "Elasticsearch 和 Kibana 通常用于日志和数据分析。允许从互联网入站访问这些端口可能会将敏感数据暴露给未经授权的用户。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "修改安全组以删除允许从互联网入站访问 TCP 端口 9200、9300、5601 的规则。",
+      "Url": "https://docs.aws.amazon.com/vpc/latest/userguide/VPC_SecurityGroups.html"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

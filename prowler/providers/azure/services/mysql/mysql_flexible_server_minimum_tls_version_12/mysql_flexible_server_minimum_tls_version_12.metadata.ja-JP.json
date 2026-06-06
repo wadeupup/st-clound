@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "mysql_flexible_server_minimum_tls_version_12",
+  "CheckTitle": "MySQL flexible Database Server の 'TLS Version' が 'TLSV1.2' に設定されていることを確認する",
+  "CheckType": [],
+  "ServiceName": "mysql",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Microsoft.DBforMySQL/flexibleServers",
+  "ResourceGroup": "database",
+  "Description": "MySQL flexible サーバーの TLS バージョンが既定値に設定されていることを確認します。",
+  "Risk": "TLS 接続は、Transport Layer Security（TLS）を使用してデータベース サーバーとクライアント アプリケーションを接続することで、新たなセキュリティ層を提供します。データベース サーバーとクライアント アプリケーション間の TLS 接続を強制することで、サーバーとアプリケーション間のデータ ストリームが暗号化され、「中間者攻撃」への対策に役立ちます。",
+  "RelatedUrl": "https://docs.microsoft.com/en-us/azure/mysql/concepts-ssl-connection-security",
+  "Remediation": {
+    "Code": {
+      "CLI": "az mysql flexible-server parameter set --name tls_version --resource-group <resourceGroupName> --server-name <serverName> --value TLSV1.2",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/MySQL/mysql-flexible-server-tls-version.html",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-general-policies/ensure-mysql-is-using-the-latest-version-of-tls-encryption#terraform"
+    },
+    "Recommendation": {
+      "Text": "1. https://portal.azure.com で Azure Portal にログインします。2. Azure Database for MySQL flexible servers に移動します。3. 各データベースで、Settings 配下の Server parameters をクリックします。4. 検索ボックスに tls_version と入力します。5. VALUE のドロップダウンをクリックし、tls_version で TLSV1.2 のみが選択されていることを確認します。",
+      "Url": "https://docs.microsoft.com/en-us/azure/mysql/howto-configure-ssl"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

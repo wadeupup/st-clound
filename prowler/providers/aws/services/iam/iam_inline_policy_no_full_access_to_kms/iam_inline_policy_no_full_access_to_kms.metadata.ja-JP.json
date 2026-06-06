@@ -1,0 +1,33 @@
+{
+  "Provider": "aws",
+  "CheckID": "iam_inline_policy_no_full_access_to_kms",
+  "CheckTitle": "完全な \"kms:*\" 権限を許可する IAM インラインポリシーが作成されていないことを確認する",
+  "CheckType": [
+    "Software and Configuration Checks"
+  ],
+  "ServiceName": "iam",
+  "SubServiceName": "inline_policy",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "medium",
+  "ResourceType": "AwsIamPolicy",
+  "ResourceGroup": "IAM",
+  "Description": "完全な \"kms:*\" 権限を許可する IAM インラインポリシーが作成されていないことを確認する",
+  "Risk": "KMS は重要なサービスであり、このサービスに対する IAM ポリシーは特に最小権限モデルに従う必要があります",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "最初から過度に緩い権限を付与して後で絞るより、最小限の権限セットから開始し、必要に応じて追加する方が安全です。ポリシーを一覧化し、業務実行に必要な最小権限になっているかを分析してください。",
+      "Url": "http://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

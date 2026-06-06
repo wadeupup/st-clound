@@ -1,0 +1,33 @@
+{
+  "Provider": "azure",
+  "CheckID": "storage_ensure_private_endpoints_in_storage_accounts",
+  "CheckTitle": "Storage Accounts へのアクセスに Private Endpoints が使用されていることを確認する",
+  "CheckType": [],
+  "ServiceName": "storage",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AzureStorageAccount",
+  "ResourceGroup": "storage",
+  "Description": "Azure Storage accounts に private endpoints を使用し、クライアントとサービスが暗号化された Private Link 経由でネットワーク越しにデータへ安全にアクセスできるようにします。private endpoint は各サービスに対して VNet の IP アドレスを使用します。異なるサービス間のネットワーク トラフィックは VNet 上で暗号化されて安全に転送されます。この VNet はアドレス空間をリンクしてネットワークを拡張し、その上のリソースにアクセスすることもできます。同様に、パブリック ネットワークをトンネルとしてリモート インフラを接続することも可能です。ネットワーク トラフィックをセグメント化し、外部からのアクセスを防ぐことで、さらなるセキュリティが得られます。",
+  "Risk": "Private Endpoints を使用するよう構成されていないストレージ アカウントは、パブリック インターネット経由でアクセス可能です。これによりデータの持ち出しやその他のセキュリティ問題につながる可能性があります。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/storage/common/storage-private-endpoints",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity-staging/knowledge-base/azure/StorageAccounts/private-endpoints.html#",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "Storage Accounts へのアクセスに Private Endpoints を使用します",
+      "Url": "https://docs.microsoft.com/en-us/azure/storage/common/storage-private-endpoints"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

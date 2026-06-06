@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "elbv2_internet_facing",
+  "CheckTitle": "Application Load Balancer がパブリックアクセス可能でないこと（0.0.0.0/0 または ::/0 からの TCP 受信なし）",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices/Network Reachability",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/CIS AWS Foundations Benchmark",
+    "TTPs/Initial Access"
+  ],
+  "ServiceName": "elbv2",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsElbv2LoadBalancer",
+  "ResourceGroup": "network",
+  "Description": "`internet-facing` として構成された **ELBv2 Application Load Balancer** について、関連付けられた **security groups** を確認して露出状態を評価します。\n\n`0.0.0.0/0` または `::/0` を許可する TCP 受信ルールは、インターネットから無制限に到達可能であることを示します。",
+  "Risk": "**無制限の ALB アクセス** は、あらゆるクライアントが公開エンドポイントへ到達できる状態を生み、**クレデンシャルスタッフィング**、自動スキャン、**Web 攻撃** を可能にします。\n\n影響：\n- 機密性：データ流出\n- 完全性：不正変更\n- 可用性：攻撃面拡大と **DoS** リスク増大",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/waf/latest/developerguide/web-acl-associating-aws-resource.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/ELBv2/internet-facing-load-balancers.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation Security Group for ALB with no public (0.0.0.0/0 or ::/0) TCP ingress\nResources:\n  <example_resource_name>:\n    Type: AWS::EC2::SecurityGroup\n    Properties:\n      GroupDescription: ALB SG restricted ingress\n      VpcId: \"<example_resource_id>\"\n      SecurityGroupIngress:\n        - IpProtocol: tcp\n          FromPort: 80\n          ToPort: 80\n          CidrIp: 10.0.0.0/8  # Critical: restricts inbound to private CIDR, preventing public access\n```",
+      "Other": "1. AWS コンソールで EC2 > Load Balancers に移動し、ALB を選択します\n2. Description タブで関連付けられた Security Group を確認して開きます\n3. Edit inbound rules をクリックします\n4. Source が 0.0.0.0/0 または ::/0 の TCP ルールを削除します\n5. 必要な場合は、特定のプライベート CIDR または信頼済み security groups のみ追加します\n6. Save rules をクリックします",
+      "Terraform": "```hcl\n# Security Group for ALB with no public (0.0.0.0/0 or ::/0) TCP ingress\nresource \"aws_security_group\" \"<example_resource_name>\" {\n  name   = \"alb-restricted-sg\"\n  vpc_id = \"<example_resource_id>\"\n\n  ingress {\n    from_port   = 80\n    to_port     = 80\n    protocol    = \"tcp\"\n    cidr_blocks = [\"10.0.0.0/8\"] # Critical: restricts inbound to private CIDR, preventing public access\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "security groups には **最小権限** を適用し、`0.0.0.0/0` を避け、信頼済み CIDR または上流サービスのみ許可してください。\n\n非公開アプリには `internal` ロードバランサーを使用します。\n\n公開エンドポイントには **WAF** ルール、厳格な TLS、レート制限を重ね、**CloudFront/Shield** の利用も検討して多層防御と直接露出の低減を図ってください。",
+      "Url": "https://hub.prowler.com/check/elbv2_internet_facing"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

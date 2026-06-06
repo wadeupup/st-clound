@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "redshift_cluster_encrypted_at_rest",
+  "CheckTitle": "Redshift クラスターは保存時に暗号化されています",
+  "CheckType": [
+    "ソフトウェアと構成のチェック/AWS セキュリティベストプラクティス",
+    "ソフトウェアと構成のチェック/業界および規制基準/AWS 基礎セキュリティベストプラクティス",
+    "ソフトウェアと構成のチェック/業界および規制基準/CIS AWS Foundations Benchmark",
+    "影響/データの露出"
+  ],
+  "ServiceName": "redshift",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "critical",
+  "ResourceType": "AwsRedshiftCluster",
+  "ResourceGroup": "analytics",
+  "Description": "**Amazon Redshift クラスター**は**保存時の暗号化**を使用します。評価は、ディスク上のデータとスナップショットが管理キーで保護されているかどうかを判断するためにクラスターの暗号化設定を検査します。",
+  "Risk": "**保存時の暗号化**がない場合、ストレージメディアやバックアップに不正アクセスされると、データブロックやスナップショットが読み取られる可能性があります。これにより**機密性**が損なわれ、大量の**データ流出**や機密分析の露出が可能になり、さらなる侵害を引き起こす可能性があります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/redshift/latest/mgmt/changing-cluster-encryption.html",
+    "https://docs.aws.amazon.com/redshift/latest/mgmt/working-with-db-encryption.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/redshift-controls.html#redshift-10"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws redshift modify-cluster --cluster-identifier <cluster-id> --encrypted",
+      "NativeIaC": "```yaml\n# CloudFormation: Redshift クラスターの保存時暗号化を有効にする\nResources:\n  <example_resource_name>:\n    Type: AWS::Redshift::Cluster\n    Properties:\n      ClusterIdentifier: \"<example_resource_id>\"\n      DBName: \"<DB_NAME>\"\n      MasterUsername: \"<MASTER_USERNAME>\"\n      MasterUserPassword: \"<MASTER_PASSWORD>\"\n      NodeType: \"<NODE_TYPE>\"\n      ClusterType: \"<CLUSTER_TYPE>\"\n      Encrypted: true  # 重要: チェックを通過するために保存時の暗号化を有効にします\n```",
+      "Other": "1. AWS マネジメントコンソールを開き、Amazon Redshift に移動します\n2. クラスターを選択し、クラスターを選択します\n3. プロパティタブを開く > データベース構成 > 編集 > 暗号化を編集\n4. 暗号化を有効にする（AWS 管理キーまたは特定の KMS キーを使用）を選択\n5. 変更を保存をクリック",
+      "Terraform": "```hcl\n# Terraform: Redshift クラスターの保存時暗号化を有効にする\nresource \"aws_redshift_cluster\" \"<example_resource_name>\" {\n  cluster_identifier = \"<example_resource_id>\"\n  node_type          = \"<NODE_TYPE>\"\n  cluster_type       = \"<CLUSTER_TYPE>\"\n  master_username    = \"<MASTER_USERNAME>\"\n  master_password    = \"<MASTER_PASSWORD>\"\n\n  encrypted = true  # 重要: チェックを通過するために保存時の暗号化を有効にします\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "すべてのクラスターに対して**保存時の暗号化**を有効にし、制御と監査のために**顧客管理キー**（`CMEK`）を優先します。キーの使用に**最小特権**を適用し、キーを回転させ、スナップショットのアクセスとリージョン間コピーを制限します。**多層防御**の一環としてキーの健全性とアクセスイベントを監視します。",
+      "Url": "https://hub.prowler.com/check/redshift_cluster_encrypted_at_rest"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

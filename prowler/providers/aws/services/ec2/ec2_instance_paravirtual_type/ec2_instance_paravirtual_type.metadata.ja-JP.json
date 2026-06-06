@@ -1,0 +1,32 @@
+{
+  "Provider": "aws",
+  "CheckID": "ec2_instance_paravirtual_type",
+  "CheckTitle": "Amazon EC2 パラバーチャル仮想化タイプは使用すべきではない",
+  "CheckType": [],
+  "ServiceName": "ec2",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "medium",
+  "ResourceType": "AwsEc2Instance",
+  "ResourceGroup": "compute",
+  "Description": "EC2 インスタンスの仮想化タイプがパラバーチャルでないことを確認します。EC2 インスタンスの virtualizationType が paravirtual に設定されている場合、コントロールは失敗します。",
+  "Risk": "パラバーチャルインスタンスを使用すると、ハードウェア仮想マシン (HVM) インスタンスが提供するパフォーマンスとセキュリティの利点（改善された CPU、ネットワーク、ストレージ効率など）が制限される可能性があります。",
+  "RelatedUrl": "https://docs.aws.amazon.com/config/latest/developerguide/ec2-paravirtual-instance-check.html",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://docs.aws.amazon.com/securityhub/latest/userguide/ec2-controls.html#ec2-24",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "EC2 インスタンスを新しいインスタンスタイプに更新するには、Amazon EC2 ユーザーガイドのインスタンスタイプの変更を参照してください。",
+      "Url": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-resize.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

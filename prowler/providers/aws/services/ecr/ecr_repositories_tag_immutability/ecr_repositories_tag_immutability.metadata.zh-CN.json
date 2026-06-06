@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "ecr_repositories_tag_immutability",
+  "CheckTitle": "ECR 存储库已启用镜像标签不可变性",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices"
+  ],
+  "ServiceName": "ecr",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsEcrRepository",
+  "ResourceGroup": "container",
+  "Description": "评估 Amazon ECR 存储库的 **镜像标签不可变性**。识别允许标签更新（`MUTABLE`）的存储库；识别强制执行不可变标签（例如 `IMMUTABLE`）的存储库。",
+  "Risk": "可变标签允许替换受信任标签后面的镜像，从而破坏发布 **完整性**。这可能导致供应链注入、意外部署和后门部署，损害 **可用性**。恶意镜像可能窃取数据，影响 **机密性**。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/config/latest/developerguide/ecr-private-tag-immutability-enabled.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/ecr-controls.html#ecr-2",
+    "https://docs.aws.amazon.com/AmazonECR/latest/userguide/image-tag-mutability.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws ecr put-image-tag-mutability --repository-name <repository-name> --image-tag-mutability IMMUTABLE",
+      "NativeIaC": "```yaml\nResources:\n  <example_resource_name>:\n    Type: AWS::ECR::Repository\n    Properties:\n      ImageTagMutability: IMMUTABLE  # Critical: enables tag immutability to prevent tag overwrites\n```",
+      "Other": "1. 打开 Amazon ECR 控制台\n2. 转到存储库（私有）并选择存储库\n3. 点击操作 > 编辑\n4. 将镜像标签不可变性设置为不可变\n5. 点击保存",
+      "Terraform": "```hcl\nresource \"aws_ecr_repository\" \"<example_resource_name>\" {\n  name                 = \"<example_resource_name>\"\n  image_tag_mutability = \"IMMUTABLE\" # Critical: enables tag immutability to prevent tag overwrites\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "启用 **标签不可变性**，以便标签映射到单个工件。每次构建使用 **版本化标签**，在 CI/CD 中阻止重新标记，并对推送操作应用 **最小权限**。分层使用 **镜像签名** 和准入控制，仅运行受信任的镜像。*如果需要例外，请保持其范围狭窄并受到监控。*",
+      "Url": "https://hub.prowler.com/check/ecr_repositories_tag_immutability"
+    }
+  },
+  "Categories": [
+    "container-security"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

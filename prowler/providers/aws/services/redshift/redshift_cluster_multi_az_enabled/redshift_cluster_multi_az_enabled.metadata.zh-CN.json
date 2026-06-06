@@ -1,0 +1,39 @@
+{
+  "Provider": "aws",
+  "CheckID": "redshift_cluster_multi_az_enabled",
+  "CheckTitle": "Redshift 集群已启用 Multi-AZ",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践"
+  ],
+  "ServiceName": "redshift",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsRedshiftCluster",
+  "ResourceGroup": "analytics",
+  "Description": "**Amazon Redshift 集群**在配置的 `RA3` 集群上评估**Multi-AZ 部署**，确认计算跨越两个可用区并通过单个端点提供服务。",
+  "Risk": "如果没有 **Multi-AZ**，单一可用区集群容易受到可用区或节点故障的影响，导致连接中断、查询中止和 ETL/BI 作业停滞。这会降低**可用性**，增加 RTO，延迟分析，并且由于级联管道积压而有违反 SLA 的风险。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/redshift/latest/mgmt/managing-cluster-multi-az.html",
+    "https://docs.aws.amazon.com/redshift/latest/mgmt/overview-multi-az.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws redshift modify-cluster --cluster-identifier <cluster-id> --multi-az",
+      "NativeIaC": "```yaml\n# CloudFormation：在 Redshift 集群上启用 Multi-AZ\nResources:\n  <example_resource_name>:\n    Type: AWS::Redshift::Cluster\n    Properties:\n      ClusterIdentifier: <example_resource_id>\n      MultiAZ: true  # 关键：启用 Multi-AZ 以通过检查\n```",
+      "Other": "1. 在 Amazon Redshift 控制台中，转到集群\n2. 选择目标集群\n3. 选择操作 > 激活 Multi-AZ\n4. 确认并等待集群显示 Multi-AZ: 是",
+      "Terraform": "```hcl\n# 在 Redshift 集群上启用 Multi-AZ\nresource \"aws_redshift_cluster\" \"<example_resource_name>\" {\n  cluster_identifier = \"<example_resource_id>\"\n  multi_az           = true  # 关键：启用 Multi-AZ 以通过检查\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "为配置的 `RA3` 集群启用 **Multi-AZ 部署**以避免单一可用区依赖。设计应符合**容错**和**高可用性**：提供足够的容量，实施客户端/ETL 重试和重新连接，定期验证故障转移，并监控性能和错误率。",
+      "Url": "https://hub.prowler.com/check/redshift_cluster_multi_az_enabled"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

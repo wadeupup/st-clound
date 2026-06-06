@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "eks_cluster_deletion_protection_enabled",
+  "CheckTitle": "EKS 集群已启用删除保护",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Effects/Data Destruction"
+  ],
+  "ServiceName": "eks",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsEksCluster",
+  "ResourceGroup": "container",
+  "Description": "**Amazon EKS 集群**已启用**删除保护**，阻止集群删除，直到明确禁用保护。",
+  "Risk": "如果没有**删除保护**，自动化错误或受入侵的管理员可以删除集群控制平面，导致立即的**可用性**损失和停机。破坏性操作还会影响部署的**完整性**，留下孤立资源，阻碍恢复，并增加**运营成本**。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/eks/latest/APIReference/API_UpdateClusterConfig.html",
+    "https://docs.aws.amazon.com/eks/latest/userguide/deletion-protection.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws eks update-cluster-config --name <cluster_name> --region <region_name> --deletion-protection",
+      "NativeIaC": "```yaml\n# CloudFormation: enable deletion protection on the EKS cluster\nResources:\n  <example_resource_name>:\n    Type: AWS::EKS::Cluster\n    Properties:\n      RoleArn: <example_role_arn>\n      ResourcesVpcConfig:\n        SubnetIds: [<example_subnet_id_1>, <example_subnet_id_2>]\n      DeletionProtection: true  # critical: prevents cluster deletion until disabled\n```",
+      "Other": "1. 打开 AWS 管理控制台并转到 Amazon EKS\n2. 选择您的集群\n3. 转到配置选项卡并点击编辑\n4. 启用删除保护\n5. 点击保存更改",
+      "Terraform": "```hcl\n# Enable deletion protection for the EKS cluster\nresource \"aws_eks_cluster\" \"<example_resource_name>\" {\n  name     = \"<example_resource_name>\"\n  role_arn = \"<example_role_arn>\"\n\n  vpc_config {\n    subnet_ids = [\"<subnet_id_1>\", \"<subnet_id_2>\"]\n  }\n\n  deletion_protection = true  # critical: prevents cluster deletion until disabled\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "在关键集群上启用**删除保护**（`deletionProtection=true`）。强制执行**最小权限**，使只有范围狭窄的角色才能禁用或删除集群。要求**变更控制**（需要审批）和**职责分离**，并应用防护措施以防止广泛的删除权限。",
+      "Url": "https://hub.prowler.com/check/eks_cluster_deletion_protection_enabled"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

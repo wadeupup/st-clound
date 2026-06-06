@@ -1,0 +1,44 @@
+{
+  "Provider": "aws",
+  "CheckID": "cloudwatch_log_metric_filter_security_group_changes",
+  "CheckTitle": "セキュリティグループ変更に対する CloudWatch Logs メトリクスフィルターとアラームが存在すること",
+  "CheckType": [
+    "Software and Configuration Checks/Industry and Regulatory Standards/CIS AWS Foundations Benchmark",
+    "Software and Configuration Checks/AWS Security Best Practices/Runtime Behavior Analysis"
+  ],
+  "ServiceName": "cloudwatch",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsCloudWatchAlarm",
+  "ResourceGroup": "monitoring",
+  "Description": "**セキュリティグループの設定変更**に関する **CloudTrail** イベントが、関連付けられた **CloudWatch Logs メトリクスフィルター**と **アラーム**を用いて監視されます。フィルターは `AuthorizeSecurityGroupIngress/Egress`、`RevokeSecurityGroupIngress/Egress`、`CreateSecurityGroup`、`DeleteSecurityGroup` などのアクションを対象として、あらゆるセキュリティグループの変更を検知します。",
+  "Risk": "**セキュリティグループ変更** に対するアラートがない場合、許可されていない、または誤ったルールによってサービスがインターネットに公開され、ブルートフォース攻撃や横移動を許すおそれがあります（**機密性・完全性**への影響）。セキュリティグループの削除や過度な制限は通信断を引き起こす可能性があり（**可用性**）、検知が遅れるほど攻撃者の滞在時間と影響度が大きくなります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudwatch-alarms-for-cloudtrail.html",
+    "https://support.icompaas.com/support/solutions/articles/62000084030-ensure-a-log-metric-filter-and-alarm-exist-for-security-group-changes",
+    "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/Alarm-On-Logs.html",
+    "https://asecure.cloud/a/cwalarm_securitygroup_changes/"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation：セキュリティグループ変更用のメトリクスフィルターとアラームを作成\nResources:\n  MetricFilter:\n    Type: AWS::Logs::MetricFilter\n    Properties:\n      LogGroupName: <example_log_group_name>\n      # 重要：本チェックで要求されるセキュリティグループ変更イベントにマッチ\n      # CloudTrail ログにこれらのイベントが現れたときにメトリクスを発行\n      FilterPattern: '{ ($.eventName = AuthorizeSecurityGroupIngress) || ($.eventName = AuthorizeSecurityGroupEgress) || ($.eventName = RevokeSecurityGroupIngress) || ($.eventName = RevokeSecurityGroupEgress) || ($.eventName = CreateSecurityGroup) || ($.eventName = DeleteSecurityGroup) }'\n      MetricTransformations:\n        - MetricName: <example_metric_name>\n          MetricNamespace: <example_metric_namespace>\n          MetricValue: \"1\"\n\n  Alarm:\n    Type: AWS::CloudWatch::Alarm\n    Properties:\n      # 重要：要件を満たすために、このメトリクスに対してアラームを作成\n      MetricName: <example_metric_name>\n      Namespace: <example_metric_namespace>\n      Statistic: Sum\n      Period: 300\n      EvaluationPeriods: 1\n      Threshold: 1\n      ComparisonOperator: GreaterThanOrEqualToThreshold\n```",
+      "Other": "1. CloudWatch コンソールで Logs > Log groups を開き、CloudTrail ロググループを選択します\n2. 次のパターンでメトリクスフィルターを作成します：\n   { ($.eventName = AuthorizeSecurityGroupIngress) || ($.eventName = AuthorizeSecurityGroupEgress) || ($.eventName = RevokeSecurityGroupIngress) || ($.eventName = RevokeSecurityGroupEgress) || ($.eventName = CreateSecurityGroup) || ($.eventName = DeleteSecurityGroup) }\n3. メトリクスを割り当てます：name に <example_metric_name>、namespace に <example_metric_namespace>、value に 1 を設定してフィルターを作成します\n4. メトリクスフィルターから Create alarm を選択し、Statistic=Sum、Period=5 minutes、Threshold type=Static、Greater/Equal 1、Evaluation periods=1 を設定してアラームを作成します",
+      "Terraform": "```hcl\n# セキュリティグループ変更用メトリクスフィルター\nresource \"aws_cloudwatch_log_metric_filter\" \"sg\" {\n  name           = \"<example_resource_name>\"\n  log_group_name = \"<example_log_group_name>\"\n  # 重要：本チェックで要求されるセキュリティグループ変更イベントにマッチ\n  pattern = \"{ ($.eventName = AuthorizeSecurityGroupIngress) || ($.eventName = AuthorizeSecurityGroupEgress) || ($.eventName = RevokeSecurityGroupIngress) || ($.eventName = RevokeSecurityGroupEgress) || ($.eventName = CreateSecurityGroup) || ($.eventName = DeleteSecurityGroup) }\"\n\n  metric_transformation {\n    name      = \"<example_metric_name>\"\n    namespace = \"<example_metric_namespace>\"\n    value     = \"1\"\n  }\n}\n\n# 上記メトリクスに対するアラーム\nresource \"aws_cloudwatch_metric_alarm\" \"sg\" {\n  alarm_name          = \"<example_resource_name>\"\n  # 重要：このセキュリティグループ変更メトリクスに対してアラームを設定してコントロールを満たす\n  metric_name         = \"<example_metric_name>\"\n  namespace           = \"<example_metric_namespace>\"\n  statistic           = \"Sum\"\n  period              = 300\n  evaluation_periods  = 1\n  threshold           = 1\n  comparison_operator = \"GreaterThanOrEqualToThreshold\"\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "CloudTrail を CloudWatch に送信し、メトリクスフィルターとアラームを作成して担当者へ通知することで、**セキュリティグループ変更** に関するリアルタイムアラートを確立してください。\n- セキュリティグループ変更には**最小権限の原則**を適用する\n- 変更管理とタグ付けを活用する\n- ログを集中管理し、アラームをテストし、ランブックを整備する\n- NACL や WAF と組み合わせて **多層防御（Defense in Depth）** を実現する",
+      "Url": "https://hub.prowler.com/check/cloudwatch_log_metric_filter_security_group_changes"
+    }
+  },
+  "Categories": [
+    "logging"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "ロギングおよびモニタリング"
+}
+
+

@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "app_function_application_insights_enabled",
+  "CheckTitle": "Function App で Application Insights が構成されていることを確認する",
+  "CheckType": [],
+  "ServiceName": "app",
+  "SubServiceName": "function",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Microsoft.Web/sites",
+  "ResourceGroup": "serverless",
+  "Description": "Application Insights は、Azure Function App のパフォーマンスと健全性を監視するための強力なツールです。例外、パフォーマンス問題、利用パターンに関する有用な情報を提供し、問題の迅速な検出と解決を可能にします。",
+  "Risk": "Application Insights がない場合、Function App の重大なエラー、性能低下、異常動作を見逃す可能性があり、可用性やユーザー体験に影響を与えるおそれがあります。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/azure-monitor/app/app-insights-overview",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/Functions/function-app-insights-on.html",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "Azure Function App のパフォーマンスと健全性を監視するために、Application Insights を有効化してください。",
+      "Url": "https://learn.microsoft.com/en-us/azure/azure-monitor/app/monitor-functions"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

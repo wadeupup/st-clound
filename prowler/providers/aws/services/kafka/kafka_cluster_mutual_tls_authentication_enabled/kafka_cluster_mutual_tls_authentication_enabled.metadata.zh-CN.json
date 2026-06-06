@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "kafka_cluster_mutual_tls_authentication_enabled",
+  "CheckTitle": "Kafka 集群已启用 TLS 认证",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践",
+    "软件和配置检查/行业和法规标准/AWS 基础安全最佳实践",
+    "TTPs/初始访问"
+  ],
+  "ServiceName": "kafka",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsMskCluster",
+  "ResourceGroup": "messaging",
+  "Description": "Amazon MSK 集群在客户端到代理的连接上强制执行**客户端认证**。无服务器集群默认使用基于 TLS 的认证；预置集群必须显式启用**双向 TLS (mTLS)**。",
+  "Risk": "没有**mTLS**，攻击者可以冒充客户端或拦截会话，危及**机密性**和**完整性**。未经授权的生产者/消费者可以读取或更改主题、污染数据流并淹没代理，降低**可用性**并影响下游系统。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/MSK/enable-mutual-tls-authentication-for-kafka-clients.html",
+    "https://docs.aws.amazon.com/msk/latest/developerguide/msk-update-security.html",
+    "https://docs.aws.amazon.com/msk/latest/developerguide/msk-authentication.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws kafka update-security --cluster-arn <CLUSTER_ARN> --current-version <CURRENT_VERSION> --client-authentication 'Tls={CertificateAuthorityArnList=[\"<ACM_PCA_ARN>\"]}' --encryption-info 'EncryptionInTransit={ClientBroker=TLS}'",
+      "NativeIaC": "```yaml\n# CloudFormation：为 MSK 集群启用 mTLS\nResources:\n  <example_resource_name>:\n    Type: AWS::MSK::Cluster\n    Properties:\n      ClusterName: <example_resource_name>\n      KafkaVersion: <example_kafka_version>\n      NumberOfBrokerNodes: 2\n      BrokerNodeGroupInfo:\n        InstanceType: kafka.m5.large\n        ClientSubnets:\n          - <subnet_id_1>\n          - <subnet_id_2>\n      ClientAuthentication:\n        Tls:\n          CertificateAuthorityArnList:\n            - <acm_pca_arn>  # 关键：使用此私有 CA 启用双向 TLS\n      EncryptionInfo:\n        EncryptionInTransit:\n          ClientBroker: TLS  # 关键：启用 mTLS 时必需\n```",
+      "Other": "1. 在 AWS 控制台中，转到 Amazon MSK > 集群并选择预置集群（状态必须为 ACTIVE）\n2. 选择操作 > 更新安全性（或安全性 > 编辑）\n3. 在客户端认证下，启用 TLS 并添加您的 AWS 私有 CA ARN\n4. 在传输加密下，将客户端-代理设置为 TLS\n5. 保存/更新并等待更新完成",
+      "Terraform": "```hcl\n# Terraform：为 MSK 集群启用 mTLS\nresource \"aws_msk_cluster\" \"<example_resource_name>\" {\n  cluster_name           = \"<example_resource_name>\"\n  kafka_version          = \"<example_kafka_version>\"\n  number_of_broker_nodes = 2\n\n  broker_node_group_info {\n    instance_type  = \"kafka.m5.large\"\n    client_subnets = [\"<subnet_id_1>\", \"<subnet_id_2>\"]\n  }\n\n  client_authentication {\n    tls {\n      certificate_authority_arns = [\"<acm_pca_arn>\"]  # 关键：使用此私有 CA 启用双向 TLS\n    }\n  }\n\n  encryption_info {\n    encryption_in_transit {\n      client_broker = \"TLS\"  # 关键：启用 mTLS 时必需\n    }\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "为客户端-代理流量启用**双向 TLS**并禁用 `PLAINTEXT` 监听器。从具有轮换的托管 CA 发放短期客户端证书。使用 Kafka ACL 应用**最小权限**，限制网络访问到受信任的来源，并监控认证事件作为**深度防御**的一部分。",
+      "Url": "https://hub.prowler.com/check/kafka_cluster_mutual_tls_authentication_enabled"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

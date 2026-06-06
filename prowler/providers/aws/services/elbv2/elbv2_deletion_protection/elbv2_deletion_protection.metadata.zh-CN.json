@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "elbv2_deletion_protection",
+  "CheckTitle": "ELBv2 负载均衡器已启用删除保护",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Effects/Denial of Service"
+  ],
+  "ServiceName": "elbv2",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsElbv2LoadBalancer",
+  "ResourceGroup": "network",
+  "Description": "启用**删除保护**（`deletion_protection.enabled`）的 **ELBv2 负载均衡器**可抵御通过标准 API 的删除操作。\n\n该检查会判断每个负载均衡器是否启用了此属性。",
+  "Risk": "如果没有**删除保护**，用户或自动化流程可能删除负载均衡器，导致服务端点中断和路由失效，损害**可用性**。\n\n恶意或误操作删除会引发 **DoS**、扰乱蓝绿回滚，并增加事件恢复时间。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/elasticloadbalancing/latest/application/application-load-balancers.html#deletion-protection",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/ELBv2/deletion-protection.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws elbv2 modify-load-balancer-attributes --load-balancer-arn <lb_arn> --attributes Key=deletion_protection.enabled,Value=true",
+      "NativeIaC": "```yaml\nResources:\n  <example_resource_name>:\n    Type: AWS::ElasticLoadBalancingV2::LoadBalancer\n    Properties:\n      Subnets:\n        - <example_subnet_id_1>\n        - <example_subnet_id_2>\n      LoadBalancerAttributes:\n        - Key: deletion_protection.enabled  # Critical: enable deletion protection\n          Value: \"true\"                   # Ensures the LB cannot be deleted accidentally\n```",
+      "Other": "1. 在 AWS 控制台进入 EC2 > Load Balancers（位于 Load Balancing 下）\n2. 选择目标负载均衡器\n3. 打开 Attributes 标签并点击 Edit attributes\n4. 启用 Deletion protection\n5. 点击 Save changes",
+      "Terraform": "```hcl\nresource \"aws_lb\" \"<example_resource_name>\" {\n  subnets = [\"<example_subnet_id_1>\", \"<example_subnet_id_2>\"]\n\n  enable_deletion_protection = true # Critical: enables deletion protection to pass the check\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "为生产环境及其他关键负载均衡器启用**删除保护**。\n\n落实**最小权限**以限制删除操作；对受保护资产实施治理（标签和策略护栏）；并要求含审批的**变更控制**。*对于流水线*，增加校验以阻止删除受保护资源。",
+      "Url": "https://hub.prowler.com/check/elbv2_deletion_protection"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

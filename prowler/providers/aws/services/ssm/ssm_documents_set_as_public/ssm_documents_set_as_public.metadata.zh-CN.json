@@ -1,0 +1,40 @@
+{
+  "Provider": "aws",
+  "CheckID": "ssm_documents_set_as_public",
+  "CheckTitle": "SSM文档不是公开的，仅与受信任的AWS帐户共享",
+  "CheckType": [
+    "软件和配置检查/AWS安全最佳实践",
+    "影响/数据暴露"
+  ],
+  "ServiceName": "ssm",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsSsmPatchCompliance",
+  "ResourceGroup": "devops",
+  "Description": "**SSM文档**会针对**公共共享**（“所有”）以及与定义的受信任列表之外的AWS帐户的共享进行评估。保持私有或仅与受信任帐户共享的文档表示分发受限。",
+  "Risk": "公开或不受信任的共享会暴露文档内容，侵蚀脚本、参数和嵌入式秘密的**机密性**。对手可以研究运行手册来制定有针对性的攻击和重用逻辑，从而导致凭据泄漏和下游**完整性**和**可用性**影响。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/systems-manager/latest/userguide/ssm-before-you-share.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws ssm modify-document-permission --name <DOCUMENT_NAME> --permission-type Share --account-ids-to-remove all",
+      "NativeIaC": "",
+      "Other": "1.打开AWS系统管理器>文档\n2。选择文档>权限选项卡>编辑。选择“私人”（删除“公共”/“全部”）\n4。删除所有不受信任的AWS帐户ID\n5。保存",
+      "Terraform": "```hcl\nresource \"aws_ssm_document\" \"<example_resource_name>\" {\n  name          = \"<example_resource_name>\"\n  document_type = \"Command\"\n  content       = jsonencode({\n    schemaVersion = \"2.2\"\n    mainSteps     = []\n  })\n  # 严重：无权限阻止->文档保持私有（非公共/共享）\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "将**最小特权**应用于文档分发：\n-保持文档私有；仅与特定的受信任帐户ID共享\n-为文档启用帐户级阻止公共共享\n-从内容中删除机密；使用安全参数\n-限制谁可以共享或运行文档；需要审查和版本控制",
+      "Url": "https://hub.prowler.com/check/ssm_documents_set_as_public"
+    }
+  },
+  "Categories": [
+    "identity-access",
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

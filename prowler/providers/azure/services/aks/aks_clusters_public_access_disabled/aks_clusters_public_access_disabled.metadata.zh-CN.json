@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "aks_clusters_public_access_disabled",
+  "CheckTitle": "确保集群启用私有端点并禁用公共访问",
+  "CheckType": [],
+  "ServiceName": "aks",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Microsoft.ContainerService/ManagedClusters",
+  "ResourceGroup": "container",
+  "Description": "如果不需要，请禁用来自节点网络外部对 Kubernetes API 的访问。",
+  "Risk": "在私有集群中，主节点有两个端点：私有端点和公共端点。私有端点是主节点的内部 IP 地址，位于主节点虚拟网络中的内部负载均衡器之后。节点使用私有端点与主节点通信。公共端点允许从主节点虚拟网络外部访问 Kubernetes API。尽管 Kubernetes API 需要授权令牌才能执行敏感操作，但漏洞可能会导致 Kubernetes 公共暴露并出现不受限制的访问。此外，攻击者可能能够识别当前集群和 Kubernetes API 版本，并判断其是否易受攻击。除非确有需要，禁用公共端点将有助于防止此类威胁，并要求攻击者必须位于主节点虚拟网络中才能对 Kubernetes API 发起攻击。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/aks/private-clusters?tabs=azure-portal",
+  "Remediation": {
+    "Code": {
+      "CLI": "az aks update -n <cluster_name> -g <resource_group> --disable-public-fqdn",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "要使用私有端点，请先在虚拟网络中创建新的私有端点，然后在虚拟网络与新的私有 DNS 区域之间创建链接",
+      "Url": "https://learn.microsoft.com/en-us/azure/aks/access-private-cluster?tabs=azure-cli"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "wafv2_webacl_with_rules",
+  "CheckTitle": "AWS WAFv2 Web ACL 至少附加了一个规则或规则组",
+  "CheckType": [
+    "软件和配置检查/AWS安全最佳实践",
+    "软件和配置检查/行业和监管标准/AWS 基础安全最佳实践",
+    "软件和配置检查/行业和监管标准/NIST 800-53 控制措施"
+  ],
+  "ServiceName": "wafv2",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsWafv2WebAcl",
+  "ResourceGroup": "security",
+  "Description": "**AWS WAFv2 Web ACL** 会根据是否存在至少一个已配置的 **rule** 或 **rule group** 进行评估，这些 **rule** 或 **rule group** 定义了如何检查 HTTP(S) 请求并对其采取相应操作。",
+  "Risk": "如果没有规则，流量将仅受 web ACL `DefaultAction` 的控制，这通常会在不进行检查的情况下允许请求通过。这会增加对**机密性**（通过注入进行数据外泄）、**完整性**（XSS/参数篡改）和**可用性**（第 7 层 DDoS、机器人滥用）的风险。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/waf/latest/developerguide/web-acl-editing.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/waf-controls.html#waf-10",
+    "https://support.icompaas.com/support/solutions/articles/62000233642-ensure-aws-wafv2-webacl-has-at-least-one-rule-or-rule-group"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation：向 WAFv2 WebACL 添加至少一条规则\nResources:\n  <example_resource_name>:\n    Type: AWS::WAFv2::WebACL\n    Properties:\n      Scope: REGIONAL\n      DefaultAction:\n        Allow: {}\n      VisibilityConfig:\n        SampledRequestsEnabled: true\n        CloudWatchMetricsEnabled: true\n        MetricName: <example_resource_name>\n      Rules:  # 关键：在此处添加任何规则/规则组都会通过使 Web ACL 非空来修复该发现\n        - Name: <example_rule_name>\n          Priority: 0\n          Statement:\n            ManagedRuleGroupStatement:\n              VendorName: AWS\n              Name: AWSManagedRulesCommonRuleSet  # 使用 AWS 托管规则组\n          OverrideAction:\n            Count: {}  # 非阻塞，以尽量减少影响\n          VisibilityConfig:\n            SampledRequestsEnabled: true\n            CloudWatchMetricsEnabled: true\n            MetricName: <example_rule_name>\n```",
+      "Other": "1. 在 AWS 控制台中，前往 AWS WAF\n2. 打开 Web ACLs 并选择失败的 Web ACL\n3. 前往 Rules 选项卡并点击 Add rules\n4. 选择 Add managed rule group，选择 AWS > AWSManagedRulesCommonRuleSet\n5. 将操作设置为 Count（以避免阻止），然后点击 Add rule 并保存\n6. 验证 Web ACL 现在至少显示一条规则",
+      "Terraform": "```hcl\n# Terraform：确保 WAFv2 Web ACL 至少有一条规则\nresource \"aws_wafv2_web_acl\" \"<example_resource_name>\" {\n  name  = \"<example_resource_name>\"\n  scope = \"REGIONAL\"\n\n  default_action {\n    allow {}\n  }\n\n  visibility_config {\n    cloudwatch_metrics_enabled = true\n    metric_name                = \"<example_resource_name>\"\n    sampled_requests_enabled   = true\n  }\n\n  rule { # 关键：存在此规则会使 Web ACL 非空并通过检查\n    name     = \"<example_rule_name>\"\n    priority = 0\n    statement {\n      managed_rule_group_statement {\n        name        = \"AWSManagedRulesCommonRuleSet\"\n        vendor_name = \"AWS\"  # 最小托管规则组\n      }\n    }\n    override_action { count {} } # 非阻塞\n    visibility_config {\n      cloudwatch_metrics_enabled = true\n      metric_name                = \"<example_rule_name>\"\n      sampled_requests_enabled   = true\n    }\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "用有针对性的规则或托管规则组填充每个 Web ACL，以实施最小权限的 Web 访问：覆盖常见漏洞利用（SQLi/XSS）、IP 声誉和速率限制，并将其范围限定到你的应用。使用保守的 `DefaultAction`，监控指标/日志，并持续调优——以支持**纵深防御**和**零信任**。",
+      "Url": "https://hub.prowler.com/check/wafv2_webacl_with_rules"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

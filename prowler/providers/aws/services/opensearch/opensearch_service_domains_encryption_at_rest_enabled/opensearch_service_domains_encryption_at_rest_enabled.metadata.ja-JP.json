@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "opensearch_service_domains_encryption_at_rest_enabled",
+  "CheckTitle": "Amazon OpenSearch Service ドメインは、保存時の暗号化が有効になっています",
+  "CheckType": [
+    "ソフトウェアと構成のチェック/AWS セキュリティベストプラクティス",
+    "ソフトウェアと構成のチェック/業界および規制基準/AWS 基礎セキュリティベストプラクティス",
+    "影響/データの露出"
+  ],
+  "ServiceName": "opensearch",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "critical",
+  "ResourceType": "AwsOpenSearchServiceDomain",
+  "ResourceGroup": "database",
+  "Description": "**Amazon OpenSearch Service ドメイン**は、保存されたデータ（インデックス、スワップファイル、自動スナップショットを含む）全体にわたって、AWS KMS（`AES-256`）を使用して`保存時の暗号化`が評価されます。",
+  "Risk": "**暗号化されていない OpenSearch データ**は、攻撃者が**ディスクレベルのアクセス**を得たり、**自動スナップショット**を盗んだり、ホストを侵害した場合に読み取られたりコピーされたりする可能性があります。これにより、**機密性**が危険にさらされ、保存されたインデックスの改ざんが可能になり、**整合性**に影響を与えます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/encryption-at-rest.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/Elasticsearch/encryption-at-rest.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws opensearch update-domain-config --domain-name <DOMAIN_NAME> --encryption-at-rest-options Enabled=true",
+      "NativeIaC": "```yaml\n# CloudFormation: OpenSearch ドメインの保存時の暗号化を有効にする\nResources:\n  <example_resource_name>:\n    Type: AWS::OpenSearchService::Domain\n    Properties:\n      DomainName: <example_resource_name>\n      EncryptionAtRestOptions:\n        Enabled: true  # 重要: ドメインの保存時の暗号化を有効にします\n```",
+      "Other": "1. AWS コンソールで、OpenSearch Service > ドメインに移動し、ドメインを選択します\n2. アクション > セキュリティ設定の編集をクリックします\n3. 暗号化の下で、保存データの暗号化を有効にするをチェックします\n4. デフォルトの AWS 所有キーを保持する（必要に応じて KMS キーを選択）\n5. 変更を保存をクリックします\n",
+      "Terraform": "```hcl\n# Terraform: OpenSearch ドメインの保存時の暗号化を有効にする\nresource \"aws_opensearch_domain\" \"<example_resource_name>\" {\n  domain_name = \"<example_resource_name>\"\n\n  encrypt_at_rest {\n    enabled = true  # 重要: ドメインの保存時の暗号化を有効にします\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "AWS KMS を使用して`保存時の暗号化`を有効にし、可能であれば**顧客管理キー**を使用します。\n- **最小特権**キー ポリシーを強制し、付与を制限します\n- 自動キー回転を有効にし、KMS の使用を監視します\n- ログおよびエクスポートされたスナップショットを暗号化します\n- ネットワークおよび IAM コントロールで**多層防御**を適用します",
+      "Url": "https://hub.prowler.com/check/opensearch_service_domains_encryption_at_rest_enabled"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

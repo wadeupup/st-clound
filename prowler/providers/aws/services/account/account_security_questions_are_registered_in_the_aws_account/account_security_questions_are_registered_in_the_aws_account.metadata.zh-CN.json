@@ -1,0 +1,38 @@
+{
+  "Provider": "aws",
+  "CheckID": "account_security_questions_are_registered_in_the_aws_account",
+  "CheckTitle": "[已弃用] AWS 根用户已配置安全挑战问题",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践"
+  ],
+  "ServiceName": "account",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "governance",
+  "Description": "[已弃用] **AWS 账户根用户**配置可能包括用于支持身份验证的传统**安全挑战问题**。此检查评估账户上是否设置了这些问题。*新配置已被 AWS 停止，此功能的剩余支持是有限期的。*",
+  "Risk": "缺少这些问题可能会限制在根凭据或 MFA 丢失时的支持辅助恢复，降低**可用性**并减慢**事件响应**。依赖基于知识的身份验证（KBA）也会因**社会工程**而削弱**机密性**。将此视为恢复缺口，并采用更强的、防钓鱼的身份验证因素。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.prowler.com/checks/aws/iam-policies/iam_15",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/IAM/security-challenge-questions.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "1. 登录 AWS 管理控制台\n2. 导航到您的 AWS 账户设置页面：https://console.aws.amazon.com/billing/home?#/account/\n3. 向下滚动到 Configure Security Challenge Questions 部分，单击 Edit 链接\n4. 选择 Amazon 提供的三个不同问题并提供适当的答案\n5. 将答案存储在安全但可访问的位置\n6. 单击 Update 按钮保存更改",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "优先使用更强的恢复方法，而不是基于知识的身份验证（KBA）：\n- 强制**根用户使用 MFA**并最小化根用户使用\n- 保持**备用联系人**和根用户电子邮件最新并受保护\n- 建立严格控制的**应急角色**，应用最小权限和职责分离\n- 记录并测试恢复程序；监控根用户活动",
+      "Url": "https://hub.prowler.com/check/account_security_questions_are_registered_in_the_aws_account"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

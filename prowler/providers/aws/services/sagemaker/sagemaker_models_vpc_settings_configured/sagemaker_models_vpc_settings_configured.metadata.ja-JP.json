@@ -1,0 +1,40 @@
+{
+  "Provider": "aws",
+  "CheckID": "sagemaker_models_vpc_settings_configured",
+  "CheckTitle": "Amazon SageMaker モデルで VPC 設定が有効になっています",
+  "CheckType": [
+    "ソフトウェアおよび設定のチェック/AWS セキュリティのベストプラクティス/ネットワーク到達可能性",
+    "ソフトウェアと設定のチェック/業界および規制基準/AWS 基盤セキュリティのベストプラクティス"
+  ],
+  "ServiceName": "sagemaker",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "ai_ml",
+  "Description": "**SageMaker モデル**は、推論コンテナがパブリックインターネットではなく選択した VPC を介して通信するように、**VPC 設定**（サブネットとセキュリティグループを含む `VpcConfig`）を使用します。\n\nこれは、モデルがそのネットワーク経路に対して VPC サブネットを定義しているかどうかを評価します。",
+  "Risk": "**VPC分離**がないと、モデルのトラフィックやデータアクセスがパブリックな経路を通過する可能性があり、傍受や誤送信によって**機密性**と**完全性**が弱まります。\n\nセキュリティグループやプライベートエンドポイントが欠如していると、**アクセス制御**が低下し、侵害されたコンテナからの過剰な外向き通信、データ流出、またはコマンド＆コントロールが可能になります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/sagemaker/latest/dg/studio-notebooks-and-internet-access.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\nResources:\n  SageMakerModel:\n    Type: AWS::SageMaker::Model\n    Properties:\n      ExecutionRoleArn: \"<example_resource_id>\"\n      PrimaryContainer:\n        Image: \"<example_resource_name>\"\n      # 重要: VpcConfig によりモデルの VPC ネットワーキングが有効になるため、このチェックは合格します\n      VpcConfig:\n        SecurityGroupIds:\n          - \"<example_resource_id>\"  # 重要: VPC内のセキュリティグループ\n        Subnets:\n          - \"<example_resource_id>\"  # 重大: VPC内に少なくとも1つのサブネットが必要です\n```",
+      "Other": "1. AWS コンソール > Amazon SageMaker > 推論 > モデル を開きます\n2. モデルを開き、そのコンテナイメージと実行ロールをメモします\n3. モデルを削除します（VPC 設定を追加するためにモデルを更新することはできません）\n4. [モデルを作成] をクリックします\n5. 同じモデル名を入力し、実行ロールとコンテナイメージを設定します\n6. [ネットワーク] で VPC を選択し、次に少なくとも 1 つのサブネットと 1 つのセキュリティグループを選択します\n7. モデルを作成します\n8. モデルで VPC 設定が有効になっていることを確認します",
+      "Terraform": "```hcl\nresource \"aws_sagemaker_model\" \"model\" {\n  name               = \"<example_resource_name>\"\n  execution_role_arn = \"<example_resource_id>\"\n\n  primary_container {\n    image = \"<example_resource_name>\"\n  }\n\n  # 重要: VPC構成によりモデルのVPCネットワーキングが有効になっているため、このチェックは合格します\n  vpc_config {\n    subnets            = [\"<example_resource_id>\"]       # 重大な\n    security_group_ids = [\"<example_resource_id>\"]       # 重大な\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "モデルに対して **VPC 専用ネットワーキング** を有効にするには、プライベートサブネットと制限的なセキュリティグループを含む `VpcConfig` を定義します。\n\n**最小権限のエグレス** を適用し、S3 と SageMaker ランタイムには **VPC エンドポイント** を使用し、パブリックルートを避け、セグメンテーションとトラフィック監視による **多層防御** を実装します。",
+      "Url": "https://hub.prowler.com/check/sagemaker_models_vpc_settings_configured"
+    }
+  },
+  "Categories": [
+    "trust-boundaries",
+    "gen-ai"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

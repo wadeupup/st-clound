@@ -1,0 +1,36 @@
+{
+  "Provider": "aws",
+  "CheckID": "ec2_ami_public",
+  "CheckTitle": "确保没有 EC2 AMI 设置为公共",
+  "CheckType": [
+    "Infrastructure Security"
+  ],
+  "ServiceName": "ec2",
+  "SubServiceName": "ami",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "critical",
+  "ResourceType": "Other",
+  "ResourceGroup": "compute",
+  "Description": "确保没有 EC2 AMI 设置为公共",
+  "Risk": "当您的 AMI 公开可访问时，它们会在社区 AMI 中可用，任何拥有 AWS 账户的人都可以使用它们来启动 EC2 实例。您的 AMI 可能包含应用程序的快照（包括其数据），因此不建议以这种方式暴露您的快照。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "aws ec2 modify-image-attribute --region <REGION> --image-id <EC2_AMI_ID> --launch-permission {\"Remove\":[{\"Group\":\"all\"}]}",
+      "NativeIaC": "",
+      "Other": "https://docs.prowler.com/checks/aws/public-policies/public_8",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "我们建议您的 EC2 AMI 不应公开可访问，或通常在社区 AMI 中可用。",
+      "Url": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/cancel-sharing-an-AMI.html"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

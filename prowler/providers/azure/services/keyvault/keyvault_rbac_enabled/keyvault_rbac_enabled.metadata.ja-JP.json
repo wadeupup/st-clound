@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "keyvault_rbac_enabled",
+  "CheckTitle": "Azure Key Vault でロールベース アクセス制御（RBAC）を有効にする",
+  "CheckType": [],
+  "ServiceName": "keyvault",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "KeyVault",
+  "ResourceGroup": "security",
+  "Description": "警告: Key Vault を削除（ソフト削除）して復元すると、ロール割り当てが消失します。その後、すべてのロール割り当てを再作成する必要があります。これは Azure の全サービスに共通するソフト削除機能の制限です。",
+  "Risk": "Key Vault の新しい RBAC 権限モデルは、従来の Vault アクセス ポリシーよりも、シークレット、キー、証明書などに対してよりきめ細かなアクセス制御を可能にします。これにより、これらのロールに対して特権 ID 管理（PIM）を利用でき、JIT（Just-In-Time）アクセス管理によって Key Vault のセキュリティを強化できます。",
+  "RelatedUrl": "https://docs.microsoft.com/en-gb/azure/key-vault/general/rbac-migration#vault-access-policy-to-azure-rbac-migration-steps",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "Azure Portal から、Key Vault は作成時に Azure ロールベース アクセス制御を使用するよう構成できます。既存の Key Vault の場合: 1. Azure Home から左上の Portal Menu を開きます。2. Key Vaults を選択します。3. 監査対象の Key Vault を選択します。4. Access configuration を選択します。5. 警告メッセージに注意しながら、Permission model のラジオボタンを Azure role-based access control に設定します。6. Save をクリックします。7. Access Control (IAM) を選択します。8. Role Assignments タブを選択します。9. 必要に応じてグループまたはユーザーへ権限を再適用します。",
+      "Url": "https://docs.microsoft.com/en-gb/azure/role-based-access-control/role-assignments-portal?tabs=current"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "これは Key Vault へのアクセス/管理方法の根本的な変更であるため、実装は初期段階から適切に設計する必要があります。Key Vault の権限変更時には、権限の再適用中にサービス停止が発生する可能性があります。ダウンタイムを最小化するため、現在のグループとユーザーを必要な権限へ事前にマッピングしてください。"
+}

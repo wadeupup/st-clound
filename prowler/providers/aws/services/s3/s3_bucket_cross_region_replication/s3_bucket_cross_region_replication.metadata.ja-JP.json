@@ -1,0 +1,35 @@
+{
+  "Provider": "aws",
+  "CheckID": "s3_bucket_cross_region_replication",
+  "CheckTitle": "S3バケットがクロスリージョンレプリケーションを使用しているか確認してください。",
+  "CheckType": [
+    "安全なアクセス管理"
+  ],
+  "ServiceName": "s3",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:s3:::bucket_name",
+  "Severity": "low",
+  "ResourceType": "AwsS3Bucket",
+  "ResourceGroup": "storage",
+  "Description": "S3バケットでクロスリージョンレプリケーションが有効になっているかを確認し、複数のAWSリージョンにわたるデータの冗長性と可用性を確保する",
+  "Risk": "S3 バケットでクロスリージョンレプリケーションを行わないと、リージョン全体が停止した場合にデータが失われたりアクセス不能になったりするリスクがあり、サービス中断やデータの利用不能につながる可能性があります。",
+  "RelatedUrl": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/replication.html",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://docs.aws.amazon.com/securityhub/latest/userguide/s3-controls.html#s3-7",
+      "Terraform": "https://docs.prowler.com/checks/aws/general-policies/ensure-that-s3-bucket-has-cross-region-replication-enabled#terraform"
+    },
+    "Recommendation": {
+      "Text": "S3 バケットでクロスリージョンレプリケーションが有効になっていることを確認してください。",
+      "Url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/replication-walkthrough1.html"
+    }
+  },
+  "Categories": [
+    "redundancy"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "databricks_workspace_cmk_encryption_enabled",
+  "CheckTitle": "Azure Databricks ワークスペースが保存データ暗号化にカスタマー管理キー（CMK）を使用していることを確認する",
+  "CheckType": [],
+  "ServiceName": "databricks",
+  "SubServiceName": "workspace",
+  "ResourceIdTemplate": "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Databricks/workspaces/{workspaceName}",
+  "Severity": "high",
+  "ResourceType": "AzureDatabricksWorkspace",
+  "ResourceGroup": "ai_ml",
+  "Description": "Azure Databricks ワークスペースが保存データ暗号化にカスタマー管理キー（CMK）を使用するよう構成されているかを確認し、データ暗号化とコンプライアンスに対する制御を強化します。",
+  "Risk": "CMK を使用しない場合、組織の暗号鍵に対する管理性が低下し、規制コンプライアンスに影響する可能性や、不正なデータアクセスのリスク増大につながる可能性があります。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/databricks/security/keys/customer-managed-keys",
+  "Remediation": {
+    "Code": {
+      "CLI": "az databricks workspace update --name <databricks-workspace-name> --resource-group <resource-group-name> --prepare-encryption && databricks workspace update --name <databricks-workspace-name> --resource-group <resource-group-name> --key-source 'Microsoft.KeyVault' --key-name <key-name> --key-vault <key-vault-uri> --key-version <key-version>",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "Azure Key Vault を使用して Databricks ワークスペースでカスタマー管理キー（CMK）を有効化し、データ暗号化、監査、およびコンプライアンスに対する制御を強化してください。",
+      "Url": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/Databricks/enable-encryption-with-cmk.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "カスタマー管理キー（CMK）暗号化は Premium ティアの Databricks ワークスペースでのみ利用できます。"
+}

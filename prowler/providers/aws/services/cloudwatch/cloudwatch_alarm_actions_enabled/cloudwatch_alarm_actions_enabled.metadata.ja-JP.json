@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "cloudwatch_alarm_actions_enabled",
+  "CheckTitle": "CloudWatch メトリクスアラームでアクションが有効になっている",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "TTPs/Defense Evasion"
+  ],
+  "ServiceName": "cloudwatch",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsCloudWatchAlarm",
+  "ResourceGroup": "monitoring",
+  "Description": "**CloudWatch メトリクスアラーム** が **アラームアクション** のアクティベーション（`actions_enabled: true`）について評価され、状態変更が設定された通知または自動応答を呼び出すことができます。",
+  "Risk": "アラームアクションが無効になっている場合、状態変更は通知も修復もしません。インシデントが気づかれずに継続し、不正なアクティビティ、設定のドリフト、または容量の枯渇を可能にします。可視性が低下し、MTTR が上昇し、機密性、整合性、可用性がすべてより大きなリスクにさらされます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/CloudWatch/cloudwatch-alarm-action-activated.html",
+    "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/AlarmThatSendsEmail.html#alarms-and-actions",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/cloudwatch-controls.html#cloudwatch-17"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws cloudwatch enable-alarm-actions --alarm-names <alarm-name>",
+      "NativeIaC": "```yaml\nResources:\n  <example_resource_name>:\n    Type: AWS::CloudWatch::Alarm\n    Properties:\n      ActionsEnabled: true  # FIX: activates alarm actions so the check passes\n      ComparisonOperator: GreaterThanThreshold\n      EvaluationPeriods: 1\n      MetricName: <example_metric_name>\n      Namespace: <example_metric_namespace>\n      Period: 60\n      Statistic: Average\n      Threshold: 1\n```",
+      "Other": "1. CloudWatch コンソールを開きます\n2. アラーム > すべてのアラームに移動し、アラームを選択します\n3. アクション > アラームアクション - 新規 > 有効化を選択します\n4. 確認してアクションをアクティブにします",
+      "Terraform": "```hcl\nresource \"aws_cloudwatch_metric_alarm\" \"<example_resource_name>\" {\n  alarm_name          = \"<example_resource_name>\"\n  comparison_operator = \"GreaterThanThreshold\"\n  evaluation_periods  = 1\n  metric_name         = \"<example_metric_name>\"\n  namespace           = \"<example_metric_namespace>\"\n  period              = 60\n  statistic           = \"Average\"\n  threshold           = 1\n\n  actions_enabled = true  # FIX: activates alarm actions so the check passes\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "重要なアラームで `actions_enabled` を有効にし、ALARM 状態と回復状態に最小権限のアクション（SNS、自動化）をアタッチします。冗長なターゲットを使用し、定期的に通知をテストし、インシデント対応と統合します。補完的な検出とともに **多層防御** を適用して、タイムリーで信頼性の高いアラートを確保します。",
+      "Url": "https://hub.prowler.com/check/cloudwatch_alarm_actions_enabled"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

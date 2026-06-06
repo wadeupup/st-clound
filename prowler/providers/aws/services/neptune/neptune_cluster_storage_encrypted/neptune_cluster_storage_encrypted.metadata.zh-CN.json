@@ -1,0 +1,40 @@
+{
+  "Provider": "aws",
+  "CheckID": "neptune_cluster_storage_encrypted",
+  "CheckTitle": "Neptune 集群存储在静态时加密",
+  "CheckType": [
+    "软件和配置检查/行业和法规标准/AWS 基础安全最佳实践",
+    "敏感数据识别/安全性"
+  ],
+  "ServiceName": "neptune",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Other",
+  "ResourceGroup": "database",
+  "Description": "Neptune 数据库集群被评估为**静态加密**。这表明集群的底层存储未加密。",
+  "Risk": "**未加密的 Neptune 存储**降低了存储数据和元数据的机密性，并增加了攻击面。\n\n可能的影响：\n- 未经授权的访问或从底层卷或快照中提取数据\n- 泄露或共享快照导致的更大影响范围",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/neptune-controls.html#neptune-1",
+    "https://docs.aws.amazon.com/neptune/latest/userguide/encrypt.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\nResources:\n  EncryptedNeptuneCluster:\n    Type: AWS::Neptune::DBCluster\n    Properties:\n      DBClusterIdentifier: !Sub ${DBClusterIdentifier}\n      StorageEncrypted: true  # 启用静态加密以保护数据\n```",
+      "Terraform": "```hcl\nresource \"aws_neptune_cluster\" \"example_resource\" {\n  cluster_identifier = \"<cluster-id>\"\n  storage_encrypted  = true  # 启用静态加密以保护数据\n}\n```",
+      "Other": ""
+    },
+    "Recommendation": {
+      "Text": "为所有新的 Neptune 数据库集群提供**静态加密**，并优先选择**客户管理密钥 (CMK)** 以实现密钥所有权和可审计性。\n\n对 KMS 密钥实施**最小权限**，实施密钥生命周期实践（轮换、撤销），并确保备份/快照保持加密以防止暴露。",
+      "Url": "https://hub.prowler.com/check/neptune_cluster_storage_encrypted"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

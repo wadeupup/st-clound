@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "elasticbeanstalk_environment_managed_updates_enabled",
+  "CheckTitle": "Elastic Beanstalk 环境已启用托管平台更新",
+  "CheckType": [
+    "Software and Configuration Checks/Patch Management",
+    "Software and Configuration Checks/AWS Security Best Practices"
+  ],
+  "ServiceName": "elasticbeanstalk",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsElasticBeanstalkEnvironment",
+  "ResourceGroup": "compute",
+  "Description": "启用**托管平台更新**（`ManagedActionsEnabled: true`）的 **Elastic Beanstalk 环境**会在计划维护窗口内自动应用平台补丁/次版本更新。",
+  "Risk": "如果没有自动平台更新，环境可能运行在**存在漏洞的 OS/运行时版本**上，容易被利用已知 CVE、RCE 或权限提升漏洞。\n\n补丁漂移还会增加不稳定性，损害**可用性**并削弱应用**完整性**。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/elasticbeanstalk-controls.html#elasticbeanstalk-2",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/ElasticBeanstalk/managed-platform-updates.html",
+    "https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/environment-platform-update-managed.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws elasticbeanstalk update-environment --environment-name <environment-name> --option-settings Namespace=aws:elasticbeanstalk:managedactions,OptionName=ManagedActionsEnabled,Value=true",
+      "NativeIaC": "```yaml\nResources:\n  <example_resource_name>:\n    Type: AWS::ElasticBeanstalk::Environment\n    Properties:\n      ApplicationName: <example_resource_name>\n      SolutionStackName: <example_resource_name>\n      OptionSettings:\n        - Namespace: aws:elasticbeanstalk:managedactions\n          OptionName: ManagedActionsEnabled  # Critical: enables managed platform updates\n          Value: \"true\"                      # Critical: set to true to pass the check\n```",
+      "Other": "1. 打开 AWS 管理控制台并进入 Elastic Beanstalk\n2. 选择你的环境\n3. 选择 Configuration\n4. 在 Managed updates 中点击 Edit\n5. 将 Managed updates 切换为 Enabled\n6. 点击 Apply/Save",
+      "Terraform": "```hcl\nresource \"aws_elastic_beanstalk_environment\" \"<example_resource_name>\" {\n  name                = \"<example_resource_name>\"\n  application         = \"<example_resource_name>\"\n  solution_stack_name = \"<example_resource_name>\"\n\n  setting {\n    namespace = \"aws:elasticbeanstalk:managedactions\"\n    name      = \"ManagedActionsEnabled\"   # Critical: enables managed platform updates\n    value     = \"true\"                    # Critical: set to true to pass the check\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "启用**托管平台更新**，设置维护窗口并选择更新级别（`patch` 或 `minor`）。确保已启用**增强型健康报告**，并让更新角色遵循**最小权限**。先在预发布环境验证，再逐步推广，并错开各环境维护窗口，以增强**纵深防御**和韧性。",
+      "Url": "https://hub.prowler.com/check/elasticbeanstalk_environment_managed_updates_enabled"
+    }
+  },
+  "Categories": [
+    "vulnerabilities"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

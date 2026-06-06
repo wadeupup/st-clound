@@ -1,0 +1,39 @@
+{
+  "Provider": "aws",
+  "CheckID": "shield_advanced_protection_in_classic_load_balancers",
+  "CheckTitle": "Classic Load Balancer 受 AWS Shield Advanced 保护",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践/网络可达性",
+    "影响/拒绝服务"
+  ],
+  "ServiceName": "shield",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsElbLoadBalancer",
+  "ResourceGroup": "network",
+  "Description": "**经典负载均衡器** 会被评估是否与 **AWS Shield Advanced** 关联为受保护资源。\n\n在已启用订阅的情况下，识别没有处于活动状态的 Shield Advanced 保护的负载均衡器。",
+  "Risk": "未受保护的 ELB Classic 端点更容易暴露于大规模 L3/L4 DDoS（例如 SYN/UDP 洪泛）之下，存在因连接耗尽和运行状况检查失败而导致**可用性丧失**的风险，同时还会因自动扩缩容和数据传输激增而带来运营影响。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/waf/latest/developerguide/configure-new-protection.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws shield create-protection --name <PROTECTION_NAME> --resource-arn <ELB_ARN>",
+      "NativeIaC": "```yaml\n# CloudFormation：为经典负载均衡器添加 Shield Advanced 保护\nResources:\n  <example_resource_name>:\n    Type: AWS::Shield::Protection\n    Properties:\n      Name: <example_resource_name>\n      ResourceArn: <example_resource_id>  # 关键：要保护的经典负载均衡器的 ARN\n```",
+      "Other": "1. 在 AWS 控制台中，打开 AWS WAF & Shield\n2. 前往 Shield > Protected resources，然后点击 Add resources to protect\n3. 选择区域和资源类型 Classic Load Balancer，然后点击 Load resources\n4. 选择你的 Classic Load Balancer，然后点击 Protect with Shield Advanced\n5. 确认以创建保护",
+      "Terraform": "```hcl\n# 为经典负载均衡器添加 Shield Advanced 保护\nresource \"aws_shield_protection\" \"<example_resource_name>\" {\n  name         = \"<example_resource_name>\"\n  resource_arn = \"<example_resource_id>\" # 关键：要保护的经典负载均衡器的 ARN\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "将面向互联网的 **Classic Load Balancers** 添加为 **Shield Advanced** 中的受保护资源，以增强 DDoS 韧性和成本保护。\n\n应用纵深防御：尽量减少公网暴露，实施最小权限网络访问，启用基于运行状况的检测，并使用保护组。",
+      "Url": "https://hub.prowler.com/check/shield_advanced_protection_in_classic_load_balancers"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

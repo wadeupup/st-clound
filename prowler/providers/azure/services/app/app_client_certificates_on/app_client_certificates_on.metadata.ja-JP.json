@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "app_client_certificates_on",
+  "CheckTitle": "Web アプリの「クライアント証明書（受信クライアント証明書）」が「オン」に設定されていることを確認する",
+  "CheckType": [],
+  "ServiceName": "app",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Microsoft.Web/sites/config",
+  "ResourceGroup": "serverless",
+  "Description": "クライアント証明書を有効にすると、アプリは受信リクエストに対して証明書の提示を要求できます。有効な証明書を持つクライアントのみがアプリへ到達できます。",
+  "Risk": "エンタープライズ環境における TLS 相互認証は、サーバーに対するクライアントの真正性を保証します。受信クライアント証明書が有効な場合、有効な証明書を持つ認証済みクライアントのみがアプリにアクセスできます。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/app-service/app-service-web-configure-tls-mutual-auth?tabs=azurecli",
+  "Remediation": {
+    "Code": {
+      "CLI": "az webapp update --resource-group <RESOURCE_GROUP_NAME> --name <APP_NAME> --set clientCertEnabled=true",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-networking-policies/bc_azr_networking_7#terraform"
+    },
+    "Recommendation": {
+      "Text": "1. https://portal.azure.com で Azure Portal にログインします 2. App Services に移動します 3. 各アプリをクリックします 4. Settings セクションで Configuration をクリックし、次に General settings を開きます 5. Incoming client certificates の Client certificate mode を Require に設定します",
+      "Url": "https://learn.microsoft.com/en-us/security/benchmark/azure/security-controls-v3-identity-management#im-4-authenticate-server-and-services"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "クライアント証明書の利用と維持には、証明書の取得、更新管理、およびキー ローテーションのための追加作業が必要です。"
+}

@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "defender_ensure_notify_alerts_severity_is_high",
+  "CheckTitle": "最小重大度が「High」以下のアラートに対してメール通知が構成されていることを確認する",
+  "CheckType": [],
+  "ServiceName": "defender",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AzureEmailNotifications",
+  "ResourceGroup": "monitoring",
+  "Description": "Microsoft Defender for Cloud は、一定以上の重大度のアラートが発生した際にメール通知を送信します。最小重大度を「High」「Medium」または「Low」に設定すると、同等またはそれ以上の重大度（例: High や Critical）のアラートが引き続き配信されます。「Low」のような低いしきい値を選択すると、より包括的なアラート カバレッジが得られます。",
+  "Risk": "この設定が厳しすぎる（例: 「Critical」のみ）場合、「High」や「Medium」の重要なセキュリティ アラートを見逃す可能性があります。「High」またはそれ以下のしきい値を構成することで、セキュリティ チームは重大な脅威を把握し、適時に対応できます。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/defender-for-cloud/email-notifications-alerts#manage-notifications-on-email",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/SecurityCenter/enable-high-severity-email-notifications.html",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-general-policies/bc_azr_general_4#terraform"
+    },
+    "Recommendation": {
+      "Text": "1. Azure Home から Portal Menu を選択します。2. Microsoft Defender for Cloud を選択します。3. Environment Settings をクリックします。4. 対象の Management Group、Subscription、または Workspace をクリックします。5. Email notifications をクリックします。6. 「Notify about alerts with the following severity (or higher)」で、少なくとも「High」（またはより広いカバレッジのため「Medium」や「Low」）を選択します。7. Save をクリックします。",
+      "Url": "https://docs.microsoft.com/en-us/rest/api/securitycenter/securitycontacts/list"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

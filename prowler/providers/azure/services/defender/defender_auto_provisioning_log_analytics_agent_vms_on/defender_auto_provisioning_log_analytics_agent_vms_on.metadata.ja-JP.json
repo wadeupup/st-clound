@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "defender_auto_provisioning_log_analytics_agent_vms_on",
+  "CheckTitle": "「Azure VM 用 Log Analytics エージェント」の自動プロビジョニングが「オン」に設定されていることを確認する",
+  "CheckType": [],
+  "ServiceName": "defender",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AzureDefenderPlan",
+  "ResourceGroup": "security",
+  "Description": "「Azure VM 用 Log Analytics エージェント」の自動プロビジョニングが「オン」に設定されていることを確認します。Microsoft Monitoring Agent は、システム更新、OS 脆弱性、エンドポイント保護など、さまざまなセキュリティ関連設定やイベントをスキャンし、アラートを提供します。",
+  "Risk": "セキュリティ アラート、セキュリティ推奨事項、変更追跡など、Azure VM に関する重要なセキュリティ情報を見逃す可能性があります。",
+  "RelatedUrl": "https://docs.microsoft.com/en-us/azure/security-center/security-center-data-security",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity-staging/knowledge-base/azure/SecurityCenter/automatic-provisioning-of-monitoring-agent.html",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "不足している更新、OS セキュリティ設定の誤構成、進行中の脅威など、潜在的なセキュリティ脆弱性を包括的に可視化し、タイムリーな緩和対応と全体的なセキュリティ態勢の向上を実現してください",
+      "Url": "https://learn.microsoft.com/en-us/azure/defender-for-cloud/monitoring-components"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

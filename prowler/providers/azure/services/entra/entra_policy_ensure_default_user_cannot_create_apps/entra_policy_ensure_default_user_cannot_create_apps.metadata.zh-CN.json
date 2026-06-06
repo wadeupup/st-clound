@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "entra_policy_ensure_default_user_cannot_create_apps",
+  "CheckTitle": "确保“用户可注册应用程序”设置为“否”",
+  "CheckType": [],
+  "ServiceName": "entra",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "#microsoft.graph.authorizationPolicy",
+  "ResourceGroup": "IAM",
+  "Description": "要求由管理员或经适当委派的用户注册第三方应用程序。",
+  "Risk": "建议仅允许管理员注册自定义开发应用。这可确保应用在暴露 Azure Active Directory 数据前经过正式安全审查和审批流程。某些用户（如开发者或其他高频申请用户）也可被委派权限，以避免其等待管理员处理。组织应审查自身策略并决定具体需求。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/entra/identity-platform/how-applications-are-added#who-has-permission-to-add-applications-to-my-azure-ad-instance",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/ActiveDirectory/users-can-register-applications.html",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "1. 在 Azure Home 中选择 Portal Menu 2. 选择 Azure Active Directory 3. 选择 Users 4. 选择 User settings 5. 确保 Users can register applications 设置为 No",
+      "Url": "https://learn.microsoft.com/en-us/entra/identity/role-based-access-control/delegate-app-roles#restrict-who-can-create-applications"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "强制启用此设置会产生额外审批请求，需要管理员处理。若进行了权限委派，用户可能会批准恶意第三方应用，潜在导致其访问你的数据。"
+}

@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "efs_multi_az_enabled",
+  "CheckTitle": "EFS ファイルシステムが複数のマウントターゲットを持つマルチ AZ である",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Effects/Denial of Service"
+  ],
+  "ServiceName": "efs",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsEfsFileSystem",
+  "ResourceGroup": "storage",
+  "Description": "**Amazon EFS** ファイルシステムは **マルチ AZ の回復力** について評価されます：リージョンタイプ（`availability_zone_id` なし）で、複数の可用性ゾーンにマウントターゲットがあります。単一 AZ（One Zone）またはマウントターゲットが 1 つだけのリージョンタイプは、注意が必要として識別されます。",
+  "Risk": "単一の AZ または単一のマウントターゲットを通じたアクセスの集中は **可用性** を低下させます。AZ の中断により、クライアント接続が切断され、ダウンタイムと I/O エラーが発生する可能性があります。単一のマウントターゲットは、AZ 間トラフィックを強制し、レイテンシとコストを増加させ、**回復力** とシームレスなフェイルオーバーを損ないます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/efs/latest/ug/creating-using-create-fs.html#availabiltydurability",
+    "https://docs.aws.amazon.com/efs/latest/ug/accessing-fs.html",
+    "https://ops.tips/gists/how-aws-efs-multiple-availability-zones-terraform/"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws efs create-mount-target --file-system-id <FILE_SYSTEM_ID> --subnet-id <SUBNET_ID>",
+      "NativeIaC": "```yaml\n# CloudFormation: add an extra EFS mount target to another AZ\nResources:\n  <example_resource_name>:\n    Type: AWS::EFS::MountTarget\n    Properties:\n      FileSystemId: fs-<example_resource_id>  # FIX: adds another mount target for this EFS\n      SubnetId: subnet-<example_resource_id>  # FIX: choose a subnet in a different AZ\n      SecurityGroups:\n        - <example_security_group_id>         # Required by CFN\n```",
+      "Other": "1. AWS コンソールで、EFS > ファイルシステム > ファイルシステムを選択に移動します\n2. ファイルシステムタイプがリージョンと表示されている場合：ネットワークタブ > マウントターゲット > マウントターゲットを管理 > マウントターゲットを追加を開きます\n3. 異なる可用性ゾーン内のサブネットを選択して保存します\n4. ファイルシステムタイプが One Zone と表示されている場合：ファイルシステムタイプ = リージョンで新しい EFS を作成し、少なくとも 2 つの AZ にマウントターゲットを作成します；クライアントを新しいファイルシステムに再マウントし、古いファイルシステムを廃止します",
+      "Terraform": "```hcl\n# Add an extra EFS mount target in a different AZ/subnet\nresource \"aws_efs_mount_target\" \"<example_resource_name>\" {\n  file_system_id = \"<example_resource_id>\"  # FIX: target EFS\n  subnet_id      = \"<example_resource_id>\"  # FIX: subnet in another AZ to make targets > 1\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "**リージョン EFS** を使用し、各必要な **可用性ゾーン** にマウントターゲットを作成して、単一障害点を排除し、クライアントをその AZ 内でローカルに保ちます。重要なデータには One Zone を避けます。**高可用性** と **フォールトトレランス** を維持するために、マウントターゲットの分布を定期的に確認します。",
+      "Url": "https://hub.prowler.com/check/efs_multi_az_enabled"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "networkfirewall_in_all_vpc",
+  "CheckTitle": "VPC已启用网络防火墙",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践/网络可达性",
+    "软件和配置检查/行业和法规标准/AWS 基础安全最佳实践"
+  ],
+  "ServiceName": "networkfirewall",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsEc2Vpc",
+  "ResourceGroup": "network",
+  "Description": "**VPCs** 与同一VPC关联的 **AWS Network Firewall** 用于检查和过滤网络流量。\n\n识别没有链接网络防火墙资源的VPC。",
+  "Risk": "没有 **Network Firewall**，VPC流量可能绕过深度检查和集中策略执行，导致 **数据泄露**、**命令与控制** 和 **横向移动**。未监控的流量降低了机密性；恶意软件和破坏性流量威胁完整性和可用性。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/network-firewall/latest/developerguide/vpc-config.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/NetworkFirewall/network-firewall-in-use.html",
+    "https://docs.aws.amazon.com/network-firewall/latest/developerguide/setting-up.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws network-firewall create-firewall --firewall-name <example_resource_name> --firewall-policy-arn <example_resource_id> --vpc-id <example_resource_id> --subnet-mappings \"SubnetId=<example_resource_id>\"",
+      "NativeIaC": "```yaml\n# CloudFormation：在VPC中创建网络防火墙\nResources:\n  <example_resource_name>:\n    Type: AWS::NetworkFirewall::Firewall\n    Properties:\n      FirewallName: <example_resource_name>\n      FirewallPolicyArn: <example_resource_id>  # 关键：防火墙所需的策略\n      VpcId: <example_resource_id>              # 关键：将防火墙关联到目标VPC（修复检查）\n      SubnetMappings:                           # 关键：在VPC中创建防火墙端点\n        - SubnetId: <example_resource_id>\n```",
+      "Other": "1. 在AWS控制台中，转到 Network Firewall > Firewalls > Create firewall\n2. 输入名称并选择目标VPC\n3. 选择现有防火墙策略（或在提示时创建一个）\n4. 在子网映射下添加至少一个来自VPC的子网\n5. 选择创建防火墙\n6. 验证防火墙显示在所选VPC下",
+      "Terraform": "```hcl\n# 在VPC中创建网络防火墙\nresource \"aws_networkfirewall_firewall\" \"<example_resource_name>\" {\n  name                = \"<example_resource_name>\"\n  firewall_policy_arn = \"<example_resource_id>\"  # 关键：所需的策略\n  vpc_id              = \"<example_resource_id>\"  # 关键：将防火墙关联到VPC（修复检查）\n\n  subnet_mapping {                                # 关键：在VPC中创建防火墙端点\n    subnet_id = \"<example_resource_id>\"\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "在每个VPC中部署 **AWS Network Firewall** 或通过专用中心VPC集中检查。\n\n采用 `default-deny` 姿态，使用最小特权规则，限制出口到所需目的地，分段工作负载（**深度防御**，**零信任**），并启用日志记录以监控和调整网络策略。",
+      "Url": "https://hub.prowler.com/check/networkfirewall_in_all_vpc"
+    }
+  },
+  "Categories": [
+    "trust-boundaries"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

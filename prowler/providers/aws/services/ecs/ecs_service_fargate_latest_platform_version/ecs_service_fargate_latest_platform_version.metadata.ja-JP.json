@@ -1,0 +1,45 @@
+{
+  "Provider": "aws",
+  "CheckID": "ecs_service_fargate_latest_platform_version",
+  "CheckTitle": "ECS Fargate サービスが最新の Fargate プラットフォームバージョンを使用している",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices"
+  ],
+  "ServiceName": "ecs",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsEcsService",
+  "ResourceGroup": "container",
+  "Description": "**ECS Fargate サービス** は、`platformVersion`=`LATEST` または `platformFamily`（Linux/Windows）の現在のリリースと一致する明示的な値を使用して、**最新の Fargate プラットフォームバージョン** を使用します。",
+  "Risk": "古いプラットフォームで実行すると、カーネル/ランタイムの既知の CVE がパッチ未適用のままになり、以下のリスクがあります：\n- **機密性**：コンテナエスケープによるデータ暴露\n- **整合性**：権限昇格と改ざん\n- **可用性**：クラッシュ/DoS と負荷下での不安定性",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://servian.dev/setting-up-fargate-for-ecs-exec-8f5cc8d7d80e",
+    "https://docs.aws.amazon.com/AmazonECS/latest/developerguide/platform-fargate.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/ECS/platform-version.html",
+    "https://docs.aws.amazon.com/config/latest/developerguide/ecs-fargate-latest-platform-version.html",
+    "https://docs.aws.amazon.com/AmazonECS/latest/developerguide/Welcome.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/ecs-controls.html#ecs-10"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws ecs update-service --cluster <cluster-name> --service <service-name> --platform-version LATEST",
+      "NativeIaC": "```yaml\n# CloudFormation: set ECS Fargate service to latest platform version\nResources:\n  <example_resource_name>:\n    Type: AWS::ECS::Service\n    Properties:\n      Cluster: <example_resource_id>\n      TaskDefinition: <example_resource_name>\n      LaunchType: FARGATE\n      PlatformVersion: LATEST  # Critical: use the latest Fargate platform version\n      NetworkConfiguration:\n        AwsvpcConfiguration:\n          Subnets:\n            - <example_resource_id>\n```",
+      "Other": "1. AWS コンソールで、Amazon ECS に移動します\n2. クラスターを開き、サービスを選択します\n3. 更新をクリックします\n4. プラットフォームバージョンを LATEST に設定します\n5. 更新サービス（またはデプロイ）をクリックして適用します",
+      "Terraform": "```hcl\n# ECS Fargate service using the latest platform version\nresource \"aws_ecs_service\" \"<example_resource_name>\" {\n  name            = \"<example_resource_name>\"\n  cluster         = \"<example_resource_id>\"\n  task_definition = \"<example_resource_name>\"\n  launch_type     = \"FARGATE\"\n  platform_version = \"LATEST\" # Critical: ensures the latest Fargate platform version\n\n  network_configuration {\n    subnets = [\"<example_resource_id>\"]\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "- パッチを受信するために `platformVersion` `LATEST` を優先します。\n- 固定する場合は、リリースを監視し、現在のバージョンに迅速に再デプロイします。\n- CI/CD で段階的なロールアウトを使用して更新を自動化します。\n- **多層防御** と **最小権限** を適用して、ランタイムの悪用の影響を制限します。",
+      "Url": "https://hub.prowler.com/check/ecs_service_fargate_latest_platform_version"
+    }
+  },
+  "Categories": [
+    "vulnerabilities",
+    "container-security"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

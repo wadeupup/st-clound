@@ -1,0 +1,45 @@
+{
+  "Provider": "aws",
+  "CheckID": "cloudwatch_changes_to_network_gateways_alarm_configured",
+  "CheckTitle": "ネットワークゲートウェイの変更用の CloudWatch Logs メトリクスフィルターとアラームが存在する",
+  "CheckType": [
+    "Software and Configuration Checks/Industry and Regulatory Standards/CIS AWS Foundations Benchmark",
+    "Software and Configuration Checks/AWS Security Best Practices/Runtime Behavior Analysis",
+    "Software and Configuration Checks/AWS Security Best Practices/Network Reachability",
+    "TTPs/Command and Control"
+  ],
+  "ServiceName": "cloudwatch",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsCloudWatchAlarm",
+  "ResourceGroup": "monitoring",
+  "Description": "トレイルログを受信するロググループ内の `CreateCustomerGateway`、`DeleteCustomerGateway`、`AttachInternetGateway`、`CreateInternetGateway`、`DeleteInternetGateway`、`DetachInternetGateway` などの CloudTrail イベントを一致させることで、**ネットワークゲートウェイの変更** 用の CloudWatch ログメトリクスフィルターとアラームが識別されます。",
+  "Risk": "この監視がない場合、ゲートウェイの変更により、プライベートネットワークがインターネットに露出したり、接続が切断されたりする可能性があります。攻撃者や誤りにより、データの窃取が有効になり、ネットワーク検査を回避し、削除やデタッチにより中断を引き起こし、**機密性** と **可用性** に影響を与える可能性があります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudwatch-alarms-for-cloudtrail.html",
+    "https://support.icompaas.com/support/solutions/articles/62000083807-ensure-a-log-metric-filter-and-alarm-exist-for-changes-to-network-gateways",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/cloudwatch-controls.html#cloudwatch-12",
+    "https://paper.bobylive.com/Security/CIS/CIS_Amazon_Web_Services_Foundations_Benchmark_v1_3_0.pdf"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation: Create metric filter and alarm for network gateway changes\nResources:\n  NetworkGatewayMetricFilter:\n    Type: AWS::Logs::MetricFilter\n    Properties:\n      LogGroupName: <example_resource_name>\n      FilterPattern: '{ ($.eventName = CreateCustomerGateway) || ($.eventName = DeleteCustomerGateway) || ($.eventName = AttachInternetGateway) || ($.eventName = CreateInternetGateway) || ($.eventName = DeleteInternetGateway) || ($.eventName = DetachInternetGateway) }'  # Critical: matches gateway change events\n      MetricTransformations:\n        - MetricName: <example_resource_name>\n          MetricNamespace: <example_resource_name>\n          MetricValue: \"1\"\n\n  NetworkGatewayAlarm:\n    Type: AWS::CloudWatch::Alarm\n    Properties:\n      ComparisonOperator: GreaterThanOrEqualToThreshold\n      EvaluationPeriods: 1\n      MetricName: <example_resource_name>  # Critical: alarm targets the metric created by the filter\n      Namespace: <example_resource_name>\n      Period: 300\n      Statistic: Sum\n      Threshold: 1\n```",
+      "Other": "1. AWS コンソールで、CloudWatch > ログ > ロググループに移動し、CloudTrail ロググループを開きます\n2. メトリクスフィルターを作成します：\n   - フィルターパターン：{ ($.eventName = CreateCustomerGateway) || ($.eventName = DeleteCustomerGateway) || ($.eventName = AttachInternetGateway) || ($.eventName = CreateInternetGateway) || ($.eventName = DeleteInternetGateway) || ($.eventName = DetachInternetGateway) }\n   - メトリクス名：<example_resource_name>\n   - メトリクス名前空間：<example_resource_name>\n   - メトリクス値：1\n3. フィルターからアラームの作成を選択します：\n   - 統計：合計、期間：5 分、しきい値：>= 1、評価期間：1\n   - アラームを作成します（アクションはオプション）\n",
+      "Terraform": "```hcl\n# CloudWatch Logs metric filter for network gateway changes\nresource \"aws_cloudwatch_log_metric_filter\" \"<example_resource_name>\" {\n  name           = \"<example_resource_name>\"\n  log_group_name = \"<example_resource_name>\"\n  pattern        = \"{ ($.eventName = CreateCustomerGateway) || ($.eventName = DeleteCustomerGateway) || ($.eventName = AttachInternetGateway) || ($.eventName = CreateInternetGateway) || ($.eventName = DeleteInternetGateway) || ($.eventName = DetachInternetGateway) }\" # Critical: matches gateway change events\n\n  metric_transformation {\n    name      = \"<example_resource_name>\"\n    namespace = \"<example_resource_name>\"\n    value     = \"1\"\n  }\n}\n\n# Alarm on the metric filter\nresource \"aws_cloudwatch_metric_alarm\" \"<example_resource_name>\" {\n  alarm_name          = \"<example_resource_name>\"\n  comparison_operator = \"GreaterThanOrEqualToThreshold\"\n  evaluation_periods  = 1\n  metric_name         = \"<example_resource_name>\"   # Critical: must match metric from the filter\n  namespace           = \"<example_resource_name>\"\n  period              = 300\n  statistic           = \"Sum\"\n  threshold           = 1\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "CloudTrail を CloudWatch Logs に送信し、リストされたゲートウェイイベント用のメトリクスフィルターを作成し、応答者に通知するアラームを設定します。ゲートウェイの変更に **最小権限の原則** を適用し、変更の承認を要求し、**多層防御** の一部としてアラートを監視されたチャネルにルーティングします。",
+      "Url": "https://hub.prowler.com/check/cloudwatch_changes_to_network_gateways_alarm_configured"
+    }
+  },
+  "Categories": [
+    "logging"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "Logging and Monitoring"
+}
+

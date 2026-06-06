@@ -1,0 +1,44 @@
+{
+  "Provider": "aws",
+  "CheckID": "ecs_task_definitions_host_namespace_not_shared",
+  "CheckTitle": "ECS 任务定义不与其容器共享主机的进程命名空间",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/CIS Host Hardening Benchmarks",
+    "TTPs/Privilege Escalation",
+    "TTPs/Discovery"
+  ],
+  "ServiceName": "ecs",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsEcsTaskDefinition",
+  "ResourceGroup": "container",
+  "Description": "**ECS 任务定义** 中 `pidMode` 为 `host` 的配置会与容器共享主机的 **进程命名空间**，而不是使用隔离的任务或私有命名空间。",
+  "Risk": "**主机 PID 共享** 使容器能够查看和与主机进程交互，从而削弱隔离性。\n- 机密性：进程枚举和元数据泄露\n- 完整性/可用性：信号或 `ptrace` 篡改、终止服务\n\n使从受感染的容器进行横向移动和权限提升成为可能。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/ecs-controls.html#ecs-3",
+    "https://docs.aws.amazon.com/config/latest/developerguide/ecs-task-definition-pid-mode-check.html",
+    "https://docs.aws.amazon.com/AmazonECS/latest/userguide/task_definition_parameters.html#container_definition_pid_mode"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws ecs register-task-definition --family <example_resource_name> --pid-mode task --container-definitions '[{\"name\":\"<container-name>\",\"image\":\"<image>\"}]'",
+      "NativeIaC": "```yaml\n# CloudFormation: ECS Task Definition without host PID namespace\nResources:\n  <example_resource_name>:\n    Type: AWS::ECS::TaskDefinition\n    Properties:\n      Family: <example_resource_name>\n      ContainerDefinitions:\n        - Name: <container-name>\n          Image: <image>\n      PidMode: task  # Critical: ensures containers use task PID namespace, not host\n```",
+      "Other": "1. 在 AWS 控制台中，转到 Amazon ECS > 任务定义\n2. 选择任务定义并点击创建新修订版\n3. 将进程命名空间共享（PID 模式）设置为任务（而非主机）\n4. 保存新修订版\n5. （如果之前的 Host PID 修订版仍然处于活动状态）选择该修订版并点击注销",
+      "Terraform": "```hcl\n# ECS Task Definition without host PID namespace\nresource \"aws_ecs_task_definition\" \"example\" {\n  family                = \"<example_resource_name>\"\n  container_definitions = jsonencode([{ name = \"<container-name>\", image = \"<image>\" }])\n  pid_mode              = \"task\"  # Critical: prevents sharing the host's process namespace\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "优先使用 **隔离的 PID 命名空间**：设置 `pidMode=task` 或使用默认的每容器命名空间。避免 `host` PID 共享，除非是严格控制的诊断场景。\n\n应用 **最小权限**：非 root 用户、最小功能、只读文件系统；以及通过网络和运行时控制实现 **纵深防御**。",
+      "Url": "https://hub.prowler.com/check/ecs_task_definitions_host_namespace_not_shared"
+    }
+  },
+  "Categories": [
+    "container-security"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "defender_ensure_notify_alerts_severity_is_high",
+  "CheckTitle": "确保已为最小严重级别为“高”或更低的告警配置邮件通知",
+  "CheckType": [],
+  "ServiceName": "defender",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AzureEmailNotifications",
+  "ResourceGroup": "monitoring",
+  "Description": "当触发达到某个严重级别或更高的告警时，Microsoft Defender for Cloud 会发送邮件通知。将最小严重级别设置为“高”“中”甚至“低”时，可确保同级或更高级别（如高或严重）的告警仍会送达。选择较低阈值（如“低”）可获得更全面的告警覆盖。",
+  "Risk": "如果此设置过于严格（例如仅设置为“严重”），可能会漏掉“高”或“中”等重要安全告警。将其配置为“高”或更低阈值有助于安全团队及时获知关键威胁并迅速响应。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/defender-for-cloud/email-notifications-alerts#manage-notifications-on-email",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/SecurityCenter/enable-high-severity-email-notifications.html",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-general-policies/bc_azr_general_4#terraform"
+    },
+    "Recommendation": {
+      "Text": "1. 在 Azure Home 中选择 Portal Menu。2. 选择 Microsoft Defender for Cloud。3. 点击 Environment Settings。4. 点击对应的 Management Group、Subscription 或 Workspace。5. 点击 Email notifications。6. 在“Notify about alerts with the following severity (or higher)”下，至少选择“High”（也可选择“Medium”或“Low”以获得更广覆盖）。7. 点击 Save。",
+      "Url": "https://docs.microsoft.com/en-us/rest/api/securitycenter/securitycontacts/list"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

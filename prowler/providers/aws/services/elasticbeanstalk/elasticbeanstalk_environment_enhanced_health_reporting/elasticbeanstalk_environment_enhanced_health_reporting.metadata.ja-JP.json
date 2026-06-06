@@ -1,0 +1,40 @@
+{
+  "Provider": "aws",
+  "CheckID": "elasticbeanstalk_environment_enhanced_health_reporting",
+  "CheckTitle": "Elastic Beanstalk 環境で拡張ヘルスレポートが有効化されていること",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/AWS Security Best Practices/Runtime Behavior Analysis"
+  ],
+  "ServiceName": "elasticbeanstalk",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "low",
+  "ResourceType": "AwsElasticBeanstalkEnvironment",
+  "ResourceGroup": "compute",
+  "Description": "**Elastic Beanstalk 環境**でヘルスレポートが basic ではなく `enhanced` に設定されていることを確認します。",
+  "Risk": "**拡張ヘルス** がない場合、問題検知が遅れ、MTTR が増加して **サービス停止** につながる可能性があります。隠れたインスタンス障害や不適切なデプロイによりフリートが不均一になり、**可用性** が低下し、（古いバージョンを配信することで）**完全性** にも影響する可能性があります。さらに、エラー急増やスラッシングで運用コストが増大します。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/health-enhanced-enable.html#health-enhanced-enable-console",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/elasticbeanstalk-controls.html#elasticbeanstalk-1"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws elasticbeanstalk update-environment --environment-name <environment-name> --option-settings Namespace=aws:elasticbeanstalk:healthreporting:system,OptionName=SystemType,Value=enhanced",
+      "NativeIaC": "```yaml\n# CloudFormation: enable enhanced health reporting for an Elastic Beanstalk environment\nResources:\n  <example_resource_name>:\n    Type: AWS::ElasticBeanstalk::Environment\n    Properties:\n      ApplicationName: <example_resource_name>\n      EnvironmentName: <example_resource_name>\n      SolutionStackName: <example_solution_stack>\n      OptionSettings:\n        - Namespace: aws:elasticbeanstalk:healthreporting:system\n          OptionName: SystemType  # Critical: selects the enhanced health reporting system\n          Value: enhanced          # Critical: sets health reporting to enhanced\n```",
+      "Other": "1. AWS Elastic Beanstalk コンソールを開き、Region を選択します\n2. Environments に移動して対象環境を選択します\n3. Configuration > Monitoring > Edit を選択します\n4. Health reporting の System を Enhanced に設定します\n5. Apply をクリックして変更を保存します",
+      "Terraform": "```hcl\n# Terraform: enable enhanced health reporting for an Elastic Beanstalk environment\nresource \"aws_elastic_beanstalk_environment\" \"<example_resource_name>\" {\n  name                = \"<example_resource_name>\"\n  application         = \"<example_resource_name>\"\n  solution_stack_name = \"<example_solution_stack>\"\n\n  setting {\n    namespace = \"aws:elasticbeanstalk:healthreporting:system\"\n    name      = \"SystemType\"  # Critical: selects the enhanced health reporting system\n    value     = \"enhanced\"    # Critical: sets health reporting to enhanced\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "すべての環境でヘルスレポートを `enhanced` に設定し、セキュリティベースラインにしてください。ヘルスシグナルをアラートに連携して迅速対応を実現します。必要なロールには **最小権限** を適用し、自動復旧・アラーム・ランブックによる **多層防御** を実装して長期的な劣化を防止します。",
+      "Url": "https://hub.prowler.com/check/elasticbeanstalk_environment_enhanced_health_reporting"
+    }
+  },
+  "Categories": [
+    "logging"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

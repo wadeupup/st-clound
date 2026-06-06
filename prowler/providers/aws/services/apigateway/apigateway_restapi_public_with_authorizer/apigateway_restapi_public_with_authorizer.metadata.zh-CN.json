@@ -1,0 +1,52 @@
+{
+  "Provider": "aws",
+  "CheckID": "apigateway_restapi_public_with_authorizer",
+  "CheckTitle": "具有公共端点的 API Gateway REST API 已配置授权器",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践/网络可达性",
+    "TTPs/初始访问/未授权访问",
+    "影响/数据暴露"
+  ],
+  "ServiceName": "apigateway",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsApiGatewayRestApi",
+  "ResourceGroup": "api_gateway",
+  "Description": "暴露到互联网的**API Gateway REST API** 会评估是否附加了**授权器**，该授权器在方法调用时强制执行调用者身份（Lambda 授权器或 Cognito 用户池）。\n\n重点是公共端点是否需要经过身份验证的请求，而不是接受匿名调用。",
+  "Risk": "如果公共 API 上没有**授权器**，匿名调用者可以：\n- 读取或更改数据（机密性/完整性）\n- 触发后端操作，影响系统\n- 滥用流量，降低可用性并增加成本\n\n端点枚举还支持更广泛的发现和横向移动。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://support.icompaas.com/support/solutions/articles/62000233640-check-if-api-gateway-public-endpoint-has-an-authorizer-configured",
+    "https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-api-endpoint-types.html",
+    "https://api7.ai/blog/secure-rest-api-in-aws-api-gateway",
+    "https://supertokens.com/blog/lambda-authorizers",
+    "https://clerk.com/blog/how-to-secure-api-gateway-using-jwt-and-lambda-authorizers-with-clerk",
+    "https://aws.plainenglish.io/6-rest-api-security-best-practices-you-can-achieve-with-amazon-api-gateway-2-authentication-62b5171989bd",
+    "https://stackoverflow.com/questions/68512642/how-to-configure-aws-api-gateway-without-authorizer",
+    "https://auth0.com/docs/customize/integrations/aws/aws-api-gateway-custom-authorizers"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws apigateway create-authorizer --rest-api-id <rest_api_id> --name <example_resource_name> --type TOKEN --authorizer-uri arn:aws:apigateway:<region>:lambda:path/2015-03-31/functions/arn:aws:lambda:<region>:<account-id>:function:<example_resource_name>/invocations --identity-source 'method.request.header.Authorization'",
+      "NativeIaC": "```yaml\n# CloudFormation: 为公共 REST API 创建最小的 Lambda TOKEN 授权器\nResources:\n  <example_resource_name>:\n    Type: AWS::ApiGateway::Authorizer\n    Properties:\n      Name: <example_resource_name>\n      RestApiId: <example_resource_id>\n      Type: TOKEN  # 关键：向 REST API 添加授权器\n      IdentitySource: method.request.header.Authorization  # 关键：从中读取令牌的标头\n      AuthorizerUri: arn:aws:apigateway:<region>:lambda:path/2015-03-31/functions/arn:aws:lambda:<region>:<account-id>:function/<example_resource_name>/invocations  # 关键：Lambda 授权器函数 URI\n```",
+      "Other": "1. 在 AWS 控制台中，打开 API Gateway 并选择您的 REST API\n2. 在左侧窗格中，单击 Authorizers > Create authorizer\n3. 选择 Lambda (TOKEN) 或 Cognito User Pool\n4. 对于 Lambda：选择函数并将 Identity source 设置为 method.request.header.Authorization；对于 Cognito：选择用户池\n5. 单击 Create authorizer 将其添加到 API",
+      "Terraform": "```hcl\n# Terraform: API Gateway REST API 的最小 Lambda TOKEN 授权器\nresource \"aws_api_gateway_authorizer\" \"<example_resource_name>\" {\n  name            = \"<example_resource_name>\"\n  rest_api_id     = \"<example_resource_id>\"\n  type            = \"TOKEN\"  # 关键：在 REST API 上启用 Lambda 授权器\n  identity_source = \"method.request.header.Authorization\"  # 关键：读取令牌的标头\n  authorizer_uri  = \"arn:aws:apigateway:<region>:lambda:path/2015-03-31/functions/arn:aws:lambda:<region>:<account-id>:function/<example_resource_name>/invocations\"  # 关键：Lambda 授权器函数 URI\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "通过附加**授权器**（Cognito 用户池或 Lambda）来强制执行**身份验证**，该授权器验证令牌和范围，对所有面向互联网的 API 强制执行。\n\n应用纵深防御：\n- 限制性资源策略和 IP 控制\n- WAF、节流、配额、速率限制\n- 最小权限后端访问和全面的日志记录",
+      "Url": "https://hub.prowler.com/check/apigateway_restapi_public_with_authorizer"
+    }
+  },
+  "Categories": [
+    "internet-exposed",
+    "identity-access"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "",
+  "CheckAliases": [
+    "apigateway_public_with_authorizer"
+  ]
+}
+

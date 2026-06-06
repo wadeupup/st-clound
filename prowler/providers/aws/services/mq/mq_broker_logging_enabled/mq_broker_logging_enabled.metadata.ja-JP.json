@@ -1,0 +1,44 @@
+{
+  "Provider": "aws",
+  "CheckID": "mq_broker_logging_enabled",
+  "CheckTitle": "MQブローカーは一般ログが有効になっており、ActiveMQの場合は監査ログも有効になっています",
+  "CheckType": [
+    "ソフトウェアと構成のチェック/AWS セキュリティベストプラクティス",
+    "ソフトウェアと構成のチェック/業界および規制基準/NIST 800-53 コントロール",
+    "ソフトウェアと構成のチェック/業界および規制基準/AWS 基礎セキュリティベストプラクティス"
+  ],
+  "ServiceName": "mq",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "low",
+  "ResourceType": "AwsAmazonMQBroker",
+  "ResourceGroup": "messaging",
+  "Description": "**Amazon MQブローカー**は、エンジンタイプごとに**CloudWatch Logs**へのログ記録が有効になっています。**ActiveMQ**には`general`ログと`audit`ログの両方が必要です。**RabbitMQ**には`general`ログが必要です。",
+  "Risk": "ブローカーログが欠如すると、認証イベント、管理変更、ブローカーの障害において盲点が生じます。攻撃者は検出されずに行動でき、不正アクセスやメッセージ改ざん（機密性/完全性）を可能にし、インシデント対応や根本原因分析（可用性）を妨げます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/amazon-mq/latest/developer-guide/configure-logging-monitoring-activemq.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/mq-controls.html#mq-2",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/MQ/log-exports.html",
+    "https://docs.aws.amazon.com/cli/latest/reference/mq/create-broker.html",
+    "https://docs.aws.amazon.com/amazon-mq/latest/developer-guide/security-logging-monitoring.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws mq update-broker --broker-id <example_resource_id> --logs Audit=true,General=true",
+      "NativeIaC": "```yaml\n# CloudFormation: Amazon MQのログを有効にする\nResources:\n  <example_resource_name>:\n    Type: AWS::AmazonMQ::Broker\n    Properties:\n      BrokerName: <example_resource_name>\n      EngineType: ACTIVEMQ\n      HostInstanceType: mq.t3.micro\n      DeploymentMode: SINGLE_INSTANCE\n      PubliclyAccessible: true\n      Users:\n        - Username: <example_user>\n          Password: <example_password>\n      Logs:\n        General: true  # 重要: CloudWatchへの一般ログを有効にします\n        Audit: true    # 重要: 監査ログを有効にします（ActiveMQに必要）\n```",
+      "Other": "1. AWSコンソールで、Amazon MQ > Brokersに移動します\n2. <example_resource_name>を選択し、編集を選びます\n3. ログ設定で:\n   - ActiveMQの場合: 一般ログと監査ログを有効にします\n   - RabbitMQの場合: 一般ログのみを有効にします\n4. 変更を保存し、プロンプトが表示されたら再起動します",
+      "Terraform": "```hcl\n# Terraform: Amazon MQのログを有効にする\nresource \"aws_mq_broker\" \"<example_resource_name>\" {\n  broker_name         = \"<example_resource_name>\"\n  engine_type         = \"ActiveMQ\"\n  host_instance_type  = \"mq.t3.micro\"\n  deployment_mode     = \"SINGLE_INSTANCE\"\n  publicly_accessible = true\n\n  user {\n    username = \"<example_user>\"\n    password = \"<example_password>\"\n  }\n\n  logs {\n    general = true  # 重要: 一般ログを有効にします\n    audit   = true  # 重要: 監査ログを有効にします（ActiveMQ）\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "ブローカーのために集中化された**CloudWatch Logs**を有効にします。**ActiveMQ**の場合、`general`ログと`audit`ログの両方をオンにします。**RabbitMQ**の場合、`general`ログを有効にします。\n\nログアクセスには**最小特権**を適用し、保持期間を設定し、異常なイベントに対するアラートを作成して、**多層防御**を強化します。",
+      "Url": "https://hub.prowler.com/check/mq_broker_logging_enabled"
+    }
+  },
+  "Categories": [
+    "logging"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

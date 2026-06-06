@@ -1,0 +1,35 @@
+{
+  "Provider": "aws",
+  "CheckID": "iam_user_two_active_access_key",
+  "CheckTitle": "检查 IAM 用户是否有两个活跃的访问密钥",
+  "CheckType": [
+    "软件和配置检查",
+    "行业和监管标准",
+    "CIS AWS 基础基准"
+  ],
+  "ServiceName": "iam",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "medium",
+  "ResourceType": "AwsIamUser",
+  "ResourceGroup": "IAM",
+  "Description": "检查 IAM 用户是否有两个活跃的访问密钥",
+  "Risk": "访问密钥可能会丢失或被盗。这会造成严重风险。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "避免使用长期有效的访问密钥。",
+      "Url": "https://docs.aws.amazon.com/IAM/latest/APIReference/API_ListAccessKeys.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

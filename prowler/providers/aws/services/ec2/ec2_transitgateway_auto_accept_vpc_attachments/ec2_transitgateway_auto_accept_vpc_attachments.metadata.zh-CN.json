@@ -1,0 +1,34 @@
+{
+  "Provider": "aws",
+  "CheckID": "ec2_transitgateway_auto_accept_vpc_attachments",
+  "CheckTitle": "Amazon EC2 Transit Gateway 不应自动接受 VPC 附件请求",
+  "CheckType": [
+    "Infrastructure Security"
+  ],
+  "ServiceName": "ec2",
+  "SubServiceName": "transit-gateway",
+  "ResourceIdTemplate": "arn:aws:ec2:region:account-id:transit-gateway/tgw-id",
+  "Severity": "high",
+  "ResourceType": "AwsEc2TransitGateway",
+  "ResourceGroup": "network",
+  "Description": "确保 EC2 Transit Gateway 不会自动接受共享 VPC 附件。如果 Transit Gateway 配置为自动接受共享 VPC 附件请求，则会被判定为失败。",
+  "Risk": "启用 AutoAcceptSharedAttachments 允许 Transit Gateway 在未经验证的情况下自动接受任何跨账户 VPC 附件请求。这会增加未经授权的 VPC 附件的风险，从而危及网络安全。",
+  "RelatedUrl": "https://docs.aws.amazon.com/config/latest/developerguide/ec2-transit-gateway-auto-vpc-attach-disabled.html",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://docs.aws.amazon.com/securityhub/latest/userguide/ec2-controls.html#ec2-23",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "关闭 AutoAcceptSharedAttachments，以确保仅接受授权的 VPC 附件请求",
+      "Url": "https://docs.aws.amazon.com/vpc/latest/tgw/tgw-transit-gateways.html#tgw-modifying"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

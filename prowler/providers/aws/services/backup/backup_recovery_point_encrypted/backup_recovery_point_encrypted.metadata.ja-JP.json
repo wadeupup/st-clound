@@ -1,0 +1,45 @@
+{
+  "Provider": "aws",
+  "CheckID": "backup_recovery_point_encrypted",
+  "CheckTitle": "AWS Backup回復ポイントが保存時に暗号化されている",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Effects/Data Exposure"
+  ],
+  "ServiceName": "backup",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsBackupRecoveryPoint",
+  "ResourceGroup": "storage",
+  "Description": "**AWS Backup回復ポイント**は、バックアップボルトのKMS設定を使用した**保存時の暗号化**について評価されます。ボルトレベルの暗号化を欠く項目は、ソースリソースの暗号化状態に関係なく強調表示されます。",
+  "Risk": "暗号化されていない回復ポイントは、ボルトアクセスが取得された場合、読み取りまたはコピーが可能で、オフライン分析とデータ窃取を可能にします（**機密性**）。スナップショットまたは復元が変更される可能性があります（**整合性**）、安全でない復元は回復操作を中断する可能性があります（**可用性**）。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/backup-controls.html#backup-1",
+    "https://readmedium.com/how-would-you-desgin-a-solution-for-autmated-backup-and-recovery-of-data-and-services-in-aws-311662f5a43e",
+    "https://docs.aws.amazon.com/aws-backup/latest/devguide/encryption.html",
+    "https://medium.com/cloud-devops-security-ai-career-talk/how-would-you-desgin-a-solution-for-autmated-backup-and-recovery-of-data-and-services-in-aws-311662f5a43e",
+    "https://github.com/turbot/steampipe-mod-aws-compliance/issues/598"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation：暗号化されたAWS Backupボルト\nResources:\n  <example_resource_name>:\n    Type: AWS::Backup::BackupVault\n    Properties:\n      BackupVaultName: <example_resource_name>\n      EncryptionKeyArn: <kms_key_arn>  # 重要：ボルトがこのKMSキーを使用するため、ここに保存された回復ポイントは保存時に暗号化されます\n```",
+      "Other": "1. AWS Backupで、バックアップボルト > バックアップボルトの作成に移動\n2. 名前を入力し、KMSキー（aws/backupまたはカスタマー管理キー）を選択\n3. ボルトを保存\n4. バックアップ計画 > 計画を選択 > 編集し、ターゲットバックアップボルトを暗号化されたボルトに設定 > 保存\n5. 既存の暗号化されていない回復ポイントを修復するには：回復ポイント > 項目を選択 > コピー > 暗号化されたボルトを選択 > コピー開始、その後元の暗号化されていない回復ポイントを削除",
+      "Terraform": "```hcl\n# 暗号化されたAWS Backupボルト\nresource \"aws_backup_vault\" \"<example_resource_name>\" {\n  name        = \"<example_resource_name>\"\n  kms_key_arn = \"<kms_key_arn>\" # 重要：このボルト内の回復ポイントが保存時に暗号化されることを保証\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "**KMS**を使用してすべての回復ポイントを暗号化し、ローテーションと制御のために**カスタマー管理キー**を優先します。キーとボルトに**最小権限**を適用し、アカウント/リージョン間で暗号化されたコピーを要求し、暗号化されていないアーティファクトを継続的に監視します。`aws/backup`または`CMEK`を一貫して使用します。",
+      "Url": "https://hub.prowler.com/check/backup_recovery_point_encrypted"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

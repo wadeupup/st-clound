@@ -1,0 +1,39 @@
+{
+  "Provider": "aws",
+  "CheckID": "ssmincidents_enabled_with_plans",
+  "CheckTitle": "SSM Incidents 复制集处于 ACTIVE 状态，并且至少有一个响应计划",
+  "CheckType": [
+    "软件和配置检查/AWS安全最佳实践",
+    "软件和配置检查/行业和监管标准/NIST CSF 控制（美国）"
+  ],
+  "ServiceName": "ssmincidents",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "monitoring",
+  "Description": "**Incident Manager** 使用 **replication set** 和 **response plans**。这会评估 replication set 是否存在且为 `ACTIVE`，并且是否至少配置了一个 response plan 以进行协调的事件处理。",
+  "Risk": "如果没有 `ACTIVE` 复制集或响应计划，事件将缺乏协调的参与和自动化，从而增加 MTTR，并影响可用性和完整性。\n\n威胁包括由于遏制延迟和错误升级路由而导致的长时间中断、横向移动和数据外泄。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/incident-manager/latest/userguide/response-plans.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation：创建一个最小化的 Incident Manager 响应计划\nResources:\n  ResponsePlan:\n    Type: AWS::SSMIncidents::ResponsePlan\n    Properties:\n      Name: <example_resource_name>  # 关键：确保至少存在一个响应计划\n      IncidentTemplate:              # 关键：响应计划所需的模板\n        Title: <example_title>       # 关键：必需\n        Impact: 5                    # 严重：必填（1=最高，5=最低）\n```",
+      "Other": "1. 在 AWS 控制台中，前往 Systems Manager > Incident Manager\n2. Replication sets > Create replication set > 添加至少一个 Region > Create；等待直到 Status 为 ACTIVE\n3. Response plans > Create response plan > 设置 Name、Title 和 Impact > Create\n4. 验证：Replication set 显示 ACTIVE，且至少存在一个 response plan",
+      "Terraform": "```hcl\n# 确保复制集存在并变为 ACTIVE\nresource \"aws_ssmincidents_replication_set\" \"example\" {\n  regions {                      # 关键：创建复制集，使其能够处于 ACTIVE 状态\n    region_name = \"us-east-1\"\n  }\n}\n\n# 创建一个最小化的响应计划\nresource \"aws_ssmincidents_response_plan\" \"example\" {\n  name = \"<example_resource_name>\"  # 关键：确保至少存在一个响应计划\n\n  incident_template {                # 关键：必需 template for the plan\n    title  = \"<example_title>\"\n    impact = 5\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "建立一个 `ACTIVE` **复制集**，并创建定义参与方式、升级流程、运行手册、严重级别和沟通方式的**响应计划**。\n\n对自动化角色应用**最小权限**，定期测试计划，将其与监控集成以触发它们，并使用具有冗余联系人和区域的**纵深防御**。",
+      "Url": "https://hub.prowler.com/check/ssmincidents_enabled_with_plans"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

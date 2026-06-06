@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "app_ftp_deployment_disabled",
+  "CheckTitle": "确保已禁用 FTP 部署",
+  "CheckType": [],
+  "ServiceName": "app",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Microsoft.Web/sites/config",
+  "ResourceGroup": "serverless",
+  "Description": "默认情况下，Azure Functions、Web 和 API Services 可以通过 FTP 部署。如果关键部署流程必须使用 FTP，则应要求所有 App Service 应用和 Functions 在 FTP 登录时使用 FTPS。",
+  "Risk": "Azure FTP 部署端点是公开的。攻击者如果在远程员工使用的 Wi-Fi 网络或企业网络中监听流量，可能会看到明文登录流量，从而获得对应用或服务代码库的完全控制。如果部署用户凭据是在订阅级别设置，而不是使用每个应用唯一的默认应用凭据，此风险会更加严重。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/app-service/deploy-ftp?tabs=portal",
+  "Remediation": {
+    "Code": {
+      "CLI": "az webapp config set --resource-group <resource group name> --name <app name> --ftps-state [disabled|FtpsOnly]",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/AppService/ftp-access-disabled.html",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-general-policies/ensure-ftp-deployments-are-disabled#terraform"
+    },
+    "Recommendation": {
+      "Text": "1. 进入 Azure Portal 2. 选择 App Services 3. 点击某个应用 4. 选择 Settings 然后 Configuration 5. 在 General Settings 的 Platform Settings 中，将 FTP state 设置为 Disabled 或 FTPS Only",
+      "Url": ""
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "任何依赖 FTP 或 FTPS（而非 WebDeploy 或 HTTPS 端点）的部署流程都可能受到影响。"
+}

@@ -1,0 +1,33 @@
+{
+  "Provider": "aws",
+  "CheckID": "iam_user_console_access_unused",
+  "CheckTitle": "确保未使用的用户控制台访问被禁用",
+  "CheckType": [
+    "软件和配置检查"
+  ],
+  "ServiceName": "iam",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "medium",
+  "ResourceType": "AwsIamUser",
+  "ResourceGroup": "IAM",
+  "Description": "确保未使用的用户控制台访问被禁用",
+  "Risk": "为了提高您的 AWS 账户的安全性，请删除不需要的 IAM 用户凭证（即密码和访问密钥）。例如，当用户离开您的组织或不再需要 AWS 访问权限时。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "找到他们使用的凭证，并确保这些凭证不再有效。理想情况下，如果不再需要这些凭证，您应该删除它们。如果有需要，您可以在以后重新创建它们。至少，您应该更改密码或停用访问密钥，以确保前用户不再有访问权限。",
+      "Url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_finding-unused.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

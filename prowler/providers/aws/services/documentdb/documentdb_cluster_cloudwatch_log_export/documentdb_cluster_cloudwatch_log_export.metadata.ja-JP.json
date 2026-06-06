@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "documentdb_cluster_cloudwatch_log_export",
+  "CheckTitle": "DocumentDB クラスターが監査ログとプロファイラーログを CloudWatch Logs にエクスポートしているか",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices/Runtime Behavior Analysis",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices"
+  ],
+  "ServiceName": "documentdb",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsRdsDbCluster",
+  "ResourceGroup": "database",
+  "Description": "Amazon DocumentDB クラスターについて、`audit` および `profiler` ログが **CloudWatch Logs** にエクスポートされているかを評価します。\nいずれか一方、または両方のログ種別のエクスポートが有効になっていないクラスターは、ログエクスポート設定が不完全として識別されます。",
+  "Risk": "**audit** や **profiler** ログのエクスポートが無効な場合、認証・認可およびデータ定義アクティビティの可視性が低下します。\nブルートフォースログイン、権限の乱用、破壊的なスキーマ変更といった攻撃が検知されにくくなり、**機密性**と**完全性**が損なわれ、インシデント対応も遅延します。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/documentdb-controls.html#documentdb-4",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/DocumentDB/enable-profiler.html",
+    "https://docs.aws.amazon.com/cli/latest/reference/docdb/create-db-cluster.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws docdb modify-db-cluster --db-cluster-identifier <DB_CLUSTER_ID> --cloudwatch-logs-export-configuration '{\"EnableLogTypes\":[\"audit\",\"profiler\"]}' --apply-immediately",
+      "NativeIaC": "```yaml\n# CloudFormation: enable DocumentDB log exports\nResources:\n  <example_resource_name>:\n    Type: AWS::DocDB::DBCluster\n    Properties:\n      EnableCloudwatchLogsExports:\n        - audit      # Critical: export audit logs to CloudWatch Logs\n        - profiler   # Critical: export profiler logs to CloudWatch Logs\n```",
+      "Other": "1. AWS コンソールで Amazon DocumentDB > Clusters に移動します\n2. 対象クラスターを選択し、Actions > Modify をクリックします\n3. Log exports セクションで Audit と Profiler を有効化します\n4. Apply immediately にチェックを入れ、Modify cluster をクリックします",
+      "Terraform": "```hcl\n# Enable DocumentDB log exports\nresource \"aws_docdb_cluster\" \"<example_resource_name\" {\n  enabled_cloudwatch_logs_exports = [\"audit\", \"profiler\"] # Critical: export both logs to CloudWatch Logs\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "`audit` ログと `profiler` ログの両方を **CloudWatch Logs** へエクスポートするよう、すべてのクラスターで有効化し、分析を集約します。\nログアクセスには**最小権限**を適用し、保持期間と改ざん防止を定義し、アラートシステムと連携させるとともに、**職務分掌**を通じてログを保護し定期的にレビューすることで、**多層防御**を実現します。",
+      "Url": "https://hub.prowler.com/check/documentdb_cluster_cloudwatch_log_export"
+    }
+  },
+  "Categories": [
+    "logging"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+
+

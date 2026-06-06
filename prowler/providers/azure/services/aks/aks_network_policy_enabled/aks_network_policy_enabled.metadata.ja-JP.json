@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "aks_network_policy_enabled",
+  "CheckTitle": "ネットワーク ポリシーが有効化され、適切に設定されていることを確認する",
+  "CheckType": [],
+  "ServiceName": "aks",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Microsoft.ContainerService/managedClusters",
+  "ResourceGroup": "container",
+  "Description": "Kubernetes でモダンなマイクロサービス アプリケーションを実行する場合、どのコンポーネント同士が通信できるかを制御したいことがよくあります。Azure Kubernetes Service (AKS) クラスター内の Pod 間トラフィックには最小権限の原則を適用すべきです。たとえば、バックエンド アプリケーションへの直接トラフィックはブロックしたいことが一般的です。Kubernetes のネットワーク ポリシー機能では、クラスター内の Pod 間の受信および送信トラフィックのルールを定義できます。",
+  "Risk": "既定では、AKS クラスター内のすべての Pod は制限なくトラフィックを送受信できます。セキュリティを強化するために、トラフィック フローを制御するルールを定義できます。たとえば、バックエンド アプリケーションは必要なフロントエンド サービスにのみ公開し、データベース コンポーネントはそれに接続するアプリケーション層のみにアクセスを許可するのが一般的です。ネットワーク ポリシーは、Pod 間通信のアクセス ポリシーを定義する Kubernetes 仕様です。ネットワーク ポリシーを使用すると、トラフィックの送受信を制御する順序付きルール セットを定義し、1 つ以上のラベル セレクターに一致する Pod の集合に適用できます。これらのルールは YAML マニフェストとして定義され、deployment や service を作成する広範なマニフェストの一部として含めることもできます。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/security/benchmark/azure/security-controls-v2-network-security#ns-2-connect-private-networks-together",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-kubernetes-policies/bc_azr_kubernetes_4#terraform"
+    },
+    "Recommendation": {
+      "Text": "",
+      "Url": "https://learn.microsoft.com/en-us/azure/aks/use-network-policies"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "ネットワーク ポリシーには Network Policy アドオンが必要です。ネットワーク ポリシーを有効にしてクラスターを作成する場合、このアドオンは自動的に含まれますが、既存クラスターでは有効化前に追加する必要があります。ネットワーク ポリシーの有効化/無効化は、クラスター アップグレードと同様に全ノードのローリング更新を引き起こします。この操作は長時間実行され、完了するまでクラスター上の他の操作（削除を含む）をブロックします。ネットワーク ポリシーを使用する場合、クラスターには少なくとも n1-standard-1 以上のノードが 2 台必要です。ネットワーク ポリシー強制適用の推奨最小クラスター サイズは n1-standard-1 インスタンス 3 台です。ネットワーク ポリシー強制適用を有効化すると、ノードで追加リソースを消費します。具体的には、kube-system プロセスのメモリ使用量が約 128MB 増加し、CPU は約 300 ミリコア追加で必要になります。"
+}

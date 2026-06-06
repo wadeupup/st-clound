@@ -1,0 +1,33 @@
+{
+  "Provider": "aws",
+  "CheckID": "iam_no_custom_policy_permissive_role_assumption",
+  "CheckTitle": "确保不存在允许宽松角色假设的自定义 IAM 策略（例如在 * 上授予 sts:AssumeRole）",
+  "CheckType": [
+    "Software and Configuration Checks"
+  ],
+  "ServiceName": "iam",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "high",
+  "ResourceType": "AwsIamPolicy",
+  "ResourceGroup": "IAM",
+  "Description": "确保不存在允许宽松角色假设的自定义 IAM 策略（例如在 * 上授予 sts:AssumeRole）",
+  "Risk": "如果未加限制，可能会发生非预期访问。",
+  "RelatedUrl": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_permissions-to-switch.html#roles-usingrole-createpolicy",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "在授予权限时遵循最小权限原则。",
+      "Url": "https://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRole.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "CAF Security Epic: IAM"
+}

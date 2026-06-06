@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "vm_ensure_using_managed_disks",
+  "CheckTitle": "确保虚拟机使用托管磁盘",
+  "CheckType": [],
+  "ServiceName": "vm",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Microsoft.Compute/virtualMachines",
+  "ResourceGroup": "compute",
+  "Description": "将虚拟机上基于 Blob 的 VHD 迁移到托管磁盘，以利用该配置的默认特性。包括：1. 默认磁盘加密；2. 更高韧性，因为 Microsoft 会管理磁盘存储，并在底层硬件故障时进行迁移；3. 相比存储账户可降低成本。",
+  "Risk": "托管磁盘默认在底层硬件上加密，因此基础保护通常不需要额外加密；如有需要也可启用额外加密。托管磁盘在设计上比存储账户更具韧性。对于通过 ARM 部署的虚拟机，Azure Advisor 在后续可能会从安全和成本管理角度建议将 VHD 迁移到托管磁盘。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/virtual-machines/unmanaged-disks-deprecation",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/VirtualMachines/managed-disks-in-use.html",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-general-policies/ensure-virtual-machines-are-utilizing-managed-disks#terraform"
+    },
+    "Recommendation": {
+      "Text": "1. 使用搜索功能进入 Virtual Machines。2. 选择要转换的虚拟机。3. 在该 VM 菜单中选择 Disks。4. 在顶部选择 Migrate to managed disks。5. 按提示完成转换，最后选择 Migrate 启动流程。",
+      "Url": "https://docs.microsoft.com/en-us/security/benchmark/azure/security-controls-v3-data-protection#dp-4-enable-data-at-rest-encryption-by-default"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "托管磁盘会根据分配的磁盘空间产生额外成本。转换为托管磁盘时，VM 会先关机再开机。"
+}

@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "opensearch_service_domains_encryption_at_rest_enabled",
+  "CheckTitle": "Amazon OpenSearch Service 域已启用静态加密",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践",
+    "软件和配置检查/行业和法规标准/AWS 基础安全最佳实践",
+    "影响/数据暴露"
+  ],
+  "ServiceName": "opensearch",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "critical",
+  "ResourceType": "AwsOpenSearchServiceDomain",
+  "ResourceGroup": "database",
+  "Description": "**Amazon OpenSearch Service 域**使用 AWS KMS (`AES-256`) 对存储的数据进行`静态加密`评估，包括索引、交换文件和自动快照。",
+  "Risk": "**未加密的 OpenSearch 数据**如果攻击者获得**磁盘级访问**、窃取**自动快照**或攻陷主机，则可能被读取或复制。这会危及**机密性**并可能篡改存储的索引，影响**完整性**。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/encryption-at-rest.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/Elasticsearch/encryption-at-rest.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws opensearch update-domain-config --domain-name <DOMAIN_NAME> --encryption-at-rest-options Enabled=true",
+      "NativeIaC": "```yaml\n# CloudFormation：为 OpenSearch 域启用静态加密\nResources:\n  <example_resource_name>:\n    Type: AWS::OpenSearchService::Domain\n    Properties:\n      DomainName: <example_resource_name>\n      EncryptionAtRestOptions:\n        Enabled: true  # 关键：为域启用静态加密\n```",
+      "Other": "1. 在 AWS 控制台中，转到 OpenSearch Service > Domains 并选择您的域\n2. 点击操作 > 编辑安全配置\n3. 在加密下，勾选启用静态数据加密\n4. 保持默认的 AWS 拥有密钥（或根据需要选择 KMS 密钥）\n5. 点击保存更改\n",
+      "Terraform": "```hcl\n# Terraform：为 OpenSearch 域启用静态加密\nresource \"aws_opensearch_domain\" \"<example_resource_name>\" {\n  domain_name = \"<example_resource_name>\"\n\n  encrypt_at_rest {\n    enabled = true  # 关键：为域启用静态加密\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "使用 AWS KMS 启用`静态加密`，最好使用**客户管理的密钥**。\n- 强制执行**最小权限**密钥策略并限制授权\n- 启用自动密钥轮换并监控 KMS 使用情况\n- 加密日志和任何导出的快照\n- 通过网络和 IAM 控制应用**深度防御**",
+      "Url": "https://hub.prowler.com/check/opensearch_service_domains_encryption_at_rest_enabled"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

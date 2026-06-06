@@ -1,0 +1,40 @@
+{
+  "Provider": "aws",
+  "CheckID": "fsx_file_system_copy_tags_to_backups_enabled",
+  "CheckTitle": "FSx ファイルシステムでバックアップへのタグコピーが有効化されていること",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices"
+  ],
+  "ServiceName": "fsx",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "low",
+  "ResourceType": "AwsFSxFileSystem",
+  "ResourceGroup": "storage",
+  "Description": "**Amazon FSx ファイルシステム**について、`copy_tags_to_backups` 設定により **リソースタグ** が **バックアップ** にコピーされるかを評価します。",
+  "Risk": "タグ継承がないとバックアップが未分類となり、タグベース制御の対象外になります。これにより機密性と可用性が低下します。タグ連動 IAM や保持ポリシーが適用されず、不正アクセス、誤削除、孤立バックアップの発生につながり、復旧を複雑化しコストを増加させます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/fsx-controls.html#fsx-2",
+    "https://docs.aws.amazon.com/fsx/latest/OpenZFSGuide/updating-file-system.html",
+    "https://docs.aws.amazon.com/config/latest/developerguide/fsx-lustre-copy-tags-to-backups.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws fsx update-file-system --file-system-id <file-system-id> --open-zfs-configuration CopyTagsToBackups=true",
+      "NativeIaC": "```yaml\n# CloudFormation: Enable copying tags to backups for FSx OpenZFS\nResources:\n  <example_resource_name>:\n    Type: AWS::FSx::FileSystem\n    Properties:\n      FileSystemType: OPENZFS\n      OpenZFSConfiguration:\n        CopyTagsToBackups: true  # Critical: ensures tags are copied to backups (passes the check)\n```",
+      "Other": "1. AWS コンソールで Amazon FSx に移動します\n2. 対象の FSx ファイルシステムを選択し、Actions > Update file system を選びます\n3. Copy tags to backups を有効化します\n4. Update をクリックして保存します",
+      "Terraform": "```hcl\n# Terraform: Enable copying tags to backups for FSx OpenZFS\nresource \"aws_fsx_openzfs_file_system\" \"<example_resource_name>\" {\n  subnet_ids          = [\"<subnet_id>\"]\n  deployment_type     = \"SINGLE_AZ_1\"\n  throughput_capacity = 64\n  storage_capacity    = 128\n\n  copy_tags_to_backups = true # Critical: ensures tags are copied to backups (passes the check)\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "FSx バックアップでタグコピーを有効化し、必須タグ（owner、data classification、environment）を標準化してください。\nこれらタグに **最小権限** とライフサイクルポリシーを紐づけ、自動化とガードレールで強制し、未タグ付け・誤分類バックアップを防ぐため定期監査を実施します。",
+      "Url": "https://hub.prowler.com/check/fsx_file_system_copy_tags_to_backups_enabled"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

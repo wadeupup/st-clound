@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "athena_workgroup_enforce_configuration",
+  "CheckTitle": "Athena 工作组强制执行工作组配置，不能被客户端设置覆盖",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践",
+    "软件和配置检查/行业和监管标准/AWS 基础安全最佳实践"
+  ],
+  "ServiceName": "athena",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsAthenaWorkGroup",
+  "ResourceGroup": "analytics",
+  "Description": "设置 `enforce_workgroup_configuration=true` 的**Athena 工作组**将**工作组的设置**应用于每个查询，覆盖客户端选项，包括结果位置、预期存储桶所有者、加密以及对写入结果存储桶的对象的控制。",
+  "Risk": "没有强制执行，客户端可能会禁用或更改结果**加密**，将输出重定向到意外或跨账户存储桶，并绕过保留控制。\n\n这会导致数据暴露（机密性）、结果篡改（完整性）和弱可审计性，使事件响应复杂化。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/athena/latest/ug/workgroups-settings-override.html",
+    "https://support.icompaas.com/support/solutions/articles/62000233407-ensure-that-workgroup-configuration-is-enforced-so-it-cannot-be-overriden-by-client-side-settings-"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws athena update-work-group --work-group <workgroup_name> --configuration-updates EnforceWorkGroupConfiguration=true",
+      "NativeIaC": "```yaml\n# CloudFormation: 启用工作组配置的强制执行\nResources:\n  <example_resource_name>:\n    Type: AWS::Athena::WorkGroup\n    Properties:\n      Name: <example_resource_name>\n      WorkGroupConfiguration:\n        EnforceWorkGroupConfiguration: true  # 关键：强制工作组设置覆盖客户端设置\n```",
+      "Other": "1. 打开 AWS 管理控制台并转到 Amazon Athena\n2. 单击 Workgroups，选择目标工作组\n3. 单击 Edit workgroup\n4. 选中 Override client-side settings（强制执行工作组设置）\n5. 单击 Save",
+      "Terraform": "```hcl\n# Terraform: 启用工作组配置的强制执行\nresource \"aws_athena_workgroup\" \"<example_resource_name>\" {\n  name = \"<example_resource_name>\"\n\n  configuration {\n    enforce_workgroup_configuration = true  # 关键：强制工作组设置覆盖客户端设置\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "设置 `enforce_workgroup_configuration=true` 以集中控制。\n\n要求**加密结果**（优先使用**SSE-KMS**），将输出限制到具有预期存储桶所有者的已批准 S3 位置，并应用**最小权限**。监控结果访问和日志，作为**纵深防御**的一部分。",
+      "Url": "https://hub.prowler.com/check/athena_workgroup_enforce_configuration"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

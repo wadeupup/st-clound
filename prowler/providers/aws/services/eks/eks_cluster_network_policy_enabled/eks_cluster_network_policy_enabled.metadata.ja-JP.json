@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "eks_cluster_network_policy_enabled",
+  "CheckTitle": "EKS クラスターでネットワークポリシーが有効になっている",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices/Network Reachability",
+    "TTPs/Lateral Movement"
+  ],
+  "ServiceName": "eks",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsEksCluster",
+  "ResourceGroup": "container",
+  "Description": "**Amazon EKS クラスター**は、Kubernetes `NetworkPolicy` を介した **Pod レベルのネットワーク分離** について評価され、定義されたルールに従って Pod と名前空間間のトラフィックが制限されているかどうかを示します。",
+  "Risk": "**NetworkPolicy** がない場合、Pod は自由に通信でき、**横方向の移動**、**データ窃取**、内部サービスの悪用を可能にします。制限のない東西トラフィックは、機密性と整合性を損ない、単一の侵害された Pod の爆発半径を拡大します。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/EKS/security-groups.html",
+    "https://docs.aws.amazon.com/eks/latest/userguide/eks-networking-add-ons.html",
+    "https://docs.aws.amazon.com/eks/latest/userguide/cni-network-policy.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws eks update-cluster-config --name <example_cluster_name> --resources-vpc-config securityGroupIds=<example_security_group_id>",
+      "NativeIaC": "```yaml\n# CloudFormation: attach a security group to the EKS cluster\nResources:\n  <example_resource_name>:\n    Type: AWS::EKS::Cluster\n    Properties:\n      RoleArn: <example_role_arn>\n      ResourcesVpcConfig:\n        SubnetIds:\n          - <example_subnet_id>\n        SecurityGroupIds:\n          - <example_security_group_id>  # Critical: sets a security group for the cluster, satisfying the check\n```",
+      "Other": "1. AWS コンソールを開き、EKS > クラスターに移動します\n2. <クラスター> を選択し、ネットワークタブを開きます\n3. ネットワークセクションで編集（または更新）をクリックします\n4. セキュリティグループで、<example_security_group_id> を追加/選択します\n5. 保存をクリックして適用します",
+      "Terraform": "```hcl\n# Minimal EKS cluster config with a security group attached\nresource \"aws_eks_cluster\" \"<example_resource_name>\" {\n  name     = \"<example_resource_name>\"\n  role_arn = \"<example_role_arn>\"\n\n  vpc_config {\n    subnet_ids         = [\"<example_subnet_id>\"]\n    security_group_ids = [\"<example_security_group_id>\"]  # Critical: attaches a security group to pass the check\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "**最小権限** `NetworkPolicy` を強制し、イングレスとエグレスに対して `default-deny` を設定し、次にラベルと名前空間によって必要なフローを明示的に許可します。Pod のセキュリティグループとプライベートアクセスで **多層防御** を適用し、ポリシーの有効性を継続的にテストおよび監視します。",
+      "Url": "https://hub.prowler.com/check/eks_cluster_network_policy_enabled"
+    }
+  },
+  "Categories": [
+    "trust-boundaries",
+    "cluster-security"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "ネットワークポリシーを有効にすると、すべてのクラスターノードのローリング更新が発生し、追加のリソースが消費される可能性があります。"
+}
+

@@ -1,0 +1,49 @@
+{
+  "Provider": "aws",
+  "CheckID": "ecs_task_definitions_host_networking_mode_users",
+  "CheckTitle": "Amazon ECS 任务定义不使用主机网络模式，或非特权容器指定了非 root 用户",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices/Network Reachability",
+    "Software and Configuration Checks/AWS Security Best Practices/Runtime Behavior Analysis",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/CIS Host Hardening Benchmarks",
+    "TTPs/Privilege Escalation",
+    "TTPs/Lateral Movement"
+  ],
+  "ServiceName": "ecs",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsEcsTaskDefinition",
+  "ResourceGroup": "container",
+  "Description": "评估 `host` 网络模式下的 **Amazon ECS 任务定义** 中 `privileged=false` 且容器 `user` 为 `root` 或未设置的容器。",
+  "Risk": "共享主机网络使容器能够直接访问主机接口。以 **root** 用户（或未设置用户）运行会增加绑定低端口、嗅探流量或冒充服务的可能性，并使内核漏洞更容易被利用 - 从而导致数据窃取、篡改和中断，影响 **机密性**、**完整性** 和 **可用性**。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-networking.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/ecs-controls.html#ecs-6",
+    "https://docs.aws.amazon.com/config/latest/developerguide/ecs-task-definition-user-for-host-mode-check.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/ecs-controls.html",
+    "https://docs.aws.amazon.com/AmazonECS/latest/developerguide/update-task-definition-console-v2.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation: ECS task definition not using host network mode\nResources:\n  <example_resource_name>:\n    Type: AWS::ECS::TaskDefinition\n    Properties:\n      NetworkMode: awsvpc  # CRITICAL: avoids host mode to pass the check\n      ContainerDefinitions:\n        - Name: <example_resource_name>\n          Image: <image>\n```",
+      "Other": "1. 打开 Amazon ECS 控制台并转到任务定义\n2. 选择任务定义并选择最新修订版\n3. 点击创建新修订版\n4. 将网络模式设置为 awsvpc（而非 host）\n5. 保存修订版，如果被服务使用，请更新服务以使用此新修订版\n6. 如果必须保留 host 模式：编辑每个非特权容器并将用户设置为非 root 值（例如，1000）并保存新修订版",
+      "Terraform": "```hcl\n# ECS task definition not using host network mode\nresource \"aws_ecs_task_definition\" \"<example_resource_name>\" {\n  family                = \"<example_resource_name>\"\n  network_mode          = \"awsvpc\"  # CRITICAL: avoids host mode to pass the check\n  container_definitions = jsonencode([\n    {\n      name  = \"<example_resource_name>\"\n      image = \"nginx\"\n    }\n  ])\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "优先使用 **`awsvpc`** 以实现隔离。如果必须使用 `host`，强制执行 **最小权限**：\n- 以非 root `user` 运行\n- 除非严格必要，否则避免 `privileged`\n- 限制功能和暴露的端口\n\n通过网络分段和最小 IAM 权限应用 **纵深防御**。",
+      "Url": "https://hub.prowler.com/check/ecs_task_definitions_host_networking_mode_users"
+    }
+  },
+  "Categories": [
+    "container-security",
+    "trust-boundaries"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

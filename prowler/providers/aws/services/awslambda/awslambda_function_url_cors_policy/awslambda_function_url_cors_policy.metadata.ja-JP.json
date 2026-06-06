@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "awslambda_function_url_cors_policy",
+  "CheckTitle": "Lambda関数URLのCORSがワイルドカードオリジン（*）を許可していない",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices/Network Reachability",
+    "Effects/Data Exposure"
+  ],
+  "ServiceName": "awslambda",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsLambdaFunction",
+  "ResourceGroup": "serverless",
+  "Description": "**Lambda関数URL**のCORSポリシーは`AllowOrigins`について確認されます。`*`の存在は、CORS設定で広範なオリジンが許可されていることを示します。",
+  "Risk": "**ワイルドカードオリジン**により、任意のWebサイトがブラウザからエンドポイントを呼び出して応答を読み取ることができ、オリジンの分離が弱まります。\n\n状態変更メソッドにアクセスできる場合、これによりデータ漏洩（C）と不正な操作（I）が発生する可能性があり、スクリプト化された悪用やクロスオリジン攻撃を可能にします。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://support.icompaas.com/support/solutions/articles/62000229584-ensure-lambda-function-url-cors-configurations-were-checked",
+    "https://docs.aws.amazon.com/lambda/latest/api/API_Cors.html",
+    "https://tutorialsdojo.com/how-to-configure-aws-lambda-function-url-with-cross-origin-resource-sharing/",
+    "https://dev.to/rimutaka/aws-lambda-function-url-with-cors-explained-by-example-14df"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws lambda update-function-url-config --function-name <example_resource_name> --cors AllowOrigins=https://www.example.com",
+      "NativeIaC": "```yaml\n# CloudFormation：Lambda関数URLのCORSを特定のオリジンに制限\nResources:\n  FunctionUrl:\n    Type: AWS::Lambda::Url\n    Properties:\n      TargetFunctionArn: <example_resource_arn>\n      AuthType: AWS_IAM\n      Cors:\n        AllowOrigins:\n          - https://www.example.com  # 重要：このオリジンのみを許可することで'*'ワイルドカードを削除\n```",
+      "Other": "1. AWSコンソールで、Lambda > 関数に移動し、<example_resource_name>を選択\n2. 設定 > 関数URL > 編集を開く\n3. CORSで、許可されたオリジンから'*'を削除し、https://www.example.comを入力\n4. 変更を保存",
+      "Terraform": "```hcl\n# Terraform：Lambda関数URLのCORSを特定のオリジンに制限\nresource \"aws_lambda_function_url\" \"example\" {\n  function_name      = \"<example_resource_name>\"\n  authorization_type = \"AWS_IAM\"\n  cors {\n    allow_origins = [\"https://www.example.com\"] # 重要：このオリジンのみを許可することで'*'ワイルドカードを削除\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "CORSに最小権限を適用：\n- `AllowOrigins`を信頼できるドメインに制限；`*`を避ける\n- `AllowMethods`/`AllowHeaders`を制限；必要な場合を除き`AllowCredentials`を無効化\n- 認証されたアクセス（例：`AWS_IAM`）を優先し、多層防御のためにリソースポリシーを強制",
+      "Url": "https://hub.prowler.com/check/awslambda_function_url_cors_policy"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

@@ -1,0 +1,40 @@
+{
+  "Provider": "aws",
+  "CheckID": "shield_advanced_protection_in_associated_elastic_ips",
+  "CheckTitle": "Elastic IP address は AWS Shield Advanced によって保護されています",
+  "CheckType": [
+    "ソフトウェアおよび設定のチェック/AWS セキュリティのベストプラクティス/ネットワーク到達可能性",
+    "業界および規制基準/AWS基盤セキュリティのベストプラクティス",
+    "サービスへの影響/拒否"
+  ],
+  "ServiceName": "shield",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsEc2Eip",
+  "ResourceGroup": "network",
+  "Description": "**Elastic IP addresses** は、保護対象リソースとして登録されていることを確認することで、**AWS Shield Advanced** の保護対象かどうかが評価されます。",
+  "Risk": "**Shield Advanced** がない場合、インターネット向け EIP は **DDoS** の影響をより受けやすくなり、**可用性** を脅かし、**コスト** の急増を招きます。\n\nボリュメトリック攻撃やプロトコルフラッドは、帯域幅を飽和させたり接続状態を枯渇させたりして、EIP の背後にあるサービスを妨害し、インシデント対応を遅らせる可能性があります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/waf/latest/developerguide/configure-new-protection.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws shield create-protection --name <example_resource_name> --resource-arn arn:aws:ec2:<REGION>:<ACCOUNT_ID>:elastic-ip/eipalloc-<ALLOCATION_ID>",
+      "NativeIaC": "```yaml\n# CloudFormation: Elastic IP に Shield Advanced 保護を追加する\nResources:\n  Protection:\n    Type: AWS::Shield::Protection\n    Properties:\n      Name: <example_resource_name>\n      ResourceArn: arn:aws:ec2:<REGION>:<ACCOUNT_ID>:elastic-ip/eipalloc-<ALLOCATION_ID>  # 重要: 保護する Elastic IP の ARN\n```",
+      "Other": "1. AWS WAF & Shield コンソールを開く\n2. AWS Shield > Protected resources に移動する\n3. Add resources to protect をクリックする\n4. Region とリソースタイプ: EC2 Elastic IP を選択し、Load resources をクリックする\n5. 対象の Elastic IP を選択する\n6. Protect with Shield Advanced をクリックする",
+      "Terraform": "```hcl\n# Terraform: Elastic IP に Shield Advanced 保護を追加する\nresource \"aws_shield_protection\" \"<example_resource_name>\" {\n  name         = \"<example_resource_name>\"\n  resource_arn = \"arn:aws:ec2:<REGION>:<ACCOUNT_ID>:elastic-ip/eipalloc-<ALLOCATION_ID>\" # 重要: 保護する Elastic IP の ARN\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "重要な EIP を**Shield Advanced の保護対象リソース**として登録します。\n\n**多層防御**を適用します。パブリックな公開を最小限に抑え、アプリケーション層の制御（WAF、レート制限）を使用し、テレメトリを監視し、保護を定期的に見直して、ネットワークアクセスを**最小権限**に合わせます。",
+      "Url": "https://hub.prowler.com/check/shield_advanced_protection_in_associated_elastic_ips"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

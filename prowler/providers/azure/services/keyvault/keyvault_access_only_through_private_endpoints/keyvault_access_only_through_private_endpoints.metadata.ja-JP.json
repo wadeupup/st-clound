@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "keyvault_access_only_through_private_endpoints",
+  "CheckTitle": "プライベート エンドポイント使用時にパブリック ネットワーク アクセスが無効化されていることを確認する。",
+  "CheckType": [],
+  "ServiceName": "keyvault",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "/subscriptions/{subscription_id}/resourceGroups/{resource_group}/providers/Microsoft.KeyVault/vaults/{vault_name}",
+  "Severity": "high",
+  "ResourceType": "KeyVault",
+  "ResourceGroup": "security",
+  "Description": "プライベート エンドポイントを使用する Key Vault で、パブリック ネットワーク アクセスが無効化されているかを確認します。",
+  "Risk": "プライベート エンドポイント使用時に Key Vault のパブリック ネットワーク アクセスを許可すると、機密データが不正アクセスにさらされる可能性があります。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/key-vault/general/network-security",
+  "Remediation": {
+    "Code": {
+      "CLI": "az keyvault update --resource-group <resource_group> --name <vault_name> --public-network-access disabled",
+      "NativeIaC": "{\n  \"type\": \"Microsoft.KeyVault/vaults\",\n  \"apiVersion\": \"2022-07-01\",\n  \"properties\": {\n    \"publicNetworkAccess\": \"disabled\"\n  }\n}",
+      "Terraform": "resource \"azurerm_key_vault\" \"example\" {\n  # ... other configuration ...\n\n  public_network_access_enabled = false\n}",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/KeyVault/use-private-endpoints.html"
+    },
+    "Recommendation": {
+      "Text": "プライベート エンドポイントを使用する Key Vault では、ネットワーク トラフィックがプライベート エンドポイント経由のみとなるよう、パブリック ネットワーク アクセスを無効化してください。",
+      "Url": "https://learn.microsoft.com/en-us/azure/private-link/private-endpoint-overview"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

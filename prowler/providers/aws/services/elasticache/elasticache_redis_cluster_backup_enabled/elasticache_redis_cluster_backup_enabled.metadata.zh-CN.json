@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "elasticache_redis_cluster_backup_enabled",
+  "CheckTitle": "ElastiCache Redis 缓存集群已启用自动快照备份且保留期至少为 7 天",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Effects/Data Destruction"
+  ],
+  "ServiceName": "elasticache",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Other",
+  "ResourceGroup": "database",
+  "Description": "Amazon ElastiCache Redis 复制组已启用 **自动快照备份**，**保留期**至少为 `7` 天。\n\n评估重点关注是否启用了备份以及配置的保留期是否满足最低阈值。",
+  "Risk": "缺少或保留期短的备份会降低 **可用性**并增加 **数据丢失**风险。硬件故障、损坏或意外删除可能无法恢复到所需的时间点，从而破坏 **RPO/RTO**，延长中断时间，并限制对缓存数据的 **取证**。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/ElastiCache/enable-automatic-backups.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/elasticache-controls.html#elasticache-1"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws elasticache modify-replication-group --replication-group-id <REPLICATION_GROUP_ID> --snapshot-retention-limit 7 --apply-immediately",
+      "NativeIaC": "```yaml\n# CloudFormation: set automated snapshot retention for a Redis replication group\nResources:\n  <example_resource_name>:\n    Type: AWS::ElastiCache::ReplicationGroup\n    Properties:\n      ReplicationGroupDescription: example\n      SnapshotRetentionLimit: 7  # Critical: enables automatic snapshots and retains them for >=7 days\n```",
+      "Other": "1. 在 AWS 控制台中，打开 ElastiCache\n2. 转到 Redis > 复制组\n3. 选择 <example_resource_id> 并点击修改\n4. 将快照保留（天）设置为 7 或更高\n5. 勾选立即应用\n6. 点击修改以保存",
+      "Terraform": "```hcl\nresource \"aws_elasticache_replication_group\" \"<example_resource_name>\" {\n  replication_group_id       = \"<example_resource_id>\"\n  replication_group_description = \"<example_description>\"\n  snapshot_retention_limit   = 7  # Critical: enable automated backups and keep them for >=7 days\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "启用 **自动备份** 并将 **保留期** 设置为满足 RPO/RTO（通常为 `7` 天）。\n- 定义一致的 `snapshot window`\n- 定期测试恢复\n- 使用 **最小权限** 和不可变性保护备份存储\n- 监控备份状态以发现故障\n- 使用副本/多可用区应用 **纵深防御**",
+      "Url": "https://hub.prowler.com/check/elasticache_redis_cluster_backup_enabled"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "databricks_workspace_cmk_encryption_enabled",
+  "CheckTitle": "确保 Azure Databricks 工作区使用客户管理密钥（CMK）进行静态加密",
+  "CheckType": [],
+  "ServiceName": "databricks",
+  "SubServiceName": "workspace",
+  "ResourceIdTemplate": "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Databricks/workspaces/{workspaceName}",
+  "Severity": "high",
+  "ResourceType": "AzureDatabricksWorkspace",
+  "ResourceGroup": "ai_ml",
+  "Description": "检查 Azure Databricks 工作区是否配置为使用客户管理密钥（CMK）进行静态加密，从而提供对数据加密与合规性的更高控制力。",
+  "Risk": "如果未使用 CMK，组织对加密密钥的控制会减弱，可能影响监管合规，并增加未授权数据访问风险。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/databricks/security/keys/customer-managed-keys",
+  "Remediation": {
+    "Code": {
+      "CLI": "az databricks workspace update --name <databricks-workspace-name> --resource-group <resource-group-name> --prepare-encryption && databricks workspace update --name <databricks-workspace-name> --resource-group <resource-group-name> --key-source 'Microsoft.KeyVault' --key-name <key-name> --key-vault <key-vault-uri> --key-version <key-version>",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "使用 Azure Key Vault 为 Databricks 工作区启用客户管理密钥（CMK），以增强对数据加密、审计和合规性的控制。",
+      "Url": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/Databricks/enable-encryption-with-cmk.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "客户管理密钥（CMK）加密仅适用于 Premium 层级的 Databricks 工作区。"
+}

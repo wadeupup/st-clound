@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "kinesis_stream_data_retention_period",
+  "CheckTitle": "Kinesis 流至少保留数据所需的最小小时数",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践",
+    "软件和配置检查/行业和法规标准/AWS 基础安全最佳实践",
+    "影响/数据销毁"
+  ],
+  "ServiceName": "kinesis",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsKinesisStream",
+  "ResourceGroup": "messaging",
+  "Description": "**Kinesis Data Streams** 保留窗口被评估以确认记录至少保留配置的最小持续时间（默认 `168` 小时）。",
+  "Risk": "保留不足会导致记录在消费者读取或重新处理之前过期，削弱**可用性**和分析**完整性**。积压或中断可能会造成不可逆的数据缺口，阻碍调查和恢复，并通过滞后对事件管道实施拒绝服务攻击。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/streams/latest/dev/kinesis-extended-retention.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/kinesis-controls.html#kinesis-3"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws kinesis increase-stream-retention-period --stream-name <example_resource_name> --retention-period-hours 168",
+      "NativeIaC": "```yaml\n# CloudFormation：将 Kinesis 流保留设置为所需的最小小时数\nResources:\n  <example_resource_name>:\n    Type: AWS::Kinesis::Stream\n    Properties:\n      ShardCount: 1\n      RetentionPeriodHours: 168  # 关键：将保留设置为 >= 168 小时以通过检查\n```",
+      "Other": "1. 登录 AWS 控制台并打开 Amazon Kinesis\n2. 转到数据流并选择 <example_resource_name>\n3. 点击编辑\n4. 将保留期设置为 168 小时（或根据您的策略更高）\n5. 点击保存更改",
+      "Terraform": "```hcl\n# 具有足够保留期的 Kinesis 流\nresource \"aws_kinesis_stream\" \"<example_resource_name>\" {\n  name             = \"<example_resource_name>\"\n  shard_count      = 1\n  retention_period = 168  # 关键：将保留设置为 >= 168 小时以通过检查\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "将**保留期**设置为超过最坏情况下的消费者滞后、重播需求和合规窗口；默认使用至少 `168` 小时（或根据需要自定义）并根据需要提高。对保留更改实施**变更控制**和最小权限，监控消费者滞后，并维护关键流的**次级持久性**（例如，存档）。",
+      "Url": "https://hub.prowler.com/check/kinesis_stream_data_retention_period"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

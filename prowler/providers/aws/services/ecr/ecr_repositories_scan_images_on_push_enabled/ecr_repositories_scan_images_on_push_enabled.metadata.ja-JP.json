@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "ecr_repositories_scan_images_on_push_enabled",
+  "CheckTitle": "[非推奨] ECR リポジトリはプッシュ時のイメージスキャンが有効になっている",
+  "CheckType": [
+    "Software and Configuration Checks/Vulnerabilities/CVE",
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices"
+  ],
+  "ServiceName": "ecr",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsEcrRepository",
+  "ResourceGroup": "container",
+  "Description": "[非推奨]\n**Amazon ECR リポジトリ** は **プッシュ時のイメージスキャン** について評価されます。設定されると、新しいイメージのアップロードが自動的に脆弱性スキャン（`scan_on_push`）をトリガーします。",
+  "Risk": "**プッシュ時スキャン** がないと、既知の CVE を含むイメージがレジストリに入り、実行時に気づかれずに到達し、悪用可能なパッケージを通じて **整合性** と **機密性** を損ないます。攻撃者はコード実行と横方向の移動を達成する可能性があります。検出の遅延は運用リスクを増加させ、修復タイムラインを延長します。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/ECR/scan-on-push.html",
+    "https://docs.aws.amazon.com/AmazonECR/latest/userguide/image-scanning-basic-enabling.html",
+    "https://docs.aws.amazon.com/AmazonECR/latest/userguide/image-scanning.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws ecr put-image-scanning-configuration --repository-name <repo_name> --image-scanning-configuration scanOnPush=true",
+      "NativeIaC": "```yaml\nResources:\n  <example_resource_name>:\n    Type: AWS::ECR::Repository\n    Properties:\n      ImageScanningConfiguration:\n        ScanOnPush: true  # Critical: enables image scanning on push for this repository\n```",
+      "Other": "1. AWS コンソールを開き、Amazon ECR に移動します\n2. リポジトリをクリックし、ターゲットリポジトリを選択します\n3. 編集をクリックします\n4. プッシュ時スキャントグルを有効にします\n5. 保存をクリックします",
+      "Terraform": "```hcl\nresource \"aws_ecr_repository\" \"<example_resource_name>\" {\n  name = \"<example_resource_name>\"\n\n  image_scanning_configuration {\n    scan_on_push = true # Critical: enables scanning on image push\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "すべてのリポジトリに対して **プッシュ時のイメージスキャン**（`scan_on_push`）を有効にし、検出結果をプロモーションゲートとして使用します。多層防御のために **継続/強化スキャン** を優先し、重大度のしきい値を設定し、非準拠のイメージをブロックまたは隔離します。結果を CI/CD に統合し、**左シフト** 脆弱性管理を採用します。",
+      "Url": "https://hub.prowler.com/check/ecr_repositories_scan_images_on_push_enabled"
+    }
+  },
+  "Categories": [
+    "container-security"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

@@ -1,0 +1,31 @@
+{
+  "Provider": "aws",
+  "CheckID": "iam_group_administrator_access_policy",
+  "CheckTitle": "AdministratorAccess ポリシーを持つ IAM グループが存在しないことを確認する",
+  "CheckType": [],
+  "ServiceName": "iam",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "high",
+  "ResourceType": "AwsIamGroup",
+  "ResourceGroup": "IAM",
+  "Description": "このチェックは、AWS アカウント内の IAM グループに 'AdministratorAccess' ポリシーがアタッチされていないことを確認します。このポリシーを持つ IAM ユーザーはすべての AWS サービスとリソースに無制限アクセスでき、誤用時に重大なセキュリティリスクとなります。",
+  "Risk": "管理者レベル権限を持つ IAM グループは、AWS 環境内のあらゆるリソースに対して任意の操作を実行できます。これらの権限が不要に付与されたり、十分な知識のない個人に付与された場合、セキュリティ脆弱性、データ漏えい、データ損失、予期しない課金につながる可能性があります。",
+  "RelatedUrl": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_groups_manage.html",
+  "Remediation": {
+    "Code": {
+      "CLI": "aws iam detach-group-policy --group-name <groupname> --policy-arn arn:aws:iam::aws:policy/AdministratorAccess",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/IAM/group-with-privileged-access.html",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "'AdministratorAccess' ポリシーを、最小権限の原則に従ったより具体的な権限に置き換えてください。権限管理をより安全に行うために、'IAM Master' や 'IAM Manager' などの IAM ロール導入を検討してください。",
+      "Url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

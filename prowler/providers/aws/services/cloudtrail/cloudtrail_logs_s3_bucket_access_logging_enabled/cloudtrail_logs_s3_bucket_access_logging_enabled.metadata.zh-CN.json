@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "cloudtrail_logs_s3_bucket_access_logging_enabled",
+  "CheckTitle": "CloudTrail 跟踪目标 S3 存储桶已启用访问日志记录",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/CIS AWS Foundations Benchmark"
+  ],
+  "ServiceName": "cloudtrail",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsCloudTrailTrail",
+  "ResourceGroup": "monitoring",
+  "Description": "CloudTrail 跟踪将日志传送到 S3 存储桶；此检查评估该存储桶是否启用了 **S3 服务器访问日志记录** 以记录对其的请求。\n\n*如果目标存储桶在账户或审计范围之外，则需要进行手动审查。*",
+  "Risk": "如果 CloudTrail 日志存储桶没有访问日志记录，对日志文件的访问和更改将缺乏独立的审计跟踪。攻击者可以在不被归因的情况下读取、删除或替换日志，从而损害 **日志机密性** 和 **完整性**，并减慢 **事件响应**。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/cloudtrail-controls.html",
+    "https://docs.aws.amazon.com/AmazonS3/latest/dev/security-best-practices.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws s3api put-bucket-logging --bucket <CLOUDTRAIL_BUCKET_NAME> --bucket-logging-status \"{\\\"LoggingEnabled\\\":{\\\"TargetBucket\\\":\\\"<TARGET_BUCKET_NAME>\\\"}}\"",
+      "NativeIaC": "```yaml\n# CloudFormation: enable S3 access logging on the CloudTrail destination bucket\nResources:\n  <example_log_bucket_name>:\n    Type: AWS::S3::Bucket\n\n  <example_cloudtrail_bucket>:\n    Type: AWS::S3::Bucket\n    Properties:\n      LoggingConfiguration:\n        DestinationBucketName: !Ref <example_log_bucket_name>  # Critical: turns on server access logging to this destination bucket\n        # This enables access logging so the check passes\n```",
+      "Other": "1. 在 AWS 控制台中，转到 S3 并打开 CloudTrail 跟踪使用的存储桶\n2. 选择属性选项卡\n3. 在服务器访问日志记录中，单击编辑\n4. 启用日志记录并选择不同的目标 S3 存储桶用于日志\n5. 单击保存更改",
+      "Terraform": "```hcl\n# Enable access logging on the CloudTrail S3 bucket\nresource \"aws_s3_bucket\" \"<example_log_bucket_name>\" {\n  bucket = \"<example_log_bucket_name>\"\n}\n\nresource \"aws_s3_bucket\" \"<example_bucket_name>\" {\n  bucket = \"<example_bucket_name>\"\n}\n\nresource \"aws_s3_bucket_logging\" \"<example_resource_name>\" {\n  bucket        = aws_s3_bucket.<example_bucket_name>.id\n  target_bucket = aws_s3_bucket.<example_log_bucket_name>.id  # Critical: enables server access logging to the target bucket\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "在 CloudTrail 日志存储桶上启用 **S3 服务器访问日志记录**，并将日志写入单独、严格控制的存储桶。应用 **最小权限原则**，启用 **版本控制**，并考虑使用 **对象锁定** 以防止篡改。集中监控以支持纵深防御和快速调查。",
+      "Url": "https://hub.prowler.com/check/cloudtrail_logs_s3_bucket_access_logging_enabled"
+    }
+  },
+  "Categories": [
+    "logging",
+    "forensics-ready"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "redshift_cluster_encrypted_at_rest",
+  "CheckTitle": "Redshift 集群在静态时加密",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践",
+    "软件和配置检查/行业和法规标准/AWS 基础安全最佳实践",
+    "软件和配置检查/行业和监管标准/CIS AWS 基础基准",
+    "影响/数据暴露"
+  ],
+  "ServiceName": "redshift",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "critical",
+  "ResourceType": "AwsRedshiftCluster",
+  "ResourceGroup": "analytics",
+  "Description": "**Amazon Redshift 集群**使用**静态加密**。评估检查集群的加密设置，以确定磁盘上的数据和快照是否受到托管密钥的保护。",
+  "Risk": "如果没有**静态加密**，当存储介质或备份被未经授权的人员访问时，数据块和快照可能会被读取。这会危害**机密性**，使大量**数据泄露**和敏感分析的暴露成为可能，从而可能导致进一步的妥协。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/redshift/latest/mgmt/changing-cluster-encryption.html",
+    "https://docs.aws.amazon.com/redshift/latest/mgmt/working-with-db-encryption.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/redshift-controls.html#redshift-10"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws redshift modify-cluster --cluster-identifier <cluster-id> --encrypted",
+      "NativeIaC": "```yaml\n# CloudFormation：为 Redshift 集群启用静态加密\nResources:\n  <example_resource_name>:\n    Type: AWS::Redshift::Cluster\n    Properties:\n      ClusterIdentifier: \"<example_resource_id>\"\n      DBName: \"<DB_NAME>\"\n      MasterUsername: \"<MASTER_USERNAME>\"\n      MasterUserPassword: \"<MASTER_PASSWORD>\"\n      NodeType: \"<NODE_TYPE>\"\n      ClusterType: \"<CLUSTER_TYPE>\"\n      Encrypted: true  # 关键：启用静态加密以通过检查\n```",
+      "Other": "1. 打开 AWS 管理控制台并转到 Amazon Redshift\n2. 选择集群，然后选择您的集群\n3. 打开属性选项卡 > 数据库配置 > 编辑 > 编辑加密\n4. 选择启用加密（使用 AWS 管理的或特定的 KMS 密钥）\n5. 点击保存更改",
+      "Terraform": "```hcl\n# Terraform：为 Redshift 集群启用静态加密\nresource \"aws_redshift_cluster\" \"<example_resource_name>\" {\n  cluster_identifier = \"<example_resource_id>\"\n  node_type          = \"<NODE_TYPE>\"\n  cluster_type       = \"<CLUSTER_TYPE>\"\n  master_username    = \"<MASTER_USERNAME>\"\n  master_password    = \"<MASTER_PASSWORD>\"\n\n  encrypted = true  # 关键：启用静态加密以通过检查\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "为所有集群启用**静态加密**，并优先选择**客户管理密钥**（`CMEK`）以进行控制和审计。对密钥使用应用**最小特权**，轮换密钥，并限制快照访问和跨区域复制。监控密钥健康状况和访问事件，作为**深度防御**的一部分。",
+      "Url": "https://hub.prowler.com/check/redshift_cluster_encrypted_at_rest"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

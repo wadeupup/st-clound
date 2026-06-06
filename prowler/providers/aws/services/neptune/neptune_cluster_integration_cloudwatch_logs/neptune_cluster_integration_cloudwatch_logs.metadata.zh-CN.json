@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "neptune_cluster_integration_cloudwatch_logs",
+  "CheckTitle": "Neptune 集群已启用 CloudWatch 审计日志",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践/运行时行为分析",
+    "软件和配置检查/行业和法规标准/AWS 基础安全最佳实践"
+  ],
+  "ServiceName": "neptune",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "database",
+  "Description": "Neptune 数据库集群会检查 CloudWatch 的 **audit** 事件导出。该发现指示集群是否将 `audit` 日志发布到 CloudWatch；报告中的失败状态意味着未启用 `audit` 导出，审计记录未被转发到 CloudWatch 进行集中日志记录和审查。",
+  "Risk": "缺少 **审计日志** 会降低 **可检测性** 和 **问责性**：\n\n- 调查人员无法重建查询、客户端来源或时间线\n- 未经授权的查询、数据泄露或权限滥用可能未被检测到\n\n这会降低机密性和完整性，并减缓事件响应速度。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/neptune/latest/userguide/auditing.html",
+    "https://docs.aws.amazon.com/neptune/latest/userguide/cloudwatch-logs.html",
+    "https://cloudanix.com/docs/aws/audit/rdsmonitoring/rules/neptune_cluster_cloudwatch_log_export_enabled_remediation",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/neptune-controls.html#neptune-2"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws neptune modify-db-cluster --db-cluster-identifier <DB_CLUSTER_IDENTIFIER> --cloudwatch-logs-export-configuration '{\"EnableLogTypes\":[\"audit\"]}'",
+      "NativeIaC": "```yaml\nResources:\n  NeptuneCluster:\n    Type: AWS::Neptune::DBCluster\n    Properties:\n      DBClusterIdentifier: \"<DB_CLUSTER_IDENTIFIER>\"\n      EnableCloudwatchLogsExports:\n        - audit  # 将审计日志导出到 CloudWatch 以进行监控和取证\n```",
+      "Terraform": "```hcl\nresource \"aws_neptune_cluster\" \"example_resource\" {\n  cluster_identifier               = \"<db_cluster_identifier>\"\n  enabled_cloudwatch_logs_exports = [\"audit\"]  # 将审计日志导出到 CloudWatch 以进行监控和取证\n}\n```",
+      "Other": "1. 登录 AWS 管理控制台并打开 Amazon Neptune\n2. 转到数据库并选择 Neptune 数据库集群\n3. 操作 > 修改\n4. 在日志导出中，勾选“审计”\n5. 继续 > 修改数据库集群"
+    },
+    "Recommendation": {
+      "Text": "通过将 `audit` 事件导出到 CloudWatch Logs 并与监控或 SIEM 集成，为 Neptune 启用和集中 **审计日志记录**。\n\n- 对日志访问实施 **最小权限**\n- 配置保留、加密和异常查询警报\n\n这支持主动检测和取证准备。",
+      "Url": "https://hub.prowler.com/check/neptune_cluster_integration_cloudwatch_logs"
+    }
+  },
+  "Categories": [
+    "logging",
+    "forensics-ready"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "dms_replication_task_source_logging_enabled",
+  "CheckTitle": "DMS レプリケーションタスクでログが有効化され、SOURCE_CAPTURE と SOURCE_UNLOAD コンポーネントの重大度が少なくとも Default に設定されている",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "TTPs/Defense Evasion"
+  ],
+  "ServiceName": "dms",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsDmsReplicationTask",
+  "ResourceGroup": "database",
+  "Description": "**AWS DMS レプリケーションタスク**で **ログ記録が有効化** されており、`SOURCE_CAPTURE` と `SOURCE_UNLOAD` の重大度が少なくとも `LOGGER_SEVERITY_DEFAULT`（またはそれ以上の `LOGGER_SEVERITY_DEBUG`、`LOGGER_SEVERITY_DETAILED_DEBUG`）に設定されていることを確認します。",
+  "Risk": "ソース側ログが存在しない、または重大度が低すぎる場合、**CDC** やフルロード処理に対する可視性が低下し、エラー、停止、改ざんが検知されないリスクがあります。これにより静かに **データドリフト** が発生し、データリネージが失われ、復旧に失敗する可能性があり、**完全性** と **可用性** が損なわれ、調査時の監査性も弱まります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/dms/latest/userguide/CHAP_Monitoring.html",
+    "https://repost.aws/knowledge-center/dms-debug-logging",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/dms-controls.html#dms-8"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws dms modify-replication-task --replication-task-arn <example_resource_arn> --replication-task-settings '{\"Logging\":{\"EnableLogging\":true,\"LogComponents\":[{\"Id\":\"SOURCE_CAPTURE\",\"Severity\":\"LOGGER_SEVERITY_DEFAULT\"},{\"Id\":\"SOURCE_UNLOAD\",\"Severity\":\"LOGGER_SEVERITY_DEFAULT\"}]}}'",
+      "NativeIaC": "```yaml\n# CloudFormation: DMS ソースログを少なくとも DEFAULT 重大度で有効化\nResources:\n  <example_resource_name>:\n    Type: AWS::DMS::ReplicationTask\n    Properties:\n      ReplicationInstanceArn: <example_resource_arn>\n      SourceEndpointArn: <example_resource_arn>\n      TargetEndpointArn: <example_resource_arn>\n      MigrationType: full-load\n      TableMappings: '{\"rules\":[]}'\n      # 重要：ログを有効化し、SOURCE コンポーネントを少なくとも DEFAULT に設定\n      ReplicationTaskSettings: |\n        {\n          \"Logging\": {\n            \"EnableLogging\": true,\n            \"LogComponents\": [\n              {\"Id\": \"SOURCE_CAPTURE\", \"Severity\": \"LOGGER_SEVERITY_DEFAULT\"},\n              {\"Id\": \"SOURCE_UNLOAD\", \"Severity\": \"LOGGER_SEVERITY_DEFAULT\"}\n            ]\n          }\n        }\n```",
+      "Other": "1. AWS コンソールで Database Migration Service > Database migration tasks に移動します\n2. タスクを選択し、Modify を選択します\n3. Modify task logging をクリックします\n4. Enable logging をオンにします\n5. SOURCE_CAPTURE と SOURCE_UNLOAD の Severity を Default（またはそれ以上）に設定します\n6. 保存／変更を行い、設定を反映させます",
+      "Terraform": "```hcl\n# DMS ソースログを少なくとも DEFAULT 重大度で有効化\nresource \"aws_dms_replication_task\" \"<example_resource_name>\" {\n  replication_instance_arn = \"<example_resource_arn>\"\n  source_endpoint_arn      = \"<example_resource_arn>\"\n  target_endpoint_arn      = \"<example_resource_arn>\"\n  migration_type           = \"full-load\"\n  table_mappings           = \"{\\\"rules\\\":[]}\"\n\n  # 重要：ログを有効化し、SOURCE コンポーネントを少なくとも DEFAULT に設定\n  replication_task_settings = <<JSON\n{\n  \"Logging\": {\n    \"EnableLogging\": true,\n    \"LogComponents\": [\n      {\"Id\": \"SOURCE_CAPTURE\", \"Severity\": \"LOGGER_SEVERITY_DEFAULT\"},\n      {\"Id\": \"SOURCE_UNLOAD\", \"Severity\": \"LOGGER_SEVERITY_DEFAULT\"}\n    ]\n  }\n}\nJSON\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "`SOURCE_CAPTURE` と `SOURCE_UNLOAD` に対して **タスクログ** を有効化し、重大度を `LOGGER_SEVERITY_DEFAULT` 以上で標準化してください。\n- ログを集中管理し、異常に対してアラートを設定\n- ログアクセスには **最小特権** を適用\n- 監査を支えるために十分な保持期間を設定\n- 可視性とコストのバランスを取るため、`DEBUG` レベルは *トラブルシューティング時のみ一時的に使用* し、長期間の有効化は避けてください",
+      "Url": "https://hub.prowler.com/check/dms_replication_task_source_logging_enabled"
+    }
+  },
+  "Categories": [
+    "logging"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+
+

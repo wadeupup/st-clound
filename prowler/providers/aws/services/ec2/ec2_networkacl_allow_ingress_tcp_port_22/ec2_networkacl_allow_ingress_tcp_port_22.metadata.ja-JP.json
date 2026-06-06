@@ -1,0 +1,36 @@
+{
+  "Provider": "aws",
+  "CheckID": "ec2_networkacl_allow_ingress_tcp_port_22",
+  "CheckTitle": "ネットワーク ACL が 0.0.0.0/0 からの SSH ポート 22 へのインバウンドを許可していないことを確認",
+  "CheckType": [
+    "Infrastructure Security"
+  ],
+  "ServiceName": "ec2",
+  "SubServiceName": "networkacl",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "medium",
+  "ResourceType": "AwsEc2NetworkAcl",
+  "ResourceGroup": "network",
+  "Description": "ネットワーク ACL が 0.0.0.0/0 からの SSH ポート 22 へのインバウンドを許可していないことを確認",
+  "Risk": "境界ファイアウォールがあっても、ネットワーク ACL が開いていると、VPC アクセス権を持つ任意のユーザーやマルウェアが既知のポートや機密ポートをスキャンし、インスタンスへのアクセスを取得できるようになります。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "https://docs.prowler.com/checks/aws/networking-policies/ensure-aws-nacl-does-not-allow-ingress-from-00000-to-port-22#cloudformation",
+      "Other": "",
+      "Terraform": "https://docs.prowler.com/checks/aws/networking-policies/ensure-aws-nacl-does-not-allow-ingress-from-00000-to-port-22#terraform"
+    },
+    "Recommendation": {
+      "Text": "ゼロトラストアプローチを適用します。制限されていない、または過度に許可的なネットワーク ACL をスキャンして修復するプロセスを実装します。推奨されるベストプラクティスは、必要な最小ポートの定義を狭めることです。",
+      "Url": "https://docs.aws.amazon.com/vpc/latest/userguide/vpc-network-acls.html"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

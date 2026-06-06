@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "monitor_alert_delete_policy_assignment",
+  "CheckTitle": "确保已为删除策略分配配置活动日志告警",
+  "CheckType": [],
+  "ServiceName": "monitor",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Monitor",
+  "ResourceGroup": "monitoring",
+  "Description": "为删除策略分配事件创建活动日志告警。",
+  "Risk": "监控删除策略分配事件可洞察“azure policy - assignments”中的变更，并可缩短检测非预期变更所需时间。",
+  "RelatedUrl": "https://docs.microsoft.com/en-in/rest/api/monitor/activitylogalerts/createorupdate",
+  "Remediation": {
+    "Code": {
+      "CLI": "az monitor activity-log alert create --resource-group '<resource group name>' --condition category=Administrative and operationName=Microsoft.Authorization/policyAssignments/delete and level=<verbose | information | warning | error | critical> --scope '/subscriptions/<subscription ID>' --name '<activity log rule name>' -- subscription <subscription id> --action-group <action group ID> --location global",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity-staging/knowledge-base/azure/ActivityLog/delete-policy-assignment-alert-in-use.html#trendmicro",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "1. 进入 Monitor 页面。2. 选择 Alerts。3. 选择 Create。4. 选择 Alert rule。5. 在 Filter by subscription 下选择一个订阅。6. 在 Filter by resource type 下选择 Policy assignment (policyAssignments)。7. 在 Filter by location 下选择 All。8. 在结果中选择该订阅。9. 选择 Done。10. 选择 Condition 选项卡。11. 在 Signal name 下点击 Delete policy assignment (Microsoft.Authorization/policyAssignments)。12. 选择 Actions 选项卡。13. 若使用现有操作组，点击 Select action groups。若创建新操作组，点击 Create action group，并填写相应信息。14. 选择 Details 选项卡。15. 选择 Resource group，提供 Alert rule 名称及可选描述。16. 点击 Review + create。17. 点击 Create。",
+      "Url": "https://docs.microsoft.com/en-in/azure/azure-monitor/platform/alerts-activity-log"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "默认情况下不会创建监控告警。"
+}

@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "entra_users_cannot_create_microsoft_365_groups",
+  "CheckTitle": "「Users can create Microsoft 365 groups in Azure portals, API or PowerShell」が「No」に設定されていることを確認する",
+  "CheckType": [],
+  "ServiceName": "entra",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Microsoft.Users/Settings",
+  "ResourceGroup": "IAM",
+  "Description": "Microsoft 365 グループの作成を管理者のみに制限します。",
+  "Risk": "Microsoft 365 グループ作成を管理者のみに制限することで、Microsoft 365 グループ作成を管理者が統制できるようになります。適切なグループは管理者が作成・管理し、グループ作成権限は他のユーザーへ委任すべきではありません。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/microsoft-365/community/all-about-groups#microsoft-365-groups",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/ActiveDirectory/users-can-create-office-365-groups.html#",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "1. Azure Home から Portal Menu を選択します 2. Microsoft Entra ID を選択します 3. 次に Groups を選択します 4. settings で General を選択します 5. Users can create Microsoft 365 groups in Azure portals, API or PowerShell を No に設定します",
+      "Url": "https://learn.microsoft.com/en-us/microsoft-365/solutions/manage-creation-of-groups?view=o365-worldwide&redirectSourcePath=%252fen-us%252farticle%252fControl-who-can-create-Office-365-Groups-4c46c8cb-17d0-44b5-9776-005fced8e618"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "この設定を有効化すると、管理者が処理すべきリクエストが多数発生する可能性があります。"
+}

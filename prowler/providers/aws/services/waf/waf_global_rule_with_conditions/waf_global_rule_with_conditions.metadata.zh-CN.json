@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "waf_global_rule_with_conditions",
+  "CheckTitle": "AWS WAF Classic Global 规则至少有一个条件",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践/网络可达性",
+    "软件和配置检查/行业和监管标准/AWS 基础安全最佳实践",
+    "软件和配置检查/行业和监管标准/NIST 800-53 控制措施"
+  ],
+  "ServiceName": "waf",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsWafRule",
+  "ResourceGroup": "security",
+  "Description": "**AWS WAF Classic 全局规则** 至少包含一个 **条件**，用于匹配该规则评估其执行操作（例如 `allow`、`block`、`count`）的 HTTP(S) 请求。",
+  "Risk": "**无条件规则**永远不会匹配流量，因此无法提供任何过滤。恶意请求（SQLi/XSS、机器人）可以到达源站，影响**机密性**（数据泄露）、**完整性**（篡改）和**可用性**（服务中断）。它们还可能造成一种错误的覆盖感。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/waf/latest/developerguide/classic-web-acl-rules-editing.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/waf-controls.html#waf-6",
+    "https://docs.aws.amazon.com/config/latest/developerguide/waf-global-rule-not-empty.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws waf update-rule --rule-id <example_resource_id> --change-token <example_change_token> --updates '[{\"Action\":\"INSERT\",\"Predicate\":{\"Negated\":false,\"Type\":\"IPMatch\",\"DataId\":\"<example_resource_id>\"}}]' --region us-east-1",
+      "NativeIaC": "```yaml\n# CloudFormation：确保 WAF Classic 全局规则至少有一个条件\nResources:\n  <example_resource_name>:\n    Type: AWS::WAF::Rule\n    Properties:\n      Name: <example_resource_name>\n      MetricName: <example_metric_name>\n      # 关键：至少添加一个谓词（条件），以使该规则不为空\n      Predicates:\n        - Negated: false  # 按原样评估\n          Type: IPMatch\n          DataId: <example_resource_id>  # 现有 IPSet ID\n```",
+      "Other": "1. 打开 AWS 控制台 > AWS WAF，然后点击切换到 AWS WAF Classic\n2. 在 Global（CloudFront）范围内，前往 Rules 并选择目标规则\n3. 点击 Edit（或 Add rule）> Add condition\n4. 选择一种条件类型（例如，IP match），选择一个现有条件，将其设置为 does（not negated）\n5. 点击 Update/Save 以应用更改",
+      "Terraform": "```hcl\n# 确保 WAF Classic Global 规则至少具有一个条件\nresource \"aws_waf_rule\" \"<example_resource_name>\" {\n  name        = \"<example_resource_name>\"\n  metric_name = \"<example_metric_name>\"\n\n  # 关键：至少添加一个谓词（条件），以使该规则不为空\n  predicate {\n    data_id = \"<example_resource_id>\"  # 现有 IPSet ID\n    negated = false\n    type    = \"IPMatch\"\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "为每条规则至少附加一个精确的**条件**，使其与已知威胁和应用程序上下文保持一致。对流量实施**最小权限**原则，使用托管规则组实现**纵深防御**，并定期审查规则以移除占位规则。*如果使用的是 Classic*，请规划迁移到 WAFv2。",
+      "Url": "https://hub.prowler.com/check/waf_global_rule_with_conditions"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

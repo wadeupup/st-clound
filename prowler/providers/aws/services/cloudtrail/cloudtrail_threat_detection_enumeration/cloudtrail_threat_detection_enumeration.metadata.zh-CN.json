@@ -1,0 +1,45 @@
+{
+  "Provider": "aws",
+  "CheckID": "cloudtrail_threat_detection_enumeration",
+  "CheckTitle": "CloudTrail 日志显示没有潜在的枚举活动",
+  "CheckType": [
+    "TTPs/Discovery",
+    "Software and Configuration Checks/AWS Security Best Practices/Runtime Behavior Analysis",
+    "Unusual Behaviors/User"
+  ],
+  "ServiceName": "cloudtrail",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "critical",
+  "ResourceType": "AwsCloudTrailTrail",
+  "ResourceGroup": "monitoring",
+  "Description": "分析 **CloudTrail 活动**，查找在最近时间窗口内执行大量发现 API（如 `List*`、`Describe*` 和 `Get*`）的 AWS 身份。\n\n超过这些操作的可配置比率的身份表明该主体可能存在枚举行为。",
+  "Risk": "集中的发现活动表明使用有效凭据进行 **侦察**。攻击者可以映射资产和策略以启用 **权限提升**，针对数据存储进行 **窃取**（机密性），并识别要破坏的服务（可用性），支持隐蔽的横向移动。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://medium.com/falconforce/falconfriday-detecting-enumeration-in-aws-0xff25-orangecon-25-edition-4aee83651088",
+    "https://www.elastic.co/guide/en/security/8.19/aws-discovery-api-calls-via-cli-from-a-single-resource.html",
+    "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-concepts.html#cloudtrail-concepts-logging-data-events",
+    "https://aws.plainenglish.io/aws-cloudtrail-event-cheatsheet-a-detection-engineers-guide-to-critical-api-calls-part-1-04fb1588556f",
+    "https://support.icompaas.com/support/solutions/articles/62000233455-ensure-there-are-no-potential-enumeration-threats-in-cloudtrail-"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws iam update-access-key --user-name <USER_NAME> --access-key-id <ACCESS_KEY_ID> --status Inactive",
+      "NativeIaC": "```yaml\n# CloudFormation: deny common enumeration APIs for a specific IAM user\nResources:\n  DenyEnumerationPolicy:\n    Type: AWS::IAM::Policy\n    Properties:\n      PolicyName: deny-enumeration\n      PolicyDocument:\n        Version: \"2012-10-17\"\n        Statement:\n          - Effect: Deny  # CRITICAL: blocks typical enumeration calls\n            Action:\n              - ec2:Describe*   # CRITICAL: deny EC2 describe APIs\n              - iam:List*       # CRITICAL: deny IAM list APIs\n              - s3:List*        # CRITICAL: deny S3 list APIs\n              - s3:Get*         # CRITICAL: deny S3 get APIs (e.g., GetBucketAcl)\n            Resource: \"*\"\n      Users:\n        - \"<example_resource_name>\"  # CRITICAL: target the enumerating user\n```",
+      "Other": "1. 在 AWS 控制台中，转到 IAM > 用户并打开警报中显示的用户（发现中的 ARN）\n2. 选择安全凭据选项卡\n3. 对于每个活动的访问密钥，单击停用以将状态设置为非活动\n4. 如果活动来自 EC2 实例角色：转到 EC2 > 实例 > 选择实例 > 安全 > IAM 角色 > 分离 IAM 角色\n5. 重新运行检查以确认没有新的枚举事件发生",
+      "Terraform": "```hcl\n# Deny common enumeration APIs for a specific IAM user\nresource \"aws_iam_user_policy\" \"<example_resource_name>\" {\n  name = \"deny-enumeration\"\n  user = \"<example_user_name>\"\n\n  policy = jsonencode({\n    Version = \"2012-10-17\",\n    Statement = [{\n      Effect   = \"Deny\", # CRITICAL: blocks typical enumeration calls\n      Action   = [\n        \"ec2:Describe*\",   # CRITICAL\n        \"iam:List*\",       # CRITICAL\n        \"s3:List*\",        # CRITICAL\n        \"s3:Get*\"          # CRITICAL\n      ],\n      Resource = \"*\"\n    }]\n  })\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "应用 **最小权限原则** 将 `List*`/`Describe*`/`Get*` 限制为必要的资源和角色；使用 **职责分离**。\n- 强制执行 MFA 和短期会话\n- 使用 **SCP** 来限制不必要的发现\n- 基线预期的读取并在峰值时发出警报作为 **纵深防御**",
+      "Url": "https://hub.prowler.com/check/cloudtrail_threat_detection_enumeration"
+    }
+  },
+  "Categories": [
+    "threat-detection"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "inspector2_is_enabled",
+  "CheckTitle": "Inspector2は、Amazon EC2インスタンス、ECRコンテナイメージ、Lambda関数、およびLambdaコードに対して有効化されています。",
+  "CheckAliases": [
+    "inspector2_findings_exist"
+  ],
+  "CheckType": [
+    "ソフトウェアと構成のチェック/AWS セキュリティベストプラクティス",
+    "ソフトウェアと構成のチェック/業界および規制基準/AWS 基礎セキュリティベストプラクティス"
+  ],
+  "ServiceName": "inspector2",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "security",
+  "Description": "**Amazon Inspector 2** の有効化とリージョン全体でのカバレッジを確認し、**EC2**、**ECR**、**Lambda関数**、および**Lambdaコード**のスキャンが適用されていることを確認します。\n\nアカウントの有効化が欠けている場合や、スキャンタイプにギャップがある場合にフラグを立てます。",
+  "Risk": "カバレッジが欠如しているか部分的であると、**未パッチの脆弱性**、リスクのある**コード依存関係**、および**意図しないネットワーク露出**が検出されません。\n\n攻撃者は既知のCVEを利用して、**リモートコード実行**、**横方向の移動**、および**データの流出**を行い、**機密性**、**完全性**、および**可用性**を低下させる可能性があります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/Inspector2/enable-amazon-inspector2.html",
+    "https://docs.aws.amazon.com/inspector/latest/user/findings-understanding.html",
+    "https://docs.aws.amazon.com/inspector/latest/user/getting_started_tutorial.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws inspector2 enable --resource-types EC2 ECR LAMBDA LAMBDA_CODE",
+      "NativeIaC": "",
+      "Other": "1. AWSコンソールにサインインし、Amazon Inspector (v2) を開きます。\n2. まだ有効化されていない場合: [Get started] をクリックし、[Activate Amazon Inspector] を選択します。\n3. 既に有効化されている場合: [Settings] > [Scans] に移動し、EC2、ECR、Lambda関数、およびLambdaコードがすべて有効になっていることを確認し、[Save] をクリックします。",
+      "Terraform": "```hcl\nresource \"aws_inspector2_enabler\" \"<example_resource_name>\" {\n  resource_types = [\"EC2\", \"ECR\", \"LAMBDA\", \"LAMBDA_CODE\"] # 必要なすべてのリソースタイプに対してInspector2スキャンを有効化します。\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "すべてのリージョンで**Amazon Inspector 2**を有効化し、**EC2**、**ECR**、**Lambda**、および**Lambdaコード**のスキャンを有効化します。\n\n**多層防御**を適用します: 新しいワークロードに対して自動的にカバレッジを有効化し、パッチ適用およびCI/CDゲートと統合し、修正SLAを強制し、発見事項を処理し行動するために**最小特権**のみを付与します。",
+      "Url": "https://hub.prowler.com/check/inspector2_is_enabled"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

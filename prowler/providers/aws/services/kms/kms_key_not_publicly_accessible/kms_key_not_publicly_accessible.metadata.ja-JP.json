@@ -1,0 +1,44 @@
+{
+  "Provider": "aws",
+  "CheckID": "kms_key_not_publicly_accessible",
+  "CheckTitle": "Cloud KMS キーは allUsers または allAuthenticatedUsers へのアクセスを許可しません",
+  "CheckType": [
+    "ソフトウェアと構成のチェック/AWS セキュリティベストプラクティス",
+    "業界および規制基準/AWS 基礎セキュリティベストプラクティス",
+    "TTPs/初期アクセス/不正アクセス",
+    "影響/データの露出"
+  ],
+  "ServiceName": "kms",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "critical",
+  "ResourceType": "AwsKmsKey",
+  "ResourceGroup": "security",
+  "Description": "**KMS キー** は、`*` プリンシパルや複数のアイデンティティに対する広範な権限を含むキー ポリシーまたは付与における**過剰なアクセス**について評価されます。",
+  "Risk": "**KMS キー** への広範なアクセスは、許可されていない `kms:Decrypt` やデータキーの生成を可能にし、**機密性**を損ないます。管理者権限があると、攻撃者はポリシーを変更したり削除をスケジュールしたりでき、制御の**整合性**を損ない、キーに依存するデータの**可用性**を脅かします。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/gcp/CloudKMS/publicly-accessible-kms-cryptokeys.html",
+    "https://support.icompaas.com/support/solutions/articles/62000232904-1-9-ensure-cloud-kms-cryptokeys-are-not-accessible-to-anonymous-or-public-users-automated-",
+    "https://docs.aws.amazon.com/kms/latest/developerguide/determining-access.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws kms put-key-policy --key-id <example_resource_id> --policy-name default --policy '{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::<account_id>:root\"},\"Action\":\"kms:*\",\"Resource\":\"*\"}]}'",
+      "NativeIaC": "```yaml\n# CloudFormation: KMS キーポリシーをアカウントルートに制限 (公開アクセスを削除)\nResources:\n  <example_resource_name>:\n    Type: AWS::KMS::Key\n    Properties:\n      KeyPolicy:\n        Version: '2012-10-17'\n        Statement:\n          - Effect: Allow\n            Principal:\n              AWS: arn:aws:iam::<account_id>:root  # 重要: アカウントルートのみがアクセス可能; 公開 \"*\" プリンシパルを防止\n            Action: kms:*\n            Resource: '*'\n```",
+      "Other": "1. AWS コンソールを開く > Key Management Service (KMS)\n2. 影響を受けるキーを選択し、キー ポリシー タブに移動\n3. 編集をクリックし、プリンシパルが \"*\" (または AWS: \"*\") に設定されているステートメントを削除\n4. arn:aws:iam::<account_id>:root のみを許可するステートメントが存在することを確認\n5. 変更を保存",
+      "Terraform": "```hcl\n# KMS キーポリシーをアカウントルートに制限して、公開 (\"*\") プリンシパルを避ける\ndata \"aws_caller_identity\" \"current\" {}\n\nresource \"aws_kms_key\" \"<example_resource_name>\" {\n  policy = jsonencode({\n    Version   = \"2012-10-17\"\n    Statement = [\n      {\n        Effect    = \"Allow\"\n        Principal = { AWS = \"arn:aws:iam::${data.aws_caller_identity.current.account_id}:root\" } # 重要: 公開アクセスを削除するためにアカウントルートに制限\n        Action    = \"kms:*\"\n        Resource  = \"*\"\n      }\n    ]\n  })\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "KMS キーに**最小特権**を適用:\n- プリンシパルを特定のロールとアカウントに制限\n- 狭く、時間制限のある付与を優先\n- キー管理を使用から分離\n- 条件を使用してコンテキストを制限\n- 定期的にレビューし、ワイルドカードやクロスアカウントの露出を削除",
+      "Url": "https://hub.prowler.com/check/kms_key_not_publicly_accessible"
+    }
+  },
+  "Categories": [
+    "internet-exposed",
+    "identity-access"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "keyvault_key_expiration_set_in_non_rbac",
+  "CheckTitle": "非 RBAC Key Vault のすべてのキーに有効期限が設定されていることを確認する。",
+  "CheckType": [],
+  "ServiceName": "keyvault",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "KeyVault",
+  "ResourceGroup": "security",
+  "Description": "非ロールベースアクセス制御（RBAC）の Azure Key Vault 内のすべてのキーに有効期限が設定されていることを確認します。",
+  "Risk": "Azure Key Vault では、Microsoft Azure 環境内で暗号鍵を保存および使用できます。exp（有効期限）属性は、その日付以降に鍵を暗号操作に使用してはならないことを示します。既定ではキーは期限切れになりません。そのため、キーをキーボルト内でローテーションし、すべてのキーに明示的な有効期限を設定することが推奨されます。これにより、割り当てられた有効期間を超えてキーが使用されることを防げます。",
+  "RelatedUrl": "https://docs.microsoft.com/en-us/azure/key-vault/key-vault-whatis",
+  "Remediation": {
+    "Code": {
+      "CLI": "az keyvault key set-attributes --name <keyName> --vault-name <vaultName> --expires Y-m-d'T'H:M:S'Z'",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/KeyVault/key-expiration-check.html#",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-general-policies/set-an-expiration-date-on-all-keys#terraform"
+    },
+    "Recommendation": {
+      "Text": "Azure Portal から: 1. Key vaults に移動します。2. 各 Key vault で Keys をクリックします。3. メイン ペインで、有効化されているキーに適切な Expiration date が設定されていることを確認します。Azure CLI から: 次のコマンドでキーの有効期限を更新します: az keyvault key set-attributes --name <keyName> --vault-name <vaultName> -- expires Y-m-d'T'H:M:S'Z' 注: Microsoft API を使用して Key Vault 内のすべてのキーの有効期限を表示するには「List」キー権限が必要です。キーの有効期限を更新するには: 1. Key vault に移動し、Access Control (IAM) をクリックします。2. Add role assignment をクリックし、適切なユーザーに Key Vault Crypto Officer ロールを割り当てます。PowerShell から: Set-AzKeyVaultKeyAttribute -VaultName <VaultName> -Name <KeyName> -Expires <DateTime>",
+      "Url": "https://docs.microsoft.com/en-us/rest/api/keyvault/about-keys--secrets-and-certificates#key-vault-keys"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "キーはそれぞれの有効期限を過ぎると使用できません。キーは利用箇所を問わず定期的にローテーションする必要があります。"
+}

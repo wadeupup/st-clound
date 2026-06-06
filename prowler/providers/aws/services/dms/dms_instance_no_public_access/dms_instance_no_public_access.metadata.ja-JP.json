@@ -1,0 +1,46 @@
+{
+  "Provider": "aws",
+  "CheckID": "dms_instance_no_public_access",
+  "CheckTitle": "DMS レプリケーションインスタンスがインターネットから公開されていない",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices/Network Reachability",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/CIS AWS Foundations Benchmark",
+    "TTPs/Initial Access"
+  ],
+  "ServiceName": "dms",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "critical",
+  "ResourceType": "AwsDmsReplicationInstance",
+  "ResourceGroup": "database",
+  "Description": "**AWS DMS レプリケーションインスタンス** は **パブリック公開** の有無について評価されます。`PubliclyAccessible` が有効で、関連付けられたセキュリティグループが任意のアドレスからのインバウンドトラフィックを許可している場合は公開と見なされます。プライベートまたは許可リストのみを受け付けるインスタンスは公開とは見なされません。",
+  "Risk": "インターネットから到達可能なレプリケーションインスタンスは次のリスクをもたらします。\n- 機密性：移行データや認証情報が傍受または流出する可能性がある。\n- 完全性：攻撃者がタスクを変更したり、レコードを注入したりする可能性がある。\n- 可用性：悪用や DDoS によりレプリケーションが停止し、カットオーバーが遅延する可能性がある。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/dms-controls.html#dms-1",
+    "https://docs.aws.amazon.com/amazonq/detector-library/terraform/restrict-public-access-dms-terraform/",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/DMS/publicly-accessible.html",
+    "https://support.icompaas.com/support/solutions/articles/62000233448-ensure-dms-instances-are-not-publicly-accessible"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation: DMS インスタンスをパブリックにしない\nResources:\n  <example_resource_name>:\n    Type: AWS::DMS::ReplicationInstance\n    Properties:\n      ReplicationInstanceClass: dms.t3.micro\n      PubliclyAccessible: false  # 重要：インターネットへの公開を防ぐためにパブリックアクセスを無効化\n```",
+      "Other": "1. AWS コンソールで Database Migration Service > Replication instances を開き、インスタンスを選択します\n2. Details > Networking で、各アタッチ済みセキュリティグループ ID をクリックして EC2 コンソールで開きます\n3. インバウンドルールで、送信元が 0.0.0.0/0 または ::/0 のルールを削除します\n4. 各セキュリティグループでルールを保存します",
+      "Terraform": "```hcl\n# DMS インスタンスをパブリックにしない\nresource \"aws_dms_replication_instance\" \"<example_resource_name>\" {\n  replication_instance_id    = \"<example_resource_id>\"\n  replication_instance_class = \"dms.t3.micro\"\n  publicly_accessible        = false  # 重要：インターネットへの公開を防ぐためにパブリックアクセスを無効化\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "**プライベートのみ** の設計を採用します。\n- `PubliclyAccessible` を無効にし、インスタンスをプライベートサブネットに配置します。\n- **最小特権** のセキュリティグループ（`0.0.0.0/0` を禁止）を適用し、必要な送信元／ポートのみを許可します。\n- アクセスは **VPN**、ピアリング、または Direct Connect 経由で提供します。\n- ACL やモニタリングなどのコントロールを多層的に適用し、IAM を必要なアクションのみに制限します。",
+      "Url": "https://hub.prowler.com/check/dms_instance_no_public_access"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+
+

@@ -1,0 +1,34 @@
+{
+  "Provider": "aws",
+  "CheckID": "ec2_transitgateway_auto_accept_vpc_attachments",
+  "CheckTitle": "Amazon EC2 Transit Gateway は VPC アタッチメントリクエストを自動的に受け入れるべきではない",
+  "CheckType": [
+    "Infrastructure Security"
+  ],
+  "ServiceName": "ec2",
+  "SubServiceName": "transit-gateway",
+  "ResourceIdTemplate": "arn:aws:ec2:region:account-id:transit-gateway/tgw-id",
+  "Severity": "high",
+  "ResourceType": "AwsEc2TransitGateway",
+  "ResourceGroup": "network",
+  "Description": "EC2 Transit Gateway が共有 VPC アタッチメントを自動的に受け入れないことを確認します。Transit Gateway が共有 VPC アタッチメントリクエストを自動的に受け入れるように設定されている場合、失敗と判定されます。",
+  "Risk": "AutoAcceptSharedAttachments を有効にすると、Transit Gateway は検証なしで任意のクロスアカウント VPC アタッチメントリクエストを自動的に受け入れることができます。これにより、不正な VPC アタッチメントのリスクが増加し、ネットワークセキュリティが損なわれる可能性があります。",
+  "RelatedUrl": "https://docs.aws.amazon.com/config/latest/developerguide/ec2-transit-gateway-auto-vpc-attach-disabled.html",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://docs.aws.amazon.com/securityhub/latest/userguide/ec2-controls.html#ec2-23",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "AutoAcceptSharedAttachments をオフにして、承認された VPC アタッチメントリクエストのみが受け入れられるようにします",
+      "Url": "https://docs.aws.amazon.com/vpc/latest/tgw/tgw-transit-gateways.html#tgw-modifying"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "dynamodb_table_deletion_protection_enabled",
+  "CheckTitle": "DynamoDB 表已启用删除保护",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Effects/Data Destruction"
+  ],
+  "ServiceName": "dynamodb",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsDynamoDbTable",
+  "ResourceGroup": "database",
+  "Description": "**DynamoDB 表**通过 `deletion protection` 设置启用了**删除保护**，这意味着删除操作需要先禁用此设置",
+  "Risk": "如果没有**删除保护**，表可能因授权操作或配置错误的自动化而被删除，导致不可恢复的数据丢失和服务中断。这会影响**完整性**和**可用性**，并增加被入侵凭据或错误运行手册的影响范围。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/dynamodb-controls.html#dynamodb-6",
+    "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/WorkingWithTables.Basics.html#WorkingWithTables.Basics.DeletionProtection"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws dynamodb update-table --table-name <TABLE_NAME> --deletion-protection-enabled",
+      "NativeIaC": "```yaml\nResources:\n  <example_resource_name>:\n    Type: AWS::DynamoDB::Table\n    Properties:\n      DeletionProtectionEnabled: true  # CRITICAL: Enables deletion protection to prevent table deletion\n```",
+      "Other": "1. 打开 AWS 管理控制台并前往 DynamoDB\n2. 选择表\n3. 选择 Additional settings\n4. 启用 Deletion protection\n5. 保存更改",
+      "Terraform": "```hcl\nresource \"aws_dynamodb_table\" \"<example_resource_name>\" {\n  name     = \"<example_resource_name>\"\n  hash_key = \"id\"\n\n  attribute {\n    name = \"id\"\n    type = \"S\"\n  }\n\n  deletion_protection_enabled = true  # CRITICAL: Prevents accidental table deletion\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "在关键表上启用**删除保护**。\n- 强制执行**最小权限**以限制谁可以修改此设置\n- 要求在计划删除之前通过变更控制来禁用它\n- 结合**PITR**和备份以实现纵深防御\n- 使用自动化使新表默认启用此功能",
+      "Url": "https://hub.prowler.com/check/dynamodb_table_deletion_protection_enabled"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

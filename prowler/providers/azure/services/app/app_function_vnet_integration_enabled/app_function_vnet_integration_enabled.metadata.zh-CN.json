@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "app_function_vnet_integration_enabled",
+  "CheckTitle": "确保已为 Azure Functions 启用虚拟网络集成",
+  "CheckType": [],
+  "ServiceName": "app",
+  "SubServiceName": "function",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Microsoft.Web/sites",
+  "ResourceGroup": "serverless",
+  "Description": "为 Azure Functions 启用虚拟网络集成，可通过将访问限制到所选虚拟网络子网来提供额外的安全层，从而帮助保护 Function App 免受未授权访问和潜在威胁。",
+  "Risk": "如果未启用虚拟网络集成，Function App 可能暴露在公共互联网上，增加未授权访问与潜在安全事件的风险。",
+  "RelatedUrl": "https://docs.microsoft.com/en-us/azure/azure-functions/functions-networking-options#virtual-network-integration",
+  "Remediation": {
+    "Code": {
+      "CLI": "az functionapp vnet-integration update --name <function_app_name> --resource-group <resource_group_name> --vnet <vnet_name> --subnet <subnet_name>",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/Functions/azure-function-vnet-integration-on.html",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "建议为 Azure Functions 启用虚拟网络集成，以增强安全性并防止未授权访问。",
+      "Url": "https://docs.microsoft.com/en-us/azure/azure-functions/functions-networking-options#enable-virtual-network-integration"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

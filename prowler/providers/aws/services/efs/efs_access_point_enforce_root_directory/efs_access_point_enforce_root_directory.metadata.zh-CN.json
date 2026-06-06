@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "efs_access_point_enforce_root_directory",
+  "CheckTitle": "EFS 文件系统没有允许访问根目录的访问点",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Effects/Data Exposure"
+  ],
+  "ServiceName": "efs",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsEfsAccessPoint",
+  "ResourceGroup": "storage",
+  "Description": "评估 **Amazon EFS 访问点** 以确保它们强制执行非根目录。该检查识别配置的根目录 `Path` 为 `/` 的访问点，这意味着客户端将挂载文件系统的根目录而不是作用域子目录。",
+  "Risk": "通过访问点暴露文件系统根目录会破坏 **机密性** 和 **完整性**，因为它允许遍历超出预期数据集的范围。攻击者或配置错误的应用程序可能：\n- 读取敏感目录\n- 修改或删除共享数据\n- 跨租户转向，影响 **可用性**",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/efs/latest/ug/enforce-root-directory-access-point.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/efs-controls.html#efs-3"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws efs delete-access-point --access-point-id <access-point-id>",
+      "NativeIaC": "```yaml\n# CloudFormation: EFS access point enforcing a non-root directory\nResources:\n  <example_resource_name>:\n    Type: AWS::EFS::AccessPoint\n    Properties:\n      FileSystemId: <example_resource_id>\n      RootDirectory:\n        Path: /data  # Critical: set to a non-root path to avoid \"/\" and pass the check\n        # This enforces the access point root to /data instead of the file system root\n```",
+      "Other": "1. 在 AWS 控制台中，转到 EFS > 访问点\n2. 选择显示根目录为 / 的访问点\n3. 点击删除并确认\n4. 点击创建访问点\n5. 选择文件系统并将根目录路径设置为非根路径（例如，/data）\n6. 点击创建访问点",
+      "Terraform": "```hcl\n# Terraform: EFS access point enforcing a non-root directory\nresource \"aws_efs_access_point\" \"<example_resource_name>\" {\n  file_system_id = \"<example_resource_id>\"\n\n  root_directory {\n    path = \"/data\"  # Critical: not \"/\"; enforces a subdirectory as root to pass the check\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "应用 **最小权限**：将每个访问点的 `Path` 设置为专用子目录，避免使用 `/`。\n- 使用每个应用程序的访问点\n- 强制执行 POSIX 身份和目录权限\n- 分层控制（网络分段、监控）以实现 **纵深防御**",
+      "Url": "https://hub.prowler.com/check/efs_access_point_enforce_root_directory"
+    }
+  },
+  "Categories": [
+    "vulnerabilities"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

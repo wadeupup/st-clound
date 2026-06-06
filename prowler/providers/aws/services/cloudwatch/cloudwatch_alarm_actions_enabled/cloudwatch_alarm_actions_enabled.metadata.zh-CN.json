@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "cloudwatch_alarm_actions_enabled",
+  "CheckTitle": "CloudWatch 指标警报已启用操作",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "TTPs/Defense Evasion"
+  ],
+  "ServiceName": "cloudwatch",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsCloudWatchAlarm",
+  "ResourceGroup": "monitoring",
+  "Description": "评估 **CloudWatch 指标警报** 的 **警报操作** 激活情况（`actions_enabled: true`），使状态更改能够调用配置的通知或自动响应。",
+  "Risk": "如果警报操作被禁用，状态更改既不会通知也不会修复。事件可能会持续未被注意到，从而启用未经授权的活动、配置漂移或容量耗尽。可见性下降，MTTR 上升，机密性、完整性和可用性都面临更大风险。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/CloudWatch/cloudwatch-alarm-action-activated.html",
+    "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/AlarmThatSendsEmail.html#alarms-and-actions",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/cloudwatch-controls.html#cloudwatch-17"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws cloudwatch enable-alarm-actions --alarm-names <alarm-name>",
+      "NativeIaC": "```yaml\nResources:\n  <example_resource_name>:\n    Type: AWS::CloudWatch::Alarm\n    Properties:\n      ActionsEnabled: true  # FIX: activates alarm actions so the check passes\n      ComparisonOperator: GreaterThanThreshold\n      EvaluationPeriods: 1\n      MetricName: <example_metric_name>\n      Namespace: <example_metric_namespace>\n      Period: 60\n      Statistic: Average\n      Threshold: 1\n```",
+      "Other": "1. 打开 CloudWatch 控制台\n2. 转到警报 > 所有警报并选择警报\n3. 选择操作 > 警报操作 - 新建 > 启用\n4. 确认以激活操作",
+      "Terraform": "```hcl\nresource \"aws_cloudwatch_metric_alarm\" \"<example_resource_name>\" {\n  alarm_name          = \"<example_resource_name>\"\n  comparison_operator = \"GreaterThanThreshold\"\n  evaluation_periods  = 1\n  metric_name         = \"<example_metric_name>\"\n  namespace           = \"<example_metric_namespace>\"\n  period              = 60\n  statistic           = \"Average\"\n  threshold           = 1\n\n  actions_enabled = true  # FIX: activates alarm actions so the check passes\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "在关键警报上启用 `actions_enabled`，并为 ALARM 和恢复状态附加最小权限操作（SNS、自动化）。使用冗余目标，定期测试通知，并与事件响应集成。应用 **纵深防御** 和补充检测，以确保及时、可靠的警报。",
+      "Url": "https://hub.prowler.com/check/cloudwatch_alarm_actions_enabled"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

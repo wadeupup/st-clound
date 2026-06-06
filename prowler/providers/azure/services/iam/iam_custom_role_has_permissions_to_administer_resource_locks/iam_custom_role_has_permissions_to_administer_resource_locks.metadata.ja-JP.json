@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "iam_custom_role_has_permissions_to_administer_resource_locks",
+  "CheckTitle": "IAM カスタム ロールにリソース ロック管理権限があることを確認する",
+  "CheckType": [],
+  "ServiceName": "iam",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AzureRole",
+  "ResourceGroup": "IAM",
+  "Description": "カスタム ロールにリソース ロック管理権限が割り当てられていることを確認する",
+  "Risk": "Azure では、リソース ロックは重要リソースの誤削除や誤変更を防ぐ手段です。これらのロックはリソース グループ レベルまたは個別リソース レベルで設定できます。リソース ロック管理は重要な作業であり、適切な権限を持つカスタム ロールで実施すべきです。これにより、認可されたユーザーのみがリソース ロックを管理できます。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/lock-resources?tabs=json",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity-staging/knowledge-base/azure/AccessControl/resource-lock-custom-role.html",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "リソース ロックは、重要な Azure リソースの誤削除や誤変更を防ぐために必要です。リソース ロックの管理は、適切な権限を持つカスタム ロールで実施すべきです。",
+      "Url": "https://www.trendmicro.com/cloudoneconformity-staging/knowledge-base/azure/AccessControl/resource-lock-custom-role.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

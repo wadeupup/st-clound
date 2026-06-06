@@ -1,0 +1,40 @@
+{
+  "Provider": "aws",
+  "CheckID": "vpc_different_regions",
+  "CheckTitle": "VPC 存在于多个区域中",
+  "CheckType": [
+    "软件和配置检查/AWS安全最佳实践",
+    "影响/拒绝服务"
+  ],
+  "ServiceName": "vpc",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsEc2Vpc",
+  "ResourceGroup": "network",
+  "Description": "非默认 **VPC** 会在整个账户范围内进行评估，以确定它们是否存在于**多个区域**中。结果反映了您的自定义网络拓扑是分布在多个区域，还是集中在单个区域。",
+  "Risk": "单区域 VPC 部署会削弱**可用性**和**弹性**。区域性中断、服务故障或网络控制配置错误可能导致大范围停机、阻碍恢复，并扩大影响业务连续性的事件的**爆炸半径**。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/vpc/latest/userguide/vpc-example-private-subnets-nat.html",
+    "https://docs.aws.amazon.com/vpc/latest/userguide/VPC_Scenario2.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws ec2 create-vpc --region <OTHER_REGION> --cidr-block <CIDR_BLOCK>",
+      "NativeIaC": "```yaml\n#在第二个 AWS 区域部署此堆栈以通过检查\nResources:\n  <example_resource_name>:\n    Type: AWS::EC2::VPC\n    Properties:\n      CidrBlock: 10.0.0.0/16  #严重：在此区域创建一个非默认 VPC\n```",
+      "Other": "1. 打开 AWS 控制台并进入 VPC\n2. 在区域选择器（右上角）中，选择一个与您现有非默认 VPC 不同的区域\n3. 点击 Create VPC > VPC only\n4. 输入一个 IPv4 CIDR 块（例如，10.0.0.0/16）\n5. 点击 Create VPC\n6. 验证此第二个区域中现在已存在一个非默认 VPC",
+      "Terraform": "```hcl\nprovider \"aws\" {\n  alias  = \"other\"\n  region = \"<OTHER_REGION>\" #关键：确保在第二个区域中创建 VPC\n}\n\nresource \"aws_vpc\" \"<example_resource_name>\" {\n  provider   = aws.other\n  cidr_block = \"10.0.0.0/16\" #严重：在该区域中创建一个非默认 VPC\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "采用**多区域网络设计**：\n- 至少在两个区域为关键工作负载创建 VPC\n- 一致地复制路由、安全控制和端点\n- 通过数据复制以及有弹性的 DNS/故障转移来应用**容错**和**纵深防御**，以避免对单一区域的依赖",
+      "Url": "https://hub.prowler.com/check/vpc_different_regions"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

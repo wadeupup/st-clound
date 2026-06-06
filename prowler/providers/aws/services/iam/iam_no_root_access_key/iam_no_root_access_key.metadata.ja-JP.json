@@ -1,0 +1,35 @@
+{
+  "Provider": "aws",
+  "CheckID": "iam_no_root_access_key",
+  "CheckTitle": "root アカウントのアクセスキーが存在しないことを確認する",
+  "CheckType": [
+    "Software and Configuration Checks",
+    "Industry and Regulatory Standards",
+    "CIS AWS Foundations Benchmark"
+  ],
+  "ServiceName": "iam",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "critical",
+  "ResourceType": "AwsIamAccessKey",
+  "ResourceGroup": "IAM",
+  "Description": "root アカウントのアクセスキーが存在しないことを確認する",
+  "Risk": "root アカウントは AWS アカウントで最も権限の高いユーザーです。AWS Access Keys は AWS アカウントへのプログラムアクセスを提供します。root アカウントに関連付けられたすべてのアクセスキーを削除することが推奨されます。root アカウントのアクセスキーを削除することで、アカウント侵害の経路を減らせます。また、root アクセスキーの削除は、最小権限に基づくロールベースアカウントの作成と利用を促進します。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "認証情報レポートを使用してユーザーを確認し、access_key_1_active と access_key_2_active の各フィールドが FALSE に設定されていることを確認してください。AWS Organizations を利用している場合は、Centralized Root Management の有効化と個別 root 認証情報の削除を検討してください。",
+      "Url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_getting-report.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

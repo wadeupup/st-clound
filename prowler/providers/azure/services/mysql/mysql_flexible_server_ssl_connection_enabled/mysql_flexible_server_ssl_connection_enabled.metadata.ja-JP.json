@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "mysql_flexible_server_ssl_connection_enabled",
+  "CheckTitle": "標準 MySQL Database Server で 'Enforce SSL connection' が 'Enabled' に設定されていることを確認する",
+  "CheckType": [],
+  "ServiceName": "mysql",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Microsoft.DBforMySQL/flexibleServers",
+  "ResourceGroup": "database",
+  "Description": "MYSQL サーバーで SSL 接続を有効にします。",
+  "Risk": "SSL 接続は、Secure Sockets Layer（SSL）を使用してデータベース サーバーとクライアント アプリケーションを接続することで、新たなセキュリティ層を提供します。データベース サーバーとクライアント アプリケーション間の SSL 接続を強制することで、サーバーとアプリケーション間のデータ ストリームが暗号化され、「中間者攻撃」への対策に役立ちます。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/mysql/single-server/concepts-ssl-connection-security",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.tenable.com/policies/[type]/AC_AZURE_0131",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "1. https://portal.azure.com で Azure Portal にログインします。2. Azure Database for MySQL servers に移動します。3. 各データベースで Connection security をクリックします。4. SSL settings で ENABLED をクリックして SSL 接続を強制します。",
+      "Url": "https://docs.microsoft.com/en-us/azure/mysql/single-server/how-to-configure-ssl"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

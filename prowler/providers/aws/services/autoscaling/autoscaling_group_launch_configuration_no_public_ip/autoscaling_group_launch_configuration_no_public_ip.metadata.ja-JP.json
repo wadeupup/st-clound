@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "autoscaling_group_launch_configuration_no_public_ip",
+  "CheckTitle": "Auto Scaling グループに関連付けられた起動設定がパブリック IP アドレスを割り当てていません",
+  "CheckType": [
+    "ソフトウェアと設定チェック/AWS セキュリティベストプラクティス/ネットワーク到達可能性",
+    "ソフトウェアと設定チェック/業界および規制基準/AWS 基礎セキュリティベストプラクティス",
+    "ソフトウェアと設定チェック/業界および規制基準/CIS AWS 基礎ベンチマーク"
+  ],
+  "ServiceName": "autoscaling",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsAutoScalingAutoScalingGroup",
+  "ResourceGroup": "compute",
+  "Description": "**Amazon EC2 Auto Scaling グループ**は、関連する**起動設定**がインスタンスに**パブリック IP アドレス**を割り当てるかどうか（例：`AssociatePublicIpAddress=true`）を判断するために評価されます。",
+  "Risk": "**パブリックにアドレス指定可能なインスタンス**はインターネットから到達可能で、偵察、ブルートフォース、露出したサービスの悪用を可能にします。\n\n侵害により、リモートアクセス、**データ流出**、**横方向の移動**が可能になり、**機密性**、**整合性**、**可用性**に影響を与えます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/autoscaling-controls.html#autoscaling-5",
+    "https://docs.aws.amazon.com/autoscaling/ec2/userguide/create-auto-scaling-groups-launch-configuration.html",
+    "https://docs.aws.amazon.com/autoscaling/ec2/userguide/change-launch-config.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation 起動設定、パブリック IP なし\nResources:\n  <example_resource_name>:\n    Type: AWS::AutoScaling::LaunchConfiguration\n    Properties:\n      ImageId: <example_ami_id>\n      InstanceType: <example_instance_type>\n      AssociatePublicIpAddress: false  # 重要：インスタンスへのパブリック IP の割り当てを無効にします\n```",
+      "Other": "1. AWS コンソールで、EC2 > Auto Scaling > Launch configurations に移動し、Create launch configuration をクリックします\n2. 現在のグループと同じ AMI とインスタンスタイプを使用します；Advanced details の下で、IP address type を Do not assign a public IP address に設定します\n3. 起動設定を作成します\n4. EC2 > Auto Scaling Groups に移動し、グループを選択し、Launch configuration の横の Edit をクリックし、新しい設定を選択して、Update をクリックします",
+      "Terraform": "```hcl\n# パブリック IP なしの起動設定\nresource \"aws_launch_configuration\" \"<example_resource_name>\" {\n  image_id                    = \"<example_ami_id>\"\n  instance_type               = \"<example_instance_type>\"\n  associate_public_ip_address = false  # 重要：パブリック IP の割り当てを無効にします\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "インスタンスをプライベートサブネットに配置し、パブリックアドレッシングを無効にします（`AssociatePublicIpAddress=false`）。**ロードバランサー**または**プライベートエンドポイント**を介してサービスを公開し、**最小権限**セキュリティグループを強制し、管理アクセスには**SSM**、VPN、または強化されたバストンホストを使用します。ネットワーク制御を標準化するために**起動テンプレート**を優先します。",
+      "Url": "https://hub.prowler.com/check/autoscaling_group_launch_configuration_no_public_ip"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

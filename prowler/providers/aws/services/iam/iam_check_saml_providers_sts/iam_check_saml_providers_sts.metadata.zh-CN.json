@@ -1,0 +1,35 @@
+{
+  "Provider": "aws",
+  "CheckID": "iam_check_saml_providers_sts",
+  "CheckTitle": "检查是否存在 SAML Provider，以便可使用 STS",
+  "CheckType": [
+    "Software and Configuration Checks",
+    "Industry and Regulatory Standards",
+    "CIS AWS Foundations Benchmark"
+  ],
+  "ServiceName": "iam",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "low",
+  "ResourceType": "Other",
+  "ResourceGroup": "IAM",
+  "Description": "检查是否存在 SAML Provider，以便可使用 STS",
+  "Risk": "如果没有 SAML provider，拥有 AWS CLI 或 AWS API 访问权限的用户可能会使用 IAM 静态凭证。SAML 可帮助用户在每次认证时默认通过 Assume Role 获取权限。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "启用 SAML provider 并使用临时凭证。你可以使用临时安全凭证通过 AWS CLI 或 AWS API（使用 AWS SDK）以编程方式请求 AWS 资源。临时凭证可提供与长期安全凭证（如 IAM 用户凭证）相同的权限。若不具备 SAML provider 能力，应尽量避免使用长期凭证。",
+      "Url": "https://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRoleWithSAML.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

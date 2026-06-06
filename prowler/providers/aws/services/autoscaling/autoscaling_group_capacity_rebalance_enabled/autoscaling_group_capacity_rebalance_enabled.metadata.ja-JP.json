@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "autoscaling_group_capacity_rebalance_enabled",
+  "CheckTitle": "Amazon EC2 Auto Scaling グループで容量リバランシングが有効になっています",
+  "CheckType": [
+    "ソフトウェアと設定チェック/AWS セキュリティベストプラクティス",
+    "影響/サービス拒否"
+  ],
+  "ServiceName": "autoscaling",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsAutoScalingAutoScalingGroup",
+  "ResourceGroup": "compute",
+  "Description": "**EC2 Auto Scaling グループ**は、**容量リバランシング**を使用して EC2 `rebalance` の推奨事項に対応し、リスクのある Spot インスタンスを起動し、それらが正常になった後に終了します。\n\n*この積極的な置き換え動作が有効になっているかどうかを評価します。*",
+  "Risk": "**容量リバランシング**がない場合、Spot の中断によりターゲットが低下し、容量が減少し、タイムアウト、5xx の急増、バックログの増加が発生する可能性があります。2分の通知はしばしば不十分で、サービスの**可用性**を低下させ、カスケード障害と回復の遅延の可能性を増加させます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/awssupport/latest/user/fault-tolerance-checks.html#amazon-ec2-auto-scaling-group-capacity-rebalance-enabled",
+    "https://docs.aws.amazon.com/autoscaling/ec2/userguide/ec2-auto-scaling-capacity-rebalancing.html",
+    "https://trendmicro.com/cloudoneconformity/knowledge-base/aws/EC2/enable-capacity-rebalancing.html",
+    "https://docs.aws.amazon.com/autoscaling/ec2/userguide/enable-capacity-rebalancing-console-cli.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws autoscaling update-auto-scaling-group --auto-scaling-group-name <example_resource_name> --capacity-rebalance",
+      "NativeIaC": "```yaml\n# CloudFormation: Auto Scaling グループで容量リバランシングを有効にします\nResources:\n  <example_resource_name>:\n    Type: AWS::AutoScaling::AutoScalingGroup\n    Properties:\n      MinSize: \"1\"\n      MaxSize: \"1\"\n      AvailabilityZones: [\"<example_az>\"]\n      LaunchTemplate:\n        LaunchTemplateName: <example_resource_name>\n        Version: \"$Default\"\n      CapacityRebalance: true  # 重要：リスクのある Spot インスタンスの積極的な置き換えを有効にします\n```",
+      "Other": "1. AWS コンソールで、EC2 > Auto Scaling Groups に移動します\n2. <example_resource_name> を選択し、Details タブを開きます\n3. Allocation strategies > Edit をクリックし、Capacity rebalancing をチェックします\n4. Update/Save をクリックします",
+      "Terraform": "```hcl\n# Terraform: Auto Scaling グループで容量リバランシングを有効にします\nresource \"aws_autoscaling_group\" \"<example_resource_name>\" {\n  name               = \"<example_resource_name>\"\n  min_size           = 1\n  max_size           = 1\n  desired_capacity   = 1\n  availability_zones = [\"<example_az>\"]\n\n  launch_template {\n    id    = \"<example_resource_id>\"\n    version = \"$Latest\"\n  }\n\n  capacity_rebalance = true  # 重要：容量リバランシングを有効にします\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "Spot を使用する ASG に対して**容量リバランシング**を有効にします。\n\nレジリエンスの実践を適用します：\n- `price-capacity-optimized` 割り当てを優先します\n- 余裕を `MaxSize` 以下に保ちます\n- ライフサイクルフックを使用してドレイン/登録解除します\n- ステートレスで中断に耐性のあるワークロードを設計します（依存関係に対して最小権限と多層防御を使用）",
+      "Url": "https://hub.prowler.com/check/autoscaling_group_capacity_rebalance_enabled"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

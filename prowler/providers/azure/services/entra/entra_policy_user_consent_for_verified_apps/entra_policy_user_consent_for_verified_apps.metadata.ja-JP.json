@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "entra_policy_user_consent_for_verified_apps",
+  "CheckTitle": "「User consent for applications」が「Allow for Verified Publishers」に設定されていることを確認する",
+  "CheckType": [],
+  "ServiceName": "entra",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "#microsoft.graph.authorizationPolicy",
+  "ResourceGroup": "IAM",
+  "Description": "要求元が検証済みパブリッシャーである場合に、選択されたアクセス許可に対する同意をユーザーに許可します。",
+  "Risk": "Microsoft Entra ID をサードパーティ アプリケーションの ID プロバイダーとして利用する場合、権限と同意は管理者または事前承認に限定すべきです。悪意あるアプリケーションは、データ流出や特権ユーザー アカウントの悪用を試みる可能性があります。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/entra/identity/enterprise-apps/configure-user-consent?pivots=portal#configure-user-consent-to-applications",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "1. Azure Home から Portal Menu を選択します 2. Microsoft Entra ID を選択します 3. Enterprise Applications を選択します 4. Consent and permissions を選択します 5. User consent settings を選択します 6. User consent for applications で Allow user consent for apps from verified publishers, for selected permissions を選択します 7. Save を選択します",
+      "Url": "https://learn.microsoft.com/en-us/security/benchmark/azure/mcsb-privileged-access#pa-1-separate-and-limit-highly-privilegedadministrative-users"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "この設定を強制すると、管理者がレビューすべき追加リクエストが増える可能性があります。"
+}

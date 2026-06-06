@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "networkfirewall_multi_az",
+  "CheckTitle": "Network Firewall 防火墙部署在多个可用区",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践",
+    "软件和配置检查/行业和监管标准/NIST 800-53 控制",
+    "影响/拒绝服务"
+  ],
+  "ServiceName": "networkfirewall",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsNetworkFirewallFirewall",
+  "ResourceGroup": "network",
+  "Description": "**AWS Network Firewall 防火墙** 被评估为 **多可用区部署**，期望在多个可用区中有子网映射。\n\n仅有一个子网映射的配置表示单可用区防火墙。",
+  "Risk": "单可用区防火墙是单点故障。可用区中断可能导致流量丢失或黑洞，降低**可用性**，或促使路由更改绕过检查，暴露**机密性**和**完整性**于未过滤的访问、数据泄露和横向移动。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/id_id/network-firewall/latest/developerguide/arch-two-zone-igw.html",
+    "https://aws.amazon.com/es/blogs/networking-and-content-delivery/deployment-models-for-aws-network-firewall/",
+    "https://docs.aws.amazon.com/network-firewall/latest/developerguide/arch-two-zone-igw.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/networkfirewall-controls.html#networkfirewall-1"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws network-firewall associate-subnets --firewall-arn <FIREWALL_ARN> --subnet-mappings SubnetId=<SUBNET_ID_IN_DIFFERENT_AZ>",
+      "NativeIaC": "```yaml\n# CloudFormation：通过添加第二个子网映射确保防火墙跨多个可用区\nResources:\n  <example_resource_name>:\n    Type: AWS::NetworkFirewall::Firewall\n    Properties:\n      FirewallName: <example_resource_name>\n      FirewallPolicyArn: <example_firewall_policy_arn>\n      VpcId: <example_vpc_id>\n      SubnetMappings:\n        - SubnetId: <subnet-id-1>\n        - SubnetId: <subnet-id-2>  # 关键：在不同可用区中添加第二个子网以实现多可用区\n```",
+      "Other": "1. 打开 AWS 控制台并转到 VPC > Network Firewall > Firewalls\n2. 选择您的防火墙并打开防火墙详情选项卡\n3. 在关联策略和 VPC 中，点击编辑\n4. 点击添加新子网，选择同一 VPC 中的另一个可用区及其子网\n5. 确保选择至少两个可用区，然后点击保存",
+      "Terraform": "```hcl\n# Terraform：添加第二个 subnet_mapping 以在多个可用区中部署防火墙\nresource \"aws_networkfirewall_firewall\" \"<example_resource_name>\" {\n  name                = \"<example_resource_name>\"\n  firewall_policy_arn = \"<example_firewall_policy_arn>\"\n  vpc_id              = \"<example_vpc_id>\"\n\n  subnet_mapping {\n    subnet_id = \"<subnet-id-1>\"\n  }\n\n  subnet_mapping {\n    subnet_id = \"<subnet-id-2>\"  # 关键：在不同可用区中添加第二个子网以实现多可用区\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "在 `>=2` 个可用区中部署防火墙，每个使用的可用区都有专用子网。保持每个可用区的对称路由到本地端点以保持有状态检查。应用**深度防御**并自动化漂移控制和可用区故障转移测试以维持弹性。",
+      "Url": "https://hub.prowler.com/check/networkfirewall_multi_az"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

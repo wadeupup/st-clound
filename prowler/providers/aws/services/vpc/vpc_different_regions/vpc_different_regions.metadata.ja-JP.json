@@ -1,0 +1,40 @@
+{
+  "Provider": "aws",
+  "CheckID": "vpc_different_regions",
+  "CheckTitle": "VPC は複数のリージョンに存在します",
+  "CheckType": [
+    "ソフトウェアと構成チェック/AWSセキュリティのベストプラクティス",
+    "サービスへの影響/拒否"
+  ],
+  "ServiceName": "vpc",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsEc2Vpc",
+  "ResourceGroup": "network",
+  "Description": "デフォルト以外の**VPC**は、**複数のリージョン**に存在するかどうかを判断するために、アカウント全体で評価されます。結果は、カスタムネットワークトポロジーがリージョン間に分散しているか、単一のリージョンに集中しているかを示します。",
+  "Risk": "単一リージョンのVPCデプロイは、**可用性**と**レジリエンス**を弱めます。リージョン障害、サービス中断、またはネットワーク制御の設定ミスは、広範なダウンタイムを引き起こし、復旧を妨げ、事業継続性に影響するインシデントの**影響範囲**を拡大させる可能性があります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/vpc/latest/userguide/vpc-example-private-subnets-nat.html",
+    "https://docs.aws.amazon.com/vpc/latest/userguide/VPC_Scenario2.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws ec2 create-vpc --region <OTHER_REGION> --cidr-block <CIDR_BLOCK>",
+      "NativeIaC": "```yaml\n#このスタックを2つ目のAWSリージョンにデプロイして、チェックに合格してください\nResources:\n  <example_resource_name>:\n    Type: AWS::EC2::VPC\n    Properties:\n      CidrBlock: 10.0.0.0/16  #重大: このリージョンにデフォルト以外のVPCを作成します\n```",
+      "Other": "1. AWS コンソールを開き、VPC に移動します\n2. リージョンセレクター（右上）で、既存の非デフォルト VPC とは異なるリージョンを選択します\n3. Create VPC > VPC only をクリックします\n4. IPv4 CIDR ブロック（例: 10.0.0.0/16）を入力します\n5. Create VPC をクリックします\n6. この 2 つ目のリージョンに非デフォルト VPC が存在することを確認します",
+      "Terraform": "```hcl\nprovider \"aws\" {\n  alias  = \"other\"\n  region = \"<OTHER_REGION>\" #重要: VPC が第2のリージョンに作成されることを保証します\n}\n\nresource \"aws_vpc\" \"<example_resource_name>\" {\n  provider   = aws.other\n  cidr_block = \"10.0.0.0/16\" #重大: そのリージョンにデフォルト以外のVPCを作成します\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "**マルチリージョンのネットワーク設計**を採用します：\n- 重要なワークロード向けに少なくとも2つのリージョンにVPCを作成する\n- ルーティング、セキュリティ制御、エンドポイントを一貫して複製する\n- 単一リージョンへの依存を避けるために、データレプリケーションと耐障害性のあるDNS/フェイルオーバーにより、**フォールトトレランス**と**多層防御**を適用する",
+      "Url": "https://hub.prowler.com/check/vpc_different_regions"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

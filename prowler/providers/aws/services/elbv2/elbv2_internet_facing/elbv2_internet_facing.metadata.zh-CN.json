@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "elbv2_internet_facing",
+  "CheckTitle": "Application Load Balancer 不应被公网访问（入站 TCP 不允许 0.0.0.0/0 或 ::/0）",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices/Network Reachability",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/CIS AWS Foundations Benchmark",
+    "TTPs/Initial Access"
+  ],
+  "ServiceName": "elbv2",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsElbv2LoadBalancer",
+  "ResourceGroup": "network",
+  "Description": "对于配置为 `internet-facing` 的 **ELBv2 Application Load Balancer**，会通过检查其关联的**安全组**来评估暴露风险。\n\n若入站 TCP 规则允许 `0.0.0.0/0` 或 `::/0`，则表示存在不受限制的公网可达性。",
+  "Risk": "**未受限制的 ALB 访问**会让任意客户端触达暴露端点，带来**凭证填充**、自动化扫描和**Web 漏洞利用**风险。\n\n影响包括：\n- 机密性：数据外泄\n- 完整性：未授权更改\n- 可用性：攻击面扩大与 **DoS** 风险增加",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/waf/latest/developerguide/web-acl-associating-aws-resource.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/ELBv2/internet-facing-load-balancers.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation Security Group for ALB with no public (0.0.0.0/0 or ::/0) TCP ingress\nResources:\n  <example_resource_name>:\n    Type: AWS::EC2::SecurityGroup\n    Properties:\n      GroupDescription: ALB SG restricted ingress\n      VpcId: \"<example_resource_id>\"\n      SecurityGroupIngress:\n        - IpProtocol: tcp\n          FromPort: 80\n          ToPort: 80\n          CidrIp: 10.0.0.0/8  # Critical: restricts inbound to private CIDR, preventing public access\n```",
+      "Other": "1. 在 AWS 控制台进入 EC2 > Load Balancers 并选择 ALB\n2. 在 Description 标签中查看并打开关联的 Security Group\n3. 点击 Edit inbound rules\n4. 删除 Source 为 0.0.0.0/0 或 ::/0 的 TCP 规则\n5. 如需访问，仅添加特定私有 CIDR 或可信安全组\n6. 点击 Save rules",
+      "Terraform": "```hcl\n# Security Group for ALB with no public (0.0.0.0/0 or ::/0) TCP ingress\nresource \"aws_security_group\" \"<example_resource_name>\" {\n  name   = \"alb-restricted-sg\"\n  vpc_id = \"<example_resource_id>\"\n\n  ingress {\n    from_port   = 80\n    to_port     = 80\n    protocol    = \"tcp\"\n    cidr_blocks = [\"10.0.0.0/8\"] # Critical: restricts inbound to private CIDR, preventing public access\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "对安全组执行**最小权限**：避免 `0.0.0.0/0`，仅允许可信 CIDR 或上游服务。\n\n非公网应用应使用 `internal` 负载均衡器。\n\n对于公网端点，叠加 **WAF** 规则、严格 TLS 和限流；可结合 **CloudFront/Shield** 实现纵深防御并降低直接暴露。",
+      "Url": "https://hub.prowler.com/check/elbv2_internet_facing"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

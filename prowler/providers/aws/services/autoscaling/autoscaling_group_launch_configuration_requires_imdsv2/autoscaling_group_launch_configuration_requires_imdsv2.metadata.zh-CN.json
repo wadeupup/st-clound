@@ -1,0 +1,46 @@
+{
+  "Provider": "aws",
+  "CheckID": "autoscaling_group_launch_configuration_requires_imdsv2",
+  "CheckTitle": "Auto Scaling 组强制执行 IMDSv2 或禁用实例元数据服务",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践",
+    "软件和配置检查/行业和监管标准/AWS 基础安全最佳实践",
+    "软件和配置检查/行业和监管标准/CIS AWS 基础基准",
+    "TTPs/凭据访问",
+    "影响/数据暴露"
+  ],
+  "ServiceName": "autoscaling",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsAutoScalingAutoScalingGroup",
+  "ResourceGroup": "compute",
+  "Description": "Amazon EC2 Auto Scaling 启动配置会根据**实例元数据服务**设置进行评估。实例应该将元数据端点设置为 `enabled`，并将 `http_tokens=required`（强制执行**IMDSv2**），或者将元数据服务设置为 `disabled`。\n\n允许 `http_tokens=optional` 或省略版本会保留传统访问的启用状态。",
+  "Risk": "没有强制执行的**IMDSv2**，**SSRF**和本地逃逸路径可以访问**IAM 角色凭据**，从而启用未授权的 API 调用。\n\n攻击者可以：\n- 使用被盗的令牌泄露数据\n- 横向移动并修改资源，降低机密性和完整性",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://trendmicro.com/cloudoneconformity/knowledge-base/aws/EC2/require-imds-v2.html",
+    "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/configuring-IMDS-new-instances.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/autoscaling-controls.html#autoscaling-3",
+    "https://aws.plainenglish.io/dont-let-metadata-leak-why-imdsv2-is-a-must-and-how-to-migrate-a88e1e285394"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws autoscaling create-launch-configuration --launch-configuration-name <new-launch-config> --image-id <AMI_ID> --instance-type <INSTANCE_TYPE> --metadata-options 'HttpTokens=required,HttpEndpoint=enabled'",
+      "NativeIaC": "```yaml\n# CloudFormation: ASG 启动配置强制执行 IMDSv2\nResources:\n  LaunchConfig:\n    Type: AWS::AutoScaling::LaunchConfiguration\n    Properties:\n      ImageId: <example_ami_id>\n      InstanceType: <example_instance_type>\n      MetadataOptions:\n        HttpTokens: required     # 关键：要求 IMDSv2 令牌（禁用 IMDSv1）\n        HttpEndpoint: enabled    # 关键：在强制执行 v2 时保持 IMDS 启用\n\n  AutoScalingGroup:\n    Type: AWS::AutoScaling::AutoScalingGroup\n    Properties:\n      LaunchConfigurationName: !Ref LaunchConfig\n      MinSize: 1\n      MaxSize: 1\n      VPCZoneIdentifier:\n        - <example_subnet_id>\n```",
+      "Other": "1. 在 AWS 控制台中，转到 EC2 > Auto Scaling > Launch configurations\n2. 单击 Create launch configuration 并选择组使用的相同 AMI 和实例类型\n3. 展开 Advanced details 并将 Metadata options 设置为：Metadata accessible = Enabled，Metadata version = V2 only (token required)\n4. 创建启动配置\n5. 转到 EC2 > Auto Scaling > Auto Scaling groups，选择组，单击 Edit\n6. 在 Launch configuration 下，选择新的启动配置并 Save\n7. （替代方案）要完全禁用 IMDS：创建启动配置时，将 Metadata accessible 设置为 Disabled",
+      "Terraform": "```hcl\n# ASG 启动配置强制执行 IMDSv2\nresource \"aws_launch_configuration\" \"example\" {\n  image_id      = \"<example_ami_id>\"\n  instance_type = \"<example_instance_type>\"\n\n  metadata_options {\n    http_tokens   = \"required\"  # 关键：要求 IMDSv2 令牌（阻止 IMDSv1）\n    http_endpoint = \"enabled\"   # 关键：在强制执行 v2 时启用 IMDS\n  }\n}\n\nresource \"aws_autoscaling_group\" \"example\" {\n  launch_configuration = aws_launch_configuration.example.name\n  min_size             = 1\n  max_size             = 1\n  vpc_zone_identifier  = [\"<example_subnet_id>\"]\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "当元数据为 `enabled` 时，通过设置 `http_tokens=required` 为 Auto Scaling 启动的实例要求**IMDSv2**。*如果不需要元数据*，请禁用它。\n\n对实例角色应用**最小权限**，将 IMDSv2 设置为账户默认值，并使用**纵深防御**（出口过滤、SSRF 保护）来限制暴露。",
+      "Url": "https://hub.prowler.com/check/autoscaling_group_launch_configuration_requires_imdsv2"
+    }
+  },
+  "Categories": [
+    "secrets"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

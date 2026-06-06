@@ -1,0 +1,36 @@
+{
+  "Provider": "aws",
+  "CheckID": "ec2_ebs_volume_encryption",
+  "CheckTitle": "暗号化されていない EBS ボリュームがないことを確認",
+  "CheckType": [
+    "Data Protection"
+  ],
+  "ServiceName": "ec2",
+  "SubServiceName": "volume",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "medium",
+  "ResourceType": "AwsEc2Volume",
+  "ResourceGroup": "storage",
+  "Description": "暗号化されていない EBS ボリュームがないことを確認",
+  "Risk": "保存時のデータ暗号化により、不正アクセスや盗難が発生した場合にデータの可視化を防ぎます",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "すべての EBS ボリュームを暗号化し、デフォルトで暗号化を有効にします。AWS アカウントを設定して、作成する新しい EBS ボリュームとスナップショットコピーの暗号化を強制できます。たとえば、Amazon EBS は、インスタンスを起動するときに作成される EBS ボリュームと、暗号化されていないスナップショットからコピーするスナップショットを暗号化します。",
+      "Url": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EBSEncryption.html"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

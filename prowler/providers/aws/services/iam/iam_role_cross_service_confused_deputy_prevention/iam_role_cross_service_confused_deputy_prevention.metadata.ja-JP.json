@@ -1,0 +1,33 @@
+{
+  "Provider": "aws",
+  "CheckID": "iam_role_cross_service_confused_deputy_prevention",
+  "CheckTitle": "IAM サービスロールがクロスサービスの混乱した代理攻撃を防ぐことを確認する",
+  "CheckType": [],
+  "ServiceName": "iam",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "high",
+  "ResourceType": "AwsIamRole",
+  "ResourceGroup": "IAM",
+  "Description": "IAM サービスロールがクロスサービスの混乱した代理攻撃を防ぐことを確認する",
+  "Risk": "攻撃者がリソースへの不正アクセスを得ることを許可する",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "クロスサービスの混乱した代理攻撃を軽減するために、IAM ロールの信頼ポリシーで `aws:SourceArn` および `aws:SourceAccount` のグローバル条件コンテキストキーを使用することをお勧めします。ロールがこれらのフィールドをサポートしていない場合は、より制限的なリソースベースのポリシーを定義するか、サービス固有の信頼ポリシーを使用するなどの代替セキュリティ対策を実装して、ロールの権限と露出を制限することを検討してください。詳細なガイダンスについては、クロスサービスの混乱した代理問題を防ぐための AWS のドキュメントを参照してください。",
+      "Url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/confused-deputy.html#cross-service-confused-deputy-prevention"
+    }
+  },
+  "Categories": [
+    "trust-boundaries"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "neptune_cluster_snapshot_encrypted",
+  "CheckTitle": "Neptune DB クラスターのスナップショットは保存時に暗号化されています",
+  "CheckType": [
+    "ソフトウェアと構成のチェック/AWS セキュリティベストプラクティス/保存時の暗号化",
+    "ソフトウェアと構成のチェック/業界および規制基準/AWS 基礎セキュリティベストプラクティス",
+    "影響/データの露出"
+  ],
+  "ServiceName": "neptune",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsRdsDbClusterSnapshot",
+  "ResourceGroup": "database",
+  "Description": "Neptune DB クラスターのスナップショットは保存時に暗号化されています。この評価では、各スナップショットの暗号化属性が有効になっているかどうかを確認し、データが保存中に保護されていることを確認します。",
+  "Risk": "**暗号化されていない Neptune スナップショット** はデータの機密性を損ないます。資格情報の漏洩や設定ミスによりアクセスされたり共有されたりすると、攻撃者はスナップショットの内容を復元またはダウンロードし、**データの流出**や機密記録の露出を可能にします。これにより、全体的なデータ保護の姿勢が弱まります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/neptune-controls.html#neptune-6",
+    "https://docs.aws.amazon.com/neptune/latest/userguide/backup-restore-share-snapshot.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws rds copy-db-cluster-snapshot --source-db-cluster-snapshot-identifier <source-snapshot> --target-db-cluster-snapshot-identifier <encrypted-snapshot> --kms-key-id <kms-key-id>",
+      "NativeIaC": "",
+      "Terraform": "```hcl\nresource \"aws_neptune_cluster\" \"restored\" {\n  cluster_identifier  = \"restored-cluster\"\n  snapshot_identifier = \"<source-snapshot>\"\n  storage_encrypted   = true  # スナップショットから復元されたクラスターが暗号化されていることを確認します\n}\n```",
+      "Other": "1. AWS マネジメントコンソールにサインインし、Amazon Neptune を開きます\n2. 左側のペインで **Snapshots** を選択します\n3. 暗号化されていないスナップショットを選択し、**Actions** > **Restore snapshot** をクリックします\n4. 復元ページで **Encryption** を有効にし、KMS キーを選択します\n5. **Restore DB cluster** をクリックします\n6. クラスターが復元された後、復元された（暗号化された）クラスターの新しいスナップショットを作成します"
+    },
+    "Recommendation": {
+      "Text": "**保存時の暗号化**と強力なキー管理を実施してスナップショットデータを保護します。\n\n- ライフサイクルとローテーションが管理された**顧客管理キー**を使用\n- スナップショットのアクセスと共有に**最小特権**を適用\n- 組織の構成とポリシー制御を通じて暗号化されていないスナップショットの作成を防止",
+      "Url": "https://hub.prowler.com/check/neptune_cluster_snapshot_encrypted"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

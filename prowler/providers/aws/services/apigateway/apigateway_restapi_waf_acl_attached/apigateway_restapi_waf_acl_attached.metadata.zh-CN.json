@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "apigateway_restapi_waf_acl_attached",
+  "CheckTitle": "API Gateway 阶段已附加 WAF Web ACL",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践",
+    "软件和配置检查/行业和监管标准/AWS 基础安全最佳实践"
+  ],
+  "ServiceName": "apigateway",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsApiGatewayStage",
+  "ResourceGroup": "api_gateway",
+  "Description": "**Amazon API Gateway (REST API)** 阶段会评估是否关联了**AWS WAF Web ACL**。该检查结果反映是否在阶段级别链接了 `web ACL`。",
+  "Risk": "缺少**WAF Web ACL**，API 会暴露于影响 CIA（机密性、完整性、可用性）的应用层威胁：\n- 机密性：通过注入进行数据泄露\n- 完整性：参数篡改和路径遍历\n- 可用性：L7 层洪水攻击、机器人滥用、资源耗尽\n*公共端点面临更高的风险。*",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/apigateway/latest/developerguide/security-monitoring.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws wafv2 associate-web-acl --web-acl-arn <WEB_ACL_ARN> --resource-arn arn:aws:apigateway:<REGION>::/restapis/<REST_API_ID>/stages/<STAGE_NAME>",
+      "NativeIaC": "```yaml\n# CloudFormation: 将 WAFv2 Web ACL 附加到 API Gateway REST API 阶段\nResources:\n  <example_resource_name>:\n    Type: AWS::WAFv2::WebACLAssociation\n    Properties:\n      ResourceArn: arn:aws:apigateway:<example_region>::/restapis/<example_resource_id>/stages/<example_stage_name>  # 关键：目标 API Gateway 阶段\n      WebACLArn: <example_resource_arn>  # 关键：要附加的 Web ACL\n```",
+      "Other": "1. 打开 AWS 控制台并转到 WAF & Shield\n2. 选择 Web ACLs（Scope: Regional），选择您的 Web ACL\n3. 单击 Add AWS resource\n4. 选择 API Gateway，选择 REST API 和特定 Stage\n5. 单击 Add/Associate 以附加 Web ACL",
+      "Terraform": "```hcl\n# 将 WAFv2 Web ACL 附加到 API Gateway REST API 阶段\nresource \"aws_wafv2_web_acl_association\" \"<example_resource_name>\" {\n  resource_arn = \"arn:aws:apigateway:<example_region>::/restapis/<example_resource_id>/stages/<example_stage_name>\" # 关键：目标 API Gateway 阶段\n  web_acl_arn  = \"<example_resource_arn>\" # 关键：要附加的 Web ACL\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "将**AWS WAF Web ACL**附加到每个暴露的阶段，并应用**纵深防御**：\n- 使用托管规则组和定制的允许/拒绝列表\n- 应用速率限制以限制滥用\n- 强制执行最小权限的网络暴露\n- 使用日志和指标持续调整规则\n*验证更改以减少误报。*",
+      "Url": "https://hub.prowler.com/check/apigateway_restapi_waf_acl_attached"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "",
+  "CheckAliases": [
+    "apigateway_waf_acl_attached"
+  ]
+}
+

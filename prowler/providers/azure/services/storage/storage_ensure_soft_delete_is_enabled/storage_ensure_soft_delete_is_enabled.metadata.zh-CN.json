@@ -1,0 +1,33 @@
+{
+  "Provider": "azure",
+  "CheckID": "storage_ensure_soft_delete_is_enabled",
+  "CheckTitle": "确保 Azure 容器和 Blob 存储已启用软删除",
+  "CheckType": [],
+  "ServiceName": "storage",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AzureStorageAccount",
+  "ResourceGroup": "storage",
+  "Description": "Azure Storage Blob 可能包含电子健康信息（ePHI）或财务数据等敏感或个人信息。若数据被应用程序或其他存储账户用户误修改或删除，将导致数据丢失或不可用。",
+  "Risk": "容器和 Blob 存储中的数据可能被错误删除。攻击者或恶意用户也可能故意执行该操作以造成业务中断。删除 Azure Storage Blob 会立即导致数据丢失。为 Azure 存储启用此配置可确保即使 Blob/数据已从存储账户中删除，仍可在保留策略设定的期限内恢复（范围为 7 天到 365 天）。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/storage/blobs/soft-delete-blob-enable?tabs=azure-portal",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity-staging/knowledge-base/azure/StorageAccounts/enable-soft-delete.html#",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "在 Azure 主页中，打开左上角的汉堡菜单，或点击右指箭头下方的“更多服务”。2. 选择 Storage。3. 选择 Storage Accounts。4. 对每个 Storage Account，在左侧滚动栏中进入 Data protection。5. 为 blobs 和 containers 都勾选 soft delete。将保留期设置为符合组织需求的时长。",
+      "Url": "https://docs.microsoft.com/en-us/azure/storage/blobs/storage-blob-soft-delete"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "由于快照会被保留，可能会产生额外的存储成本。"
+}

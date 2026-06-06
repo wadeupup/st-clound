@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "wafv2_webacl_rule_logging_enabled",
+  "CheckTitle": "AWS WAFv2 Web ACL では、すべてのルールおよびルールグループに対して Amazon CloudWatch メトリクスが有効になっています",
+  "CheckType": [
+    "ソフトウェアおよび設定のチェック/AWSセキュリティのベストプラクティス/ランタイム動作分析",
+    "ソフトウェアと設定のチェック/業界および規制基準/AWS 基盤セキュリティのベストプラクティス",
+    "ソフトウェアおよび設定のチェック／業界および規制基準／NIST 800-53 管理策"
+  ],
+  "ServiceName": "wafv2",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsWafv2WebAcl",
+  "ResourceGroup": "security",
+  "Description": "**AWS WAFv2 Web ACL** は、関連付けられたすべての **rule** および **rule group** で、ルール評価とトラフィックの可視性を確保するために **CloudWatch metrics** が有効になっていることを確認するために評価されます",
+  "Risk": "**CloudWatch metrics** が存在しないと、WAF テレメトリが失われ、急増、ルールのバイパス、設定ミスが見えなくなります。これにより、SQLi/XSS プローブやボットフラッドの検知が遅れ、データの機密性、リクエストの完全性、アプリケーションの可用性が危険にさらされます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://support.icompaas.com/support/solutions/articles/62000233644-ensure-aws-wafv2-webacl-rule-or-rule-group-has-amazon-cloudwatch-metrics-enabled",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/waf-controls.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/waf-controls.html#waf-12"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation: WAFv2 Web ACL ルールで CloudWatch メトリクスを有効にする\nResources:\n  <example_resource_name>:\n    Type: AWS::WAFv2::WebACL\n    Properties:\n      Name: <example_resource_name>\n      Scope: REGIONAL\n      DefaultAction:\n        Allow: {}\n      VisibilityConfig:\n        SampledRequestsEnabled: true\n        CloudWatchMetricsEnabled: true\n        MetricName: <metric_name>\n      Rules:\n        - Name: <example_rule_name>\n          Priority: 1\n          Statement:\n            ManagedRuleGroupStatement:\n              VendorName: AWS\n              Name: AWSManagedRulesCommonRuleSet\n          OverrideAction:\n            None: {}\n          VisibilityConfig:\n            SampledRequestsEnabled: true\n            CloudWatchMetricsEnabled: true  # 重要: このルールのCloudWatchメトリクスを有効にします\n            MetricName: <rule_metric_name>  # CloudWatch メトリクスで必須\n```",
+      "Other": "1. AWS コンソールで、AWS WAF & Shield > Web ACLs に移動し、Web ACL を選択します\n2. Rules タブを開き、各ルールを編集して CloudWatch メトリクスを有効化し（Visibility configuration > CloudWatch metrics enabled）、その後 Save します\n3. ルールグループの場合: AWS WAF & Shield > Rule groups に移動し、ルールグループを選択して Visibility configuration を編集し、CloudWatch メトリクスを有効化してから Save します",
+      "Terraform": "```hcl\n# Terraform: WAFv2 Web ACL ルールで CloudWatch メトリクスを有効にする\nresource \"aws_wafv2_web_acl\" \"<example_resource_name>\" {\n  name  = \"<example_resource_name>\"\n  scope = \"REGIONAL\"\n\n  default_action { allow {} }\n\n  visibility_config {\n    cloudwatch_metrics_enabled = true\n    metric_name                = \"<metric_name>\"\n    sampled_requests_enabled   = true\n  }\n\n  rule {\n    name     = \"<example_rule_name>\"\n    priority = 1\n\n    statement {\n      managed_rule_group_statement {\n        vendor_name = \"AWS\"\n        name        = \"AWSManagedRulesCommonRuleSet\"\n      }\n    }\n\n    override_action { none {} }\n\n    visibility_config {\n      cloudwatch_metrics_enabled = true  # 重要: このルールのCloudWatchメトリクスを有効にします\n      metric_name                = \"<rule_metric_name>\"  # CloudWatch メトリクスで必須\n      sampled_requests_enabled   = true\n    }\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "すべてのWAFルールおよびルールグループ（*マネージドルールグループを含む*）で**CloudWatch metrics**を有効にします。一貫したメトリクス名を使用し、ダッシュボードとアラートを一元化し、ルールの有効性を検証するために傾向を確認します。**defense in depth**のためにSIEMと統合し、テレメトリに基づいてルールを調整します。",
+      "Url": "https://hub.prowler.com/check/wafv2_webacl_rule_logging_enabled"
+    }
+  },
+  "Categories": [
+    "logging"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

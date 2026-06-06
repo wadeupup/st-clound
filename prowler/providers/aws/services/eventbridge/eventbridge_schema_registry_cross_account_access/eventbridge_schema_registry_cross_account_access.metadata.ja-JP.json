@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "eventbridge_schema_registry_cross_account_access",
+  "CheckTitle": "AWS EventBridge schema registry でクロスアカウントアクセスを許可しないこと",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "TTPs/Initial Access/Unauthorized Access",
+    "Effects/Data Exposure"
+  ],
+  "ServiceName": "eventbridge",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsEventSchemasRegistry",
+  "ResourceGroup": "messaging",
+  "Description": "**EventBridge schema registry** のリソースポリシーにおける **クロスアカウントアクセス** を評価します。この検出は、外部または公開プリンシパル（例: `Principal: *` や他アカウント）に registry と schema への権限を付与するステートメントを特定します。",
+  "Risk": "不明なクロスアカウントアクセスは schema 定義を露出させ、偵察やデータモデル漏えい（**機密性**）につながります。過剰権限により外部主体が schema を改変/削除し、コードバインディング破壊や連携停止を引き起こし（**完全性** と **可用性**）ます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://aws.amazon.com/about-aws/whats-new/2021/09/cross-account-discovery-amazon-eventbridge-schema/",
+    "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-schema.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws schemas put-resource-policy --registry-name <example_resource_name> --policy '{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::<example_account_id>:root\"},\"Action\":\"schemas:*\",\"Resource\":\"*\"}]}'",
+      "NativeIaC": "```yaml\n# CloudFormation: Restrict EventBridge Schema Registry policy to same account only\nResources:\n  <example_resource_name>RegistryPolicy:\n    Type: AWS::EventSchemas::RegistryPolicy\n    Properties:\n      RegistryName: <example_resource_name>\n      # Critical: Principal limited to this AWS account to prevent cross-account access\n      Policy: !Sub |\n        {\n          \"Version\": \"2012-10-17\",\n          \"Statement\": [\n            {\n              \"Effect\": \"Allow\",\n              \"Principal\": { \"AWS\": \"arn:${AWS::Partition}:iam::${AWS::AccountId}:root\" },\n              \"Action\": \"schemas:*\",\n              \"Resource\": \"*\"\n            }\n          ]\n        }\n```",
+      "Other": "1. Amazon EventBridge コンソールを開きます\n2. Schemas > Registries に移動し、<example_resource_name> を選択します\n3. Permissions タブを開いて Edit をクリックします\n4. Principal が \"*\" または自アカウント以外の AWS アカウントのステートメントを削除します\n5. Principal = arn:aws:iam::<your_account_id>:root の Allow ステートメントを 1 つ追加します\n6. 変更を保存します",
+      "Terraform": "```hcl\n# Restrict EventBridge Schema Registry policy to same account only\nresource \"aws_schemas_registry_policy\" \"<example_resource_name>\" {\n  registry_name = \"<example_resource_name>\"\n\n  # Critical: Principal limited to same account to remove cross-account access\n  policy = jsonencode({\n    Version = \"2012-10-17\"\n    Statement = [{\n      Effect    = \"Allow\"\n      Principal = { AWS = \"arn:aws:iam::<example_account_id>:root\" }\n      Action    = \"schemas:*\"\n      Resource  = \"*\"\n    }]\n  })\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "registry リソースポリシーには **最小権限** を適用してください：\n- `Principal: *` など公開プリンシパルを避ける\n- 信頼済みアカウント ARN または組織 ID のみ許可\n- 権限は最小限、可能なら読み取り専用\n- **職務分離** と変更ログを実施\n\n*クロスアカウントが必要な場合* は、厳密にスコープを絞り定期レビューしてください。",
+      "Url": "https://hub.prowler.com/check/eventbridge_schema_registry_cross_account_access"
+    }
+  },
+  "Categories": [
+    "trust-boundaries",
+    "identity-access"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

@@ -1,0 +1,45 @@
+{
+  "Provider": "aws",
+  "CheckID": "athena_workgroup_logging_enabled",
+  "CheckTitle": "Amazon Athena 工作组已启用 CloudWatch 日志记录",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践",
+    "软件和配置检查/行业和监管标准/AWS 基础安全最佳实践",
+    "TTPs/防御规避"
+  ],
+  "ServiceName": "athena",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsAthenaWorkGroup",
+  "ResourceGroup": "analytics",
+  "Description": "**Athena 工作组**将**查询指标**发布到 CloudWatch。此评估确定每个工作组是否在 CloudWatch 中启用了查询活动日志记录。",
+  "Risk": "没有 CloudWatch 查询日志记录，风险或异常查询不会被观察到，削弱了**机密性**和**完整性**。被泄露或内部账户可以在不被及时检测的情况下泄露数据和更改数据集，阻碍取证和遏制。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/athena/latest/ug/security-logging-monitoring.html",
+    "https://docs.aws.amazon.com/athena/latest/ug/athena-cloudwatch-metrics-enable.html",
+    "https://stackoverflow.com/questions/68896809/how-to-save-queries-executed-by-athena-in-logsgroup-cloudwatch",
+    "https://support.icompaas.com/support/solutions/articles/62000233405-ensure-that-logging-is-enabled-for-amazon-athena-workgroups-to-capture-query-activity-",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/athena-controls.html#athena-4"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws athena update-work-group --work-group <WORKGROUP_NAME> --configuration-updates PublishCloudWatchMetricsEnabled=true",
+      "NativeIaC": "```yaml\n# CloudFormation 为 Athena 工作组启用 CloudWatch 日志记录\nResources:\n  AthenaWorkGroup:\n    Type: AWS::Athena::WorkGroup\n    Properties:\n      Name: <example_resource_name>\n      WorkGroupConfiguration:\n        PublishCloudWatchMetricsEnabled: true  # 关键：为工作组启用 CloudWatch 日志记录\n```",
+      "Other": "1. 打开 AWS 管理控制台并转到 Amazon Athena\n2. 在左侧窗格中，单击 Workgroups 并选择目标工作组\n3. 单击 Edit\n4. 选中 Publish query metrics to AWS CloudWatch\n5. 单击 Save",
+      "Terraform": "```hcl\n# 为 Athena 工作组启用 CloudWatch 日志记录\nresource \"aws_athena_workgroup\" \"example\" {\n  name = \"<example_resource_name>\"\n\n  configuration {\n    publish_cloudwatch_metrics_enabled = true  # 关键：启用 CloudWatch 日志记录\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "为所有工作组启用并强制执行**CloudWatch 查询日志记录**（`PublishCloudWatchMetricsEnabled`）。\n- 对日志应用最小权限并在静态时加密\n- 设置保留期和异常警报\n- 与**CloudTrail**关联以进行用户归因\n- 将日志集中到监控账户",
+      "Url": "https://hub.prowler.com/check/athena_workgroup_logging_enabled"
+    }
+  },
+  "Categories": [
+    "logging"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

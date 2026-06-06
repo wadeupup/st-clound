@@ -1,0 +1,46 @@
+{
+  "Provider": "aws",
+  "CheckID": "cloudtrail_s3_dataevents_write_enabled",
+  "CheckTitle": "CloudTrail トレイルがすべてのバケットのすべての S3 オブジェクトレベルの API 操作を記録している",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/CIS AWS Foundations Benchmark"
+  ],
+  "ServiceName": "cloudtrail",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "low",
+  "ResourceType": "AwsCloudTrailTrail",
+  "ResourceGroup": "monitoring",
+  "Description": "**CloudTrail トレイル** には、クラシックまたは高度なセレクターを介して、**すべての現在および将来のバケット** にわたる **書き込み（またはすべて）操作** の **S3 オブジェクトレベルのデータイベント** が含まれます。これにより、オブジェクトレベルで `PutObject`、`DeleteObject`、マルチパートアップロードなどのアクションが記録されます。",
+  "Risk": "オブジェクトレベルの書き込みログがない場合、不正または偶発的な変更や削除が観察されず、データの **整合性** と **可用性** を損なう可能性があります。フォレンジックは、誰がオブジェクトを変更または削除したかの可視性を失い、ランサムウェア、不正な自動化、または内部関係者の改ざんの検出を妨げます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/logging-data-events-with-cloudtrail.html",
+    "https://docs.aws.amazon.com/AmazonS3/latest/userguide/enable-cloudtrail-logging-for-s3.html",
+    "https://www.go2share.net/article/s3-bucket-logging",
+    "https://docs.amazonaws.cn/en_us/AmazonS3/latest/userguide/cloudtrail-logging-s3-info.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/s3-controls.html#s3-22"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws cloudtrail put-event-selectors --trail-name <example_resource_name> --event-selectors '[{\"ReadWriteType\":\"WriteOnly\",\"DataResources\":[{\"Type\":\"AWS::S3::Object\",\"Values\":[\"arn:aws:s3\"]}]}]'",
+      "NativeIaC": "```yaml\nResources:\n  <example_resource_name>:\n    Type: AWS::CloudTrail::Trail\n    Properties:\n      TrailName: <example_resource_name>\n      S3BucketName: <example_resource_name>\n      EventSelectors:\n        - ReadWriteType: WriteOnly\n          DataResources:\n            - Type: AWS::S3::Object\n              Values:\n                - arn:aws:s3  # Critical: enables S3 object-level write data events for all buckets, fixing the check\n```",
+      "Other": "1. AWS コンソールで、CloudTrail を開き、トレイルに移動します\n2. <your trail> を選択し、データイベントの下で編集をクリックします\n3. データイベントソースで、S3 を選択します\n4. すべての現在および将来の S3 バケットを選択します\n5. 書き込みイベント（またはすべてのイベント）にチェックを入れます\n6. 変更を保存をクリックします",
+      "Terraform": "```hcl\nresource \"aws_cloudtrail\" \"<example_resource_name>\" {\n  name           = \"<example_resource_name>\"\n  s3_bucket_name = \"<example_resource_name>\"\n\n  event_selector {\n    read_write_type = \"WriteOnly\"\n    data_resource {\n      type   = \"AWS::S3::Object\"\n      values = [\"arn:aws:s3\"]  # Critical: logs S3 object-level write events for all buckets to pass the check\n    }\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "マルチリージョントレイルで、すべてのバケットにわたるオブジェクトレベルの **書き込み**（および*オプションで*読み取り）の **CloudTrail S3 データイベント** を有効にします。ログストレージに **最小権限の原則** を適用し、**ライフサイクル** 保持を設定し、アラートを統合します。**高度なセレクター** を使用して、コスト制御と **多層防御** のために機密性の高いバケット/操作を対象にします。",
+      "Url": "https://hub.prowler.com/check/cloudtrail_s3_dataevents_write_enabled"
+    }
+  },
+  "Categories": [
+    "logging",
+    "forensics-ready"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

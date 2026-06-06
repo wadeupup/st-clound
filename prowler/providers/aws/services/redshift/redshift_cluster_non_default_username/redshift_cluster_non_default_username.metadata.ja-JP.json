@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "redshift_cluster_non_default_username",
+  "CheckTitle": "Amazon Redshift クラスターはデフォルトの管理者ユーザー名を使用していません",
+  "CheckType": [
+    "ソフトウェアと構成のチェック/AWS セキュリティベストプラクティス",
+    "TTPs/初期アクセス/不正アクセス"
+  ],
+  "ServiceName": "redshift",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsRedshiftCluster",
+  "ResourceGroup": "analytics",
+  "Description": "**Amazon Redshift クラスター**は、**非デフォルトの管理者ユーザー名**の使用について評価されます。既知のデフォルト `awsuser` を使用しているクラスターが特定されます。",
+  "Risk": "デフォルトの管理者名はアカウントを予測可能にし、ユーザー名の列挙、パスワードスプレー、ブルートフォース攻撃を可能にします。乗っ取りは、ウェアハウスデータを露出させる可能性があり（**機密性**）、不正なクエリやスキーマ変更を可能にし（**整合性**）、分析ワークロードを妨害する可能性があります（**可用性**）。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/redshift-controls.html#redshift-8",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/Redshift/master-username.html",
+    "https://docs.aws.amazon.com/redshift/latest/gsg/rs-gsg-prereq.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation: 非デフォルトの管理者ユーザー名を持つ Redshift クラスター\nResources:\n  <example_resource_name>:\n    Type: AWS::Redshift::Cluster\n    Properties:\n      ClusterType: single-node\n      NodeType: <example_node_type>\n      MasterUsername: <new-username>  # 重要: チェックを通過するには 'awsuser' ではないこと\n      MasterUserPassword: <password>\n```",
+      "Other": "1. Amazon Redshift コンソールで、クラスターの作成を選択します\n2. 管理者ユーザー名を awsuser 以外の値に設定します（重要）\n3. 必要な最小設定（パスワード、ノードタイプ）を入力し、クラスターを作成します\n4. 必要に応じて古いクラスターからデータを移行します\n5. awsuser 管理者を使用する古いクラスターを削除して、失敗するリソースを削除します",
+      "Terraform": "```hcl\nresource \"aws_redshift_cluster\" \"<example_resource_name>\" {\n  cluster_identifier = \"<example_resource_id>\"\n  node_type          = \"<example_node_type>\"\n  cluster_type       = \"single-node\"\n  master_username    = \"<new-username>\"  # 重要: チェックを通過するには 'awsuser' ではないこと\n  master_password    = \"<password>\"\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "作成時に `awsuser` の代わりに**ユニークで予測不可能な**管理者ユーザー名を使用します。専用のロールを使用し、スーパーユーザーの使用を制限することで**最小特権**を適用します。強力な認証を強制し、資格情報をローテーションし、アクセスを監査します。*既存のクラスターの場合*、ユニークな管理者を持つ新しいクラスターを作成し、移行します。",
+      "Url": "https://hub.prowler.com/check/redshift_cluster_non_default_username"
+    }
+  },
+  "Categories": [
+    "identity-access"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

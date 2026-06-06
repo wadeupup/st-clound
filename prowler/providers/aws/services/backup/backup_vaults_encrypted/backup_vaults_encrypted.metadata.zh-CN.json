@@ -1,0 +1,45 @@
+{
+  "Provider": "aws",
+  "CheckID": "backup_vaults_encrypted",
+  "CheckTitle": "AWS Backup 库在静态时已加密",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/NIST 800-53 Controls (USA)",
+    "Software and Configuration Checks/Industry and Regulatory Standards/NIST CSF Controls (USA)",
+    "Software and Configuration Checks/Industry and Regulatory Standards/PCI-DSS",
+    "Software and Configuration Checks/Industry and Regulatory Standards/ISO 27001 Controls",
+    "Software and Configuration Checks/Industry and Regulatory Standards/HIPAA Controls (USA)"
+  ],
+  "ServiceName": "backup",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsBackupBackupVault",
+  "ResourceGroup": "storage",
+  "Description": "**AWS Backup 库**会被评估是否使用**AWS KMS**进行**静态加密**。此发现会突出显示没有配置 KMS 密钥来保护存储的恢复点的库。",
+  "Risk": "未加密的库如果存储或凭据被泄露，允许读取恢复点，削弱**机密性**并可能导致数据泄露。缺少 KMS 控制也会削弱**完整性**保证，并在调查期间阻碍取证**可审计性**。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/aws-backup/latest/devguide/encryption.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/Athena/encrypted-with-cmk.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation：加密的 AWS Backup 库\nResources:\n  <example_resource_name>:\n    Type: AWS::Backup::BackupVault\n    Properties:\n      BackupVaultName: <example_resource_name>\n      EncryptionKeyArn: <kms_key_arn>  # 关键：设置 KMS 密钥以在静态时加密库\n```",
+      "Other": "1. 在 AWS 控制台中，转到 AWS Backup > 备份库\n2. 点击创建备份库\n3. 将名称设置为 <example_resource_name>\n4. 在加密密钥下，选择客户管理的 KMS 密钥（<kms_key_arn>）\n5. 点击创建备份库\n6. 更新任何备份计划以使用新库（计划 > 选择计划 > 编辑 > 更改目标库名称）\n7. 旧未加密库为空后将其删除（选择库 > 删除备份库）",
+      "Terraform": "```hcl\n# 加密的 AWS Backup 库\nresource \"aws_backup_vault\" \"<example_resource_name>\" {\n  name        = \"<example_resource_name>\"\n  kms_key_arn = \"<kms_key_arn>\"  # 关键：为库启用静态加密\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "使用**客户管理的 KMS 密钥**（`CMK`）加密每个备份库。在密钥策略中强制执行**最小权限**，启用轮换，并将密钥管理员与备份操作员分离。使用库锁定和日志记录添加**纵深防御**。*对于副本*，确保目标库使用适当的 KMS 密钥。",
+      "Url": "https://hub.prowler.com/check/backup_vaults_encrypted"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

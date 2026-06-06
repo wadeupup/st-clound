@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "documentdb_cluster_cloudwatch_log_export",
+  "CheckTitle": "DocumentDB 集群将审计和分析器日志导出到 CloudWatch Logs",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices/Runtime Behavior Analysis",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices"
+  ],
+  "ServiceName": "documentdb",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsRdsDbCluster",
+  "ResourceGroup": "database",
+  "Description": "Amazon DocumentDB 集群会被评估是否将 `audit` 和 `profiler` 日志导出到 **CloudWatch Logs**。\n缺少任一或两种日志类型导出的集群将被识别为日志导出配置不完整。",
+  "Risk": "未启用 **audit** 和/或 **profiler** 日志导出会降低对身份验证、授权和数据定义活动的可见性。\n暴力破解登录、权限滥用或破坏性架构更改等攻击可能不会被发现，从而削弱**机密性**和**完整性**并延迟事件响应。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/documentdb-controls.html#documentdb-4",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/DocumentDB/enable-profiler.html",
+    "https://docs.aws.amazon.com/cli/latest/reference/docdb/create-db-cluster.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws docdb modify-db-cluster --db-cluster-identifier <DB_CLUSTER_ID> --cloudwatch-logs-export-configuration '{\"EnableLogTypes\":[\"audit\",\"profiler\"]}' --apply-immediately",
+      "NativeIaC": "```yaml\n# CloudFormation: enable DocumentDB log exports\nResources:\n  <example_resource_name>:\n    Type: AWS::DocDB::DBCluster\n    Properties:\n      EnableCloudwatchLogsExports:\n        - audit      # Critical: export audit logs to CloudWatch Logs\n        - profiler   # Critical: export profiler logs to CloudWatch Logs\n```",
+      "Other": "1. 在 AWS 控制台中，前往 Amazon DocumentDB > Clusters\n2. 选中目标集群并选择“Actions > Modify”\n3. 在 Log exports 中勾选 Audit 和 Profiler\n4. 勾选“Apply immediately”，然后点击“Modify cluster”",
+      "Terraform": "```hcl\n# Enable DocumentDB log exports\nresource \"aws_docdb_cluster\" \"<example_resource_name>\" {\n  enabled_cloudwatch_logs_exports = [\"audit\", \"profiler\"] # Critical: export both logs to CloudWatch Logs\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "为所有集群启用将 `audit` 和 `profiler` 日志同时导出到 **CloudWatch Logs**，并集中进行分析。\n对日志访问应用**最小权限**原则，配置保留期和不可篡改性，将日志集成到告警系统中，并通过**职责分离**来保护日志并定期审查，以实现**纵深防御**。",
+      "Url": "https://hub.prowler.com/check/documentdb_cluster_cloudwatch_log_export"
+    }
+  },
+  "Categories": [
+    "logging"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+
+

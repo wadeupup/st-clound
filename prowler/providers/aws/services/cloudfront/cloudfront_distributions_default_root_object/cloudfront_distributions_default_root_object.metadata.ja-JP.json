@@ -1,0 +1,39 @@
+{
+  "Provider": "aws",
+  "CheckID": "cloudfront_distributions_default_root_object",
+  "CheckTitle": "CloudFrontディストリビューションにデフォルトルートオブジェクトが設定されている",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices"
+  ],
+  "ServiceName": "cloudfront",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsCloudFrontDistribution",
+  "ResourceGroup": "network",
+  "Description": "CloudFrontディストリビューションは、ルートリクエストを直接オリジンに転送するのではなく、`/`リクエストを`index.html`などの特定のファイルにマッピングする**デフォルトルートオブジェクト**が設定されているかどうかを評価されます。",
+  "Risk": "**デフォルトルートオブジェクト**がない場合、ルートリクエストは**オリジンリスト**や意図しないファイルを公開し、データ（**機密性**）を漏洩し、偵察を支援する可能性があります。また、エラーを返して稼働時間（**可用性**）を低下させたり、予測不可能にルーティングして間違ったコンテンツ配信（**整合性**）のリスクを生じさせたりする可能性があります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/cloudfront-controls.html#cloudfront-1",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/CloudFront/cloudfront-default-object.html",
+    "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/DefaultRootObject.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws cloudfront get-distribution-config --id <DISTRIBUTION_ID> --output json > current-config.json && echo 'Manually edit current-config.json to add DefaultRootObject: \"index.html\", then run:' && echo 'aws cloudfront update-distribution --id <DISTRIBUTION_ID> --distribution-config file://current-config.json --if-match $(aws cloudfront get-distribution-config --id <DISTRIBUTION_ID> --query \"ETag\" --output text)'",
+      "NativeIaC": "```yaml\n# CloudFormation：CloudFrontディストリビューションにデフォルトルートオブジェクトを設定\nResources:\n  CloudFrontDistribution:\n    Type: AWS::CloudFront::Distribution\n    Properties:\n      DistributionConfig:\n        Enabled: true\n        DefaultRootObject: index.html  # 重要：デフォルトルートオブジェクトが設定されていることを保証\n        Origins:\n          - Id: <example_origin_id>\n            DomainName: <example_origin_domain>\n            S3OriginConfig: {}\n        DefaultCacheBehavior:\n          TargetOriginId: <example_origin_id>\n          ViewerProtocolPolicy: allow-all\n          ForwardedValues:\n            QueryString: false\n```",
+      "Other": "1. AWSコンソールを開き、CloudFrontに移動\n2. ターゲットディストリビューションを選択し、設定 > 一般 > 編集を選択\n3. デフォルトルートオブジェクトで、index.htmlを入力（/で始めない）\n4. 変更を保存し、デプロイが完了するまで待つ",
+      "Terraform": "```hcl\n# Terraform：CloudFrontディストリビューションにデフォルトルートオブジェクトを設定\nresource \"aws_cloudfront_distribution\" \"<example_resource_name>\" {\n  enabled             = true\n  default_root_object = \"index.html\" # 重要：デフォルトルートオブジェクトが設定されていることを保証\n\n  origin {\n    domain_name = \"<example_origin_domain>\"\n    origin_id   = \"<example_origin_id>\"\n\n    s3_origin_config {}\n  }\n\n  default_cache_behavior {\n    target_origin_id       = \"<example_origin_id>\"\n    viewer_protocol_policy = \"allow-all\"\n    forwarded_values {\n      query_string = false\n    }\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "安全なランディングページ（例：`index.html`）を返す**デフォルトルートオブジェクト**を設定します。**多層防御**を適用：直接オリジンアクセスを制限し、明示的なエラーページを定義し、リダイレクトを標準化します。ルートとサブディレクトリのリクエストをテストして、予測可能な応答を確認します。オリジンの権限を**最小権限**と一致させます。",
+      "Url": "https://hub.prowler.com/check/cloudfront_distributions_default_root_object"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

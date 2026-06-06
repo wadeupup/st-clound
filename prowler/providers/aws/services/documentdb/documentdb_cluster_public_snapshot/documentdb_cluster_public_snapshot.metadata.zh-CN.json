@@ -1,0 +1,45 @@
+{
+  "Provider": "aws",
+  "CheckID": "documentdb_cluster_public_snapshot",
+  "CheckTitle": "DocumentDB 手动集群快照未公开共享",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Effects/Data Exposure",
+    "TTPs/Initial Access"
+  ],
+  "ServiceName": "documentdb",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "critical",
+  "ResourceType": "AwsRdsDbClusterSnapshot",
+  "ResourceGroup": "database",
+  "Description": "**Amazon DocumentDB** 手动集群快照的可见性会被评估，以检测被标记为 **公开 (public)** 而不是仅限特定 AWS 账户访问的快照。",
+  "Risk": "**公开快照** 会削弱**机密性**：任何 AWS 账户都可以基于快照恢复并读取数据库内容，从而实现数据外泄。\n\n它们还会通过暴露嵌入的密钥/配置帮助攻击者进行**横向移动**，并且当快照在你的账户之外被恢复时，会降低可追责性。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/documentdb/latest/developerguide/backup_restore-share_cluster_snapshots.html#backup_restore-share_snapshots",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/documentdb-controls.html#documentdb-3",
+    "https://docs.aws.amazon.com/config/latest/developerguide/docdb-cluster-snapshot-public-prohibited.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws docdb modify-db-cluster-snapshot-attribute --db-cluster-snapshot-identifier <snapshot_id> --attribute-name restore --values-to-remove all",
+      "NativeIaC": "",
+      "Other": "1. 打开 Amazon DocumentDB 控制台并进入 Snapshots\n2. 选择公开的手动集群快照\n3. 点击 Actions > Share\n4. 将 DB snapshot visibility 设置为 Private（如果列表中存在 \"all\"，请将其移除）\n5. 点击 Save",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "保持快照可见性为 `Private`，并仅在**最小权限**原则下与受信任账户共享。优先使用 **CMEK 加密**，通过密钥访问控制来限制并防止公共共享。定期审查共享列表，限制可修改可见性的 IAM 权限，并监控暴露情况，以实现**纵深防御**。",
+      "Url": "https://hub.prowler.com/check/documentdb_cluster_public_snapshot"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+
+

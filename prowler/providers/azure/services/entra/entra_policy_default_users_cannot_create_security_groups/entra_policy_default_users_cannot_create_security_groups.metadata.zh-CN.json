@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "entra_policy_default_users_cannot_create_security_groups",
+  "CheckTitle": "确保“用户可在 Azure 门户、API 或 PowerShell 中创建安全组”设置为“否”",
+  "CheckType": [],
+  "ServiceName": "entra",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "#microsoft.graph.authorizationPolicy",
+  "ResourceGroup": "IAM",
+  "Description": "将安全组创建权限限制为仅管理员可用。",
+  "Risk": "启用创建安全组后，目录中的所有用户都可创建新安全组并向其中添加成员。除非业务确有日常委派需求，否则应将安全组创建权限限制为仅管理员。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/entra/identity/users/groups-self-service-management",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/ActiveDirectory/users-can-create-security-groups.html",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "1. 在 Azure Home 中选择 Portal Menu 2. 选择 Microsoft Entra ID 3. 选择 Groups 4. 在 Settings 下选择 General 5. 将 Users can create security groups in Azure portals, API or PowerShell 设置为 No",
+      "Url": ""
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "启用此设置可能会产生大量需要管理员处理的请求。"
+}

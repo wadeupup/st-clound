@@ -1,0 +1,32 @@
+{
+  "Provider": "aws",
+  "CheckID": "codepipeline_project_repo_private",
+  "CheckTitle": "确保 CodePipeline 项目不使用公共 GitHub 或 GitLab 存储库作为源",
+  "CheckType": [],
+  "ServiceName": "codepipeline",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "devops",
+  "Description": "确保 CodePipeline 项目不使用公共 GitHub 或 GitLab 存储库作为源。",
+  "Risk": "在 CodePipeline 项目中使用公共 Git 存储库可能暴露敏感的部署配置，并增加供应链攻击的风险。",
+  "RelatedUrl": "https://docs.aws.amazon.com/codepipeline/latest/userguide/connections-github.html",
+  "Remediation": {
+    "Code": {
+      "CLI": "aws codestar-connections create-connection --provider-type GitHub|GitLab --connection-name <connection-name>",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "为 CodePipeline 源使用私有 Git 存储库，并确保使用 AWS CodeStar Connections 配置适当的身份验证。对于敏感代码，考虑使用 AWS CodeCommit 或其他私有存储库解决方案。",
+      "Url": "https://docs.aws.amazon.com/codepipeline/latest/userguide/connections"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "此检查通过 CodeStar Connections 支持 GitHub 和 GitLab 存储库"
+}
+

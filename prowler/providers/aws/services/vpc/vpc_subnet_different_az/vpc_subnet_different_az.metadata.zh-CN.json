@@ -1,0 +1,40 @@
+{
+  "Provider": "aws",
+  "CheckID": "vpc_subnet_different_az",
+  "CheckTitle": "VPC 在多个可用区中拥有子网",
+  "CheckType": [
+    "软件和配置检查/AWS安全最佳实践",
+    "影响/拒绝服务"
+  ],
+  "ServiceName": "vpc",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsEc2Subnet",
+  "ResourceGroup": "network",
+  "Description": "**VPC** 会根据 **跨多个可用区分布的子网** 进行评估。该发现将子网仅限于单个可用区或没有子网的 VPC，与在 `2+` 个不同可用区中具有子网的 VPC 区分开来。",
+  "Risk": "单可用区子网布局会造成**单点故障**，在可用区中断、维护或容量事件期间导致**服务停机**。缺乏**跨可用区冗余**会限制负载均衡和出口设计，降低**故障隔离**能力，并破坏可用性和恢复目标。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/pdfs/whitepapers/latest/building-scalable-secure-multi-vpc-network-infrastructure/building-scalable-secure-multi-vpc-network-infrastructure.pdf",
+    "https://docs.aws.amazon.com/vpc/latest/userguide/configure-subnets.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation：在不同的可用区中创建两个子网，以确保 VPC 跨越多个可用区\nResources:\n  SubnetA:\n    Type: AWS::EC2::Subnet\n    Properties:\n      VpcId: <example_resource_id>\n      CidrBlock: 10.0.0.0/24\n      AvailabilityZone: <example_az_1>  # 关键：将子网放置在 AZ1 中，以开始实现可用区多样性\n  SubnetB:\n    Type: AWS::EC2::Subnet\n    Properties:\n      VpcId: <example_resource_id>\n      CidrBlock: 10.0.1.0/24\n      AvailabilityZone: <example_az_2>  # 关键：第二个可用区确保 VPC 在多个可用区中具有子网\n```",
+      "Other": "1. 在 AWS 控制台中，前往 VPC > Subnets\n2. 点击 Create subnet\n3. 选择目标 VPC（<example_resource_id>）\n4. 在不同的可用区中添加两个 CIDR 不重叠的子网（例如，<example_az_1> 和 <example_az_2>）\n5. 点击 Create subnet 以保存",
+      "Terraform": "```hcl\n# 创建两个位于不同可用区的子网，以便 VPC 跨越多个可用区\nresource \"aws_subnet\" \"subnet_a\" {\n  vpc_id            = \"<example_resource_id>\"\n  cidr_block        = \"10.0.0.0/24\"\n  availability_zone = \"<example_az_1>\" # 关键：第一个可用区\n}\n\nresource \"aws_subnet\" \"subnet_b\" {\n  vpc_id            = \"<example_resource_id>\"\n  cidr_block        = \"10.0.1.0/24\"\n  availability_zone = \"<example_az_2>\" # 关键：第二个可用区；确保子网位于多个可用区中\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "将子网分布到 `2+` 个**可用区**中，并在不同的可用区部署工作负载，以实现**高可用性**。在每个可用区中镜像网络层级，按可用区对齐路由和出口，并使用 IaC 和策略护栏强制执行多可用区布局。*定期测试故障切换*以验证弹性。",
+      "Url": "https://hub.prowler.com/check/vpc_subnet_different_az"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

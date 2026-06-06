@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "sqlserver_microsoft_defender_enabled",
+  "CheckTitle": "确保关键 SQL 服务器的 Microsoft Defender for SQL 设置为“On”",
+  "CheckType": [],
+  "ServiceName": "sqlserver",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "SQLServer",
+  "ResourceGroup": "database",
+  "Description": "确保关键 SQL 服务器的 Microsoft Defender for SQL 设置为“On”",
+  "Risk": "Microsoft Defender for SQL 是一套统一的高级 SQL 安全能力。Microsoft Defender 适用于 Azure SQL Database、Azure SQL Managed，并可用于对敏感数据进行分类、发现并缓解潜在数据库漏洞，以及检测可能表明数据库受威胁的异常活动。它为启用和管理这些能力提供了统一入口。",
+  "RelatedUrl": "https://docs.microsoft.com/en-us/azure/azure-sql/database/azure-defender-for-sql?view=azuresql",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity-staging/knowledge-base/azure/SecurityCenter/defender-azure-sql.html",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "1. 进入 SQL servers。对于每个生产 SQL 服务器实例：2. 点击 Microsoft Defender for Cloud。3. 点击 Enable Microsoft Defender for SQL。",
+      "Url": "https://learn.microsoft.com/en-us/azure/defender-for-cloud/defender-for-sql-usage"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "Microsoft Defender for SQL 是付费功能，每个 SQL 服务器都会产生额外费用。"
+}

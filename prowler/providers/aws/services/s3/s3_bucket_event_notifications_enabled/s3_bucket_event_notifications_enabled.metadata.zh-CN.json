@@ -1,0 +1,33 @@
+{
+  "Provider": "aws",
+  "CheckID": "s3_bucket_event_notifications_enabled",
+  "CheckTitle": "检查 S3 存储桶是否已启用事件通知。",
+  "CheckType": [
+    "软件和配置检查/行业和监管标准/NIST 800-53 控制措施"
+  ],
+  "ServiceName": "s3",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:s3:::bucket_name",
+  "Severity": "medium",
+  "ResourceType": "AwsS3Bucket",
+  "ResourceGroup": "storage",
+  "Description": "确保 S3 存储桶是否已启用事件通知。",
+  "Risk": "如果没有事件通知，S3 存储桶上的重要操作可能会在未被注意的情况下发生，从而错失对关键变更及时响应的机会，例如对象的创建、删除或更新，而这些变更可能会影响数据安全性和可用性。",
+  "RelatedUrl": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/notification-how-to-event-types-and-destinations.html#supported-notification-event-types",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://docs.aws.amazon.com/securityhub/latest/userguide/s3-controls.html#s3-11",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "为所有 S3 通用存储桶启用事件通知，以监控对象创建、删除、标记和生命周期事件等重要事件，确保对相关更改具有可见性并能迅速采取行动。",
+      "Url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/EventNotifications.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

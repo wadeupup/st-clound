@@ -1,0 +1,36 @@
+{
+  "Provider": "aws",
+  "CheckID": "ec2_securitygroup_allow_ingress_from_internet_to_all_ports",
+  "CheckTitle": "セキュリティグループが 0.0.0.0/0 または ::/0 からのすべてのポートへのインバウンドを許可していないことを確認",
+  "CheckType": [
+    "Infrastructure Security"
+  ],
+  "ServiceName": "ec2",
+  "SubServiceName": "securitygroup",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "critical",
+  "ResourceType": "AwsEc2SecurityGroup",
+  "ResourceGroup": "network",
+  "Description": "セキュリティグループが 0.0.0.0/0 または ::/0 からのすべてのポートへのインバウンドを許可していないことを確認",
+  "Risk": "セキュリティグループが適切に設定されていない場合、攻撃面が増加します。攻撃者はこの設定ミスを悪用して、リソースへの不正アクセスを取得する可能性があります。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": "https://docs.prowler.com/checks/aws/networking-policies/ensure-aws-security-group-does-not-allow-all-traffic-on-all-ports/"
+    },
+    "Recommendation": {
+      "Text": "ゼロトラストアプローチを使用します。インバウンドトラフィックを可能な限り狭めます。南北トラフィックと東西トラフィックの両方を考慮してください。",
+      "Url": "https://docs.aws.amazon.com/vpc/latest/userguide/VPC_SecurityGroups.html"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

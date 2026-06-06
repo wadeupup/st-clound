@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "efs_multi_az_enabled",
+  "CheckTitle": "EFS 文件系统是多可用区，具有多个挂载目标",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Effects/Denial of Service"
+  ],
+  "ServiceName": "efs",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsEfsFileSystem",
+  "ResourceGroup": "storage",
+  "Description": "评估 **Amazon EFS** 文件系统的 **多可用区弹性**：区域类型（无 `availability_zone_id`），在多个可用区中具有挂载目标。单可用区（One Zone）或只有一个挂载目标的区域类型会被识别为需要注意。",
+  "Risk": "通过单个可用区或单个挂载目标集中访问会降低 **可用性**。可用区中断可能会切断客户端连接，导致停机时间和 I/O 错误。单个挂载目标还会强制跨可用区流量，增加延迟和成本，并削弱 **弹性** 和无缝故障转移。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/efs/latest/ug/creating-using-create-fs.html#availabiltydurability",
+    "https://docs.aws.amazon.com/efs/latest/ug/accessing-fs.html",
+    "https://ops.tips/gists/how-aws-efs-multiple-availability-zones-terraform/"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws efs create-mount-target --file-system-id <FILE_SYSTEM_ID> --subnet-id <SUBNET_ID>",
+      "NativeIaC": "```yaml\n# CloudFormation: add an extra EFS mount target to another AZ\nResources:\n  <example_resource_name>:\n    Type: AWS::EFS::MountTarget\n    Properties:\n      FileSystemId: fs-<example_resource_id>  # FIX: adds another mount target for this EFS\n      SubnetId: subnet-<example_resource_id>  # FIX: choose a subnet in a different AZ\n      SecurityGroups:\n        - <example_security_group_id>         # Required by CFN\n```",
+      "Other": "1. 在 AWS 控制台中，转到 EFS > 文件系统 > 选择您的文件系统\n2. 如果文件系统类型显示为区域：打开网络选项卡 > 挂载目标 > 管理挂载目标 > 添加挂载目标\n3. 选择不同可用区中的子网并保存\n4. 如果文件系统类型显示为单可用区：创建一个新的 EFS，文件系统类型 = 区域，并在至少两个可用区中创建挂载目标；将客户端重新挂载到新文件系统并停用旧文件系统",
+      "Terraform": "```hcl\n# Add an extra EFS mount target in a different AZ/subnet\nresource \"aws_efs_mount_target\" \"<example_resource_name>\" {\n  file_system_id = \"<example_resource_id>\"  # FIX: target EFS\n  subnet_id      = \"<example_resource_id>\"  # FIX: subnet in another AZ to make targets > 1\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "使用 **区域 EFS** 并在每个所需的 **可用区** 中创建挂载目标，以消除单点故障并保持客户端在其可用区内本地。对于关键数据避免使用单可用区。定期审查挂载目标分布以维护 **高可用性** 和 **容错性**。",
+      "Url": "https://hub.prowler.com/check/efs_multi_az_enabled"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

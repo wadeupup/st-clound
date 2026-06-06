@@ -1,0 +1,45 @@
+{
+  "Provider": "aws",
+  "CheckID": "documentdb_cluster_public_snapshot",
+  "CheckTitle": "DocumentDB 手動クラスター・スナップショットがパブリック共有されていないか",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Effects/Data Exposure",
+    "TTPs/Initial Access"
+  ],
+  "ServiceName": "documentdb",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "critical",
+  "ResourceType": "AwsRdsDbClusterSnapshot",
+  "ResourceGroup": "database",
+  "Description": "**Amazon DocumentDB** の手動クラスター・スナップショットの可視性を評価し、特定の AWS アカウントのみに限定されておらず、**public（公開）** としてマークされているスナップショットを検出します。",
+  "Risk": "**パブリック・スナップショット**は**機密性**を弱めます。任意の AWS アカウントがスナップショットからクラスターを復元し、データベース内容を読み取れるため、データ流出につながります。\n\nまた、スナップショット内に含まれるシークレットや設定情報が露出することで**ラテラルムーブメント（横方向移動）**を助長し、自アカウント外でリストアが行われた場合の追跡性・説明責任も低下します。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/documentdb/latest/developerguide/backup_restore-share_cluster_snapshots.html#backup_restore-share_snapshots",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/documentdb-controls.html#documentdb-3",
+    "https://docs.aws.amazon.com/config/latest/developerguide/docdb-cluster-snapshot-public-prohibited.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws docdb modify-db-cluster-snapshot-attribute --db-cluster-snapshot-identifier <snapshot_id> --attribute-name restore --values-to-remove all",
+      "NativeIaC": "",
+      "Other": "1. AWS コンソールで Amazon DocumentDB コンソールを開き、Snapshots に移動します\n2. 公開状態になっている手動クラスター・スナップショットを選択します\n3. Actions > Share をクリックします\n4. DB snapshot visibility を Private に設定し、リストに \"all\" が含まれている場合は削除します\n5. Save をクリックします",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "スナップショットの可視性は `Private` のまま維持し、**最小権限**の原則に基づいて信頼できるアカウントにのみ共有します。公開共有を防ぐため、アクセスを鍵ベースで制御できる **CMEK 暗号化**の利用を優先してください。共有リストを定期的に見直し、可視性を変更できる IAM 権限を制限し、露出を監視することで**多層防御**を実現します。",
+      "Url": "https://hub.prowler.com/check/documentdb_cluster_public_snapshot"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+
+

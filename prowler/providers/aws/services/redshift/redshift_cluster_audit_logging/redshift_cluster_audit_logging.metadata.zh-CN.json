@@ -1,0 +1,40 @@
+{
+  "Provider": "aws",
+  "CheckID": "redshift_cluster_audit_logging",
+  "CheckTitle": "Redshift 集群已启用审计日志记录",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践",
+    "软件和配置检查/行业和法规标准/AWS 基础安全最佳实践"
+  ],
+  "ServiceName": "redshift",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsRedshiftCluster",
+  "ResourceGroup": "analytics",
+  "Description": "Amazon Redshift 集群会评估**数据库审计日志记录**，将连接、用户和用户活动事件导出到 Amazon S3 或 CloudWatch。",
+  "Risk": "如果没有审计日志，恶意登录和查询可能会逃避检测，影响**机密性**（数据泄露）、**完整性**（未经授权的用户/角色更改）以及由于缺少取证和事件响应的证据而影响调查的**可用性**。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/redshift/latest/mgmt/db-auditing.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws redshift enable-logging --cluster-identifier <example_resource_id> --bucket-name <S3_BUCKET_NAME>",
+      "NativeIaC": "```yaml\nResources:\n  <example_resource_name>:\n    Type: AWS::Redshift::Cluster\n    Properties:\n      ClusterType: single-node\n      NodeType: dc2.large\n      DBName: mydb\n      MasterUsername: masteruser\n      MasterUserPassword: <PASSWORD>\n      # 关键：启用 Redshift 审计日志记录到 S3\n      LoggingProperties:\n        BucketName: <S3_BUCKET_NAME>  # 关键：需要开启日志记录\n```",
+      "Other": "1. 打开 Amazon Redshift 控制台并转到集群\n2. 选择目标集群并打开属性选项卡\n3. 在数据库审计日志记录中，点击编辑\n4. 启用日志记录并选择一个 S3 存储桶\n5. 点击保存更改",
+      "Terraform": "```hcl\nresource \"aws_redshift_cluster\" \"<example_resource_name>\" {\n  cluster_identifier = \"<example_resource_id>\"\n  node_type          = \"dc2.large\"\n  master_username    = \"masteruser\"\n  master_password    = \"SuperSecretPassw0rd!\"\n  cluster_type       = \"single-node\"\n\n  logging {\n    enable      = true                 # 关键：开启审计日志记录\n    bucket_name = \"<S3_BUCKET_NAME>\"  # 关键：需要 S3 目的地\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "启用全面的**Redshift 审计日志记录**并包括用户活动事件。在受保护的目的地集中日志，实施**最小权限**访问、保留和不可变性。作为**深度防御**的一部分，针对异常连接和查询实施**警报**。",
+      "Url": "https://hub.prowler.com/check/redshift_cluster_audit_logging"
+    }
+  },
+  "Categories": [
+    "logging",
+    "forensics-ready"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

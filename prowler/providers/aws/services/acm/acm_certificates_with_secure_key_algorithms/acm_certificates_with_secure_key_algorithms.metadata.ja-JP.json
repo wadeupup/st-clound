@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "acm_certificates_with_secure_key_algorithms",
+  "CheckTitle": "ACM 証明書が安全な鍵アルゴリズムを使用しています",
+  "CheckType": [
+    "ソフトウェアと設定チェック/AWS セキュリティベストプラクティス",
+    "ソフトウェアと設定チェック/業界および規制基準/AWS 基礎セキュリティベストプラクティス",
+    "ソフトウェアと設定チェック/業界および規制基準/PCI-DSS",
+    "ソフトウェアと設定チェック/業界および規制基準/NIST 800-53 コントロール（米国）"
+  ],
+  "ServiceName": "acm",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsCertificateManagerCertificate",
+  "ResourceGroup": "security",
+  "Description": "**ACM 証明書**は**公開鍵アルゴリズムとサイズ**について評価され、`RSA-1024` や ECDSA `P-192` などの弱いパラメータを使用する証明書が識別されます。`RSA-2048+` または ECDSA `P-256+` を使用する証明書は、安全なベースラインを満たしています。",
+  "Risk": "**弱い証明書鍵**は、TLS の機密性と真正性を低下させます。\n\n実行可能な因数分解または離散対数攻撃により、秘密鍵が明らかになる可能性があり、**中間者攻撃**、セッションの復号化、**証明書のなりすまし**が可能になり、データの露出と改ざんにつながります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://noise.getoto.net/2022/11/08/how-to-evaluate-and-use-ecdsa-certificates-in-aws-certificate-manager/",
+    "https://docs.aws.amazon.com/acm/latest/userguide/data-protection.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation: 安全な鍵アルゴリズムを使用する ACM 証明書\nResources:\n  <example_resource_name>:\n    Type: AWS::CertificateManager::Certificate\n    Properties:\n      DomainName: <example_domain>\n      KeyAlgorithm: EC_prime256v1  # 重要：安全な鍵アルゴリズム（RSA-2048+ または ECDSA P-256+）を保証します\n```",
+      "Other": "1. AWS コンソールで、Certificate Manager (ACM) に移動します\n2. Request a certificate をクリックし、<example_domain> を入力します\n3. Key algorithm の下で、ECDSA P-256（または RSA 2048）を選択します\n4. 検証を完了します（DNS が推奨されます）\n5. 証明書を使用するサービス（例：ALB/CloudFront/API Gateway）で、古い証明書を新しい証明書に置き換えます\n6. 使用されなくなったら、安全でない証明書（例：RSA-1024 または P-192）を削除します",
+      "Terraform": "```hcl\n# Terraform: 安全な鍵アルゴリズムを使用する ACM 証明書\nresource \"aws_acm_certificate\" \"<example_resource_name>\" {\n  domain_name   = \"<example_domain>\"\n  key_algorithm = \"EC_prime256v1\"  # 重要：安全な鍵アルゴリズム（RSA-2048+ または ECDSA P-256+）を保証します\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "**強力なアルゴリズム**を使用します：`RSA-2048+` または ECDSA `P-256/P-384`。弱いまたはレガシーの証明書を置き換え、ポリシーを通じてその使用を防止します。\n\n互換性がある場合は ECDSA を優先し、秘密鍵に**最小権限**を適用し、最新の TLS ポリシーを強制し、暗号強度を維持するために更新を自動化します。",
+      "Url": "https://hub.prowler.com/check/acm_certificates_with_secure_key_algorithms"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

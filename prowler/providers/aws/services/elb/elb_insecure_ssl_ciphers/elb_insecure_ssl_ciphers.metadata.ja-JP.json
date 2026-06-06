@@ -1,0 +1,45 @@
+{
+  "Provider": "aws",
+  "CheckID": "elb_insecure_ssl_ciphers",
+  "CheckTitle": "Elastic Load Balancer の HTTPS リスナー（存在する場合）が ELBSecurityPolicy-TLS-1-2-2017-01 ポリシーを使用していること",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/CIS AWS Foundations Benchmark",
+    "Software and Configuration Checks/Industry and Regulatory Standards/PCI-DSS",
+    "Software and Configuration Checks/Industry and Regulatory Standards/NIST 800-53 Controls (USA)"
+  ],
+  "ServiceName": "elb",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsElbLoadBalancer",
+  "ResourceGroup": "network",
+  "Description": "Elastic Load Balancer の HTTPS リスナーが **強力な TLS ポリシー** を使用しているかを評価します。`ELBSecurityPolicy-TLS-1-2-2017-01` に関連付けられたリスナーは、レガシー SSL/TLS や弱いスイートを回避し、最新のプロトコルと暗号スイートのみをネゴシエートすると見なされます。",
+  "Risk": "レガシー TLS や弱い暗号スイートは、ダウングレード攻撃や中間者による復号/改ざんを許します。攻撃者は資格情報を取得し、レスポンスを注入して横展開できるため、転送中データの **機密性** と **完全性** を損ない、ハンドシェイク失敗により **可用性** も低下します。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/ELB/elb-security-policy.html",
+    "https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html#describe-ssl-policies",
+    "https://docs.aws.amazon.com/elasticloadbalancing/latest/classic/ssl-config-update.html",
+    "https://docs.aws.amazon.com/elasticloadbalancing/latest/classic/elb-security-policy-table.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws elb set-load-balancer-policies-of-listener --load-balancer-name <lb_name> --load-balancer-port 443 --policy-names ELBSecurityPolicy-TLS-1-2-2017-01",
+      "NativeIaC": "```yaml\n# CloudFormation: Classic ELB with TLS 1.2-only security policy on HTTPS listener\nResources:\n  <example_resource_name>:\n    Type: AWS::ElasticLoadBalancing::LoadBalancer\n    Properties:\n      AvailabilityZones:\n        - <example_az>\n      Listeners:\n        - LoadBalancerPort: 443\n          InstancePort: 443\n          Protocol: HTTPS\n          InstanceProtocol: HTTPS\n          SSLCertificateId: <example_certificate_arn>\n          PolicyNames:\n            - ELBSecurityPolicy-TLS-1-2-2017-01  # Critical: attach TLS 1.2-only policy to the HTTPS listener\n      Policies:\n        - PolicyName: ELBSecurityPolicy-TLS-1-2-2017-01  # Critical: create policy referencing the predefined TLS 1.2 policy\n          PolicyType: SSLNegotiationPolicyType\n          Attributes:\n            - Name: Reference-Security-Policy\n              Value: ELBSecurityPolicy-TLS-1-2-2017-01  # Critical: enforce TLS 1.2-only\n```",
+      "Other": "1. AWS マネジメントコンソールを開き EC2 に移動します\n2. 左メニューの Load Balancing 配下で Load Balancers をクリックします\n3. 対象の Classic Load Balancer を選択します\n4. Listeners タブで Manage listeners（または Edit）をクリックします\n5. HTTPS（443）リスナーを選択し、Security policy で ELBSecurityPolicy-TLS-1-2-2017-01 を選びます\n6. Save changes をクリックします",
+      "Terraform": "```hcl\n# Create and attach TLS 1.2-only policy to a Classic ELB HTTPS listener\nresource \"aws_load_balancer_policy\" \"<example_resource_name>\" {\n  load_balancer_name = \"<example_resource_name>\"\n  policy_name        = \"ELBSecurityPolicy-TLS-1-2-2017-01\"  # Critical: policy named as required by the check\n  policy_type_name   = \"SSLNegotiationPolicyType\"\n\n  policy_attributes {\n    name  = \"Reference-Security-Policy\"\n    value = \"ELBSecurityPolicy-TLS-1-2-2017-01\"  # Critical: reference the predefined TLS 1.2 policy\n  }\n}\n\nresource \"aws_load_balancer_listener_policy\" \"<example_resource_name>\" {\n  load_balancer_name = \"<example_resource_name>\"\n  load_balancer_port = 443\n  policy_names       = [aws_load_balancer_policy.<example_resource_name>.policy_name]  # Critical: attach policy to HTTPS listener\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "**TLS 1.2+** と最新 AEAD 暗号を強制する ELB ポリシーへ標準化し、レガシープロトコルと弱いスイートを無効化してください。サーバー暗号順序を有効にし、古いポリシーを廃止し、暗号アジリティのため定期見直しを実施します。クライアント互換性を検証し、強力な証明書を使い、ネゴシエーション結果を監視してください。",
+      "Url": "https://hub.prowler.com/check/elb_insecure_ssl_ciphers"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

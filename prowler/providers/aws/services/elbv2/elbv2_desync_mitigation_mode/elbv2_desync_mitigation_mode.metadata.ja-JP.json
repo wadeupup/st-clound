@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "elbv2_desync_mitigation_mode",
+  "CheckTitle": "Application Load Balancer の desync 緩和モードが strictest または defensive、または無効ヘッダーフィールドを破棄していること",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices/Network Reachability",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "TTPs/Initial Access",
+    "Effects/Data Exposure"
+  ],
+  "ServiceName": "elbv2",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsElbv2LoadBalancer",
+  "ResourceGroup": "network",
+  "Description": "**Application Load Balancer** の **HTTP desync 防御**設定を確認します。`routing.http.desync_mitigation_mode` が `strictest` または `defensive` かを評価し、どちらでもない場合は補完的対策として `routing.http.drop_invalid_header_fields.enabled` が `true` であることを確認します。",
+  "Risk": "十分な desync 緩和がないと、HTTP 解析の不一致と **リクエストスマグリング** が発生します：\n- **機密性**：トークン窃取、データ流出\n- **完全性**：キャッシュ/キュー汚染、不正操作\n- **可用性**：バックエンド枯渇と障害\n\n無効ヘッダーの破棄だけでは、この露出を低減できても完全には解消できません。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/elb-controls.html#elb-12",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/ELBv2/drop-invalid-header-fields-enabled.html",
+    "https://support.icompaas.com/support/solutions/articles/62000233515-ensure-the-application-load-balancer-is-configured-with-strictest-desync-mitigation-mode",
+    "https://docs.aws.amazon.com/elasticloadbalancing/latest/application/application-load-balancers.html#desync-mitigation-mode"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws elbv2 modify-load-balancer-attributes --load-balancer-arn <ALB_ARN> --attributes Key=routing.http.desync_mitigation_mode,Value=strictest",
+      "NativeIaC": "```yaml\n# CloudFormation: Set ALB desync mitigation mode\nResources:\n  <example_resource_name>:\n    Type: AWS::ElasticLoadBalancingV2::LoadBalancer\n    Properties:\n      Type: application\n      Subnets:\n        - <example_subnet_id1>\n        - <example_subnet_id2>\n      LoadBalancerAttributes:\n        - Key: routing.http.desync_mitigation_mode  # Critical: enforce strictest/defensive desync mitigation to pass the check\n          Value: strictest\n```",
+      "Other": "1. AWS コンソールを開き、EC2 > Load Balancers に移動します\n2. 対象の Application Load Balancer を選択します\n3. Actions > Edit attributes（または Attributes タブ > Edit）を選択します\n4. Desync mitigation mode を Strictest（または Defensive）に設定します\n5. 変更を保存します",
+      "Terraform": "```hcl\n# Terraform: Set ALB desync mitigation mode\nresource \"aws_lb\" \"<example_resource_name>\" {\n  name    = \"<example_resource_name>\"\n  subnets = [\"<example_subnet_id1>\", \"<example_subnet_id2>\"]\n\n  desync_mitigation_mode = \"strictest\" # Critical: enforce strictest/defensive desync mitigation to pass the check\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "ALB の `desync_mitigation_mode` を `strictest`（互換性要件がある場合は `defensive`）に設定し、`routing.http.drop_invalid_header_fields.enabled`=`true` を維持してください。\n\n**多層防御** を適用し、RFC 準拠リクエストを検証し、監視しながら段階的に変更を展開し、下流サービスには **最小権限** を徹底します。",
+      "Url": "https://hub.prowler.com/check/elbv2_desync_mitigation_mode"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

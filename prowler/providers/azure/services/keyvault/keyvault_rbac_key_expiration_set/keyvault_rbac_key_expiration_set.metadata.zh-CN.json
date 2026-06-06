@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "keyvault_rbac_key_expiration_set",
+  "CheckTitle": "确保在 RBAC Key Vault 中为所有密钥设置过期日期",
+  "CheckType": [],
+  "ServiceName": "keyvault",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "KeyVault",
+  "ResourceGroup": "security",
+  "Description": "确保所有基于角色访问控制（RBAC）的 Azure Key Vault 中的密钥都设置了过期日期",
+  "Risk": "Azure Key Vault 允许用户在 Microsoft Azure 环境中存储和使用加密密钥。exp（过期日期）属性用于标识密钥在该日期及之后不得用于新数据加密、新密钥封装和签名。默认情况下，密钥永不过期。因此，建议在 Key Vault 中轮换密钥，并为所有密钥显式设置过期日期，以帮助实施密钥轮换。这可确保密钥不会在其分配生命周期之外继续被使用。",
+  "RelatedUrl": "https://docs.microsoft.com/en-us/azure/key-vault/key-vault-whatis",
+  "Remediation": {
+    "Code": {
+      "CLI": "az keyvault key set-attributes --name <keyName> --vault-name <vaultName> --expires Y-m-d'T'H:M:S'Z'",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/KeyVault/key-expiration-check.html#",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-general-policies/set-an-expiration-date-on-all-keys#terraform"
+    },
+    "Recommendation": {
+      "Text": "在 Azure 门户中：1. 转到 Key vaults。2. 对每个 Key vault，点击 Keys。3. 在主面板中，确保所有已启用（Enabled）的密钥都设置了适当的过期日期。在 Azure CLI 中：使用以下命令更新密钥过期日期：az keyvault key set-attributes --name <keyName> --vault-name <vaultName> -- expires Y-m-d'T'H:M:S'Z' 注意：若要通过 Microsoft API 查看 Key Vault 中所有密钥的过期日期，需要“List”Key 权限。若要更新密钥过期日期：1. 转到 Key vault，点击 Access Control (IAM)。2. 点击 Add role assignment，并为相应用户分配 Key Vault Crypto Officer 角色。在 PowerShell 中：Set-AzKeyVaultKeyAttribute -VaultName <VaultName> -Name <KeyName> -Expires <DateTime>",
+      "Url": "https://docs.microsoft.com/en-us/rest/api/keyvault/about-keys--secrets-and-certificates#key-vault-keys"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "密钥在各自分配的过期日期之后将无法继续使用。应在所有使用场景中定期轮换密钥。"
+}

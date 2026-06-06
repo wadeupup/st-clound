@@ -1,0 +1,44 @@
+{
+  "Provider": "aws",
+  "CheckID": "awslambda_function_url_public",
+  "CheckTitle": "Lambda 函数 URL 不可公开访问",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices/Network Reachability",
+    "Effects/Data Exposure"
+  ],
+  "ServiceName": "awslambda",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsLambdaFunction",
+  "ResourceGroup": "serverless",
+  "Description": "**AWS Lambda 函数 URL** 会被评估以确定 `AuthType` 是否强制执行**AWS IAM 身份验证**或允许**公共调用**。\n\n适用于具有函数 URL 的函数，并在请求必须通过 IAM 主体进行身份验证和授权时突出显示。",
+  "Risk": "未经身份验证的函数 URL 允许任何人调用代码：\n- 机密性：数据暴露\n- 完整性：通过过度特权的逻辑进行意外更改\n- 可用性：通过高请求率导致 DoS/钱包耗尽\n\n攻击者可以编写脚本调用、泄露数据，并使用函数的权限进行横向移动。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/Lambda/iam-auth-function-url.html",
+    "https://www.roastdev.com/post/aws-lambda-url-invocations-with-iam-authentication-and-throttling-limits",
+    "https://docs.aws.amazon.com/secretsmanager/latest/userguide/lambda-functions.html",
+    "https://dev.to/aws-builders/hands-on-aws-lambda-function-url-with-aws-iam-authentication-type-180g",
+    "https://www.rahulpnath.com/blog/how-to-secure-and-authenticate-lambda-function-urls/"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws lambda update-function-url-config --function-name <FUNCTION_NAME> --auth-type AWS_IAM",
+      "NativeIaC": "```yaml\n# CloudFormation：将 Lambda 函数 URL 设置为需要 IAM 身份验证\nResources:\n  FunctionUrl:\n    Type: AWS::Lambda::Url\n    Properties:\n      TargetFunctionArn: arn:aws:lambda:<region>:<account-id>:function/<example_resource_name>\n      AuthType: AWS_IAM  # 关键：需要 IAM 身份验证，防止公共访问\n```",
+      "Other": "1. 在 AWS 控制台中，转到 Lambda > 函数并打开 <example_resource_name>\n2. 选择配置 > 函数 URL > 编辑\n3. 将身份验证类型设置为 AWS_IAM\n4. 点击保存",
+      "Terraform": "```hcl\n# 将 Lambda 函数 URL 设置为需要 IAM 身份验证\nresource \"aws_lambda_function_url\" \"example\" {\n  function_name      = \"<example_resource_name>\"\n  authorization_type = \"AWS_IAM\"  # 关键：通过要求 IAM 身份验证来阻止公共访问\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "在函数 URL 上强制执行 `AWS_IAM` 并应用**最小权限**：\n- 仅向所需的主体授予 `lambda:InvokeFunctionUrl`\n- 避免 `*` 主体或广泛的条件\n- 将 CORS 限制为受信任的源和方法\n- 设置保留并发以遏制滥用\n\n对于 Internet 使用，考虑**纵深防御**（WAF/CDN 或私有访问）。",
+      "Url": "https://hub.prowler.com/check/awslambda_function_url_public"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

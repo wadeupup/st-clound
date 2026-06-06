@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "glue_ml_transform_encrypted_at_rest",
+  "CheckTitle": "Glue ML Transform 已启用静态加密",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/NIST 800-53 Controls (USA)"
+  ],
+  "ServiceName": "glue",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "analytics",
+  "Description": "会评估 **AWS Glue ML transforms** 是否对 transform 用户数据启用了基于 **KMS 密钥** 的**静态加密**。该发现会标记未配置加密的 transforms。",
+  "Risk": "如果未加密，将削弱**机密性**：transform 产物、映射关系和样本数据集可能通过存储访问、备份或跨账号暴露被读取。这可能导致数据泄露，并通过暴露模式和数据关系来助长**横向移动**。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/glue/latest/dg/encryption-at-rest.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/glue-controls.html#glue-3"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws glue update-ml-transform --transform-id <transform-id> --transform-encryption '{\"MlUserDataEncryption\":{\"MlUserDataEncryptionMode\":\"SSE-KMS\",\"KmsKeyId\":\"<kms-key-arn>\"}}'",
+      "NativeIaC": "```yaml\nResources:\n  <example_resource_name>:\n    Type: AWS::Glue::MLTransform\n    Properties:\n      Role: <example_resource_id>\n      InputRecordTables:\n        - DatabaseName: <example_resource_name>\n          TableName: <example_resource_name>\n      TransformParameters:\n        TransformType: FIND_MATCHES\n        FindMatchesParameters:\n          PrimaryKeyColumnName: <example_resource_name>\n      TransformEncryption:\n        MlUserDataEncryption:\n          MlUserDataEncryptionMode: SSE-KMS  # Critical: enables ML user data encryption at rest\n          KmsKeyId: <kms-key-arn>            # Critical: KMS key used for encryption\n```",
+      "Other": "1. 在 AWS Management Console 中打开 AWS Glue\n2. 进入 Machine learning > Transforms，并选择目标 transform\n3. 点击 Edit\n4. 在 Encryption 下启用 ML user data encryption\n5. 选择一个 AWS KMS key\n6. 保存更改",
+      "Terraform": "```hcl\nresource \"aws_glue_ml_transform\" \"<example_resource_name>\" {\n  name     = \"<example_resource_name>\"\n  role_arn = \"<example_resource_id>\"\n\n  input_record_tables {\n    database_name = \"<example_resource_name>\"\n    table_name    = \"<example_resource_name>\"\n  }\n\n  parameters {\n    transform_type = \"FIND_MATCHES\"\n    find_matches_parameters {\n      primary_key_column_name = \"<example_resource_name>\"\n    }\n  }\n\n  transform_encryption {\n    ml_user_data_encryption {\n      ml_user_data_encryption_mode = \"SSE-KMS\"   # Critical: enables encryption at rest\n      kms_key_id                   = \"<kms-key-arn>\" # Critical: KMS key used for encryption\n    }\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "为所有 ML transforms 启用基于 **KMS** 的**静态加密**，并优先使用**客户管理密钥**。\n- 对密钥策略实施**最小权限**并定期轮换密钥\n- 结合网络与 IAM 控制落实**纵深防御**\n- 通过审计日志监控密钥使用与 transform 访问",
+      "Url": "https://hub.prowler.com/check/glue_ml_transform_encrypted_at_rest"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

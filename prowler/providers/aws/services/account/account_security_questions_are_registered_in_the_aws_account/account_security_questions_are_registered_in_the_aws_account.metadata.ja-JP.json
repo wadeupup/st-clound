@@ -1,0 +1,38 @@
+{
+  "Provider": "aws",
+  "CheckID": "account_security_questions_are_registered_in_the_aws_account",
+  "CheckTitle": "[非推奨] AWS ルートユーザーにセキュリティチャレンジ質問が設定されています",
+  "CheckType": [
+    "ソフトウェアと設定チェック/AWS セキュリティベストプラクティス"
+  ],
+  "ServiceName": "account",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "governance",
+  "Description": "[非推奨] **AWS アカウントルート**設定には、サポートの本人確認用のレガシー**セキュリティチャレンジ質問**が含まれる場合があります。これは、アカウントにこれらの質問が設定されているかどうかを評価します。*新しい設定は AWS によって廃止され、この機能の残りのサポートは時間制限があります。*",
+  "Risk": "これらの質問がないと、ルート資格情報または MFA が失われた場合のサポート支援による回復が制限され、**可用性**が低下し、**インシデント対応**が遅くなる可能性があります。知識ベース認証（KBA）への依存は、**ソーシャルエンジニアリング**により**機密性**も弱めます。これを回復のギャップとして扱い、より強力な、フィッシング耐性のある要素を採用してください。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.prowler.com/checks/aws/iam-policies/iam_15",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/IAM/security-challenge-questions.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "1. AWS マネジメントコンソールにサインインします\n2. https://console.aws.amazon.com/billing/home?#/account/ で AWS アカウント設定ページに移動します\n3. Configure Security Challenge Questions セクションまでスクロールし、Edit リンクをクリックします\n4. Amazon が提供する3つの異なる質問を選択し、適切な回答を提供します\n5. 回答を安全でアクセス可能な場所に保存します\n6. Update ボタンをクリックして変更を保存します",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "知識ベース認証（KBA）ではなく、より強力な回復を優先します：\n- **ルートの MFA** を強制し、ルートの使用を最小限に抑えます\n- **代替連絡先**とルートメールを最新に保ち、保護します\n- 厳密に制御された**ブレークグラスロール**を確立し、最小権限と職務の分離を適用します\n- 回復手順を文書化し、テストします；ルートアクティビティを監視します",
+      "Url": "https://hub.prowler.com/check/account_security_questions_are_registered_in_the_aws_account"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

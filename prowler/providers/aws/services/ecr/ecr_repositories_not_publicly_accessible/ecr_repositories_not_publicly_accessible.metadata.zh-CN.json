@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "ecr_repositories_not_publicly_accessible",
+  "CheckTitle": "ECR 存储库不可公开访问",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices/Network Reachability",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "TTPs/Initial Access",
+    "Effects/Data Exposure"
+  ],
+  "ServiceName": "ecr",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "critical",
+  "ResourceType": "AwsEcrRepository",
+  "ResourceGroup": "container",
+  "Description": "评估 **Amazon ECR 存储库** 是否通过允许匿名主体（例如，`Principal: \"*\"`）访问存储库的存储库策略而 **公开暴露**，包括镜像列表、拉取或修改。",
+  "Risk": "**ECR 存储库的公开访问** 削弱了 **机密性** 和 **完整性**。\n\n任何人都可以拉取镜像，暴露专有代码或嵌入的密钥；如果允许推送，攻击者可以污染镜像，从而造成供应链攻击。不受控制的拉取可能会增加 **出站成本** 并泄露存储库元数据。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/AmazonECR/latest/public/security_iam_service-with-iam.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws ecr delete-repository-policy --repository-name <example_resource_name>",
+      "NativeIaC": "```yaml\nResources:\n  <example_resource_name>:\n    Type: AWS::ECR::Repository\n    Properties:\n      RepositoryPolicyText:\n        Version: \"2012-10-17\"\n        Statement:\n          - Effect: Allow\n            Principal:\n              AWS: \"arn:aws:iam::<example_resource_id>:root\"  # Critical: restricts access to a specific AWS account; removes public (*) access\n            Action: \"ecr:*\"\n```",
+      "Other": "1. 在 AWS 控制台中，转到 Amazon ECR > 存储库\n2. 选择存储库\n3. 打开权限选项卡并点击编辑\n4. 删除任何 Principal 设置为 \"*\" 的语句，或将其替换为特定的 AWS ARN（例如，arn:aws:iam::<example_resource_id>:root）\n5. 保存更改",
+      "Terraform": "```hcl\nresource \"aws_ecr_repository_policy\" \"<example_resource_name>\" {\n  repository = \"<example_resource_name>\"\n  policy     = jsonencode({\n    Version   = \"2012-10-17\"\n    Statement = [{\n      Effect    = \"Allow\"\n      Principal = { AWS = \"arn:aws:iam::<example_resource_id>:root\" } # Critical: restricts access to a specific AWS principal; removes public (*) access\n      Action    = \"ecr:*\"\n    }]\n  })\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "对存储库策略应用 **最小权限**：\n- 避免 `Principal:\"*\"` 并阻止匿名访问\n- 向特定账户/角色授予最小操作权限\n- 通过 IAM 要求经过身份验证的拉取/推送\n- 使用 **私有连接**（例如，VPC 端点）\n- 通过镜像扫描和签名添加 **纵深防御**",
+      "Url": "https://hub.prowler.com/check/ecr_repositories_not_publicly_accessible"
+    }
+  },
+  "Categories": [
+    "internet-exposed",
+    "container-security"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "eks_cluster_network_policy_enabled",
+  "CheckTitle": "EKS 集群已启用网络策略",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices/Network Reachability",
+    "TTPs/Lateral Movement"
+  ],
+  "ServiceName": "eks",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsEksCluster",
+  "ResourceGroup": "container",
+  "Description": "评估 **Amazon EKS 集群**是否通过 Kubernetes `NetworkPolicy` 实现 **Pod 级网络隔离**，指示 Pod 和命名空间之间的流量是否根据定义的规则受到限制。",
+  "Risk": "如果没有 **NetworkPolicy**，Pod 可以自由通信，从而启用 **横向移动**、**数据窃取**和滥用内部服务。不受限制的东西向流量会损害机密性和完整性，并扩大单个受感染 Pod 的爆炸半径。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/EKS/security-groups.html",
+    "https://docs.aws.amazon.com/eks/latest/userguide/eks-networking-add-ons.html",
+    "https://docs.aws.amazon.com/eks/latest/userguide/cni-network-policy.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws eks update-cluster-config --name <example_cluster_name> --resources-vpc-config securityGroupIds=<example_security_group_id>",
+      "NativeIaC": "```yaml\n# CloudFormation: attach a security group to the EKS cluster\nResources:\n  <example_resource_name>:\n    Type: AWS::EKS::Cluster\n    Properties:\n      RoleArn: <example_role_arn>\n      ResourcesVpcConfig:\n        SubnetIds:\n          - <example_subnet_id>\n        SecurityGroupIds:\n          - <example_security_group_id>  # Critical: sets a security group for the cluster, satisfying the check\n```",
+      "Other": "1. 打开 AWS 控制台并转到 EKS > 集群\n2. 选择 <您的集群> 并打开网络选项卡\n3. 在网络部分点击编辑（或更新）\n4. 在安全组下，添加/选择 <example_security_group_id>\n5. 点击保存以应用",
+      "Terraform": "```hcl\n# Minimal EKS cluster config with a security group attached\nresource \"aws_eks_cluster\" \"<example_resource_name>\" {\n  name     = \"<example_resource_name>\"\n  role_arn = \"<example_role_arn>\"\n\n  vpc_config {\n    subnet_ids         = [\"<example_subnet_id>\"]\n    security_group_ids = [\"<example_security_group_id>\"]  # Critical: attaches a security group to pass the check\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "强制执行 **最小权限** `NetworkPolicy`，对入站和出站流量使用 `default-deny`，然后通过标签和命名空间明确允许所需的流量。使用 Pod 的安全组和私有访问应用 **纵深防御**，并持续测试和监控策略有效性。",
+      "Url": "https://hub.prowler.com/check/eks_cluster_network_policy_enabled"
+    }
+  },
+  "Categories": [
+    "trust-boundaries",
+    "cluster-security"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "启用网络策略可能会导致所有集群节点的滚动更新，并消耗额外的资源。"
+}
+

@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "vm_linux_enforce_ssh_authentication",
+  "CheckTitle": "确保基于 Linux 的虚拟机强制使用 SSH 密钥认证",
+  "CheckType": [],
+  "ServiceName": "vm",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/{vmName}",
+  "Severity": "high",
+  "ResourceType": "Microsoft.Compute/virtualMachines",
+  "ResourceGroup": "compute",
+  "Description": "确保 Azure 基于 Linux 的虚拟机通过禁用密码认证来配置为使用 SSH 密钥。",
+  "Risk": "允许基于密码的 SSH 认证会增加暴力破解攻击和未授权访问风险。强制使用 SSH 密钥认证可确保只有持有私钥的用户才能访问 VM。",
+  "RelatedUrl": "https://docs.microsoft.com/en-us/azure/virtual-machines/linux/create-ssh-keys-detailed",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/VirtualMachines/ssh-authentication-type.html",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "重新创建 Linux VM，启用 SSH 密钥认证并禁用密码认证。",
+      "Url": "https://docs.microsoft.com/en-us/azure/virtual-machines/linux/create-ssh-keys-detailed"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

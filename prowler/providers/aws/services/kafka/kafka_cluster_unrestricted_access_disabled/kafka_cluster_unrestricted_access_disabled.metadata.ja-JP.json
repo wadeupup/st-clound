@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "kafka_cluster_unrestricted_access_disabled",
+  "CheckTitle": "Kafka クラスターは認証を必要とします",
+  "CheckType": [
+    "ソフトウェアと構成のチェック/AWS セキュリティベストプラクティス",
+    "ソフトウェアと構成のチェック/業界および規制基準/AWS 基礎セキュリティベストプラクティス",
+    "TTPs/初期アクセス/不正アクセス",
+    "影響/データの露出"
+  ],
+  "ServiceName": "kafka",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "critical",
+  "ResourceType": "AwsMskCluster",
+  "ResourceGroup": "messaging",
+  "Description": "Amazon MSK クラスターは、**認証されていないクライアントアクセス**について評価されます。サーバーレスクラスターは本質的に認証を必要とし、プロビジョニングされたクラスターは、認証されたクライアントではなく**無制限の接続**を許可する構成についてチェックされます。",
+  "Risk": "**認証されていないアクセス**を許可すると、誰でも接続して以下を行うことができます:\n- 機密トピックを読む（機密性）\n- データを公開または変更する（整合性）\n- ブローカーやコンシューマーを過負荷にする（可用性）\n\nこれにより、メッセージの流出、ストリームの汚染、信頼されたデータパイプラインの悪用が可能になります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/msk/latest/developerguide/msk-configure-security.html",
+    "https://docs.aws.amazon.com/msk/latest/developerguide/security.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/MSK/unrestricted-access-to-brokers.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws kafka update-security --cluster-arn <example_resource_arn> --current-version <example_current_version> --client-authentication 'Unauthenticated={Enabled=false}'",
+      "NativeIaC": "```yaml\n# CloudFormation: MSK の認証されていないクライアントアクセスを無効にします\nResources:\n  <example_resource_name>:\n    Type: AWS::MSK::Cluster\n    Properties:\n      ClusterName: <example_resource_name>\n      KafkaVersion: <example_kafka_version>\n      NumberOfBrokerNodes: 2\n      BrokerNodeGroupInfo:\n        InstanceType: <example_instance_type>\n        ClientSubnets:\n          - <subnet_id_1>\n          - <subnet_id_2>\n        StorageInfo:\n          EbsStorageInfo:\n            VolumeSize: 1000\n      ClientAuthentication:\n        Unauthenticated:\n          Enabled: false  # 重要: 認証されていないクライアントアクセスを無効にします\n```",
+      "Other": "1. AWS コンソールを開き、Amazon MSK に移動します\n2. クラスターを選択し、セキュリティタブを開きます\n3. クライアント認証の下の編集をクリックします\n4. 認証されていないアクセスをオフ/クリアします\n5. 変更を保存して更新を適用します",
+      "Terraform": "```hcl\n# Terraform: MSK の認証されていないクライアントアクセスを無効にします\nresource \"aws_msk_cluster\" \"<example_resource_name>\" {\n  cluster_name           = \"<example_resource_name>\"\n  kafka_version          = \"<example_kafka_version>\"\n  number_of_broker_nodes = 2\n\n  broker_node_group_info {\n    instance_type   = \"<example_instance_type>\"\n    client_subnets  = [\"<subnet_id_1>\", \"<subnet_id_2>\"]\n    ebs_volume_size = 1000\n  }\n\n  client_authentication {\n    unauthenticated = false  # 重要: 認証されていないクライアントアクセスを無効にします\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "**認証されていないアクセス**を無効にし、**強力なクライアント認証**（mTLS または IAM/SASL）を要求します。\n- スコープされた ACL で**最小特権**を強制します\n- プライベート接続と厳格なセキュリティグループを介してネットワークパスを制限します\n- 転送中の暗号化、アクセスの監視、資格情報の定期的なローテーションを行います",
+      "Url": "https://hub.prowler.com/check/kafka_cluster_unrestricted_access_disabled"
+    }
+  },
+  "Categories": [
+    "identity-access"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

@@ -1,0 +1,35 @@
+{
+  "Provider": "aws",
+  "CheckID": "s3_bucket_public_access",
+  "CheckTitle": "确保没有任何 S3 存储桶对所有人或任何 AWS 用户开放。",
+  "CheckType": [
+    "数据保护"
+  ],
+  "ServiceName": "s3",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:s3:::bucket_name",
+  "Severity": "critical",
+  "ResourceType": "AwsS3Bucket",
+  "ResourceGroup": "storage",
+  "Description": "确保没有任何 S3 存储桶对所有人或任何 AWS 用户开放。",
+  "Risk": "即使您在 Amazon S3 控制台中启用了所有可用的存储桶 ACL 选项，仅靠 ACL 本身也不能允许所有人从您的存储桶下载对象。根据您选择的选项，任何用户都可以执行某些操作。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "aws s3api put-public-access-block --public-access-block-configuration BlockPublicAcls=true,IgnorePublicAcls=true,BlockPublicPolicy=true,RestrictPublicBuckets=true --bucket <bucket_name>",
+      "NativeIaC": "",
+      "Other": "https://github.com/cloudmatos/matos/tree/master/remediations/aws/s3/s3/block-public-access",
+      "Terraform": "https://docs.prowler.com/checks/aws/networking-policies/s3-bucket-should-have-public-access-blocks-defaults-to-false-if-the-public-access-block-is-not-attached#terraform"
+    },
+    "Recommendation": {
+      "Text": "您只能为接入点、存储桶和 AWS 账户启用阻止公有访问设置。Amazon S3 不支持按对象设置阻止公有访问。当您将阻止公有访问设置应用到账户时，这些设置会在全球范围内应用于所有 AWS 区域。这些设置可能不会立即或同时在所有区域生效，但最终会传播到所有区域。",
+      "Url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-control-block-public-access.html"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

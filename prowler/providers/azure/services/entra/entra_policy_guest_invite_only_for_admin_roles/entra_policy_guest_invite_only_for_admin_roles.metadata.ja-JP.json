@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "entra_policy_guest_invite_only_for_admin_roles",
+  "CheckTitle": "「Guest invite restrictions」が「Only users assigned to specific admin roles can invite guest users」に設定されていることを確認する",
+  "CheckType": [],
+  "ServiceName": "entra",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "#microsoft.graph.authorizationPolicy",
+  "ResourceGroup": "IAM",
+  "Description": "招待を特定の管理者ロールを持つユーザーのみに制限します。",
+  "Risk": "招待を特定の管理者ロールを持つユーザーに制限することで、認可されたアカウントのみがクラウド リソースへアクセスできるようになります。これにより「Need to Know」権限の維持に役立ち、データへの意図しないアクセスを防ぎます。既定では Guest invite restrictions は「Anyone in the organization can invite guest users including guests and non-admins」に設定されています。これにより組織内の誰でもゲストや非管理者をテナントに招待できるため、セキュリティ リスクとなります。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/entra/external-id/external-collaboration-settings-configure",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "1. Azure Home から Portal Menu を選択します 2. Microsoft Entra ID を選択します 3. 次に External Identities を選択します 4. External collaboration settings を選択します 5. Guest invite settings の Guest invite restrictions で「Only users assigned to specific admin roles can invite guest users」が選択されていることを確認します",
+      "Url": "https://learn.microsoft.com/en-us/answers/questions/685101/how-to-allow-only-admins-to-add-guests"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "「Only users assigned to specific admin roles can invite guest users」を選択すると、特定管理者ロールを持つユーザーが外部ユーザーへの招待送信を担当するため、アカウント管理の追加運用負荷が発生します。新規ユーザーのオンボーディング時には他部門との調整も必要になります。"
+}

@@ -1,0 +1,32 @@
+{
+  "Provider": "aws",
+  "CheckID": "ec2_launch_template_no_public_ip",
+  "CheckTitle": "Amazon EC2 启动模板不应为网络接口分配公共 IP",
+  "CheckType": [],
+  "ServiceName": "ec2",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "high",
+  "ResourceType": "AwsEc2LaunchTemplate",
+  "ResourceGroup": "compute",
+  "Description": "此控制检查 Amazon EC2 启动模板是否配置为在启动时为网络接口分配公共 IP 地址。如果 EC2 启动模板配置为为网络接口分配公共 IP 地址，或者至少有一个网络接口具有公共 IP 地址，则控制失败。",
+  "Risk": "公共 IP 地址可以从互联网访问，使关联的资源可能从互联网访问。EC2 资源不应公开可访问，以避免对工作负载的意外访问。",
+  "RelatedUrl": "https://docs.aws.amazon.com/config/latest/developerguide/ec2-launch-template-public-ip-disabled.html",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://docs.aws.amazon.com/securityhub/latest/userguide/ec2-controls.html#ec2-25",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "要更新 EC2 启动模板，请参阅 Amazon EC2 Auto Scaling 用户指南中的更改默认网络接口设置。",
+      "Url": "https://docs.aws.amazon.com/autoscaling/ec2/userguide/create-launch-template.html#change-network-interface"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

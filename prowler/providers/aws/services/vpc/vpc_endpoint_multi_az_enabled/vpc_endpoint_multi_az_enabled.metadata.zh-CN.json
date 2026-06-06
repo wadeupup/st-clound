@@ -1,0 +1,40 @@
+{
+  "Provider": "aws",
+  "CheckID": "vpc_endpoint_multi_az_enabled",
+  "CheckTitle": "Amazon VPC 接口端点在多个可用区中具有子网",
+  "CheckType": [
+    "软件和配置检查/AWS安全最佳实践",
+    "软件和配置检查/行业和监管标准/AWS 基础安全最佳实践"
+  ],
+  "ServiceName": "vpc",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsEc2VpcEndpointService",
+  "ResourceGroup": "network",
+  "Description": "**VPC 接口端点** 会根据其端点网络接口是否放置在 **多个子网** 中进行评估，这意味着它们分布在不同的 **可用区** 中。仅存在于一个子网中的端点会被识别出来。",
+  "Risk": "**单子网端点**会产生**单可用区依赖**。一个可用区的中断或路由问题可能会切断对该服务的访问，从而降低**可用性**。工作负载可能会回退到**公共端点**，使流量暴露在互联网中，并因拦截或篡改而危及**机密性**。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/vpc/latest/privatelink/interface-endpoints.html",
+    "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/interface-vpc-endpoints.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws ec2 modify-vpc-endpoint --vpc-endpoint-id <example_resource_id> --add-subnet-ids <example_subnet_id_2>",
+      "NativeIaC": "```yaml\nResources:\n  <example_resource_name>:\n    Type: AWS::EC2::VPCEndpoint\n    Properties:\n      VpcEndpointType: Interface\n      VpcId: <example_resource_id>\n      ServiceName: com.amazonaws.<region>.<service>\n      SubnetIds:  #关键：至少包含两个子网（最好位于不同的可用区）以通过检查\n        - <example_subnet_id_1>\n        - <example_subnet_id_2>\n```",
+      "Other": "1. 打开 AWS VPC 控制台并前往 Endpoints\n2. 选择接口终端节点\n3. 点击 Actions > Manage subnets\n4. 在不同的可用区中选择一个额外的子网\n5. 点击 Modify subnets 进行保存",
+      "Terraform": "```hcl\nresource \"aws_vpc_endpoint\" \"<example_resource_name>\" {\n  vpc_id            = \"<example_resource_id>\"\n  service_name      = \"com.amazonaws.<region>.<service>\"\n  vpc_endpoint_type = \"Interface\"\n\n  subnet_ids = [\n    \"<example_subnet_id_1>\",\n    \"<example_subnet_id_2>\"  #关键：添加第二个子网（最好位于不同的可用区）以满足多可用区要求\n  ]\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "将接口端点放置在**不同可用区的多个子网**中，以消除对单一可用区的依赖。优先采用区域本地路由，使客户端使用最近的端点，并结合**私有 DNS**和严格限制的**安全组**来限制暴露——从而支持**纵深防御**和有弹性的连接。",
+      "Url": "https://hub.prowler.com/check/vpc_endpoint_multi_az_enabled"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

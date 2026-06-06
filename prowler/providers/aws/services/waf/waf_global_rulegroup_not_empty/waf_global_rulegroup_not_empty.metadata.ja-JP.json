@@ -1,0 +1,39 @@
+{
+  "Provider": "aws",
+  "CheckID": "waf_global_rulegroup_not_empty",
+  "CheckTitle": "AWS WAF Classic グローバルルールグループには少なくとも1つのルールがあります",
+  "CheckType": [
+    "ソフトウェアおよび設定のチェック/AWS セキュリティのベストプラクティス/ネットワーク到達可能性",
+    "ソフトウェアおよび設定のチェック／業界および規制基準／NIST 800-53 管理策"
+  ],
+  "ServiceName": "waf",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsWafRuleGroup",
+  "ResourceGroup": "security",
+  "Description": "**AWS WAF Classic グローバルルールグループ** は、**1 つ以上のルール** が存在するかどうかで評価されます。空のグループは、Web ACL から参照されている場合でも識別されます。つまり、そのグループは一致ロジックを追加しません。",
+  "Risk": "空のルールグループは検査を実行しないため、Web リクエストは WAF の精査を受けずに通過します。これにより盲点が生まれ、以下が可能になります:\n- **機密性**: SQLi/XSS によるデータ流出\n- **完全性**: パラメータ改ざん\n- **可用性**: ボット悪用およびレイヤー 7 DoS\n\nまた、アタッチされている場合に保護されているという誤った安心感も生みます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/waf/latest/developerguide/waf-rule-groups.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/waf-controls.html#waf-7",
+    "https://docs.aws.amazon.com/waf/latest/developerguide/classic-rule-group-editing.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws waf update-rule-group --rule-group-id <rule-group-id> --updates Action=INSERT,ActivatedRule={Priority=1,RuleId=<rule-id>,Action={Type=BLOCK}} --change-token <change-token> --region us-east-1",
+      "NativeIaC": "```yaml\n# CloudFormation: WAF Classic のグローバルルールグループに少なくとも 1 つのルールがあることを確認する\nResources:\n  <example_resource_name>:\n    Type: AWS::WAF::RuleGroup\n    Properties:\n      Name: <example_resource_name>\n      MetricName: examplemetric\n      ActivatedRules:\n        - Priority: 1                 # 重要: グループにルールを追加します（空ではなくなります）\n          RuleId: <example_resource_id>  # 重要: 追加する既存ルールのID\n          Action:\n            Type: BLOCK              # 重要: ルールを有効化する際に必要な操作\n```",
+      "Other": "1. AWS コンソールを開いて AWS WAF に移動し、その後 AWS WAF Classic に切り替えます\n2. 上部で、スコープを Global (CloudFront) に設定します\n3. Rule groups に移動し、対象の rule group を選択します\n4. Edit rule group をクリックします\n5. 既存の rule を選択し、その action（例: BLOCK）を選んで、Add rule to rule group をクリックします\n6. Update をクリックして保存します",
+      "Terraform": "```hcl\n# Terraform: WAF Classic のグローバルルールグループに少なくとも 1 つのルールがあることを確認する\nresource \"aws_waf_rule_group\" \"<example_resource_name>\" {\n  name        = \"<example_resource_name>\"\n  metric_name = \"examplemetric\"\n\n  activated_rule {\n    priority = 1                      # 重要: グループにルールを追加します（空ではなくなります）\n    rule_id  = \"<example_resource_id>\" # 重要: 追加する既存ルールのID\n    action {\n      type = \"BLOCK\"                 # 重要: ルールを有効化する際に必要な操作\n    }\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "各ルールグループに、アプリケーションの脅威に整合した**有効なルール**を設定し、必要に応じて `block` または `count` アクションを選択してください。ベースラインとして**マネージドルールグループ**を優先し、**最小権限**のためにカスタムルールを重ねてください。プレースホルダーのグループは避け、ステージングでテストし、メトリクスを監視して調整してください。",
+      "Url": "https://hub.prowler.com/check/waf_global_rulegroup_not_empty"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

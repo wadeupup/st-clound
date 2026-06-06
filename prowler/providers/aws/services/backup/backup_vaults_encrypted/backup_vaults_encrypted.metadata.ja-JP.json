@@ -1,0 +1,45 @@
+{
+  "Provider": "aws",
+  "CheckID": "backup_vaults_encrypted",
+  "CheckTitle": "AWS Backupボルトが保存時に暗号化されている",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/NIST 800-53 Controls (USA)",
+    "Software and Configuration Checks/Industry and Regulatory Standards/NIST CSF Controls (USA)",
+    "Software and Configuration Checks/Industry and Regulatory Standards/PCI-DSS",
+    "Software and Configuration Checks/Industry and Regulatory Standards/ISO 27001 Controls",
+    "Software and Configuration Checks/Industry and Regulatory Standards/HIPAA Controls (USA)"
+  ],
+  "ServiceName": "backup",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsBackupBackupVault",
+  "ResourceGroup": "storage",
+  "Description": "**AWS Backupボルト**は、**AWS KMS**を使用した**保存時の暗号化**について評価されます。この検出結果は、保存された回復ポイントを保護するKMSキーが設定されていないボルトを強調表示します。",
+  "Risk": "暗号化されていないボルトは、ストレージまたは資格情報が侵害された場合、回復ポイントの読み取りを許可し、**機密性**を弱め、データ漏洩を可能にします。KMS制御の欠如は、**整合性**の保証を弱め、調査中にフォレンジック**監査可能性**を妨げます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/aws-backup/latest/devguide/encryption.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/Athena/encrypted-with-cmk.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation：暗号化されたAWS Backupボルト\nResources:\n  <example_resource_name>:\n    Type: AWS::Backup::BackupVault\n    Properties:\n      BackupVaultName: <example_resource_name>\n      EncryptionKeyArn: <kms_key_arn>  # 重要：保存時にボルトを暗号化するKMSキーを設定\n```",
+      "Other": "1. AWSコンソールで、AWS Backup > バックアップボルトに移動\n2. バックアップボルトの作成をクリック\n3. 名前を<example_resource_name>に設定\n4. 暗号化キーの下で、カスタマー管理KMSキー（<kms_key_arn>）を選択\n5. バックアップボルトの作成をクリック\n6. 新しいボルトを使用するようにバックアップ計画を更新（計画 > 計画を選択 > 編集 > ターゲットボルト名を変更）\n7. 古い暗号化されていないボルトが空になったら削除（ボルトを選択 > バックアップボルトの削除）",
+      "Terraform": "```hcl\n# 暗号化されたAWS Backupボルト\nresource \"aws_backup_vault\" \"<example_resource_name>\" {\n  name        = \"<example_resource_name>\"\n  kms_key_arn = \"<kms_key_arn>\"  # 重要：ボルトの保存時暗号化を有効化\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "**カスタマー管理KMSキー**（`CMK`）を使用してすべてのバックアップボルトを暗号化します。キーポリシーで**最小権限**を強制し、ローテーションを有効化し、キー管理者をバックアップオペレーターから分離します。ボルトロックとログ記録で**多層防御**を追加します。*コピーについては*、宛先ボルトが適切なKMSキーを使用することを確認します。",
+      "Url": "https://hub.prowler.com/check/backup_vaults_encrypted"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

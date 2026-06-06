@@ -1,0 +1,39 @@
+{
+  "Provider": "aws",
+  "CheckID": "wellarchitected_workload_no_high_or_medium_risks",
+  "CheckTitle": "AWS Well-Architected Tool のワークロードには、高リスクまたは中リスクの項目はありません。",
+  "CheckType": [
+    "ソフトウェアおよび設定チェック / AWS セキュリティベストプラクティス"
+  ],
+  "ServiceName": "wellarchitected",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "governance",
+  "Description": "**AWS Well-Architected ワークロード** は、フレームワークの各柱（Pillar）において `HIGH` または `MEDIUM` と分類されたリスクの有無および件数に基づいて評価されます。結果は、該当するリスクがワークロードに記録されたまま残っているかどうかを示します。",
+  "Risk": "`HIGH` / `MEDIUM` リスクは、次のようなギャップを示します。\n- **機密性（Confidentiality）** の低下（データ公開、過剰なアクセス権限）\n- **完全性（Integrity）** の問題（脆弱な統制、監視されていない変更）\n- **可用性（Availability）** の障害（脆弱な耐障害性、不十分な復旧）\n攻撃者は、公開されたエンドポイントや過剰な権限を悪用して、権限昇格、データ流出、サービス妨害を引き起こす可能性があります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://aws.amazon.com/architecture/well-architected/",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/WellArchitected/findings.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "1. AWS コンソールで **Services > Well-Architected Tool** を開きます。\n2. 修正対象のワークロードを選択します。\n3. **Improvement plan**（または **Answer questions**）を開き、`High` および `Medium` リスクでフィルタリングします。\n4. 一覧に表示された各質問を開き、AWS 推奨のベストプラクティスに沿った回答へ変更し、その質問のリスクが `Low` または `None` になるまで調整して **Save** をクリックします。\n5. `High` または `Medium` リスクが残らなくなるまで繰り返します。\n6. ワークロード概要画面に戻り、`High = 0` かつ `Medium = 0` であることを確認します。",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "検出された項目は、`HIGH` を最優先とし、次に `MEDIUM` の順で修正してください。\n**最小権限（least privilege）**、強力な **暗号化（encryption）**、継続的な **ログ記録 / アラート（logging / alerting）** を適用し、**多層防御（defense in depth）** により公開範囲を最小化してください。あわせて、テスト済みの復旧手順を備えた **耐障害性（resilience）** を考慮した設計を行います。さらに、定期的なレビューを SDLC に組み込み、一貫性を保つためにガードレールを自動化してください。",
+      "Url": "https://hub.prowler.com/check/wellarchitected_workload_no_high_or_medium_risks"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "appinsights_ensure_is_configured",
+  "CheckTitle": "Application Insights が構成されていることを確認する。",
+  "CheckType": [],
+  "ServiceName": "appinsights",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "low",
+  "ResourceType": "Microsoft.Insights/components",
+  "ResourceGroup": "monitoring",
+  "Description": "Azure の Application Insights は、アプリケーション パフォーマンス監視ソリューションとして機能し、アプリの性能に関する有益なデータやインシデント対応時の追加情報を提供します。収集されるログ データには、アプリケーション メトリクス、テレメトリ データ、アプリケーション トレース ログ データが含まれ、組織はアプリの活動やトランザクションに関する詳細情報を得られます。これら 2 種類のデータセットは、組織がモダン アプリケーション内のセキュリティおよび性能関連メトリクスに対して、予防的かつ事後的に対応する手段を提供します。",
+  "Risk": "Application Insights を構成すると、Azure の他の箇所では得られない追加データを取得でき、組織の情報セキュリティ実践における大規模なログ/監視プログラムの一部として活用できます。これらのログの種類と内容は、潜在的なコスト削減手段（アプリ性能）であると同時に、潜在インシデントの発生源を特定する手段（トレース ログ）にもなります。メトリクスとテレメトリはアプリ性能監視によりコスト最適化への予防的アプローチを提供し、トレース ログは事後的なインシデント対応シナリオで必要な詳細を提供して、組織がアプリ内の潜在的なインシデント発生源を特定するのに役立ちます。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/azure-monitor/app/app-insights-overview",
+  "Remediation": {
+    "Code": {
+      "CLI": "az monitor app-insights component create --app <app name> --resource-group <resource group name> --location <location> --kind 'web' --retention-time <INT days to retain logs> --workspace <log analytics workspace ID> -- subscription <subscription ID>",
+      "NativeIaC": "",
+      "Other": "https://www.tenable.com/audits/items/CIS_Microsoft_Azure_Foundations_v2.0.0_L2.audit:8a7a608d180042689ad9d3f16aa359f1",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "1. Application Insights に移動します 2. Basics タブの PROJECT DETAILS セクションで Subscription を選択します 3. Resource group を選択します 4. INSTANCE DETAILS で Name を入力します 5. Region を選択します 6. Resource Mode の横で Workspace-based を選択します 7. WORKSPACE DETAILS で Log Analytics ワークスペースの Subscription を選択します 8. 適切な Log Analytics Workspace を選択します 9. Next:Tags > をクリックします 10. Name、Value のペアで適切な Tags を入力します 11. Next:Review+Create をクリックします 12. Create をクリックします。",
+      "Url": ""
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "Application Insights は Log Analytics Workspace に依存するため、このサービスを使用すると追加費用が発生します。"
+}

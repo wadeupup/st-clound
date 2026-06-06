@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "cloudformation_stacks_termination_protection_enabled",
+  "CheckTitle": "CloudFormationスタックに終了保護が有効になっている",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Effects/Data Destruction"
+  ],
+  "ServiceName": "cloudformation",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsCloudFormationStack",
+  "ResourceGroup": "devops",
+  "Description": "**AWS CloudFormationルートスタック**は**終了保護**について評価されます。検出では、非ネストスタックのスタック削除をブロックするために`termination protection`が有効になっているかどうかを識別します。",
+  "Risk": "**終了保護**がない場合、人的エラーや自動化によりスタック全体が削除される可能性があり、即座に**可用性**が失われ、管理されたリソースの潜在的な**データ破壊**が発生します。\n\n削除権限を持つ攻撃者は、より簡単に中断を引き起こし、回復を妨げることができます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-protect-stacks.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/CloudFormation/stack-termination-protection.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws cloudformation update-termination-protection --stack-name <STACK_NAME> --enable-termination-protection",
+      "NativeIaC": "",
+      "Other": "1. AWS CloudFormationコンソールを開く\n2. ターゲットスタックを選択\n3. スタックアクション > 終了保護の編集を選択\n4. 有効化を選択して保存",
+      "Terraform": "```hcl\nresource \"aws_cloudformation_stack\" \"<example_resource_name>\" {\n  name                           = \"<example_resource_name>\"\n  template_url                   = \"https://s3.amazonaws.com/<bucket>/<template>.json\"\n  enable_termination_protection  = true # 重要：終了保護を有効にしてスタック削除を防止\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "重要なワークロードのルートスタックで**終了保護**を有効にします。この設定を変更したりスタックを削除したりできる人に**最小権限**を強制し、変更セットによる**変更レビュー**を要求し、**多層防御**のために**スタックポリシー**とデータストアの`DeletionPolicy: Retain`を適用します。",
+      "Url": "https://hub.prowler.com/check/cloudformation_stacks_termination_protection_enabled"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "Infrastructure Protection"
+}
+

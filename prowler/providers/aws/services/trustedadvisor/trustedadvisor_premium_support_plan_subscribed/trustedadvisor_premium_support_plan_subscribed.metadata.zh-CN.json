@@ -1,0 +1,39 @@
+{
+  "Provider": "aws",
+  "CheckID": "trustedadvisor_premium_support_plan_subscribed",
+  "CheckTitle": "AWS 账户已订阅 AWS Premium Support 计划",
+  "CheckType": [
+    "软件和配置检查/AWS安全最佳实践"
+  ],
+  "ServiceName": "trustedadvisor",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "low",
+  "ResourceType": "Other",
+  "ResourceGroup": "monitoring",
+  "Description": "**AWS 账户**已订阅 **AWS 高级支持计划**（例如，Business 或 Enterprise）",
+  "Risk": "如果没有 **Premium Support**，关键事件将面临更慢的响应，从而降低**可用性**并延迟对安全事件的遏制。有限的 Trusted Advisor 覆盖范围会使**配置错误**持续存在，增加**数据暴露**和**权限滥用**的风险。缺乏专家指导会在生产环境受影响期间增加变更风险。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://www.trendmicro.com/cloudoneconformity-staging/knowledge-base/aws/Support/support-plan.html",
+    "https://aws.amazon.com/premiumsupport/plans/"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "1. 以账户根用户身份登录 AWS Management Console\n2. 打开 https://console.aws.amazon.com/support/home#/plans\n3. 点击“Change plan”\n4. 选择“Business Support”（或更高级别），然后点击“Continue”\n5. 审核并确认升级",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "对于生产和任务关键型账户，请采用 **Business** 或更高级别。\n- 将支持集成到 IR 中，并定义联系人/严重性级别\n- 对案例访问强制实施 **最小权限**\n- 使用 Trusted Advisor 进行主动加固\n- 如果选择退出，请确保具备同等的 24/7 支持和升级路径",
+      "Url": "https://hub.prowler.com/check/trustedadvisor_premium_support_plan_subscribed"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

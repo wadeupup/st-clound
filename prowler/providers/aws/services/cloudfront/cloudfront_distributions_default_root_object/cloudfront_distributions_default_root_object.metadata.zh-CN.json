@@ -1,0 +1,39 @@
+{
+  "Provider": "aws",
+  "CheckID": "cloudfront_distributions_default_root_object",
+  "CheckTitle": "CloudFront 分配已配置默认根对象",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices"
+  ],
+  "ServiceName": "cloudfront",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsCloudFrontDistribution",
+  "ResourceGroup": "network",
+  "Description": "CloudFront 分配会被评估是否配置了**默认根对象**，该对象将 `/` 请求映射到特定文件（如 `index.html`），而不是直接将根请求转发到源。",
+  "Risk": "没有**默认根对象**，根请求可能暴露**源列表**或意外文件，泄露数据（**机密性**）并有助于侦察。它们还可能返回错误，降低正常运行时间（**可用性**），或路由不可预测，导致错误的内容交付（**完整性**）。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/cloudfront-controls.html#cloudfront-1",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/CloudFront/cloudfront-default-object.html",
+    "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/DefaultRootObject.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws cloudfront get-distribution-config --id <DISTRIBUTION_ID> --output json > current-config.json && echo 'Manually edit current-config.json to add DefaultRootObject: \"index.html\", then run:' && echo 'aws cloudfront update-distribution --id <DISTRIBUTION_ID> --distribution-config file://current-config.json --if-match $(aws cloudfront get-distribution-config --id <DISTRIBUTION_ID> --query \"ETag\" --output text)'",
+      "NativeIaC": "```yaml\n# CloudFormation：在 CloudFront 分配上设置默认根对象\nResources:\n  CloudFrontDistribution:\n    Type: AWS::CloudFront::Distribution\n    Properties:\n      DistributionConfig:\n        Enabled: true\n        DefaultRootObject: index.html  # 关键：确保配置了默认根对象\n        Origins:\n          - Id: <example_origin_id>\n            DomainName: <example_origin_domain>\n            S3OriginConfig: {}\n        DefaultCacheBehavior:\n          TargetOriginId: <example_origin_id>\n          ViewerProtocolPolicy: allow-all\n          ForwardedValues:\n            QueryString: false\n```",
+      "Other": "1. 打开 AWS 控制台并转到 CloudFront\n2. 选择目标分配并选择设置 > 常规 > 编辑\n3. 在默认根对象中，输入 index.html（不要以 / 开头）\n4. 保存更改并等待部署完成",
+      "Terraform": "```hcl\n# Terraform：在 CloudFront 分配上设置默认根对象\nresource \"aws_cloudfront_distribution\" \"<example_resource_name>\" {\n  enabled             = true\n  default_root_object = \"index.html\" # 关键：确保配置了默认根对象\n\n  origin {\n    domain_name = \"<example_origin_domain>\"\n    origin_id   = \"<example_origin_id>\"\n\n    s3_origin_config {}\n  }\n\n  default_cache_behavior {\n    target_origin_id       = \"<example_origin_id>\"\n    viewer_protocol_policy = \"allow-all\"\n    forwarded_values {\n      query_string = false\n    }\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "设置一个**默认根对象**，返回安全的着陆页（例如，`index.html`）。应用**纵深防御**：限制直接源访问，定义明确的错误页面，并标准化重定向。测试根目录和子目录请求以获得可预测的响应。使源权限与**最小权限**保持一致。",
+      "Url": "https://hub.prowler.com/check/cloudfront_distributions_default_root_object"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

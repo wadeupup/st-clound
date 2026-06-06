@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "sns_topics_not_publicly_accessible",
+  "CheckTitle": "SNSトピックは公開アクセス可能ではありません",
+  "CheckType": [
+    "ソフトウェアと構成チェック/AWSセキュリティのベストプラクティス",
+    "ソフトウェアと設定のチェック/業界および規制基準/AWS 基盤セキュリティのベストプラクティス",
+    "影響／データ露出",
+    "TTPs/初期アクセス"
+  ],
+  "ServiceName": "sns",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsSnsTopic",
+  "ResourceGroup": "messaging",
+  "Description": "**SNSトピックポリシー** は、**パブリックプリンシパル**（例: `*`）について分析されます。`aws:SourceArn`、`aws:SourceAccount`、`aws:PrincipalOrgID`、または `sns:Endpoint` によるスコープ指定などの制限的な条件なしでアクセスを許可するトピックは、公開アクセス可能として扱われます。",
+  "Risk": "**公開SNSトピック**では、誰でもまたは不明なアカウントが次のことを行えるようになります:\n- **購読**してメッセージを吸い上げる（機密性）\n- ワークフローを改変する偽装ペイロードを**公開**する（完全性）\n- 障害やコスト増を引き起こすメッセージを**大量送信**する（可用性）\nまた、クロスアカウントの悪用を可能にし、想定される信頼境界を回避します。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/SNS/topics-everyone-publish.html",
+    "https://docs.aws.amazon.com/config/latest/developerguide/sns-topic-policy.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws sns set-topic-attributes --topic-arn <TOPIC_ARN> --attribute-name Policy --attribute-value '{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::<ACCOUNT_ID>:root\"},\"Action\":\"sns:Publish\",\"Resource\":\"<TOPIC_ARN>\"}]}'",
+      "NativeIaC": "```yaml\n# CloudFormation: SNSトピックポリシーをアカウントに制限する（公開しない）\nResources:\n  <example_resource_name>:\n    Type: AWS::SNS::TopicPolicy\n    Properties:\n      Topics:\n        - arn:aws:sns:<region>:<account_id>:<example_resource_name>\n      PolicyDocument:\n        Version: '2012-10-17'\n        Statement:\n          - Effect: Allow\n            Action: sns:Publish\n            Resource: arn:aws:sns:<region>:<account_id>:<example_resource_name>\n            Principal:\n              AWS: arn:aws:iam::<account_id>:root  # 重要: 公開アクセスを削除するためにアカウントのルートに制限する\n```",
+      "Other": "1. Amazon SNSコンソールを開き、[Topics] を選択します\n2. トピックを選択し、[Access policy] タブに移動します\n3. ポリシーを編集し、Principal が \"*\"（Everyone/Public）に設定されているものをすべて削除します\n4. 自分のアカウントのルートのみを許可するステートメントを追加します: Principal = arn:aws:iam::<ACCOUNT_ID>:root、Action は sns:Publish、Resource はトピック ARN に設定します\n5. 変更を保存します",
+      "Terraform": "```hcl\n# SNSトピックポリシーをアカウントに制限する（公開しない）\nresource \"aws_sns_topic_policy\" \"<example_resource_name>\" {\n  arn    = \"<TOPIC_ARN>\"\n  policy = jsonencode({\n    Version   = \"2012-10-17\"\n    Statement = [{\n      Effect    = \"Allow\"\n      Action    = \"sns:Publish\"\n      Resource  = \"<TOPIC_ARN>\"\n      Principal = { AWS = \"arn:aws:iam::<ACCOUNT_ID>:root\" } # 重大: パブリックアクセスを削除するためにプリンシパルをアカウントに制限する\n    }]\n  })\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "**トピックポリシー**を特定のプリンシパルと最小限のアクションに制限してください:\n- `Principal:*` を避ける\n- 必要なアクションのみを許可する（例: `sns:Publish`）\n- `aws:SourceArn`、`aws:SourceAccount`、`aws:PrincipalOrgID`、または `sns:Endpoint` のような条件を追加する\n**最小権限の原則**を適用し、職務を分離し、ポリシーを定期的に見直してください。",
+      "Url": "https://hub.prowler.com/check/sns_topics_not_publicly_accessible"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

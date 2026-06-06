@@ -1,0 +1,35 @@
+{
+  "Provider": "aws",
+  "CheckID": "iam_check_saml_providers_sts",
+  "CheckTitle": "SAML Provider が存在し、STS を利用できることを確認する",
+  "CheckType": [
+    "Software and Configuration Checks",
+    "Industry and Regulatory Standards",
+    "CIS AWS Foundations Benchmark"
+  ],
+  "ServiceName": "iam",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "low",
+  "ResourceType": "Other",
+  "ResourceGroup": "IAM",
+  "Description": "SAML Provider が存在し、STS を利用できることを確認する",
+  "Risk": "SAML provider がない場合、AWS CLI または AWS API アクセスを持つユーザーは IAM の静的認証情報を使用できます。SAML は、ユーザーが認証するたびにデフォルトでロールを引き受けることを支援します。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "SAML provider を有効化し、一時的な認証情報を使用してください。AWS CLI または AWS API（AWS SDK を使用）で AWS リソースへプログラム的にリクエストする際に、一時的なセキュリティ認証情報を利用できます。一時的な認証情報は、IAM ユーザー認証情報などの長期認証情報を使用する場合と同等の権限を提供します。SAML provider の機能がない場合は、長期認証情報の使用を防止してください。",
+      "Url": "https://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRoleWithSAML.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

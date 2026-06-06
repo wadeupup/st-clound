@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "app_minimum_tls_version_12",
+  "CheckTitle": "确保 Web 应用使用最新版本的 TLS 加密",
+  "CheckType": [],
+  "ServiceName": "app",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Microsoft.Web/sites/config",
+  "ResourceGroup": "serverless",
+  "Description": "TLS（传输层安全）协议通过标准加密技术保护互联网数据传输。加密应设置为最新 TLS 版本。App Service 默认允许 TLS 1.2，这也是 PCI DSS 等行业标准推荐的 TLS 级别。",
+  "Risk": "App Service 当前允许 Web 应用设置 TLS 1.0、1.1 和 1.2。强烈建议 Web 应用安全连接使用最新的 TLS 1.2 版本。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/app-service/configure-ssl-bindings#enforce-tls-versions",
+  "Remediation": {
+    "Code": {
+      "CLI": "az webapp config set --resource-group <RESOURCE_GROUP_NAME> --name <APP_NAME> --min-tls-version 1.2",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/AppService/latest-version-of-tls-encryption-in-use.html",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-networking-policies/bc_azr_networking_6#terraform"
+    },
+    "Recommendation": {
+      "Text": "1. 使用 https://portal.azure.com 登录 Azure 门户 2. 进入 App Services 3. 点击每个应用 4. 在 Setting 部分点击 TLS/SSL settings 5. 在 Bindings 面板下，确保 Protocol Settings 中的 Minimum TLS Version 设置为 1.2",
+      "Url": "https://docs.microsoft.com/en-us/security/benchmark/azure/security-controls-v3-data-protection#dp-3-encrypt-sensitive-data-in-transit"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "默认情况下，使用命令行工具或 Azure Portal 控制台创建新应用时，TLS Version 功能会设置为 1.2。"
+}

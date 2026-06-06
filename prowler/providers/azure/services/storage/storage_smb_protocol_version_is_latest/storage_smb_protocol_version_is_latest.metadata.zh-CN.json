@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "storage_smb_protocol_version_is_latest",
+  "CheckTitle": "确保文件共享的 SMB 协议版本设置为最新版本。",
+  "CheckType": [],
+  "ServiceName": "storage",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "/subscriptions/{subscription_id}/resourceGroups/{resource_group}/providers/Microsoft.Storage/storageAccounts/{storageAccountName}/fileServices/default",
+  "Severity": "medium",
+  "ResourceType": "AzureStorageAccount",
+  "ResourceGroup": "storage",
+  "Description": "确保 SMB 文件共享仅配置为使用最新的 SMB 协议版本。",
+  "Risk": "允许使用较旧的 SMB 协议版本可能使文件共享暴露于已知漏洞和安全风险。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/storage/files/files-smb-protocol#smb-security-settings",
+  "Remediation": {
+    "Code": {
+      "CLI": "az storage account file-service-properties update --resource-group <resource-group> --account-name <storage-account> --versions <latest-version>",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "将 Azure 存储账户的文件共享配置为仅允许最新 SMB 协议版本。",
+      "Url": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/StorageAccounts/latest-smb-protocol-version.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

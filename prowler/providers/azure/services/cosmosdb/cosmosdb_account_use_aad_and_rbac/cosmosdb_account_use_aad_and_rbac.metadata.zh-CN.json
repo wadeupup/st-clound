@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "cosmosdb_account_use_aad_and_rbac",
+  "CheckTitle": "尽可能使用 Azure Active Directory (AAD) 客户端身份验证和 Azure RBAC。",
+  "CheckType": [],
+  "ServiceName": "cosmosdb",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "CosmosDB",
+  "ResourceGroup": "database",
+  "Description": "Cosmos DB 可使用令牌或 AAD 进行客户端身份验证，并进一步使用 Azure RBAC 进行授权。使用 AAD 安全性显著更高，因为 AAD 负责凭据管理，支持 MFA 和集中化管理，同时 Azure RBAC 与 Azure 其余服务集成更好。",
+  "Risk": "AAD 客户端身份验证比基于令牌的身份验证安全得多，因为令牌必须在客户端持久化保存，而 AAD 不需要。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/cosmos-db/role-based-access-control",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "梳理当前通过密钥或访问令牌访问 Azure Cosmos DB 账户的所有资源。为这些资源分别创建 Azure Active Directory (AAD) 标识：对于 Azure 资源，可创建托管标识（可在系统分配与用户分配之间选择）；对于非 Azure 资源，创建 AAD 标识。为每个 AAD 标识授予其所需最小权限。建议尽可能使用两个内置角色之一：Cosmos DB Built-in Data Reader 或 Cosmos DB Built-in Data Contributor。验证新资源是否正常工作。向标识授予新权限后，可能需要数小时传播。确认所有资源均可通过新标识正常工作后，继续下一步。可使用 az resource update powershell 命令：$cosmosdbname = 'cosmos-db-account-name' $resourcegroup = 'resource-group-name' $cosmosdb = az cosmosdb show --name $cosmosdbname --resource-group $resourcegroup | ConvertFrom-Json az resource update --ids $cosmosdb.id --set properties.disableLocalAuth=true --latest- include-preview",
+      "Url": "https://learn.microsoft.com/en-us/azure/cosmos-db/role-based-access-control"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

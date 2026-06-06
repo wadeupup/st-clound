@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "entra_policy_user_consent_for_verified_apps",
+  "CheckTitle": "确保“应用程序用户同意”设置为“允许已验证发布者”",
+  "CheckType": [],
+  "ServiceName": "entra",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "#microsoft.graph.authorizationPolicy",
+  "ResourceGroup": "IAM",
+  "Description": "当请求来自已验证发布者时，允许用户对选定权限提供同意。",
+  "Risk": "如果 Microsoft Entra ID 作为第三方应用的身份提供方运行，则权限和同意应限制为管理员或预先批准。恶意应用可能尝试窃取数据或滥用高权限用户账户。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/entra/identity/enterprise-apps/configure-user-consent?pivots=portal#configure-user-consent-to-applications",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "1. 在 Azure Home 中选择 Portal Menu 2. 选择 Microsoft Entra ID 3. 选择 Enterprise Applications 4. 选择 Consent and permissions 5. 选择 User consent settings 6. 在 User consent for applications 下，选择 Allow user consent for apps from verified publishers, for selected permissions 7. 选择 Save",
+      "Url": "https://learn.microsoft.com/en-us/security/benchmark/azure/mcsb-privileged-access#pa-1-separate-and-limit-highly-privilegedadministrative-users"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "强制启用此设置可能会产生额外请求，需要管理员审核。"
+}

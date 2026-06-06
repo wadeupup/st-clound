@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "monitor_storage_account_with_activity_logs_is_private",
+  "CheckTitle": "アクティビティ ログを保存するストレージ コンテナーが公開アクセス可能でないことを確認する",
+  "CheckType": [],
+  "ServiceName": "monitor",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Monitor",
+  "ResourceGroup": "monitoring",
+  "Description": "アクティビティ ログ エクスポートを含むストレージ アカウント コンテナーは、公開アクセス可能であってはなりません。",
+  "Risk": "アクティビティ ログ内容への公開アクセスを許可すると、攻撃者が対象アカウントの利用方法や設定上の弱点を特定しやすくなる可能性があります。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/azure-monitor/essentials/diagnostic-settings",
+  "Remediation": {
+    "Code": {
+      "CLI": "az storage container set-permission --name insights-activity-logs --account-name <Storage Account Name> --public-access off",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity-staging/knowledge-base/azure/Monitor/check-for-publicly-accessible-activity-log-storage-container.html",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-logging-policies/ensure-the-storage-container-storing-the-activity-logs-is-not-publicly-accessible#terraform"
+    },
+    "Recommendation": {
+      "Text": "1. Azure Home から Portal Menu を選択します。2. Storage Accounts を検索して Storage account ブレードに移動します。3. 対象のストレージ アカウント名をクリックします。4. settings 配下の Configuration をクリックします。5. 'Allow Blob public access' で Enabled を選択します。",
+      "Url": "https://docs.microsoft.com/en-us/security/benchmark/azure/security-controls-v3-network-security#ns-2-secure-cloud-services-with-network-controls"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "コンテナーの Access policy を private に設定すると、ストレージ アカウント所有者以外はそのコンテナーにアクセスできなくなります。ほかの必要ユーザーにアクセスを許可するには、Access policy を明示的に設定する必要があります。"
+}

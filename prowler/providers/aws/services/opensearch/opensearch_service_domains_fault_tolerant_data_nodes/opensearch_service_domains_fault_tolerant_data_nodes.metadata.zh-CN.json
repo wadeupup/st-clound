@@ -1,0 +1,40 @@
+{
+  "Provider": "aws",
+  "CheckID": "opensearch_service_domains_fault_tolerant_data_nodes",
+  "CheckTitle": "OpenSearch 域至少有 3 个数据节点并启用区域感知",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践",
+    "影响/拒绝服务"
+  ],
+  "ServiceName": "opensearch",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsOpenSearchServiceDomain",
+  "ResourceGroup": "database",
+  "Description": "**Amazon OpenSearch 域** 被评估为容错能力：**>= 3 个数据节点** (`instance_count >= 3`) 和 **区域感知** (`zone_awareness_enabled = true`) 以在可用区之间分配数据。",
+  "Risk": "**数据节点不足**或禁用**区域感知**会降低可用性和持久性。节点或可用区故障可能会触发分片不可用、写入失败或集群中断，增加在重新平衡期间数据不一致的风险，并在恢复之前阻止读/写操作。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/opensearch-service/latest/developerguide/managedomains-multiaz.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/es-controls.html#es-6"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws opensearch update-domain-config --domain-name <example_resource_name> --cluster-config InstanceCount=3,ZoneAwarenessEnabled=true",
+      "NativeIaC": "```yaml\n# CloudFormation：确保至少有 3 个数据节点并启用区域感知\nResources:\n  <example_resource_name>:\n    Type: AWS::OpenSearchService::Domain\n    Properties:\n      DomainName: <example_resource_name>\n      ClusterConfig:\n        InstanceType: m5.large.search\n        InstanceCount: 3            # 关键：设置至少 3 个数据节点以实现容错\n        ZoneAwarenessEnabled: true  # 关键：启用跨可用区（区域感知）\n```",
+      "Other": "1. 打开 AWS 控制台并转到 Amazon OpenSearch Service\n2. 选择您的域并点击编辑域\n3. 在集群配置下：\n   - 将数据节点数量设置为 3（或更多）\n   - 启用区域感知\n4. 点击提交以应用更改",
+      "Terraform": "```hcl\n# Terraform：确保至少有 3 个数据节点并启用区域感知\nresource \"aws_opensearch_domain\" \"<example_resource_name>\" {\n  domain_name = \"<example_resource_name>\"\n\n  cluster_config {\n    instance_type          = \"m5.large.search\"\n    instance_count         = 3     # 关键：设置至少 3 个数据节点以实现容错\n    zone_awareness_enabled = true  # 关键：启用跨可用区（区域感知）\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "配置 OpenSearch，使用 **>= 3 个数据节点** 并启用 **区域感知** 以在可用区之间分布节点。\n\n- 优先选择具有备用的多可用区以实现弹性故障切换\n- 使用三的倍数的节点数量并设置索引副本 (`>= 1`)\n- 实施容量规划和故障测试作为**深度防御**",
+      "Url": "https://hub.prowler.com/check/opensearch_service_domains_fault_tolerant_data_nodes"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

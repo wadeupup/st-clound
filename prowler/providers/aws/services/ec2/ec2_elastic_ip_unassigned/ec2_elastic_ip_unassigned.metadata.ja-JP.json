@@ -1,0 +1,34 @@
+{
+  "Provider": "aws",
+  "CheckID": "ec2_elastic_ip_unassigned",
+  "CheckTitle": "未割り当ての Elastic IP があるか確認",
+  "CheckType": [
+    "Infrastructure Security"
+  ],
+  "ServiceName": "ec2",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "low",
+  "ResourceType": "AwsEc2Eip",
+  "ResourceGroup": "network",
+  "Description": "未割り当ての Elastic IP があるか確認",
+  "Risk": "未割り当ての Elastic IP は追加費用が発生する可能性があります",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "aws ec2 release-address --public-ip <theIPyoudontneed>",
+      "NativeIaC": "https://docs.prowler.com/checks/aws/general-policies/general_19#cloudformation",
+      "Other": "https://docs.prowler.com/checks/aws/general-policies/general_19#ec2-console",
+      "Terraform": "https://docs.prowler.com/checks/aws/general-policies/general_19#terraform"
+    },
+    "Recommendation": {
+      "Text": "Elastic IP が未割り当てでないことを確認してください。",
+      "Url": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/elastic-ip-addresses-eip.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

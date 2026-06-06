@@ -1,0 +1,33 @@
+{
+  "Provider": "aws",
+  "CheckID": "s3_bucket_object_lock",
+  "CheckTitle": "S3 バケットでオブジェクトロックが有効になっているか確認してください",
+  "CheckType": [
+    "データ保護"
+  ],
+  "ServiceName": "s3",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:s3:::bucket_name",
+  "Severity": "low",
+  "ResourceType": "AwsS3Bucket",
+  "ResourceGroup": "storage",
+  "Description": "S3 バケットでオブジェクトロックが有効になっているか確認してください",
+  "Risk": "オブジェクトを一度書き込み複数回読み取り（WORM）モデルを使用して保存することで、一定期間または無期限にオブジェクトが削除または上書きされるのを防ぐことができます。これは、ランサムウェア攻撃の防止に役立ちます。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "aws s3 put-object-lock-configuration --bucket <BUCKET_NAME> --object-lock-configuration '{\"ObjectLockEnabled\":\"Enabled\",\"Rule\":{\"DefaultRetention\":{\"Mode\":\"GOVERNANCE\",\"Days\":1}}}'",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/S3/object-lock.html",
+      "Terraform": "https://docs.prowler.com/checks/aws/general-policies/ensure-that-s3-bucket-has-lock-configuration-enabled-by-default#terraform"
+    },
+    "Recommendation": {
+      "Text": "Amazon S3 バケットに Object Lock 機能が有効になっていることを確認し、保存されているオブジェクトが削除されないようにしてください。",
+      "Url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lock-overview.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "containerregistry_admin_user_disabled",
+  "CheckTitle": "Azure Container Registry で管理者ユーザーが無効化されていることを確認する",
+  "CheckType": [],
+  "ServiceName": "containerregistry",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "ContainerRegistry",
+  "ResourceGroup": "container",
+  "Description": "管理者ユーザーを無効化し、代わりにロールベースのアクセス制御（RBAC）を使用していることを確認します。管理者ユーザーはレジストリへの無制限アクセスを許可する可能性があるためです。",
+  "Risk": "管理者ユーザーが有効な場合、コンテナー レジストリおよびそのリソースへの不正アクセスにつながる可能性があり、保存されたイメージの機密性・完全性・可用性が損なわれるおそれがあります。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/container-registry/container-registry-authentication?tabs=azure-cli#admin-account",
+  "Remediation": {
+    "Code": {
+      "CLI": "az acr update --name <RegistryName> --resource-group <ResourceGroupName> --admin-enabled false",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "Azure Portal から Azure Container Registry の管理者ユーザーを無効化します: 1. 対象の Container Registry に移動します。2. 設定で「Access keys」を選択します。3. 「Admin user」チェックボックスがオフであることを確認します。レジストリ アクセスに依存するすべての操作は、ロールベースのアクセス制御（RBAC）へ切り替えてください。",
+      "Url": "https://learn.microsoft.com/en-us/azure/container-registry/container-registry-authentication?tabs=azure-cli#admin-account"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "管理者ユーザーから RBAC への移行により、より安全で管理しやすいアクセス モデルを実現し、コンテナー イメージへの不正アクセス リスクを最小化できます。"
+}

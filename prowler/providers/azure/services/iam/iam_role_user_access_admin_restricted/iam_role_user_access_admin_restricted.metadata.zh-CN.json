@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "iam_role_user_access_admin_restricted",
+  "CheckTitle": "确保“用户访问管理员”角色已被限制",
+  "CheckType": [],
+  "ServiceName": "iam",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AzureIAMRoleassignment",
+  "ResourceGroup": "IAM",
+  "Description": "检查 Azure 订阅中高权限“用户访问管理员”角色的活动分配情况。",
+  "Risk": "该角色的长期分配可能导致权限提升和未授权访问，增加安全事件风险。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles/privileged#user-access-administrator",
+  "Remediation": {
+    "Code": {
+      "CLI": "az role assignment delete --role 'User Access Administrator' --scope '/subscriptions/<subscription_id>'",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "在使用后立即移除“用户访问管理员”角色分配，以最小化安全风险。",
+      "Url": "https://learn.microsoft.com/en-us/azure/role-based-access-control/elevate-access-global-admin?tabs=azure-portal%2Centra-audit-logs"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

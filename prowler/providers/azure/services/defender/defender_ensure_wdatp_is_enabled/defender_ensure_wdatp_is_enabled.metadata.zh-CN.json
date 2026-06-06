@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "defender_ensure_wdatp_is_enabled",
+  "CheckTitle": "确保已选择 Microsoft Defender for Endpoint 与 Microsoft Defender for Cloud 的集成",
+  "CheckType": [],
+  "ServiceName": "defender",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "DefenderSettings",
+  "ResourceGroup": "security",
+  "Description": "此集成设置可使 Microsoft Defender for Endpoint（原“Advanced Threat Protection”或“ATP”或“WDATP”）与 Microsoft Defender for Cloud 通信。",
+  "Risk": "Microsoft Defender for Endpoint 集成可在 Microsoft Defender for Cloud 中引入全面的终端检测与响应（EDR）能力。该集成有助于发现异常，并检测和响应 Microsoft Defender for Cloud 所监控终端上的高级攻击。MDE 仅适用于 Standard 层订阅。",
+  "RelatedUrl": "https://learn.microsoft.com/en-in/azure/defender-for-cloud/integration-defender-for-endpoint?tabs=windows",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/SecurityCenter/defender-endpoint-integration.html",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "",
+      "Url": "https://learn.microsoft.com/en-us/microsoft-365/security/defender-endpoint/azure-server-integration?view=o365-worldwide"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "Microsoft Defender for Endpoint 仅适用于 Standard 定价层订阅。选择 Microsoft Defender for Cloud 的 Standard 定价层会按资源产生额外成本。"
+}

@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "defender_ensure_mcas_is_enabled",
+  "CheckTitle": "确保已选择 Microsoft Defender for Cloud Apps 与 Microsoft Defender for Cloud 的集成",
+  "CheckType": [],
+  "ServiceName": "defender",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "DefenderSettings",
+  "ResourceGroup": "security",
+  "Description": "此集成设置可使 Microsoft Defender for Cloud Apps（原“Microsoft Cloud App Security”或“MCAS”）与 Microsoft Defender for Cloud 通信。",
+  "Risk": "Microsoft Defender for Cloud 通过使用 Azure Resource Manager 事件提供额外防护层，Azure Resource Manager 被视为 Azure 的控制平面。通过分析 Azure Resource Manager 记录，Microsoft Defender for Cloud 可检测 Azure 订阅环境中的异常或潜在有害操作。前述多项分析由 Microsoft Defender for Cloud Apps 提供支持。要使用这些分析能力，订阅需具备 Cloud App Security 许可证。Microsoft Defender for Cloud Apps 仅适用于 Standard 层订阅。",
+  "RelatedUrl": "https://learn.microsoft.com/en-in/azure/defender-for-cloud/defender-for-cloud-introduction#secure-cloud-applications",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/SecurityCenter/defender-cloud-apps-integration.html#",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "1. 在 Azure Home 中选择 Portal Menu。2. 选择 Microsoft Defender for Cloud。3. 选择 Environment Settings 边栏。4. 选择订阅。5. 将 App Service Defender Plan 设为 On。6. 选择 Save。",
+      "Url": "https://docs.microsoft.com/en-us/rest/api/securitycenter/settings/list"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "Microsoft Defender for Cloud Apps 仅适用于 Standard 定价层订阅。选择 Microsoft Defender for Cloud 的 Standard 定价层会按资源产生额外成本。"
+}

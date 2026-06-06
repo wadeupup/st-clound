@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "redshift_cluster_in_transit_encryption_enabled",
+  "CheckTitle": "Redshift クラスターは転送中に暗号化されます",
+  "CheckType": [
+    "ソフトウェアと構成のチェック/AWS セキュリティベストプラクティス",
+    "ソフトウェアと構成のチェック/業界および規制基準/AWS 基礎セキュリティベストプラクティス",
+    "影響/データの露出"
+  ],
+  "ServiceName": "redshift",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsRedshiftCluster",
+  "ResourceGroup": "analytics",
+  "Description": "**Amazon Redshift クラスター**は、`require_ssl` が有効な場合にクライアント接続に **TLS** を要求することで、**転送中の暗号化**を強制します。\n\nこの評価は、接続が TLS を使用するように強制されていないクラスターを特定します。",
+  "Risk": "プレーンテキストまたはオプションの TLS を許可すると、SQL セッションが次のように露出します:\n- **機密性**の喪失: 資格情報、クエリ、および結果が傍受される可能性があります。\n- **整合性**の侵害: ステートメントやデータが転送中に改ざんされる可能性があります。\n- **可用性**への影響: セッションハイジャックがワークロードを妨害する可能性があります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/redshift/latest/mgmt/security-encryption-in-transit.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/redshift-controls.html#redshift-2",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/Redshift/redshift-parameter-groups-require-ssl.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws redshift modify-cluster-parameter-group --parameter-group-name <example_resource_name> --parameters ParameterName=require_ssl,ParameterValue=true",
+      "NativeIaC": "```yaml\n# CloudFormation: 使用中の Redshift パラメーターグループで require_ssl を true に設定します\nResources:\n  <example_resource_name>:\n    Type: AWS::Redshift::ClusterParameterGroup\n    Properties:\n      Description: Require SSL for Redshift connections\n      ParameterGroupFamily: redshift-1.0\n      Parameters:\n        - ParameterName: require_ssl   # CRITICAL: クライアント接続に TLS を強制します\n          ParameterValue: true         # CRITICAL: SSL 要件を有効にします\n```",
+      "Other": "1. AWS コンソールで、Amazon Redshift > パラメーターグループに移動します\n2. クラスターで使用されているパラメーターグループを開きます\n3. パラメーターを編集をクリックし、require_ssl を true に設定して保存します\n4. 静的パラメーターの変更を適用するためにクラスターを再起動します",
+      "Terraform": "```hcl\n# クラスターで使用されている Redshift パラメーターグループで require_ssl を true に設定します\nresource \"aws_redshift_parameter_group\" \"<example_resource_name>\" {\n  name   = \"<example_resource_name>\"\n  family = \"redshift-1.0\"\n\n  parameter {\n    name  = \"require_ssl\"   # CRITICAL: クライアント接続に TLS を強制します\n    value = \"true\"          # CRITICAL: SSL 要件を有効にします\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "`require_ssl=true` を設定してプレーンテキストを許可せず、すべての Redshift 接続に **TLS** を要求します。\n\nクライアントを構成して証明書を検証し、プライベートネットワークパスを優先するようにします。ドライバー/TLS ポリシーを最新に保ちます。輸送セキュリティが失敗した場合に備えて、**最小特権**と**多層防御**を適用して露出を制限します。",
+      "Url": "https://hub.prowler.com/check/redshift_cluster_in_transit_encryption_enabled"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

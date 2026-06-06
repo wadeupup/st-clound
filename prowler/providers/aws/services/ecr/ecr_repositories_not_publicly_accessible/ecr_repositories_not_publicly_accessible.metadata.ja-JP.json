@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "ecr_repositories_not_publicly_accessible",
+  "CheckTitle": "ECR リポジトリは公開アクセスできない",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices/Network Reachability",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "TTPs/Initial Access",
+    "Effects/Data Exposure"
+  ],
+  "ServiceName": "ecr",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "critical",
+  "ResourceType": "AwsEcrRepository",
+  "ResourceGroup": "container",
+  "Description": "**Amazon ECR リポジトリ** は、匿名プリンシパル（例：`Principal: \"*\"`）がリポジトリにアクセスできるリポジトリポリシーを通じて **公開暴露** について評価されます。これには、イメージのリスト、プル、または変更が含まれます。",
+  "Risk": "**ECR リポジトリへの公開アクセス** は **機密性** と **整合性** を弱めます。\n\n誰でもイメージをプルでき、独自のコードや埋め込まれたシークレットが暴露される可能性があります。プッシュが許可されている場合、攻撃者はイメージを汚染し、サプライチェーン侵害を可能にします。制御されていないプルは **エグレスコスト** を増加させ、リポジトリのメタデータを漏洩させる可能性があります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/AmazonECR/latest/public/security_iam_service-with-iam.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws ecr delete-repository-policy --repository-name <example_resource_name>",
+      "NativeIaC": "```yaml\nResources:\n  <example_resource_name>:\n    Type: AWS::ECR::Repository\n    Properties:\n      RepositoryPolicyText:\n        Version: \"2012-10-17\"\n        Statement:\n          - Effect: Allow\n            Principal:\n              AWS: \"arn:aws:iam::<example_resource_id>:root\"  # Critical: restricts access to a specific AWS account; removes public (*) access\n            Action: \"ecr:*\"\n```",
+      "Other": "1. AWS コンソールで、Amazon ECR > リポジトリに移動します\n2. リポジトリを選択します\n3. 権限タブを開き、編集をクリックします\n4. Principal が \"*\" に設定されているステートメントを削除するか、特定の AWS ARN（例：arn:aws:iam::<example_resource_id>:root）に置き換えます\n5. 変更を保存します",
+      "Terraform": "```hcl\nresource \"aws_ecr_repository_policy\" \"<example_resource_name>\" {\n  repository = \"<example_resource_name>\"\n  policy     = jsonencode({\n    Version   = \"2012-10-17\"\n    Statement = [{\n      Effect    = \"Allow\"\n      Principal = { AWS = \"arn:aws:iam::<example_resource_id>:root\" } # Critical: restricts access to a specific AWS principal; removes public (*) access\n      Action    = \"ecr:*\"\n    }]\n  })\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "リポジトリポリシーに **最小権限** を適用します：\n- `Principal:\"*\"` を避け、匿名アクセスをブロックします\n- 特定のアカウント/ロールに最小限のアクションを付与します\n- IAM を介して認証されたプル/プッシュを要求します\n- **プライベート接続**（例：VPC エンドポイント）を使用します\n- イメージスキャンと署名で **多層防御** を追加します",
+      "Url": "https://hub.prowler.com/check/ecr_repositories_not_publicly_accessible"
+    }
+  },
+  "Categories": [
+    "internet-exposed",
+    "container-security"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "ssm_managed_compliant_patching",
+  "CheckTitle": "EC 2マネージドインスタンスはSystems Managerパッチ要件に準拠している",
+  "CheckType": [
+    "ソフトウェアと構成チェック/パッチ管理",
+    "ソフトウェアと構成のチェック/業界および規制基準/AWSベースのセキュリティベストプラクティス"
+  ],
+  "ServiceName": "ssm",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsSsmPatchCompliance",
+  "ResourceGroup": "devops",
+  "Description": "**SSM管理のEC 2インスタンス**定義ベースラインに基づいて**パッチコンプライアンス**をレポートします。これにより、各管理ノードのコンプライアンス状態がPatch Managerから評価され、ポリシーに基づいて必要なセキュリティ更新が適用されているかどうかを判断します。",
+  "Risk": "**パッチされていないインスタンス**は、**リモートコードが**、**特権アップグレード**および**を横方向に移動することを可能にする既知の「CVE」脆弱性を露呈しました。 n  nこれは、**機密性**（データ漏洩）、**完全性*（不正な変更）、**可用性**（ランサムウェア、暗号化通貨マイニング、中断）を脅かす。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/systems-manager/latest/userguide/patch-compliance-identify.html",
+    "https://support.icompaas.com/support/solutions/articles/62000233554-ensure-ec2-instances-managed-by-systems-manager-are-compliant-with-patching-requirements",
+    "https://docs.aws.amazon.com/systems-manager/latest/userguide/compliance-fixing.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws ssm send-command --instance-ids <INSTANCE_ID> --document-name AWS-RunPatchBaseline --parameters Operation=Install",
+      "NativeIaC": "```yaml\n# インスタンスに欠落したパッチをインストールするためのSSM関連付けの作成\nResources:\n  <example_resource_name>:\n    Type: AWS::SSM::Association\n    Properties:\n      Name: AWS-RunPatchBaseline\n      InstanceId: <example_resource_id>\n      Parameters:\n        Operation:\n          - Install  # 重要：インスタンスが要件を満たすように欠落したパッチをインストールする\n```",
+      "Other": "1.AWSコンソールのオープン>システムマネージャ>コマンドの実行\n2.「実行」コマンドをクリック\n3.ドキュメントの選択：AWS RunPatchBaseline\n4.パラメータで、設定操作＝インストール\n5.Targetsで、不規則なインスタンスを選択\n6.クリック運転、コマンドが完了するのを待って、ComplianceがComplianceを表示することを確認します",
+      "Terraform": "```hcl\n# AWS RunPatchBaselineを実行してインスタンスに欠落したパッチをインストールします\nresource \"aws_ssm_association\" \"<example_resource_name>\" {\n  name        = \"AWS-RunPatchBaseline\"\n  instance_id = \"<example_resource_id>\"\n  parameters = {\n    Operation = [\"Install\"]  # 重要：コンプライアンス状態になるためのパッチのインストール\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "SystemsManagerを使用した**自動パッチ管理**の使用：EC 2を管理対象ノードとして登録し、厳格な**パッチベースライン**を定義し、頻繁な**コンプライアンススキャン**を実行し、**はクリティカルアップデート**をタイムリーにインストールします。 n  n**ディープ・ディフェンス**の適用：パッチ、段階的な配置、メンテナンス・ウィンドウ、および集中コンプライアンス・レポートとアラートの最小特権役割。",
+      "Url": "https://hub.prowler.com/check/ssm_managed_compliant_patching"
+    }
+  },
+  "Categories": [
+    "vulnerabilities"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

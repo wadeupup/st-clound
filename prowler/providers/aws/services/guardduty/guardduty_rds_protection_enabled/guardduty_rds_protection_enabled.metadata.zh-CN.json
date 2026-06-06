@@ -1,0 +1,40 @@
+{
+  "Provider": "aws",
+  "CheckID": "guardduty_rds_protection_enabled",
+  "CheckTitle": "GuardDuty detector 已启用 RDS Protection",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices/Runtime Behavior Analysis",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "TTPs/Credential Access"
+  ],
+  "ServiceName": "guardduty",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsGuardDutyDetector",
+  "ResourceGroup": "security",
+  "Description": "会评估已激活的 **Amazon GuardDuty detectors** 是否启用了 **RDS Protection**，以便分析 RDS 与 Aurora 登录活动，对异常访问模式进行画像和告警。",
+  "Risk": "若未启用 **RDS Protection**，异常数据库登录可能无法被发现。攻击者可使用**被窃取**或**暴力破解**的凭据访问数据、篡改 schema，或通过数据库进行横向扩展，影响**机密性**与**完整性**，并可能影响**可用性**。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/guardduty-controls.html#guardduty-9",
+    "https://docs.aws.amazon.com/guardduty/latest/ug/rds-protection.html",
+    "https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/guard-duty-rds-protection.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws guardduty update-detector --detector-id <detector-id> --features Name=RDS_LOGIN_EVENTS,Status=ENABLED",
+      "NativeIaC": "```yaml\nResources:\n  <example_resource_name>:\n    Type: AWS::GuardDuty::Detector\n    Properties:\n      Enable: true\n      Features:\n        - Name: RDS_LOGIN_EVENTS  # critical: selects GuardDuty RDS Protection feature\n          Status: ENABLED         # critical: turns RDS Protection on\n```",
+      "Other": "1. 在 AWS Console 中打开 Amazon GuardDuty\n2. 进入 Settings（或 Protection plans/Features）\n3. 找到 RDS Protection（RDS login events）并点击 Enable\n4. 保存更改\n5. 若使用 Organizations，请在委派的 GuardDuty 管理员账号中执行",
+      "Terraform": "```hcl\nresource \"aws_guardduty_detector\" \"<example_resource_name>\" {\n  enable = true\n  features {\n    name   = \"RDS_LOGIN_EVENTS\"  # critical: GuardDuty RDS Protection feature\n    status = \"ENABLED\"            # critical: enable the feature\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "在所有账号和 Region 中启用 **GuardDuty RDS Protection**。\n- 对数据库用户实施**最小权限**并轮换凭据\n- 限制数据库网络暴露面\n- 将发现结果接入告警与事件响应流程，以实现快速遏制",
+      "Url": "https://hub.prowler.com/check/guardduty_rds_protection_enabled"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

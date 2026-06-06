@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "sagemaker_endpoint_config_prod_variant_instances",
+  "CheckTitle": "SageMakerエンドポイント設定では、すべての本番バリアントに少なくとも2つの初期インスタンスがあります",
+  "CheckType": [
+    "ソフトウェアと構成チェック/AWSセキュリティのベストプラクティス",
+    "サービスへの影響/拒否"
+  ],
+  "ServiceName": "sagemaker",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "ai_ml",
+  "Description": "Amazon SageMaker エンドポイント設定は、各本番バリアントが少なくとも 2 の**初期インスタンス数**を使用していることを確認するために評価されます。インスタンスベースのエンドポイントで `InitialInstanceCount` が 2 未満のバリアントが特定され、組み込みのマルチ AZ 冗長性がないことを示しています。",
+  "Risk": "**単一インスタンス構成**は**単一障害点**です。インスタンスまたはそのアベイラビリティーゾーンが障害を起こすと、推論が利用不能になり、**サービス停止**、**SLA違反**、および依存システムでの**連鎖障害**につながります。これは主に**可用性**と信頼性を低下させます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/sagemaker-controls.html#sagemaker-4",
+    "https://docs.aws.amazon.com/config/latest/developerguide/sagemaker-endpoint-config-prod-instance-count.html",
+    "https://docs.aws.amazon.com/sagemaker/latest/dg/serverless-endpoints-create.html#serverless-endpoints-create-config"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws sagemaker delete-endpoint-config --endpoint-config-name <endpoint-config-name>",
+      "NativeIaC": "```yaml\n# CloudFormation：InitialInstanceCount > 1 の EndpointConfig\nResources:\n  <example_resource_name>:\n    Type: AWS::SageMaker::EndpointConfig\n    Properties:\n      ProductionVariants:\n        - VariantName: <example_resource_name>\n          ModelName: <example_resource_name>\n          InstanceType: ml.m5.large\n          InitialInstanceCount: 2  # 重要: すべてのバリアントが少なくとも2つのインスタンスで開始するように、>=2 に設定してください\n```",
+      "Other": "1. AWS コンソールで、SageMaker > Inference > Endpoint configurations に移動します\n2. Create endpoint configuration をクリックし、各 Production variant を追加して、Initial instance count を 2 に設定します\n3. いずれかのエンドポイントが古い設定を使用している場合は、SageMaker > Inference > Endpoints に移動し、エンドポイントを選択して、Update を選び、新しい endpoint configuration を選択します\n4. Endpoint configurations に戻り、非準拠の設定を削除します",
+      "Terraform": "```hcl\n# InitialInstanceCount > 1 の SageMaker エンドポイント設定\nresource \"aws_sagemaker_endpoint_configuration\" \"<example_resource_name>\" {\n  production_variants {\n    variant_name           = \"<example_resource_name>\"\n    model_name             = \"<example_resource_name>\"\n    instance_type          = \"ml.m5.large\"\n    initial_instance_count = 2 # 重要: バリアントがチェックに合格するように、2以上に設定してください\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "**レジリエンス**の原則を適用してください：\n- 各本番バリアントを `InitialInstanceCount >= 2` で実行する\n- ヘルスベースのスケーリングで AZ 間に容量を分散する\n- ダウンタイムを避けるためにローリング/カナリア更新を使用する\n- ノード損失に耐えられるように容量を適正化する\n\n*バースト性のあるワークロードでは、弾力性のためにサーバーレスまたはオートスケーリングを検討してください。*",
+      "Url": "https://hub.prowler.com/check/sagemaker_endpoint_config_prod_variant_instances"
+    }
+  },
+  "Categories": [
+    "resilience",
+    "gen-ai"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

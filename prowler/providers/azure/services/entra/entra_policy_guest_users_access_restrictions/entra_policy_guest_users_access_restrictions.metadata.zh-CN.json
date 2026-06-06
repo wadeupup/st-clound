@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "entra_policy_guest_users_access_restrictions",
+  "CheckTitle": "确保“来宾用户访问限制”设置为“来宾用户访问仅限其自身目录对象的属性和成员关系”",
+  "CheckType": [],
+  "ServiceName": "entra",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "#microsoft.graph.authorizationPolicy",
+  "ResourceGroup": "IAM",
+  "Description": "限制来宾用户权限。",
+  "Risk": "限制来宾访问可确保来宾账户无权执行某些目录任务，例如枚举用户、组或其他目录资源，且不能被分配目录中的管理角色。来宾访问有三个限制级别：1. 来宾用户与成员拥有相同访问权限（最宽松）；2. 来宾用户对目录对象的属性和成员关系具有受限访问（默认值）；3. 来宾用户访问仅限其自身目录对象的属性和成员关系（最严格）。推荐使用第 3 种最严格选项：“来宾用户访问仅限其自身目录对象”。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/entra/identity/users/users-restrict-guest-permissions",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "1. 在 Azure Home 中选择 Portal Menu 2. 选择 Microsoft Entra ID 3. 然后选择 External Identities 4. 选择 External collaboration settings 5. 在 Guest user access 下，将 Guest user access restrictions 更改为“Guest user access is restricted to properties and memberships of their own directory objects”",
+      "Url": "https://learn.microsoft.com/en-us/entra/fundamentals/users-default-permissions#member-and-guest-users"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "这可能会产生额外的资源访问权限申请，需要管理员批准。根据 https://learn.microsoft.com/en-us/azure/active-directory/enterprise- users/users-restrict-guest-permissions#services-currently-not-supported，当前不受支持的服务在新的来宾限制设置下可能存在兼容性问题。"
+}

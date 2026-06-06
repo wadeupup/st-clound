@@ -1,0 +1,33 @@
+{
+  "Provider": "azure",
+  "CheckID": "storage_secure_transfer_required_is_enabled",
+  "CheckTitle": "确保客户端与 Azure 存储账户之间传输的所有数据均使用 HTTPS 协议加密。",
+  "CheckType": [],
+  "ServiceName": "storage",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AzureStorageAccount",
+  "ResourceGroup": "storage",
+  "Description": "确保客户端与 Azure 存储账户之间传输的所有数据均使用 HTTPS 协议加密。",
+  "Risk": "通过非安全连接发送到存储账户的请求可能被窃听。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "az storage account update --name <STORAGE_ACCOUNT_NAME> --https-only true",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/StorageAccounts/secure-transfer-required.html",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-networking-policies/ensure-that-storage-account-enables-secure-transfer"
+    },
+    "Recommendation": {
+      "Text": "启用传输中数据加密。",
+      "Url": ""
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

@@ -1,0 +1,35 @@
+{
+  "Provider": "aws",
+  "CheckID": "iam_user_hardware_mfa_enabled",
+  "CheckTitle": "IAMユーザーにハードウェアMFAが有効になっているか確認します。",
+  "CheckType": [
+    "ソフトウェアと構成のチェック",
+    "業界および規制の標準",
+    "CIS AWS Foundations ベンチマーク"
+  ],
+  "ServiceName": "iam",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "medium",
+  "ResourceType": "AwsIamUser",
+  "ResourceGroup": "IAM",
+  "Description": "IAMユーザーにハードウェアMFAが有効になっているか確認します。",
+  "Risk": "ハードウェアMFAは仮想MFAよりも推奨されます。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "AWS Management Console、コマンドライン、またはIAM APIからIAMユーザーにハードウェアMFAデバイスを有効にします。",
+      "Url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_mfa_enable_physical.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

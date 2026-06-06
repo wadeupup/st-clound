@@ -1,0 +1,40 @@
+{
+  "Provider": "aws",
+  "CheckID": "cloudwatch_changes_to_vpcs_alarm_configured",
+  "CheckTitle": "AWS 账户为 VPC 更改配置了 CloudWatch Logs 指标过滤器和警报",
+  "CheckType": [
+    "Software and Configuration Checks/Industry and Regulatory Standards/CIS AWS Foundations Benchmark"
+  ],
+  "ServiceName": "cloudwatch",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsCloudWatchAlarm",
+  "ResourceGroup": "monitoring",
+  "Description": "针对 **VPC 配置更改** 的 **CloudTrail 事件**，在 CloudWatch Logs 中通过指标过滤器和关联警报进行捕获。过滤器会匹配 `CreateVpc`、`DeleteVpc`、`ModifyVpcAttribute` 以及 VPC 对等连接操作等动作，用于暴露网络拓扑发生变更的情况。",
+  "Risk": "如果不对 VPC 更改进行告警，未授权或误操作的路由、对等连接或属性编辑可能不会被注意到，从而暴露私有网络并启用数据外泄（C）、横向移动与流量篡改（I），以及由错误路由或桥接网络引起的中断（A）。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudwatch-alarms-for-cloudtrail.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation: Create a metric filter and alarm for VPC changes\nResources:\n  VPCChangesMetricFilter:\n    Type: AWS::Logs::MetricFilter\n    Properties:\n      LogGroupName: <example_log_group_name>\n      FilterPattern: '{ ($.eventName = CreateVpc) || ($.eventName = DeleteVpc) || ($.eventName = ModifyVpcAttribute) || ($.eventName = AcceptVpcPeeringConnection) || ($.eventName = CreateVpcPeeringConnection) || ($.eventName = DeleteVpcPeeringConnection) || ($.eventName = RejectVpcPeeringConnection) || ($.eventName = AttachClassicLinkVpc) || ($.eventName = DetachClassicLinkVpc) || ($.eventName = DisableVpcClassicLink) || ($.eventName = EnableVpcClassicLink) }' # Critical: matches VPC change events\n      MetricTransformations:\n        - MetricName: vpc_changes_metric\n          MetricNamespace: CISBenchmark\n          MetricValue: \"1\"  # Critical: emits a metric on matching events\n\n  VPCChangesAlarm:\n    Type: AWS::CloudWatch::Alarm\n    Properties:\n      MetricName: vpc_changes_metric  # Critical: alarm monitors the metric above\n      Namespace: CISBenchmark\n      Statistic: Sum\n      Period: 300\n      EvaluationPeriods: 1\n      Threshold: 1\n      ComparisonOperator: GreaterThanOrEqualToThreshold\n```",
+      "Other": "1. 在 AWS 控制台中，转到 CloudWatch > 日志组并打开 CloudTrail 日志组\n2. 选择“创建指标过滤器”\n3. 在过滤器模式中粘贴：\n   { ($.eventName = CreateVpc) || ($.eventName = DeleteVpc) || ($.eventName = ModifyVpcAttribute) || ($.eventName = AcceptVpcPeeringConnection) || ($.eventName = CreateVpcPeeringConnection) || ($.eventName = DeleteVpcPeeringConnection) || ($.eventName = RejectVpcPeeringConnection) || ($.eventName = AttachClassicLinkVpc) || ($.eventName = DetachClassicLinkVpc) || ($.eventName = DisableVpcClassicLink) || ($.eventName = EnableVpcClassicLink) }\n4. 为过滤器命名，将指标命名空间设为 CISBenchmark，指标名称设为 vpc_changes_metric，指标值设为 1，并创建过滤器\n5. 选择新过滤器并选择“创建警报”\n6. 将统计设置为总和，周期 5 分钟，阈值类型静态，当大于/等于 1 时触发，评估周期为 1\n7. 创建警报（操作/通知为可选项，非通过检查的必需条件）\n",
+      "Terraform": "```hcl\n# Metric filter for VPC changes\nresource \"aws_cloudwatch_log_metric_filter\" \"<example_resource_name>\" {\n  name           = \"<example_resource_name>\"\n  log_group_name = \"<example_log_group_name>\"\n  pattern        = \"{ ($.eventName = CreateVpc) || ($.eventName = DeleteVpc) || ($.eventName = ModifyVpcAttribute) || ($.eventName = AcceptVpcPeeringConnection) || ($.eventName = CreateVpcPeeringConnection) || ($.eventName = DeleteVpcPeeringConnection) || ($.eventName = RejectVpcPeeringConnection) || ($.eventName = AttachClassicLinkVpc) || ($.eventName = DetachClassicLinkVpc) || ($.eventName = DisableVpcClassicLink) || ($.eventName = EnableVpcClassicLink) }\" # Critical: matches VPC change events\n\n  metric_transformation {\n    name      = \"<example_resource_name>\"   # Critical: metric created by the filter\n    namespace = \"CISBenchmark\"\n    value     = \"1\"\n  }\n}\n\n# Alarm on the VPC changes metric\nresource \"aws_cloudwatch_metric_alarm\" \"<example_resource_name>\" {\n  metric_name        = \"<example_resource_name>\"  # Critical: alarm monitors the filter's metric\n  namespace          = \"CISBenchmark\"\n  statistic          = \"Sum\"\n  period             = 300\n  evaluation_periods = 1\n  threshold          = 1\n  comparison_operator = \"GreaterThanOrEqualToThreshold\"\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "在 CloudTrail 之上为关键 **VPC 更改事件** 创建 CloudWatch Logs 指标过滤器和警报，并通知响应人员。对网络更改应用 **最小权限原则**，要求变更审批，并通过分段、路由控制等方式实施 **纵深防御**，以预防并遏制未授权修改。",
+      "Url": "https://hub.prowler.com/check/cloudwatch_changes_to_vpcs_alarm_configured"
+    }
+  },
+  "Categories": [
+    "logging"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "Logging and Monitoring"
+}
+
+

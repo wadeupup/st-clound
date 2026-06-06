@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "sqlserver_azuread_administrator_enabled",
+  "CheckTitle": "确保 SQL 服务器已配置 Azure Active Directory 管理员",
+  "CheckType": [],
+  "ServiceName": "sqlserver",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "SQLServer",
+  "ResourceGroup": "database",
+  "Description": "确保已配置 Azure Active Directory 管理员",
+  "Risk": "Azure Active Directory 提供集中化身份管理方式。使用本地 SQL 管理员身份会增加用户账户管理难度。此外，可通过 Azure Active Directory 以集中方式对用户实施安全策略。",
+  "RelatedUrl": "https://docs.microsoft.com/en-us/azure/sql-database/sql-database-aad-authentication",
+  "Remediation": {
+    "Code": {
+      "CLI": "az sql server ad-admin create --resource-group resource_group_name --server server_name --display-name display_name --object-id user_object_id",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/Sql/active-directory-admin.html",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-general-policies/ensure-that-azure-active-directory-admin-is-configured#terraform"
+    },
+    "Recommendation": {
+      "Text": "启用 Azure Active Directory 管理员",
+      "Url": ""
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

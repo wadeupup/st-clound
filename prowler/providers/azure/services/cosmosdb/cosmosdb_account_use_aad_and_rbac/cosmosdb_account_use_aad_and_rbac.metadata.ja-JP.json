@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "cosmosdb_account_use_aad_and_rbac",
+  "CheckTitle": "可能な限り Azure Active Directory (AAD) クライアント認証と Azure RBAC を使用する。",
+  "CheckType": [],
+  "ServiceName": "cosmosdb",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "CosmosDB",
+  "ResourceGroup": "database",
+  "Description": "Cosmos DB では、クライアント認証にトークンまたは AAD を使用でき、さらに認可には Azure RBAC を使用します。AAD は資格情報の管理を担い、MFA と集中管理を可能にするため、セキュリティ面で大きく優れています。また Azure RBAC は Azure の他サービスとの統合性にも優れています。",
+  "Risk": "AAD クライアント認証はトークンベース認証よりも大幅に安全です。トークンベースではクライアント側でトークンを永続化する必要がありますが、AAD では不要です。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/cosmos-db/role-based-access-control",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "現在キーまたはアクセス トークンで Azure Cosmos DB アカウントにアクセスしているすべてのリソースを洗い出してください。これら各リソースに対して Azure Active Directory (AAD) ID を作成します。Azure リソースの場合は、システム割り当てまたはユーザー割り当てのマネージド ID を作成できます。非 Azure リソースの場合は AAD ID を作成します。各 AAD ID には必要最小限の権限のみを付与してください。可能であれば、Cosmos DB Built-in Data Reader または Cosmos DB Built-in Data Contributor の 2 つの組み込みロール定義のいずれかを使用することを推奨します。新しいリソースが正しく機能することを検証します。新しい権限を ID に付与した後、反映まで数時間かかる場合があります。すべてのリソースが新しい ID で正しく動作することを確認したら、次のステップに進みます。az resource update powershell コマンドを使用できます: $cosmosdbname = 'cosmos-db-account-name' $resourcegroup = 'resource-group-name' $cosmosdb = az cosmosdb show --name $cosmosdbname --resource-group $resourcegroup | ConvertFrom-Json az resource update --ids $cosmosdb.id --set properties.disableLocalAuth=true --latest- include-preview",
+      "Url": "https://learn.microsoft.com/en-us/azure/cosmos-db/role-based-access-control"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

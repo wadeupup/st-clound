@@ -1,0 +1,40 @@
+{
+  "Provider": "aws",
+  "CheckID": "vpc_subnet_different_az",
+  "CheckTitle": "VPC には複数のアベイラビリティーゾーンにまたがるサブネットがあります",
+  "CheckType": [
+    "ソフトウェアと構成チェック/AWSセキュリティのベストプラクティス",
+    "サービスへの影響/拒否"
+  ],
+  "ServiceName": "vpc",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsEc2Subnet",
+  "ResourceGroup": "network",
+  "Description": "**VPCs** は、**複数のアベイラビリティーゾーンにまたがって分散されたサブネット**について評価されます。この検出結果では、サブネットが単一の AZ に限定されている VPC またはサブネットが存在しない VPC と、`2+` の異なる AZ にサブネットが存在する VPC を区別します。",
+  "Risk": "Single-AZ のサブネット構成は**単一障害点**を生み出し、AZ の障害、メンテナンス、または容量イベント時に**サービス停止**を引き起こします。**ゾーン冗長性**の欠如は、ロードバランシングおよび送信設計を制約し、**障害分離**を低下させ、可用性および復旧目標を損ないます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/pdfs/whitepapers/latest/building-scalable-secure-multi-vpc-network-infrastructure/building-scalable-secure-multi-vpc-network-infrastructure.pdf",
+    "https://docs.aws.amazon.com/vpc/latest/userguide/configure-subnets.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation: VPCが複数のAZにまたがるように、異なるAZに2つのサブネットを作成します\nResources:\n  SubnetA:\n    Type: AWS::EC2::Subnet\n    Properties:\n      VpcId: <example_resource_id>\n      CidrBlock: 10.0.0.0/24\n      AvailabilityZone: <example_az_1>  # 重要: AZの多様性を確保し始めるために、サブネットをAZ1に配置してください\n  SubnetB:\n    Type: AWS::EC2::Subnet\n    Properties:\n      VpcId: <example_resource_id>\n      CidrBlock: 10.0.1.0/24\n      AvailabilityZone: <example_az_2>  # 重要: 2つ目のAZにより、VPC が複数のAZにまたがるサブネットを持つことが保証されます\n```",
+      "Other": "1. AWS コンソールで、VPC > Subnets に移動します\n2. Create subnet をクリックします\n3. 対象の VPC（<example_resource_id>）を選択します\n4. 異なる Availability Zones（例: <example_az_1> と <example_az_2>）に、重複しない CIDR を持つ 2 つのサブネットを追加します\n5. 保存するには Create subnet をクリックします",
+      "Terraform": "```hcl\n# VPC が複数のアベイラビリティーゾーンにまたがるように、異なる AZ に 2 つのサブネットを作成します\nresource \"aws_subnet\" \"subnet_a\" {\n  vpc_id            = \"<example_resource_id>\"\n  cidr_block        = \"10.0.0.0/24\"\n  availability_zone = \"<example_az_1>\" # 重要: 最初のAZ\n}\n\nresource \"aws_subnet\" \"subnet_b\" {\n  vpc_id            = \"<example_resource_id>\"\n  cidr_block        = \"10.0.1.0/24\"\n  availability_zone = \"<example_az_2>\" # 重要: 2つ目のAZ。サブネットが複数のAZにまたがることを保証します\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "サブネットを`2+`の**アベイラビリティーゾーン**に分散し、**高可用性**のためにワークロードを別々のAZにデプロイします。AZごとにネットワーク層をミラーリングし、AZごとにルーティングと外向き通信を整合させ、IaCとポリシーガードレールでマルチAZレイアウトを強制します。*フェイルオーバーを定期的にテスト*して、レジリエンスを検証します。",
+      "Url": "https://hub.prowler.com/check/vpc_subnet_different_az"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

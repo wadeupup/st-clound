@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "sqlserver_va_emails_notifications_admins_enabled",
+  "CheckTitle": "确保每个 SQL 服务器都设置了漏洞评估（VA）选项“Also send email notifications to admins and subscription owners”",
+  "CheckType": [],
+  "ServiceName": "sqlserver",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "SQLServer",
+  "ResourceGroup": "database",
+  "Description": "启用漏洞评估（VA）选项“Also send email notifications to admins and subscription owners”。",
+  "Risk": "启用“Also send email notifications to admins and subscription owners”后，VA 扫描报告和告警会发送给管理员和订阅所有者。这有助于缩短风险识别与整改所需时间。",
+  "RelatedUrl": "https://docs.microsoft.com/en-us/azure/sql-database/sql-vulnerability-assessment",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-general-policies/ensure-that-va-setting-also-send-email-notifications-to-admins-and-subscription-owners-is-set-for-an-sql-server#terraform"
+    },
+    "Recommendation": {
+      "Text": "1. 进入 SQL servers。2. 选择一个服务器实例。3. 点击 Security Center。4. 在订阅级别 Enabled 旁选择 Configure。5. 在 Vulnerability Assessment Settings 区域中，如未配置则先配置 Storage Accounts。6. 勾选/启用“Also send email notifications to admins and subscription owners”。7. 点击 Save。",
+      "Url": "https://learn.microsoft.com/en-us/azure/defender-for-cloud/sql-azure-vulnerability-assessment-enable"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "启用 Microsoft Defender for SQL 功能会对每个 SQL 服务器产生额外费用。"
+}

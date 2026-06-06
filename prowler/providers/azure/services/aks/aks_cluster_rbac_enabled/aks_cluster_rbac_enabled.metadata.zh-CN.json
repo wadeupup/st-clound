@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "aks_cluster_rbac_enabled",
+  "CheckTitle": "确保已启用 AKS RBAC",
+  "CheckType": [],
+  "ServiceName": "aks",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Microsoft.ContainerService/ManagedClusters",
+  "ResourceGroup": "container",
+  "Description": "Azure Kubernetes 服务（AKS）可以配置为使用 Azure Active Directory（AD）进行用户身份验证。在此配置中，你使用 Azure AD 身份验证令牌登录 AKS 群集。你还可以配置 Kubernetes 基于角色的访问控制（Kubernetes RBAC），根据用户身份或组成员身份来限制对群集资源的访问。",
+  "Risk": "Kubernetes RBAC 与 AKS 可帮助你保护对群集的访问，并仅向开发人员和运维人员授予所需的最小权限。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/aks/azure-ad-rbac?tabs=portal",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/AKS/enable-role-based-access-control-for-kubernetes-service.html#",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-kubernetes-policies/bc_azr_kubernetes_2#terraform"
+    },
+    "Recommendation": {
+      "Text": "",
+      "Url": "https://learn.microsoft.com/en-us/security/benchmark/azure/security-controls-v2-privileged-access#pa-7-follow-just-enough-administration-least-privilege-principle"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

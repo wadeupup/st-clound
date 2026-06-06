@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "cloudtrail_cloudwatch_logging_enabled",
+  "CheckTitle": "CloudTrail 跟踪在过去 24 小时内已将日志传送到 CloudWatch Logs",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/CIS AWS Foundations Benchmark"
+  ],
+  "ServiceName": "cloudtrail",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "low",
+  "ResourceType": "AwsCloudTrailTrail",
+  "ResourceGroup": "monitoring",
+  "Description": "**CloudTrail 跟踪** 配置为将事件发送到 **CloudWatch Logs**，并在过去 `24 小时` 内显示最近的传送。识别没有集成或没有最近 CloudWatch 传送的跟踪，包括单区域和多区域跟踪。",
+  "Risk": "缺少或过时的 CloudWatch 传送会削弱可见性并延迟检测，影响机密性和完整性。攻击者可以：\n- 隐藏 **权限提升**\n- 执行未经授权的 **资源更改**\n- 通过 API 滥用窃取数据",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.prowler.com/checks/aws/logging-policies/logging_4#aws-console",
+    "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/send-cloudtrail-events-to-cloudwatch-logs.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws cloudtrail update-trail --name <trail_name> --cloud-watch-logs-log-group-arn <cloudwatch_log_group_arn> --cloud-watch-logs-role-arn <cloudwatch_logs_role_arn>",
+      "NativeIaC": "```yaml\n# CloudFormation: enable CloudTrail delivery to CloudWatch Logs\nResources:\n  <example_resource_name>:\n    Type: AWS::CloudTrail::Trail\n    Properties:\n      S3BucketName: \"<example_resource_name>\"\n      CloudWatchLogsLogGroupArn: \"<cloudwatch_log_group_arn>\"  # CRITICAL: sends CloudTrail events to CloudWatch Logs\n      CloudWatchLogsRoleArn: \"<cloudwatch_logs_role_arn>\"      # CRITICAL: role CloudTrail assumes to deliver events\n```",
+      "Other": "1. 在 AWS 控制台中，转到 CloudTrail > 跟踪并选择跟踪\n2. 在 CloudWatch Logs 部分，单击编辑\n3. 将 CloudWatch Logs 设置为已启用\n4. 选择现有的日志组（或创建新组）并选择具有 CreateLogStream/PutLogEvents 权限的 IAM 角色\n5. 单击保存更改\n6. 几分钟后，验证事件是否出现在所选 CloudWatch Logs 日志组中",
+      "Terraform": "```hcl\n# Terraform: enable CloudTrail delivery to CloudWatch Logs\nresource \"aws_cloudtrail\" \"<example_resource_name>\" {\n  name                       = \"<example_resource_name>\"\n  s3_bucket_name             = \"<example_resource_name>\"\n  cloud_watch_logs_group_arn = \"<cloudwatch_log_group_arn>\"  # CRITICAL: sends CloudTrail events to CloudWatch Logs\n  cloud_watch_logs_role_arn  = \"<cloudwatch_logs_role_arn>\"   # CRITICAL: role CloudTrail assumes to deliver events\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "将每个跟踪与 **CloudWatch Logs** 集成，并保持持续、近实时的传送。对传送角色强制执行 **最小权限原则**，优先使用 **多区域** 覆盖，并为敏感操作实施 **指标过滤器和警报**。集中保留以支持 **纵深防御**。",
+      "Url": "https://hub.prowler.com/check/cloudtrail_cloudwatch_logging_enabled"
+    }
+  },
+  "Categories": [
+    "logging",
+    "forensics-ready"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

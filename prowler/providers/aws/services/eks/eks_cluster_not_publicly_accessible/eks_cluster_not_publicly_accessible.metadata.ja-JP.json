@@ -1,0 +1,49 @@
+{
+  "Provider": "aws",
+  "CheckID": "eks_cluster_not_publicly_accessible",
+  "CheckTitle": "EKS クラスターエンドポイントが 0.0.0.0/0 からパブリックアクセス可能でない",
+  "CheckAliases": [
+    "eks_endpoints_not_publicly_accessible",
+    "eks_control_plane_endpoint_access_restricted"
+  ],
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices/Network Reachability",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "TTPs/Initial Access/Unauthorized Access",
+    "Effects/Data Exposure"
+  ],
+  "ServiceName": "eks",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsEksCluster",
+  "ResourceGroup": "container",
+  "Description": "**Amazon EKS** クラスター API サーバーエンドポイントは、**無制限のインターネットアクセス** について評価されます。特に、パブリックエンドポイントがプライベートアクセスや限られた CIDR 範囲ではなく、`0.0.0.0/0` からの接続を許可している場合です。",
+  "Risk": "公開アクセス可能な API エンドポイントにより、インターネット全体でのプローブ、ブルートフォース、列挙が可能になり、RBAC の設定ミスや API の欠陥への露出が増加します。アクセスに成功すると、シークレットの窃取（機密性）、ワークロードの改ざん（整合性）、コントロールプレーンの中断やスケーリングの悪用（可用性、コスト）を引き起こす可能性があります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/eks/latest/eksctl/vpc-cluster-access.html",
+    "https://docs.aws.amazon.com/eks/latest/userguide/config-cluster-endpoint.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/EKS/endpoint-access.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws eks update-cluster-config --region <region_name> --name <cluster_name> --resources-vpc-config endpointPublicAccess=false,endpointPrivateAccess=true",
+      "NativeIaC": "```yaml\n# CloudFormation: Disable public endpoint and enable private endpoint\nResources:\n  <example_resource_name>:\n    Type: AWS::EKS::Cluster\n    Properties:\n      RoleArn: <example_role_arn>\n      ResourcesVpcConfig:\n        SubnetIds:\n          - <example_subnet_id_1>\n          - <example_subnet_id_2>\n        EndpointPublicAccess: false  # critical: disables public API endpoint\n        EndpointPrivateAccess: true  # critical: enables private API endpoint\n```",
+      "Other": "1. Amazon EKS コンソールを開きます\n2. クラスターを選択します\n3. ネットワークタブに移動し、エンドポイントアクセスの管理をクリックします\n4. プライベートアクセスを有効化し、パブリックアクセスを無効化します\n5. 更新/保存をクリックします",
+      "Terraform": "```hcl\n# Terraform: Disable public endpoint and enable private endpoint\nresource \"aws_eks_cluster\" \"<example_resource_name>\" {\n  name     = \"<example_resource_name>\"\n  role_arn = \"<example_role_arn>\"\n\n  vpc_config {\n    subnet_ids              = [\"<example_subnet_id_1>\", \"<example_subnet_id_2>\"]\n    endpoint_public_access  = false  # critical: disables public API endpoint\n    endpoint_private_access = true   # critical: enables private API endpoint\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "**プライベートエンドポイントアクセス** を優先し、広範な露出を避けます。*パブリックアクセスが必要な場合*、信頼できる管理者 CIDR（`0.0.0.0/0` ではない）に制限し、**VPN/Direct Connect または bastion** を介して API にアクセスし、IAM/RBAC で **最小権限** を強制します。ネットワークセグメンテーションと継続的な監視により **多層防御** を適用します。",
+      "Url": "https://hub.prowler.com/check/eks_cluster_not_publicly_accessible"
+    }
+  },
+  "Categories": [
+    "internet-exposed",
+    "cluster-security"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

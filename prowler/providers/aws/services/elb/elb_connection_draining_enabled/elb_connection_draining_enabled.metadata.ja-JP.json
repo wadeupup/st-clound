@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "elb_connection_draining_enabled",
+  "CheckTitle": "Classic Load Balancer で connection draining が有効化されていること",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices/Network Reachability",
+    "Effects/Denial of Service"
+  ],
+  "ServiceName": "elb",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsElbLoadBalancer",
+  "ResourceGroup": "network",
+  "Description": "**Classic Load Balancer** で **connection draining** が有効化されており、登録解除または異常状態のインスタンスは新規リクエストを受け取らず、既存接続は設定されたドレインウィンドウ内で完了できます。",
+  "Risk": "**connection draining** がない場合、インスタンス削除やヘルス障害時に処理中リクエストが中断され、トランザクションの不整合、セッション切断、アプリケーション状態の不一致が発生する可能性があります。これは **可用性** を低下させ、デプロイ、スケーリング、フェイルオーバー時の **データ完全性** にも影響します。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://aws.amazon.com/blogs/aws/elb-connection-draining-remove-instances-from-service-with-care/",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/ELB/elb-connection-draining-enabled.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/elb-controls.html#elb-7",
+    "https://docs.aws.amazon.com/elasticloadbalancing/latest/classic/config-conn-drain.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws elb modify-load-balancer-attributes --load-balancer-name <example_resource_name> --load-balancer-attributes '{\"ConnectionDraining\":{\"Enabled\":true}}'",
+      "NativeIaC": "```yaml\n# CloudFormation: Enable connection draining on a Classic Load Balancer\nResources:\n  <example_resource_name>:\n    Type: AWS::ElasticLoadBalancing::LoadBalancer\n    Properties:\n      Listeners:\n        - InstancePort: 80\n          LoadBalancerPort: 80\n          Protocol: HTTP\n      AvailabilityZones:\n        - us-east-1a\n      ConnectionDrainingPolicy:\n        Enabled: true  # CRITICAL: turns on connection draining so in-flight requests complete\n        # Timeout is optional; default 300s is used if omitted\n```",
+      "Other": "1. EC2 コンソールを開き、Load Balancers（Classic）に移動します\n2. 対象の Classic Load Balancer を選択します\n3. Attributes タブを開き、Edit をクリックします\n4. Enable connection draining を有効化します（必要に応じてタイムアウトを設定）\n5. Save changes をクリックします",
+      "Terraform": "```hcl\n# Terraform: Enable connection draining on a Classic Load Balancer\nresource \"aws_elb\" \"<example_resource_name>\" {\n  name               = \"<example_resource_name>\"\n  availability_zones = [\"us-east-1a\"]\n\n  listener {\n    lb_port           = 80\n    lb_protocol       = \"http\"\n    instance_port     = 80\n    instance_protocol = \"http\"\n  }\n\n  connection_draining = true  # CRITICAL: enables connection draining so existing connections complete\n  # connection_draining_timeout can be omitted (defaults to 300s)\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "すべての Classic Load Balancer で **connection draining** を有効化し、通常のリクエスト遅延に合わせてドレイン間隔を設定してください。オートスケーリングとデプロイを連携させ、インスタンスをグレースフルに停止します。エラーとリトライを監視して挙動を検証し、**可用性** と **完全性** を守るため `timeout` を保守的に調整してください。",
+      "Url": "https://hub.prowler.com/check/elb_connection_draining_enabled"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

@@ -1,0 +1,38 @@
+{
+  "Provider": "aws",
+  "CheckID": "ec2_networkacl_allow_ingress_any_port",
+  "CheckTitle": "ネットワーク ACL が 0.0.0.0/0 からの任意のポートへのインバウンドを許可していないことを確認",
+  "CheckType": [
+    "Software and Configuration Checks",
+    "Industry and Regulatory Standards",
+    "CIS AWS Foundations Benchmark"
+  ],
+  "ServiceName": "ec2",
+  "SubServiceName": "networkacl",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "medium",
+  "ResourceType": "AwsEc2NetworkAcl",
+  "ResourceGroup": "network",
+  "Description": "ネットワーク ACL が 0.0.0.0/0 からの任意のポートへのインバウンドを許可していないことを確認",
+  "Risk": "境界ファイアウォールがあっても、ネットワーク ACL が開いていると、VPC アクセス権を持つ任意のユーザーやマルウェアが既知のポートや機密ポートをスキャンし、インスタンスへのアクセスを取得できるようになります。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "ゼロトラストアプローチを適用します。制限されていない、または過度に許可的なネットワーク ACL をスキャンして修復するプロセスを実装します。推奨されるベストプラクティスは、必要な最小ポートの定義を狭めることです。",
+      "Url": "https://docs.aws.amazon.com/vpc/latest/userguide/vpc-network-acls.html"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "Infrastructure Security"
+}
+

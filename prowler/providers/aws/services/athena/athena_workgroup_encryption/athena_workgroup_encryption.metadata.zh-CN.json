@@ -1,0 +1,48 @@
+{
+  "Provider": "aws",
+  "CheckID": "athena_workgroup_encryption",
+  "CheckTitle": "Athena 工作组使用服务器端加密在 S3 中加密查询结果",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践",
+    "软件和配置检查/行业和监管标准/AWS 基础安全最佳实践",
+    "软件和配置检查/行业和监管标准/CIS AWS 基础基准",
+    "影响/数据暴露"
+  ],
+  "ServiceName": "athena",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsAthenaWorkGroup",
+  "ResourceGroup": "analytics",
+  "Description": "**Athena 工作组**根据**查询结果加密**进行评估，以确认结果数据在静态时已加密存储，无论是保存在 Amazon S3 中还是通过托管查询结果。",
+  "Risk": "未加密的查询输出可能通过 S3 配置错误或跨账户访问被意外主体在静态时读取。\n\n影响：**机密性损失**，使**数据泄露**成为可能，并通过在预期边界之外暴露敏感字段支持**横向移动**。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://aws.amazon.com/blogs/big-data/introducing-managed-query-results-for-amazon-athena/",
+    "https://docs.aws.amazon.com/athena/latest/ug/managed-results.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/Athena/encryption-enabled.html",
+    "https://docs.aws.amazon.com/athena/latest/ug/encrypting-managed-results.html",
+    "https://docs.aws.amazon.com/athena/latest/ug/encrypting-query-results-stored-in-s3.html",
+    "https://docs.aws.amazon.com/athena/latest/ug/workgroups-minimum-encryption.html",
+    "https://aws.amazon.com/blogs/aws/launch-amazon-athena-adds-support-for-querying-encrypted-data/"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws athena update-work-group --work-group <workgroup_name> --configuration-updates ResultConfigurationUpdates={EncryptionConfiguration={EncryptionOption=SSE_S3}}",
+      "NativeIaC": "```yaml\n# CloudFormation: 启用 Athena 工作组查询结果的加密\nResources:\n  <example_resource_name>:\n    Type: AWS::Athena::WorkGroup\n    Properties:\n      Name: <example_resource_name>\n      WorkGroupConfiguration:\n        ResultConfiguration:\n          EncryptionConfiguration:\n            EncryptionOption: SSE_S3  # 关键：为查询结果启用服务器端加密\n```",
+      "Other": "1. 在 AWS 控制台中，转到 Amazon Athena > Workgroups\n2. 选择工作组并单击 Edit\n3. 在 Query result configuration 下，如果为空，设置 Results location\n4. 选中 Encrypt query results 并选择 SSE-S3\n5. 单击 Save changes",
+      "Terraform": "```hcl\n# Terraform: 启用 Athena 工作组查询结果的加密\nresource \"aws_athena_workgroup\" \"<example_resource_name>\" {\n  name = \"<example_resource_name>\"\n\n  configuration {\n    result_configuration {\n      output_location = \"s3://<example_bucket>/\"  # 查询结果所需的 S3 路径\n      encryption_configuration {\n        encryption_option = \"SSE_S3\"  # 关键：为查询结果启用加密\n      }\n    }\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "使用**AWS KMS 客户管理的密钥**（`SSE_KMS` 或使用 KMS 密钥的托管结果）启用并强制执行**工作组结果加密**。设置最小加密级别并防止客户端覆盖。对密钥和结果访问应用**最小权限**，轮换密钥，并审计使用情况以保持纵深防御。",
+      "Url": "https://hub.prowler.com/check/athena_workgroup_encryption"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

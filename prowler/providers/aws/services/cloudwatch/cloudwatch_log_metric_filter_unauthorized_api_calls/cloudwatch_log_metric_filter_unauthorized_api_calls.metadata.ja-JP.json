@@ -1,0 +1,47 @@
+{
+  "Provider": "aws",
+  "CheckID": "cloudwatch_log_metric_filter_unauthorized_api_calls",
+  "CheckTitle": "未承認 API コールに対する CloudWatch Logs メトリクスフィルターとアラームが存在すること",
+  "CheckType": [
+    "Software and Configuration Checks/Industry and Regulatory Standards/CIS AWS Foundations Benchmark",
+    "Software and Configuration Checks/AWS Security Best Practices/Runtime Behavior Analysis",
+    "TTPs/Initial Access/Unauthorized Access"
+  ],
+  "ServiceName": "cloudwatch",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsCloudWatchAlarm",
+  "ResourceGroup": "monitoring",
+  "Description": "CloudTrail 用の **CloudWatch Logs** において、未承認の API エラー（`$.errorCode=\"*UnauthorizedOperation\"` または `$.errorCode=\"AccessDenied*\"`）にマッチするメトリクスフィルターと、フィルターに一致したイベント発生時にトリガーされるアラームが構成されていることを確認します。",
+  "Risk": "**未承認 API コール** に対するアラートがない場合、権限の探り出しや侵害されたアイデンティティによる失敗アクセスが検知されずに続く可能性があります。攻撃者はサービスを列挙し、横移動や権限昇格を試みることで、データの**機密性**と**完全性**を脅かします。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudwatch-alarms-for-cloudtrail.html",
+    "https://asecure.cloud/a/unauthorized_api_calls/",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/CloudWatchLogs/authorization-failures-alarm.html",
+    "https://www.tenable.com/policies/[type]/AC_AWS_0559",
+    "https://www.intelligentdiscovery.io/controls/cloudwatch/cloudwatch-unauthorized-api-calls",
+    "https://support.icompaas.com/support/solutions/articles/62000083561-ensure-a-log-metric-filter-and-alarm-exist-for-unauthorized-api-calls"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation：未承認 API コール用メトリクスフィルターとアラームを作成\nResources:\n  MetricFilterUnauthorized:\n    Type: AWS::Logs::MetricFilter\n    Properties:\n      LogGroupName: <example_resource_name>\n      FilterPattern: '{($.errorCode = \"*UnauthorizedOperation\") || ($.errorCode = \"AccessDenied*\")}'  # 重要：未承認/AccessDenied の API コールを検知\n      MetricTransformations:\n        - MetricName: unauthorized_api_calls_metric\n          MetricNamespace: CISBenchmark\n          MetricValue: \"1\"\n\n  AlarmUnauthorized:\n    Type: AWS::CloudWatch::Alarm\n    Properties:\n      ComparisonOperator: GreaterThanOrEqualToThreshold\n      EvaluationPeriods: 1\n      MetricName: unauthorized_api_calls_metric  # 重要：フィルターからのメトリクスに対してアラーム\n      Namespace: CISBenchmark\n      Period: 300\n      Statistic: Sum\n      Threshold: 1\n```",
+      "Other": "1. AWS コンソールで CloudWatch > Logs > Log groups を開き、CloudTrail ロググループを選択します\n2. Metric filters > Create metric filter に進みます\n3. Filter pattern を次のように設定します：{($.errorCode = \"*UnauthorizedOperation\") || ($.errorCode = \"AccessDenied*\")}\n4. メトリクス名を unauthorized_api_calls_metric、Namespace を CISBenchmark、Value を 1 として作成します\n5. 新しいメトリクスフィルターを選択し、Create alarm をクリックします\n6. Statistic: Sum、Period: 5 minutes、Threshold type: Static、Threshold: 1、Evaluation periods: 1 を設定します\n7. アラームを作成します",
+      "Terraform": "```hcl\n# Terraform：未承認 API コール用メトリクスフィルターとアラーム\nresource \"aws_cloudwatch_log_metric_filter\" \"unauthorized\" {\n  name           = \"unauthorized_api_calls_metric\"\n  log_group_name = \"<example_resource_name>\"\n  pattern        = \"{($.errorCode = \\\"*UnauthorizedOperation\\\") || ($.errorCode = \\\"AccessDenied*\\\")}\"  # 重要：未承認/AccessDenied の API コールを検知\n\n  metric_transformation {\n    name      = \"unauthorized_api_calls_metric\"\n    namespace = \"CISBenchmark\"\n    value     = \"1\"\n  }\n}\n\nresource \"aws_cloudwatch_metric_alarm\" \"unauthorized\" {\n  comparison_operator = \"GreaterThanOrEqualToThreshold\"\n  evaluation_periods  = 1\n  metric_name         = \"unauthorized_api_calls_metric\"   # 重要：フィルターからのメトリクスに対してアラーム\n  namespace           = \"CISBenchmark\"\n  period              = 300\n  statistic           = \"Sum\"\n  threshold           = 1\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "`*UnauthorizedOperation` や `AccessDenied*` といった未承認エラー向けに CloudWatch Logs メトリクスフィルターを追加し、対応者へ通知するアラームと関連付けることで、リアルタイムな**アラート**を有効化してください。\n- **最小権限の原則**を徹底してノイズを削減する\n- インシデントレスポンス（IR）ツールと連携し、**多層防御（Defense in Depth）** を実現する",
+      "Url": "https://hub.prowler.com/check/cloudwatch_log_metric_filter_unauthorized_api_calls"
+    }
+  },
+  "Categories": [
+    "logging"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "ロギングおよびモニタリング"
+}
+
+

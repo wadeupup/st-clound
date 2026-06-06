@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "storage_blob_public_access_level_is_disabled",
+  "CheckTitle": "ストレージ アカウント内のすべての blob コンテナーで 'Public access level' が 'Private (no anonymous access)' に設定されていることを確認する",
+  "CheckType": [],
+  "ServiceName": "storage",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AzureStorageAccount",
+  "ResourceGroup": "storage",
+  "Description": "ストレージ アカウント内のすべての blob コンテナーで 'Public access level' 設定が 'Private (no anonymous access)' になっていることを確認し、これらの Microsoft Azure リソースへの匿名アクセスをブロックします。",
+  "Risk": "blob コンテナーへ匿名アクセスするユーザーは、共有アクセス署名など、資格情報を必要としないコンストラクターを利用できる可能性があります。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/StorageAccounts/disable-blob-anonymous-access-for-storage-accounts.html",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-networking-policies/ensure-that-storage-accounts-disallow-public-access#terraform"
+    },
+    "Recommendation": {
+      "Text": "'Public access level' 設定を 'Private (no anonymous access)' に設定します",
+      "Url": ""
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

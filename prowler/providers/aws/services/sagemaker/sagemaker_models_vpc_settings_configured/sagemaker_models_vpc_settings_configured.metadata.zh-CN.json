@@ -1,0 +1,40 @@
+{
+  "Provider": "aws",
+  "CheckID": "sagemaker_models_vpc_settings_configured",
+  "CheckTitle": "Amazon SageMaker 模型已启用 VPC 设置",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践/网络可达性",
+    "软件和配置检查/行业和监管标准/AWS 基础安全最佳实践"
+  ],
+  "ServiceName": "sagemaker",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "ai_ml",
+  "Description": "**SageMaker 模型**使用**VPC 设置**（带有子网和安全组的 `VpcConfig`），使推理容器通过选定的 VPC 而不是公共互联网进行通信。\n\n这用于评估模型是否为其网络路径定义了 VPC 子网。",
+  "Risk": "如果没有 **VPC 隔离**，模型流量和数据访问可能会经过公共路径，从而因拦截或错误路由而削弱 **机密性** 和 **完整性**。\n\n缺少安全组和私有端点会降低 **访问控制**，使受损容器能够进行过度出站、数据外泄或命令与控制。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/sagemaker/latest/dg/studio-notebooks-and-internet-access.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\nResources:\n  SageMakerModel:\n    Type: AWS::SageMaker::Model\n    Properties:\n      ExecutionRoleArn: \"<example_resource_id>\"\n      PrimaryContainer:\n        Image: \"<example_resource_name>\"\n      # 关键：VpcConfig 为模型启用 VPC 网络，因此该检查通过\n      VpcConfig:\n        SecurityGroupIds:\n          - \"<example_resource_id>\"  # 关键：VPC中的安全组\n        Subnets:\n          - \"<example_resource_id>\"  # 严重：VPC 中至少有一个子网\n```",
+      "Other": "1. 打开 AWS 控制台 > Amazon SageMaker > 推理 > 模型\n2. 打开该模型并记下其容器镜像和执行角色\n3. 删除该模型（模型无法通过更新来添加 VPC 设置）\n4. 点击创建模型\n5. 输入相同的模型名称，设置执行角色和容器镜像\n6. 在网络下，选择一个 VPC，然后至少选择一个子网和一个安全组\n7. 创建模型\n8. 验证该模型显示已启用 VPC 设置",
+      "Terraform": "```hcl\nresource \"aws_sagemaker_model\" \"model\" {\n  name               = \"<example_resource_name>\"\n  execution_role_arn = \"<example_resource_id>\"\n\n  primary_container {\n    image = \"<example_resource_name>\"\n  }\n\n  # 关键：VPC 配置为模型启用 VPC 网络，因此检查通过\n  vpc_config {\n    subnets            = [\"<example_resource_id>\"]       # 关键的\n    security_group_ids = [\"<example_resource_id>\"]       # 关键的\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "通过使用私有子网和限制性安全组定义 `VpcConfig`，为模型启用**仅限 VPC 的网络**。\n\n应用**最小权限出站**，为 S3 和 SageMaker 运行时使用 **VPC 端点**，避免公共路由，并通过分段和流量监控实现**纵深防御**。",
+      "Url": "https://hub.prowler.com/check/sagemaker_models_vpc_settings_configured"
+    }
+  },
+  "Categories": [
+    "trust-boundaries",
+    "gen-ai"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

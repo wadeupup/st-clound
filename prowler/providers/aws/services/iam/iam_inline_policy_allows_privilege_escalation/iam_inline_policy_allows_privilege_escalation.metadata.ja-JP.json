@@ -1,0 +1,36 @@
+{
+  "Provider": "aws",
+  "CheckID": "iam_inline_policy_allows_privilege_escalation",
+  "CheckTitle": "権限昇格につながる可能性のある操作を許可する IAM インラインポリシーがないことを確認する",
+  "CheckType": [
+    "Software and Configuration Checks",
+    "Industry and Regulatory Standards"
+  ],
+  "ServiceName": "iam",
+  "SubServiceName": "inline_policy",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "high",
+  "ResourceType": "AwsIamPolicy",
+  "ResourceGroup": "IAM",
+  "Description": "権限昇格につながる可能性のある操作を許可する IAM インラインポリシーがないことを確認する",
+  "Risk": "一部の IAM 権限を持つユーザーは、管理者権限まで権限昇格できる可能性があります。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "リソース単位で利用権限を付与し、最小権限の原則を適用してください。",
+      "Url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html#grant-least-privilege"
+    }
+  },
+  "Categories": [
+    "privilege-escalation"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

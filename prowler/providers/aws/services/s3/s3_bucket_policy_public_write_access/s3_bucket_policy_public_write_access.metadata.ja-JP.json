@@ -1,0 +1,35 @@
+{
+  "Provider": "aws",
+  "CheckID": "s3_bucket_policy_public_write_access",
+  "CheckTitle": "S3 バケットに書き込みアクセスを許可するポリシーがあるかどうかを確認してください。",
+  "CheckType": [
+    "IAM"
+  ],
+  "ServiceName": "s3",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:s3:::bucket_name",
+  "Severity": "critical",
+  "ResourceType": "AwsS3Bucket",
+  "ResourceGroup": "storage",
+  "Description": "S3 バケットに書き込みアクセスを許可するポリシーがあるかどうかを確認してください。",
+  "Risk": "意図されていないユーザーが特定のバケットにオブジェクトを配置できます。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://docs.prowler.com/checks/aws/s3-policies/s3_18-write-permissions-public#aws-console",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "最小権限の原則を適用した適切なバケットポリシーが設定されていることを確認してください。",
+      "Url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_examples_s3_rw-bucket.html"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

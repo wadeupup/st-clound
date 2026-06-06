@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "policy_ensure_asc_enforcement_enabled",
+  "CheckTitle": "ASC 既定ポリシー設定のいずれも 'Disabled' に設定されていないことを確認する",
+  "CheckType": [],
+  "ServiceName": "policy",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Microsoft.Authorization/policyAssignments",
+  "ResourceGroup": "governance",
+  "Description": "ASC 既定ポリシーで提供される設定はいずれも、effect を Disabled に設定すべきではありません。",
+  "Risk": "セキュリティ ポリシーはワークロードの望ましい構成を定義し、企業または規制上のセキュリティ要件への準拠を支援します。ASC 既定ポリシーは既定で各サブスクリプションに関連付けられています。ASC 既定ポリシー割り当ては、ベスト プラクティスに基づくセキュリティ推奨事項のセットです。ASC 既定ポリシーで推奨事項を有効化することで、Azure Security Center はサポートされる推奨事項を監視でき、さらに一部の推奨事項では自動アクションを任意で許可できます。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/defender-for-cloud/security-policy-concept",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "1. Azure Home から Portal Menu を選択します。2. Policy を選択します。3. 各サブスクリプションで ASC Default を選択します。4. 'view Assignment' をクリックします。5. 'Edit assignment' をクリックします。6. Policy Enforcement が Enabled であることを確認します。7. 'Review + Save' をクリックします。",
+      "Url": "https://learn.microsoft.com/en-us/azure/defender-for-cloud/implement-security-recommendations"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

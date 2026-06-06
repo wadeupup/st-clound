@@ -1,0 +1,33 @@
+{
+  "Provider": "aws",
+  "CheckID": "iam_role_administratoraccess_policy",
+  "CheckTitle": "IAM ロールに AdministratorAccess ポリシーがアタッチされていないことを確認します",
+  "CheckType": [],
+  "ServiceName": "iam",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "high",
+  "ResourceType": "AwsIamRole",
+  "ResourceGroup": "IAM",
+  "Description": "IAM ロールに AdministratorAccess ポリシーがアタッチされていないことを確認します",
+  "Risk": "AWS 管理の AdministratorAccess ポリシーは、すべての AWS サービスおよびアカウント内のすべてのリソースに対するすべてのアクションを許可し、そのため顧客に重大なデータ漏洩の脅威をもたらします。非常に慎重に付与する必要があります。サードパーティベンダーにアクセスを付与する場合は、ViewOnlyAccess や SecurityAudit などの代替の管理ポリシーを使用することを検討してください。",
+  "RelatedUrl": "https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_job-functions.html#jf_administrator",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "最小特権の原則を適用します。AdministratorAccess の代わりに、特定のロールやタスクに必要な権限のみを割り当てます。最小特権の原則に基づいて、最小限の権限を持つカスタム IAM ポリシーを作成します。",
+      "Url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html#grant-least-privilege"
+    }
+  },
+  "Categories": [
+    "trust-boundaries"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "CAF セキュリティエピック: IAM"
+}

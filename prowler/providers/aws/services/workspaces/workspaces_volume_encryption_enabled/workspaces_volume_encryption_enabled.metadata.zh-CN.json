@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "workspaces_volume_encryption_enabled",
+  "CheckTitle": "Amazon WorkSpaces 工作区的根卷和用户卷已加密。",
+  "CheckType": [
+    "软件与配置检查 / AWS 安全最佳实践",
+    "软件与配置检查 / 行业与监管标准 / AWS 基础安全最佳实践",
+    "效果 / 数据泄露"
+  ],
+  "ServiceName": "workspaces",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsEc2Volume",
+  "ResourceGroup": "compute",
+  "Description": "Amazon WorkSpaces 会评估每个工作区的 EBS 卷的“静态加密”状态。它将检查根卷（Root Volume）和用户卷（User Volume）是否使用了 KMS 密钥进行加密，并识别出任一卷未加密的工作区。",
+  "Risk": "未加密的卷允许他人通过快照或底层存储脱机访问文件、缓存的凭据和配置文件数据，从而损害“机密性”。存储层级的访问权限可能导致数据被篡改，影响“完整性”，并为旨在横向移动的令牌重用提供便利。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/workspaces/latest/adminguide/encrypt-workspaces.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/WorkSpaces/storage-encryption.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation：创建一个两个卷均已加密的 WorkSpace\nResources:\n  ExampleWorkspace:\n    Type: AWS::WorkSpaces::Workspace\n    Properties:\n      BundleId: <example_bundle_id>\n      DirectoryId: <example_directory_id>\n      UserName: <example_user_name>\n      RootVolumeEncryptionEnabled: true  # 严重：加密根卷以通过检查\n      UserVolumeEncryptionEnabled: true  # 严重：加密用户卷以通过检查\n```",
+      "Other": "1. 在 AWS 控制台中，前往 WorkSpaces > WorkSpaces，然后点击“启动 WorkSpaces” (Launch WorkSpaces)\n2. 选择目录和用户，继续执行“WorkSpaces 配置”步骤\n3. 在“加密”(Encryption) 下，启用“根卷”(Root volume) 和“用户卷”(User volume)\n4. 保留默认的 AWS 托管密钥 (aws/workspaces)，或者根据需要选择客户管理型密钥 (CMK)\n5. 启动 WorkSpace，然后迁移用户并终止未加密的 WorkSpace\n6. 验证“卷加密”(Volume Encryption) 列显示两个卷均已“启用”(Enabled)",
+      "Terraform": "```hcl\n# Terraform：创建一个两个卷均已加密的 WorkSpace\nresource \"aws_workspaces_workspace\" \"example\" {\n  bundle_id    = \"<example_bundle_id>\"\n  directory_id = \"<example_directory_id>\"\n  user_name    = \"<example_user_name>\"\n\n  root_volume_encryption_enabled = true  # 严重：加密根卷\n  user_volume_encryption_enabled = true  # 严重：加密用户卷\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "为所有 WorkSpaces 的根卷（Root Volume）和用户卷（User Volume）启用基于 KMS 的加密。优先使用“客户管理型密钥”（Customer-managed keys），对密钥的使用实施“最小权限”原则，并启用密钥轮换。将加密要求嵌入到预置模板和策略中，以阻止未加密的启动请求。*请保持所需密钥处于启用状态，以便进行重建和恢复操作。*",
+      "Url": "https://hub.prowler.com/check/workspaces_volume_encryption_enabled"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

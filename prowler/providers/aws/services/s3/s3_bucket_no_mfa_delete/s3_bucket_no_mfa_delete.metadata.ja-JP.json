@@ -1,0 +1,33 @@
+{
+  "Provider": "aws",
+  "CheckID": "s3_bucket_no_mfa_delete",
+  "CheckTitle": "S3バケットのMFA Deleteが有効になっていないか確認してください。",
+  "CheckType": [
+    "ログ記録と監視"
+  ],
+  "ServiceName": "s3",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:s3:::bucket_name",
+  "Severity": "medium",
+  "ResourceType": "AwsS3Bucket",
+  "ResourceGroup": "storage",
+  "Description": "S3バケットのMFA Deleteが有効になっていないか確認してください。",
+  "Risk": "あなたのセキュリティ認証情報が侵害されているか、不正アクセスが許可されています。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "aws s3api put-bucket-versioning --profile my-root-profile --bucket my-bucket-name --versioning-configuration Status=Enabled,MFADelete=Enabled --mfa 'arn:aws:iam::00000000:mfa/root-account-mfa-device 123456'",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": "https://docs.prowler.com/checks/aws/s3-policies/bc_aws_s3_24#terraform"
+    },
+    "Recommendation": {
+      "Text": "S3 バケットに MFA 削除を追加すると、バケットのバージョン状態を変更したり、オブジェクトのバージョンを削除したりする際に追加の認証が必要になり、セキュリティ認証情報が侵害されたり不正アクセスが許可されたりした場合に、さらにもう 1 層のセキュリティが加わります。",
+      "Url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/MultiFactorAuthenticationDelete.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

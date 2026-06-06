@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "app_ensure_python_version_is_latest",
+  "CheckTitle": "Web アプリで Python を使用する場合、「Python バージョン」が最新の安定版であることを確認する",
+  "CheckType": [],
+  "ServiceName": "app",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "low",
+  "ResourceType": "Microsoft.Web/sites",
+  "ResourceGroup": "serverless",
+  "Description": "Python ソフトウェアでは、セキュリティ上の欠陥対応や機能追加のために定期的に新しいバージョンがリリースされます。Web アプリで最新の完全な Python バージョンを使用することで、必要に応じてセキュリティ修正や新バージョンの追加機能の利点を得られるため、推奨されます。",
+  "Risk": "新しいバージョンには、セキュリティ強化や追加機能が含まれる場合があります。強化点や新機能を活用するため、最新バージョンのソフトウェア使用が推奨されます。各ソフトウェア導入時には、組織はその更新が要件を満たすか判断する必要があります。また、選択した更新版に対して、追加ソフトウェアの互換性とサポートが提供されるかを検証する必要があります。最新の完全版を使用することで、脆弱性やエクスプロイトに対してスタックを安全に保てます。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/app-service/configure-common?tabs=portal#general-settings",
+  "Remediation": {
+    "Code": {
+      "CLI": "az webapp config set --resource-group <RESOURCE_GROUP_NAME> --name <APP_NAME> [--linux-fx-version 'PYTHON|3.12']",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/AppService/latest-version-of-python.html",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-general-policies/ensure-that-python-version-is-the-latest-if-used-to-run-the-web-app"
+    },
+    "Recommendation": {
+      "Text": "Azure Portal から: 1. Azure Home から左上の Portal Menu を開きます 2. App Services に移動します 3. 各アプリをクリックします 4. Settings セクションで Configuration をクリックします 5. General settings ペインで、Major Version と Minor Version が利用可能な最新の安定版（記載時点では Python 3.11）に設定されていることを確認します。注: Python version が Off の場合、Web アプリで Python を使用していないため対応は不要です。",
+      "Url": "https://learn.microsoft.com/en-us/azure/app-service/configure-language-python#configure-python-version"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "アプリがバージョン依存の機能やライブラリを使用している場合、最新バージョンでは利用できない可能性があります。アップグレードする場合は影響を十分に調査してください。アップグレードには予期しない結果が生じ、ダウンタイムにつながる可能性があります。"
+}

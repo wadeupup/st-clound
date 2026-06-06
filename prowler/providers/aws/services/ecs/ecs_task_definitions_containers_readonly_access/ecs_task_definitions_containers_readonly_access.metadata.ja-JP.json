@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "ecs_task_definitions_containers_readonly_access",
+  "CheckTitle": "ECS タスク定義のすべてのコンテナが読み取り専用ルートファイルシステムを持っている",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/CIS Host Hardening Benchmarks"
+  ],
+  "ServiceName": "ecs",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsEcsTaskDefinition",
+  "ResourceGroup": "container",
+  "Description": "Amazon ECS タスク定義は、`readonlyRootFilesystem` を通じてコンテナのルートファイルシステムが **読み取り専用** かどうかを指定します。この設定が欠落しているか `false` に設定されているコンテナは、実質的にルートファイルシステムへの書き込みアクセス権を持ちます。",
+  "Risk": "**書き込み可能なルートファイルシステム** により、ランタイムの改ざんと永続化が可能になります。攻撃者はバイナリや設定を変更し、インプラントを配置し、または重要なファイルを削除して、**整合性** と **可用性** を低下させることができます。書き込み可能なパスへのアクセスは、シークレットやログを暴露し、**機密性** を損ない、インシデント対応を複雑にする可能性があります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/config/latest/developerguide/ecs-containers-readonly-access.html",
+    "https://docs.aws.amazon.com/AmazonECS/latest/userguide/task_definition_parameters.html#container_definition_readonly",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/ecs-controls.html#ecs-5"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws ecs register-task-definition --family <task-family> --container-definitions '[{\"name\":\"<container-name>\",\"image\":\"<image>\",\"readonlyRootFilesystem\":true}]'",
+      "NativeIaC": "```yaml\n# CloudFormation: ECS task definition with read-only root filesystem\nResources:\n  <example_resource_name>:\n    Type: AWS::ECS::TaskDefinition\n    Properties:\n      Family: <example_resource_name>\n      ContainerDefinitions:\n        - Name: <example_resource_name>\n          Image: <image>\n          ReadonlyRootFilesystem: true  # Critical: enforces read-only root FS for the container\n```",
+      "Other": "1. AWS コンソールで、Amazon ECS > タスク定義に移動します\n2. タスクファミリー <task-family> を選択し、新しいリビジョンを作成をクリックします\n3. 各コンテナについて、編集して読み取り専用ルートファイルシステム（readonlyRootFilesystem = true）を有効にします\n4. 作成をクリックして新しいリビジョンを登録します\n5. （必要に応じて）サービスを更新して新しいリビジョンを使用します",
+      "Terraform": "```hcl\n# ECS task definition with read-only root filesystem\nresource \"aws_ecs_task_definition\" \"<example_resource_name>\" {\n  family                = \"<example_resource_name>\"\n  container_definitions = jsonencode([\n    {\n      name                   = \"<example_resource_name>\"\n      image                  = \"<image>\"\n      readonlyRootFilesystem = true  # Critical: enforces read-only root FS for the container\n    }\n  ])\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "コンテナに対して `readonlyRootFilesystem: true` を強制します。\n- アプリケーションに必要な特定のボリュームを通じてのみ書き込みアクセスを付与します\n- **最小権限** と **多層防御** を適用します：非 root ユーザーとして実行し、不要な機能を削除し、イメージを不変に保つことで、ランタイムの書き込みが不要になります",
+      "Url": "https://hub.prowler.com/check/ecs_task_definitions_containers_readonly_access"
+    }
+  },
+  "Categories": [
+    "container-security"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

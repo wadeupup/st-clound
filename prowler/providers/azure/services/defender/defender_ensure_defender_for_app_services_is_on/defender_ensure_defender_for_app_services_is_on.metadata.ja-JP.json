@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "defender_ensure_defender_for_app_services_is_on",
+  "CheckTitle": "Microsoft Defender for App Services が「オン」に設定されていることを確認する",
+  "CheckType": [],
+  "ServiceName": "defender",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AzureDefenderPlan",
+  "ResourceGroup": "security",
+  "Description": "Microsoft Defender for App Services が「オン」に設定されていることを確認する",
+  "Risk": "Microsoft Defender for App Service を有効化すると、App Service の脅威検知が有効になり、Microsoft Defender for Cloud において脅威インテリジェンス、異常検知、振る舞い分析を提供します。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/SecurityCenter/defender-app-service.html",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-general-policies/ensure-that-azure-defender-is-set-to-on-for-app-service#terraform"
+    },
+    "Recommendation": {
+      "Text": "既定では、Microsoft Defender for Cloud は App Service インスタンスに対して有効化されていません。App Service インスタンス向けに Defender セキュリティ サービスを有効化することで、Microsoft Security Response Center が提供する脅威検知機能を利用した高度なセキュリティ防御が可能になります。",
+      "Url": ""
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

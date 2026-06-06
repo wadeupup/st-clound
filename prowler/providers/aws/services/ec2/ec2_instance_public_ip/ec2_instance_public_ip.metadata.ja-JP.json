@@ -1,0 +1,36 @@
+{
+  "Provider": "aws",
+  "CheckID": "ec2_instance_public_ip",
+  "CheckTitle": "パブリック IP を持つ EC2 インスタンスを確認",
+  "CheckType": [
+    "Infrastructure Security"
+  ],
+  "ServiceName": "ec2",
+  "SubServiceName": "instance",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "medium",
+  "ResourceType": "AwsEc2Instance",
+  "ResourceGroup": "compute",
+  "Description": "パブリック IP を持つ EC2 インスタンスを確認",
+  "Risk": "EC2 をインターネットに直接公開すると、攻撃面が増加し、侵害のリスクが高まります",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "https://docs.prowler.com/checks/aws/public-policies/public_12#cloudformation",
+      "Other": "https://docs.prowler.com/checks/aws/public-policies/public_12#aws-console",
+      "Terraform": "https://docs.prowler.com/checks/aws/public-policies/public_12#terraform"
+    },
+    "Recommendation": {
+      "Text": "ALB を使用し、WAF ACL を適用してください。",
+      "Url": "https://aws.amazon.com/blogs/aws/aws-web-application-firewall-waf-for-application-load-balancers/"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

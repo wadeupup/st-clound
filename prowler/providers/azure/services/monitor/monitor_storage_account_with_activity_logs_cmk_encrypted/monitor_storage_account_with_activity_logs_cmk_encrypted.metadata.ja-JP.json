@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "monitor_storage_account_with_activity_logs_cmk_encrypted",
+  "CheckTitle": "アクティビティ ログを含むコンテナーのストレージ アカウントがカスタマー マネージド キーで暗号化されていることを確認する",
+  "CheckType": [],
+  "ServiceName": "monitor",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Monitor",
+  "ResourceGroup": "monitoring",
+  "Description": "アクティビティ ログのエクスポート先ストレージ アカウントは、カスタマー マネージド キー（CMK）を使用するよう構成できます。",
+  "Risk": "アクティビティ ログ エクスポート コンテナーのストレージ アカウントを CMK 利用に構成すると、ログ データに対する追加の機密性コントロールを提供できます。対象ユーザーは対応するストレージ アカウントの読み取り権限に加え、CMK による復号権限の付与が必要になります。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/security/benchmark/azure/security-controls-v3-data-protection#dp-5-encrypt-sensitive-data-at-rest",
+  "Remediation": {
+    "Code": {
+      "CLI": "az storage account update --name <name of the storage account> --resource-group <resource group for a storage account> --encryption-key-source=Microsoft.Keyvault --encryption-key-vault <Key Vault URI> --encryption-key-name <KeyName> --encryption-key-version <Key Version>",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity-staging/knowledge-base/azure/Monitor/use-cmk-for-activity-log-storage-container-encryption.html",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-general-policies/ensure-that-storage-accounts-use-customer-managed-key-for-encryption#terraform"
+    },
+    "Recommendation": {
+      "Text": "1. Activity log に移動します。2. Export を選択します。3. Subscription を選択します。4. Storage Account セクションでストレージ アカウント名を確認します。5. Export Audit Logs ブレードを閉じ、Monitor - Activity Log ブレードを閉じます。6. 右側の列で Storage Accounts サービスをクリックしてストレージ アカウント ブレードに移動します。7. 手順 4 で確認したストレージ アカウント名をクリックして、そのアカウント固有のブレードを開きます。8. Security + networking の下で Encryption をクリックします。9. Customer-managed keys が選択され、Key URI が設定されていることを確認します。",
+      "Url": "https://learn.microsoft.com/en-us/azure/azure-monitor/essentials/activity-log?tabs=cli#managing-legacy-log-profiles"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "注: この機能を利用するには、事前に Key Vault をセットアップしておく必要があります。すべての監査ログは、あなたが提供するキーで暗号化されます。カスタマー マネージド キーは別途設定する必要があり、本手順で使用するキーを選択します。キーのライフサイクル管理は利用者の責任となり、データを安全に保つために、独自に決めた間隔で手動ローテーションする必要があります。"
+}

@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "documentdb_cluster_multi_az_enabled",
+  "CheckTitle": "DocumentDB 集群已启用多可用区（Multi-AZ）",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices"
+  ],
+  "ServiceName": "documentdb",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsRdsDbCluster",
+  "ResourceGroup": "database",
+  "Description": "启用了 **Multi-AZ**（`multi_az`）的 **Amazon DocumentDB 集群**表示在多个可用区之间部署了一个主实例和一个或多个副本。",
+  "Risk": "如果未启用 Multi-AZ，集群会依赖单个可用区/实例。一旦可用区或节点故障（或维护），读写可能会完全中断，导致停机、超时以及 SLA 违约。可用性下降、恢复时间目标（RTO）升高，应用可能在创建替代容量之前持续出现失败或重试的事务。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/documentdb/latest/developerguide/failover.html",
+    "https://support.icompaas.com/support/solutions/articles/62000233690-ensure-documentdb-cluster-have-multi-az-enabled"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws docdb create-db-instance --db-instance-identifier <example_resource_id> --db-cluster-identifier <example_resource_id> --db-instance-class <INSTANCE_CLASS> --engine docdb --availability-zone <OTHER_AZ>",
+      "NativeIaC": "```yaml\n# CloudFormation: add a replica to enable Multi-AZ for an existing DocumentDB cluster\nResources:\n  DocDBReplica:\n    Type: AWS::DocDB::DBInstance\n    Properties:\n      DBClusterIdentifier: \"<example_resource_id>\"  # CRITICAL: adds a new instance to the cluster to achieve Multi-AZ\n      DBInstanceClass: \"<INSTANCE_CLASS>\"\n      AvailabilityZone: \"<OTHER_AZ>\"                # CRITICAL: place in a different AZ to provide Multi-AZ failover\n```",
+      "Other": "1. 在 AWS 控制台中，进入 Amazon DocumentDB 并打开目标集群\n2. 点击 Create instance\n3. 设置 Instance class 并选择与主实例不同的可用区（Availability Zone）\n4. 点击 Create 创建副本实例\n5. 验证集群现在显示已启用 Multi-AZ",
+      "Terraform": "```hcl\n# Add a replica to enable Multi-AZ for an existing DocumentDB cluster\nresource \"aws_docdb_cluster_instance\" \"<example_resource_name>\" {\n  cluster_identifier = \"<example_resource_id>\"  # CRITICAL: adds a new instance to the cluster to achieve Multi-AZ\n  instance_class     = \"<INSTANCE_CLASS>\"\n  availability_zone  = \"<OTHER_AZ>\"             # CRITICAL: different AZ ensures Multi-AZ failover\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "为 DocumentDB 启用 **Multi-AZ** 并将实例分布在不同的可用区。\n- 至少保留一个副本实例\n- 配置提升优先级以引导故障转移\n- 定期测试故障转移并在客户端实现健壮的重试机制\n\n这样可以构建**容错能力**并保持服务可用性。",
+      "Url": "https://hub.prowler.com/check/documentdb_cluster_multi_az_enabled"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+
+

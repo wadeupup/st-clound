@@ -1,0 +1,44 @@
+{
+  "Provider": "aws",
+  "CheckID": "cloudwatch_log_group_kms_encryption_enabled",
+  "CheckTitle": "CloudWatch ロググループが AWS KMS キーで暗号化されている",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Effects/Data Exposure"
+  ],
+  "ServiceName": "cloudwatch",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "monitoring",
+  "Description": "`kmsKeyId` を介して **AWS KMS キー** がロググループに関連付けられているかどうかを確認することで、**CloudWatch ロググループ** の **保存時暗号化** が評価されます。",
+  "Risk": "**カスタマーマネージド KMS キー** がない場合、ログはサービス管理の暗号化に依存し、制御性と監査性が制限されます。\n- 機密性：不正な読み取りに対するキーポリシーのバリアが弱い\n- 整合性/可用性：カスタムローテーションや迅速な取り消しができず、インシデント対応やコンプライアンスを妨げる",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/cli/latest/reference/logs/associate-kms-key.html",
+    "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_log_group",
+    "https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/logs/client/associate_kms_key.html",
+    "https://support.icompaas.com/support/solutions/articles/62000233436-ensure-cloudwatch-log-groups-are-protected-by-aws-kms",
+    "https://varunmanik1.medium.com/proactively-mitigating-a-medium-severity-prowler-issue-enabling-kms-encryption-for-cloudwatch-logs-51d43416c7fc"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws logs associate-kms-key --log-group-name <LOG_GROUP_NAME> --kms-key-id arn:aws:kms:<REGION>:<ACCOUNT_ID>:key/<KEY_ID>",
+      "NativeIaC": "```yaml\n# CloudFormation: Encrypt a CloudWatch Log Group with KMS\nResources:\n  <example_resource_name>:\n    Type: AWS::Logs::LogGroup\n    Properties:\n      KmsKeyId: arn:aws:kms:<REGION>:<ACCOUNT_ID>:key/<KEY_ID>  # Critical: associates a CMK to encrypt the log group\n```",
+      "Other": "1. AWS コンソールで CloudWatch > ロググループに移動します\n2. [ロググループの作成] をクリックし、名前を入力します\n3. [暗号化] で KMS キーを選択し、キー ARN を指定します\n4. [ロググループの作成] をクリックします\n5. 既存のロググループに対しては、コンソールから KMS キーを関連付けることはできないため、上記の CLI コマンドを使用します",
+      "Terraform": "```hcl\n# Encrypt a CloudWatch Log Group with KMS\nresource \"aws_cloudwatch_log_group\" \"<example_resource_name>\" {\n  name       = \"<example_resource_name>\"\n  kms_key_id = \"arn:aws:kms:<REGION>:<ACCOUNT_ID>:key/<KEY_ID>\" # Critical: associates a CMK to encrypt the log group\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "各ロググループに対して、`kmsKeyId` を介して **カスタマーマネージド KMS キー** を関連付けます。\n- キーポリシーと IAM ポリシーで **最小権限の原則** を適用し、`kms:Decrypt` を必要なプリンシパルのみに付与します\n- ローテーションを有効にし、キーの使用状況を監視します\n- アプリケーション/テナントごとにキーを分離し、**多層防御** と迅速な取り消しをサポートします",
+      "Url": "https://hub.prowler.com/check/cloudwatch_log_group_kms_encryption_enabled"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

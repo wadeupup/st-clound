@@ -1,0 +1,39 @@
+{
+  "Provider": "aws",
+  "CheckID": "appstream_fleet_session_disconnect_timeout",
+  "CheckTitle": "AppStream 队列会话断开超时为 5 分钟或更短",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践",
+    "软件和配置检查/行业和监管标准/CIS AWS 基础基准"
+  ],
+  "ServiceName": "appstream",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "compute",
+  "Description": "**AppStream 队列**根据 `DisconnectTimeoutInSeconds` 是否等于或低于 `300` 秒（5 分钟）进行评估，该设置定义了用户断开连接后流式传输会话保持活动状态的时间。",
+  "Risk": "较长的断开时间会使会话保持活动状态，从而可能发生**会话劫持**或在丢失/被盗设备上意外重新连接。这会增加数据暴露（机密性），允许未授权操作（完整性），并占用容量和成本（可用性/运营）。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/appstream2/latest/developerguide/set-up-stacks-fleets.html",
+    "https://awscli.amazonaws.com/v2/documentation/api/2.9.6/reference/appstream/update-fleet.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws appstream update-fleet --name <example_resource_name> --disconnect-timeout-in-seconds 300",
+      "NativeIaC": "```yaml\n# CloudFormation: 将 AppStream 队列断开超时设置为 5 分钟或更短\nResources:\n  ExampleFleet:\n    Type: AWS::AppStream::Fleet\n    Properties:\n      Name: <example_resource_name>\n      InstanceType: stream.standard.medium\n      ImageName: <example_image_name>\n      ComputeCapacity:\n        DesiredInstances: 1\n      DisconnectTimeoutInSeconds: 300  # 关键：确保会话断开超时 <= 300 秒\n```",
+      "Other": "1. 在 AWS 控制台中，转到 Amazon AppStream 2.0 > Fleets\n2. 选择队列 <example_resource_name> 并选择 Edit\n3. 将 Disconnect timeout 设置为 5 分钟（300 秒）或更短\n4. 保存更改",
+      "Terraform": "```hcl\n# Terraform: 将 AppStream 队列断开超时设置为 5 分钟或更短\nresource \"aws_appstream_fleet\" \"<example_resource_name>\" {\n  name          = \"<example_resource_name>\"\n  instance_type = \"stream.standard.medium\"\n  image_name    = \"<example_image_name>\"\n\n  compute_capacity {\n    desired_instances = 1\n  }\n\n  disconnect_timeout_in_seconds = 300  # 关键：确保超时 <= 300 秒\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "在所有队列中将 `DisconnectTimeoutInSeconds` 设置为 `300` 或更短。与较短的 `IdleDisconnectTimeoutInSeconds` 配对，要求在重新连接时重新进行身份验证，并强制执行**最小权限**。监控会话事件，并使用**纵深防御**（网络限制、设备状态）来降低接管风险。",
+      "Url": "https://hub.prowler.com/check/appstream_fleet_session_disconnect_timeout"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "Infrastructure Security"
+}
+

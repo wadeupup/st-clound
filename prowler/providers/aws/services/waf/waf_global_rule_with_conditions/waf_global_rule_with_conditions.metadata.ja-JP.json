@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "waf_global_rule_with_conditions",
+  "CheckTitle": "AWS WAF Classic Global ルールには少なくとも1つの条件があります",
+  "CheckType": [
+    "ソフトウェアおよび設定のチェック/AWS セキュリティのベストプラクティス/ネットワーク到達可能性",
+    "ソフトウェアと設定のチェック/業界および規制基準/AWS 基盤セキュリティのベストプラクティス",
+    "ソフトウェアおよび設定のチェック／業界および規制基準／NIST 800-53 管理策"
+  ],
+  "ServiceName": "waf",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsWafRule",
+  "ResourceGroup": "security",
+  "Description": "**AWS WAF Classic グローバルルール** には、ルールがアクション（例: `allow`、`block`、`count`）の評価対象とする HTTP(S) リクエストに一致する、少なくとも 1 つの **条件** が含まれます。",
+  "Risk": "**無条件ルール**はトラフィックに決して一致せず、フィルタリングを提供しません。悪意のあるリクエスト（SQLi/XSS、ボット）がオリジンに到達し、**機密性**（データ流出）、**完全性**（改ざん）、および **可用性**（サービス中断）に影響を及ぼす可能性があります。また、保護範囲がカバーされているという誤った安心感を生み出す可能性もあります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/waf/latest/developerguide/classic-web-acl-rules-editing.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/waf-controls.html#waf-6",
+    "https://docs.aws.amazon.com/config/latest/developerguide/waf-global-rule-not-empty.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws waf update-rule --rule-id <example_resource_id> --change-token <example_change_token> --updates '[{\"Action\":\"INSERT\",\"Predicate\":{\"Negated\":false,\"Type\":\"IPMatch\",\"DataId\":\"<example_resource_id>\"}}]' --region us-east-1",
+      "NativeIaC": "```yaml\n# CloudFormation: WAF Classic Global ルールに少なくとも1つの条件があることを確認してください\nResources:\n  <example_resource_name>:\n    Type: AWS::WAF::Rule\n    Properties:\n      Name: <example_resource_name>\n      MetricName: <example_metric_name>\n      # 重要: ルールが空にならないように、少なくとも1つの述語（条件）を追加してください\n      Predicates:\n        - Negated: false  # そのまま評価してください\n          Type: IPMatch\n          DataId: <example_resource_id>  # 既存のIPSet ID\n```",
+      "Other": "1. AWS Console > AWS WAF を開き、次に Switch to AWS WAF Classic をクリックします\n2. Global (CloudFront) スコープで、Rules に移動して対象のルールを選択します\n3. Edit（または Add rule）> Add condition をクリックします\n4. 条件タイプ（例: IP match）を選択し、既存の条件を選び、それを does（not negated）に設定します\n5. Update/Save をクリックして適用します",
+      "Terraform": "```hcl\n# WAF Classic Global ルールに少なくとも 1 つの条件があることを確認してください\nresource \"aws_waf_rule\" \"<example_resource_name>\" {\n  name        = \"<example_resource_name>\"\n  metric_name = \"<example_metric_name>\"\n\n  # 重要: ルールが空にならないように、少なくとも1つの述語（条件）を追加してください\n  predicate {\n    data_id = \"<example_resource_id>\"  # 既存のIPSet ID\n    negated = false\n    type    = \"IPMatch\"\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "すべてのルールに、既知の脅威とアプリケーションのコンテキストに沿った、少なくとも1つの正確な**条件**を付加してください。トラフィックには**最小権限**を適用し、**多層防御**のためにマネージドルールグループを使用し、プレースホルダーを削除するためにルールを定期的に見直してください。*Classic を使用している場合*は、WAFv2 への移行を計画してください。",
+      "Url": "https://hub.prowler.com/check/waf_global_rule_with_conditions"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "dms_replication_task_source_logging_enabled",
+  "CheckTitle": "DMS 复制任务已启用日志记录且 SOURCE_CAPTURE 与 SOURCE_UNLOAD 组件的严重级别至少为 Default",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "TTPs/Defense Evasion"
+  ],
+  "ServiceName": "dms",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsDmsReplicationTask",
+  "ResourceGroup": "database",
+  "Description": "**AWS DMS 复制任务** 已启用 **日志记录**，并将 `SOURCE_CAPTURE` 和 `SOURCE_UNLOAD` 的严重级别配置为至少 `LOGGER_SEVERITY_DEFAULT`（或更高，例如 `LOGGER_SEVERITY_DEBUG`、`LOGGER_SEVERITY_DETAILED_DEBUG`）。",
+  "Risk": "缺失或过低的源端日志严重级别会削弱对 **CDC** 和全量加载活动的可见性，可能导致错误、停滞或篡改未被发现。这会引起无声的 **数据漂移**、数据血缘断裂和恢复失败，从而削弱 **完整性** 与 **可用性**，并在审计和调查中降低可追溯性。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/dms/latest/userguide/CHAP_Monitoring.html",
+    "https://repost.aws/knowledge-center/dms-debug-logging",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/dms-controls.html#dms-8"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws dms modify-replication-task --replication-task-arn <example_resource_arn> --replication-task-settings '{\"Logging\":{\"EnableLogging\":true,\"LogComponents\":[{\"Id\":\"SOURCE_CAPTURE\",\"Severity\":\"LOGGER_SEVERITY_DEFAULT\"},{\"Id\":\"SOURCE_UNLOAD\",\"Severity\":\"LOGGER_SEVERITY_DEFAULT\"}]}}'",
+      "NativeIaC": "```yaml\n# CloudFormation：以至少 DEFAULT 严重级别启用 DMS 源端日志\nResources:\n  <example_resource_name>:\n    Type: AWS::DMS::ReplicationTask\n    Properties:\n      ReplicationInstanceArn: <example_resource_arn>\n      SourceEndpointArn: <example_resource_arn>\n      TargetEndpointArn: <example_resource_arn>\n      MigrationType: full-load\n      TableMappings: '{\"rules\":[]}'\n      # 关键：启用日志记录并将 SOURCE 组件设置为至少 DEFAULT\n      ReplicationTaskSettings: |\n        {\n          \"Logging\": {\n            \"EnableLogging\": true,\n            \"LogComponents\": [\n              {\"Id\": \"SOURCE_CAPTURE\", \"Severity\": \"LOGGER_SEVERITY_DEFAULT\"},\n              {\"Id\": \"SOURCE_UNLOAD\", \"Severity\": \"LOGGER_SEVERITY_DEFAULT\"}\n            ]\n          }\n        }\n```",
+      "Other": "1. 在 AWS 控制台中，前往 Database Migration Service > Database migration tasks\n2. 选择任务并点击 Modify\n3. 点击 Modify task logging\n4. 打开 Enable logging\n5. 将 SOURCE_CAPTURE 和 SOURCE_UNLOAD 的 Severity 设置为 Default（或更高）\n6. 保存/修改以应用",
+      "Terraform": "```hcl\n# 以至少 DEFAULT 严重级别启用 DMS 源端日志\nresource \"aws_dms_replication_task\" \"<example_resource_name>\" {\n  replication_instance_arn = \"<example_resource_arn>\"\n  source_endpoint_arn      = \"<example_resource_arn>\"\n  target_endpoint_arn      = \"<example_resource_arn>\"\n  migration_type           = \"full-load\"\n  table_mappings           = \"{\\\"rules\\\":[]}\"\n\n  # 关键：启用日志记录并将 SOURCE 组件设置为至少 DEFAULT\n  replication_task_settings = <<JSON\n{\n  \"Logging\": {\n    \"EnableLogging\": true,\n    \"LogComponents\": [\n      {\"Id\": \"SOURCE_CAPTURE\", \"Severity\": \"LOGGER_SEVERITY_DEFAULT\"},\n      {\"Id\": \"SOURCE_UNLOAD\", \"Severity\": \"LOGGER_SEVERITY_DEFAULT\"}\n    ]\n  }\n}\nJSON\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "为 `SOURCE_CAPTURE` 和 `SOURCE_UNLOAD` 启用并统一标准化 **任务日志记录**，将严重级别设置为 `LOGGER_SEVERITY_DEFAULT` 或更高。\n- 集中收集日志并对异常告警\n- 对日志访问实施 **最小权限** 控制\n- 配置足够的日志保留以支持审计\n- 避免长时间使用 `DEBUG` 级别，*仅在排障期间临时启用*，以平衡可见性与成本",
+      "Url": "https://hub.prowler.com/check/dms_replication_task_source_logging_enabled"
+    }
+  },
+  "Categories": [
+    "logging"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+
+

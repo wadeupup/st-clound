@@ -1,0 +1,34 @@
+{
+  "Provider": "aws",
+  "CheckID": "ec2_securitygroup_from_launch_wizard",
+  "CheckTitle": "EC2 起動ウィザードによって作成されたセキュリティグループ",
+  "CheckType": [
+    "Infrastructure Security"
+  ],
+  "ServiceName": "ec2",
+  "SubServiceName": "securitygroup",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "medium",
+  "ResourceType": "AwsEc2SecurityGroup",
+  "ResourceGroup": "network",
+  "Description": "EC2 起動ウィザードによって作成されたセキュリティグループ。",
+  "Risk": "EC2 ウィザードを使用して AWS コンソールで作成されたセキュリティグループは、0.0.0.0/0 からポート 22 へのアクセスを許可する可能性があります。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/EC2/security-group-prefixed-with-launch-wizard.html",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "ゼロトラストアプローチを適用します。EC2 ウィザードによって作成されたセキュリティグループをスキャンして修復するプロセスを実装します。推奨されるベストプラクティスは、承認されたセキュリティグループを使用することです。",
+      "Url": "https://docs.aws.amazon.com/eks/latest/userguide/sec-group-reqs.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

@@ -1,0 +1,44 @@
+{
+  "Provider": "aws",
+  "CheckID": "cloudwatch_changes_to_network_acls_alarm_configured",
+  "CheckTitle": "存在用于网络 ACL (NACL) 更改事件的 CloudWatch 日志指标过滤器和警报",
+  "CheckType": [
+    "Software and Configuration Checks/Industry and Regulatory Standards/CIS AWS Foundations Benchmark",
+    "Software and Configuration Checks/AWS Security Best Practices/Runtime Behavior Analysis"
+  ],
+  "ServiceName": "cloudwatch",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsCloudWatchAlarm",
+  "ResourceGroup": "monitoring",
+  "Description": "CloudTrail 记录的 **网络 ACL 更改** 由 CloudWatch Logs 指标过滤器匹配，并关联警报以监控 `CreateNetworkAcl`、`CreateNetworkAclEntry`、`DeleteNetworkAcl`、`DeleteNetworkAclEntry`、`ReplaceNetworkAclEntry` 和 `ReplaceNetworkAclAssociation` 等事件。",
+  "Risk": "缺少对 **NACL 更改** 的监控会降低对策略篡改的检测，存在 **机密性** 损失风险（开放入口/出口）、网络 **完整性** 降低（横向移动、绕过分段）以及 **可用性** 降低（流量黑洞或锁定）。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudwatch-alarms-for-cloudtrail.html",
+    "https://www.clouddefense.ai/compliance-rules/cis-v130/monitoring/cis-v130-4-11",
+    "https://support.icompaas.com/support/solutions/articles/62000084031-ensure-a-log-metric-filter-and-alarm-exist-for-changes-to-network-access-control-lists-nacl-",
+    "https://trendmicro.com/cloudoneconformity/knowledge-base/aws/CloudWatchLogs/network-acl-changes-alarm.html",
+    "https://support.icompaas.com/support/solutions/articles/62000233134-4-11-ensure-network-access-control-list-nacl-changes-are-monitored-manual-"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation to alert on NACL changes\nResources:\n  MetricFilter:\n    Type: AWS::Logs::MetricFilter\n    Properties:\n      LogGroupName: \"<example_resource_name>\"  # CRITICAL: CloudTrail log group to monitor\n      FilterPattern: '{ ($.eventName = CreateNetworkAcl) || ($.eventName = CreateNetworkAclEntry) || ($.eventName = DeleteNetworkAcl) || ($.eventName = DeleteNetworkAclEntry) || ($.eventName = ReplaceNetworkAclEntry) || ($.eventName = ReplaceNetworkAclAssociation) }'  # CRITICAL: detects NACL changes\n      MetricTransformations:\n        - MetricValue: \"1\"\n          MetricNamespace: \"CISBenchmark\"\n          MetricName: \"nacl_changes\"\n\n  NaclChangesAlarm:\n    Type: AWS::CloudWatch::Alarm\n    Properties:\n      AlarmName: \"nacl_changes\"\n      ComparisonOperator: GreaterThanOrEqualToThreshold\n      EvaluationPeriods: 1\n      MetricName: \"nacl_changes\"   # CRITICAL: alarm targets the metric from the filter\n      Namespace: \"CISBenchmark\"\n      Period: 300\n      Statistic: Sum\n      Threshold: 1\n```",
+      "Other": "1. 在 AWS 控制台中，转到 CloudWatch > 日志组并打开 CloudTrail 日志组\n2. 指标过滤器选项卡 > 创建指标过滤器\n3. 将过滤器模式设置为：\n   { ($.eventName = CreateNetworkAcl) || ($.eventName = CreateNetworkAclEntry) || ($.eventName = DeleteNetworkAcl) || ($.eventName = DeleteNetworkAclEntry) || ($.eventName = ReplaceNetworkAclEntry) || ($.eventName = ReplaceNetworkAclAssociation) }\n4. 下一步 > 过滤器名称：nacl_changes；指标命名空间：CISBenchmark；指标名称：nacl_changes；指标值：1 > 创建指标过滤器\n5. 选择新的指标过滤器 > 创建警报\n6. 设置统计：总和，周期：5 分钟，阈值类型：静态，条件：大于/等于，阈值：1\n7. 下一步通过操作（可选）> 名称：nacl_changes > 创建警报",
+      "Terraform": "```hcl\n# CloudWatch metric filter and alarm for NACL changes\nresource \"aws_cloudwatch_log_metric_filter\" \"nacl\" {\n  name           = \"nacl_changes\"\n  log_group_name = \"<example_resource_name>\"  # CloudTrail log group\n  pattern        = \"{ ($.eventName = CreateNetworkAcl) || ($.eventName = CreateNetworkAclEntry) || ($.eventName = DeleteNetworkAcl) || ($.eventName = DeleteNetworkAclEntry) || ($.eventName = ReplaceNetworkAclEntry) || ($.eventName = ReplaceNetworkAclAssociation) }\"  # CRITICAL: detects NACL changes\n\n  metric_transformation {\n    name      = \"nacl_changes\"\n    namespace = \"CISBenchmark\"\n    value     = \"1\"\n  }\n}\n\nresource \"aws_cloudwatch_metric_alarm\" \"nacl\" {\n  alarm_name          = \"nacl_changes\"\n  comparison_operator = \"GreaterThanOrEqualToThreshold\"\n  evaluation_periods  = 1\n  metric_name         = \"nacl_changes\"   # CRITICAL: alarm targets the metric from the filter\n  namespace           = \"CISBenchmark\"\n  period              = 300\n  statistic           = \"Sum\"\n  threshold           = 1\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "为来自 CloudTrail 的 NACL 更改事件实施 CloudWatch Logs 指标过滤器和警报，并将警报路由到响应者。对 NACL 管理强制执行 **最小权限原则**，要求 **变更控制**，并使用 **纵深防御** 配合配置监控和流日志来验证和监控网络状态。",
+      "Url": "https://hub.prowler.com/check/cloudwatch_changes_to_network_acls_alarm_configured"
+    }
+  },
+  "Categories": [
+    "logging"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "Logging and Monitoring"
+}
+

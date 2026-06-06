@@ -1,0 +1,32 @@
+{
+  "Provider": "aws",
+  "CheckID": "cognito_user_pool_client_prevent_user_existence_errors",
+  "CheckTitle": "Amazon Cognito ユーザープールはユーザー存在エラーを防ぐ必要がある",
+  "CheckType": [],
+  "ServiceName": "cognito",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:aws:cognito-idp:region:account:userpool/userpool-id",
+  "Severity": "medium",
+  "ResourceType": "AwsCognitoUserPoolClient",
+  "ResourceGroup": "IAM",
+  "Description": "Amazon Cognito ユーザープールは、ユーザー存在エラーを防ぐように設定する必要があります。この設定により、ユーザーがサインインするためにユーザー名とパスワードを入力する必要があるため、ユーザー存在エラーが防止されます。ユーザーが存在しない場合、ユーザーはエラーメッセージを受け取ります。",
+  "Risk": "ユーザー存在エラーを明らかにすることは、攻撃者がシステムにユーザーが存在するかどうかを判断できるため、セキュリティリスクになる可能性があります。これは、ユーザー列挙攻撃を実行するために使用できます。",
+  "RelatedUrl": "https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pool-managing-errors.html",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "ユーザー存在エラーを防ぐには、Amazon Cognito ユーザープールを設定して、サインインするためにユーザー名とパスワードを要求する必要があります。ユーザーが存在しない場合、ユーザーはエラーメッセージを受け取ります。",
+      "Url": "https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pool-managing-errors.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "defender_ensure_defender_for_azure_sql_databases_is_on",
+  "CheckTitle": "Microsoft Defender for Azure SQL Databases が「オン」に設定されていることを確認する",
+  "CheckType": [],
+  "ServiceName": "defender",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AzureDefenderPlan",
+  "ResourceGroup": "security",
+  "Description": "Microsoft Defender for Azure SQL Databases が「オン」に設定されていることを確認する",
+  "Risk": "Microsoft Defender for Azure SQL Databases を有効化すると、Azure SQL データベース サーバーの脅威検知が有効になり、Microsoft Defender for Cloud において脅威インテリジェンス、異常検知、振る舞い分析を提供します。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/SecurityCenter/defender-azure-sql.html",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-general-policies/ensure-that-azure-defender-is-set-to-on-for-azure-sql-database-servers#terraform"
+    },
+    "Recommendation": {
+      "Text": "既定では、Microsoft Defender for Cloud はすべての SQL データベース サーバーで無効化されています。Defender for Cloud は SQL インジェクション、ブルートフォース攻撃、権限乱用などの脅威を監視します。このセキュリティ サービスは、不審なアクティビティの詳細と脅威を緩和する方法を含む、アクション指向のセキュリティ アラートを提供します。",
+      "Url": ""
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

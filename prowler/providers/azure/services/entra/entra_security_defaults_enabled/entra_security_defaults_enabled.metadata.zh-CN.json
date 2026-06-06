@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "entra_security_defaults_enabled",
+  "CheckTitle": "确保在 Microsoft Entra ID 中启用安全默认值",
+  "CheckType": [],
+  "ServiceName": "entra",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "#microsoft.graph.identitySecurityDefaultsEnforcementPolicy",
+  "ResourceGroup": "security",
+  "Description": "Microsoft Entra ID 的安全默认值可让组织更容易保持安全并提供保护。安全默认值包含针对常见攻击的预配置安全设置。安全默认值对所有人可用，其目标是在无额外成本的情况下，确保所有组织都启用基础安全级别。你可以在 Azure 门户中开启安全默认值。",
+  "Risk": "安全默认值提供由我们代表组织管理的安全默认设置，在客户准备好自行管理身份安全设置之前帮助保障安全。例如：- 要求所有用户和管理员注册 MFA。- 在必要时（基于位置、设备、角色和任务等因素）向用户发起 MFA 质询。- 禁用来自旧版身份验证客户端（无法执行 MFA）的身份验证。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/entra/fundamentals/security-defaults",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/ActiveDirectory/security-defaults-enabled.html#",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "1. 在 Azure Home 中选择 Portal Menu。2. 浏览到 Microsoft Entra ID > Properties 3. 选择 Manage security defaults 4. 将 Enable security defaults 设置为 Enabled 5. 选择 Save",
+      "Url": "https://techcommunity.microsoft.com/t5/microsoft-entra-blog/introducing-security-defaults/ba-p/1061414"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "此建议应先行实施，之后可由其他服务/产品特定的 CIS 基准覆盖。管理员还应注意，Microsoft Entra ID 中某些配置可能会影响 Microsoft 365 等其他 Microsoft 服务。"
+}

@@ -1,0 +1,32 @@
+{
+  "Provider": "aws",
+  "CheckID": "cognito_user_pool_deletion_protection_enabled",
+  "CheckTitle": "确保 Cognito 用户池启用删除保护以防止意外删除",
+  "CheckType": [],
+  "ServiceName": "cognito",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:aws:cognito-idp:region:account:userpool/userpool-id",
+  "Severity": "medium",
+  "ResourceType": "AwsCognitoUserPool",
+  "ResourceGroup": "IAM",
+  "Description": "删除保护是一项功能，允许您锁定用户池以防止其被删除。启用删除保护后，您无法删除用户池。默认情况下，删除保护处于禁用状态",
+  "Risk": "如果未启用删除保护，任何具有必要权限的用户都可以删除用户池。这可能导致数据丢失和服务中断",
+  "RelatedUrl": "https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-settings-deletion-protection.html",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "应为用户池启用删除保护以防止意外删除",
+      "Url": "https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-settings-deletion-protection.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

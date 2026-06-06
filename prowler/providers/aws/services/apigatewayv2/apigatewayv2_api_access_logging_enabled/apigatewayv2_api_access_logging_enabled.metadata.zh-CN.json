@@ -1,0 +1,45 @@
+{
+  "Provider": "aws",
+  "CheckID": "apigatewayv2_api_access_logging_enabled",
+  "CheckTitle": "API Gateway V2 API 阶段已启用访问日志记录",
+  "CheckAliases": [
+    "apigatewayv2_access_logging_enabled"
+  ],
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践"
+  ],
+  "ServiceName": "apigatewayv2",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsApiGatewayV2Stage",
+  "ResourceGroup": "api_gateway",
+  "Description": "**API Gateway v2** 阶段配置了**访问日志记录**，以捕获请求详细信息并将其传递到日志记录目标（例如，CloudWatch Logs 或 Firehose）。该评估检查每个 API 阶段是否启用了日志记录。",
+  "Risk": "没有访问日志，API 调用缺乏可追溯性，难以发现凭据滥用、路由滥用或异常流量。\n\n这会通过未检测到的数据访问或操作降低机密性和完整性，并通过减慢事件响应影响可用性。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/apigateway/latest/developerguide/security-monitoring.html",
+    "https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-logging.html",
+    "https://support.icompaas.com/support/solutions/articles/62000229562-ensure-api-gateway-v2-has-access-logging-enabled",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/APIGateway/api-gateway-stage-access-logging.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws apigatewayv2 update-stage --api-id <API_ID> --stage-name <STAGE_NAME> --access-log-settings DestinationArn=<LOG_GROUP_ARN>,Format='{\"requestId\":\"$context.requestId\"}'",
+      "NativeIaC": "```yaml\n# CloudFormation: 在 API Gateway V2 阶段启用访问日志记录\nResources:\n  <example_resource_name>:\n    Type: AWS::ApiGatewayV2::Stage\n    Properties:\n      ApiId: <example_resource_id>\n      StageName: <example_resource_name>\n      AccessLogSettings: # 关键：为阶段启用访问日志记录\n        DestinationArn: <example_log_group_arn> # CloudWatch Logs 日志组 ARN\n        Format: '{\"requestId\":\"$context.requestId\"}' # 最小必需格式\n```",
+      "Other": "1. 在 AWS 控制台中，转到 API Gateway > 您的 HTTP/WebSocket API\n2. 打开 Stages 并选择目标阶段\n3. 在 Access logging 中，启用 Access logging\n4. 将 Log destination ARN 设置为您的 CloudWatch 日志组（或 Firehose 流）\n5. 将 Log format 设置为：{\"requestId\":\"$context.requestId\"}\n6. 单击 Save",
+      "Terraform": "```hcl\n# Terraform: 在 API Gateway V2 阶段启用访问日志记录\nresource \"aws_apigatewayv2_stage\" \"<example_resource_name>\" {\n  api_id = \"<example_resource_id>\"\n  name   = \"<example_resource_name>\"\n\n  access_log_settings { # 关键：为阶段启用访问日志记录\n    destination_arn = \"<example_log_group_arn>\"\n    format          = \"{\\\"requestId\\\":\\\"$context.requestId\\\"}\"\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "启用**阶段级访问日志记录**到集中式目标，并使用结构化格式。应用适当的保留期，并根据**最小权限**限制日志访问。将日志与监控和警报集成以检测异常，并辅以**纵深防御**控制。",
+      "Url": "https://hub.prowler.com/check/apigatewayv2_api_access_logging_enabled"
+    }
+  },
+  "Categories": [
+    "logging"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

@@ -1,0 +1,36 @@
+{
+  "Provider": "aws",
+  "CheckID": "datasync_task_logging_enabled",
+  "CheckTitle": "DataSync タスクでロギングが有効になっている必要がある",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices"
+  ],
+  "ServiceName": "datasync",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:aws:datasync:{region}:{account-id}:task/{task-id}",
+  "Severity": "high",
+  "ResourceType": "AwsDataSyncTask",
+  "ResourceGroup": "storage",
+  "Description": "このコントロールは、AWS DataSync タスクでロギングが有効になっているかどうかを確認します。タスクに CloudWatchLogGroupArn プロパティが定義されていない場合、コントロールは失敗します。",
+  "Risk": "ロギングが有効になっていない場合、重要な運用データが失われる可能性があり、問題のトラブルシューティング、パフォーマンスの監視、監査要件への準拠の確保が困難になります。",
+  "RelatedUrl": "https://docs.aws.amazon.com/datasync/latest/userguide/monitor-datasync.html#enable-logging",
+  "Remediation": {
+    "Code": {
+      "CLI": "aws datasync update-task --task-arn <task-arn> --cloud-watch-log-group-arn <log-group-arn>",
+      "NativeIaC": "",
+      "Other": "https://docs.aws.amazon.com/datasync/latest/userguide/monitor-datasync.html#enable-logging",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "DataSync タスクのロギングを設定して、運用データがキャプチャされ、デバッグ、監視、監査の目的で利用できるようにします。",
+      "Url": "https://docs.aws.amazon.com/datasync/latest/userguide/monitor-datasync.html#enable-logging"
+    }
+  },
+  "Categories": [
+    "logging"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

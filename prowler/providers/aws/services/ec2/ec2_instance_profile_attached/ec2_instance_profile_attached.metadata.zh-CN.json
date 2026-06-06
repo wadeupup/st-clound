@@ -1,0 +1,34 @@
+{
+  "Provider": "aws",
+  "CheckID": "ec2_instance_profile_attached",
+  "CheckTitle": "确保使用 IAM 实例角色从实例访问 AWS 资源",
+  "CheckType": [
+    "Software and Configuration Checks/Industry and Regulatory Standards/CIS AWS Foundations Benchmark"
+  ],
+  "ServiceName": "ec2",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "medium",
+  "ResourceType": "AwsEc2Instance",
+  "ResourceGroup": "compute",
+  "Description": "确保使用 IAM 实例角色从实例访问 AWS 资源",
+  "Risk": "从 AWS 实例内部访问 AWS 可以通过将 AWS 密钥编码到 AWS API 调用中，或者通过将实例分配给具有适当权限策略的角色来完成。AWS IAM 角色降低了与共享和轮换可在 AWS 外部使用的凭据相关的风险。如果凭据被泄露，它们可以从 AWS 账户外部使用。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://github.com/cloudmatos/matos/tree/master/remediations/aws/ec2/attach_iam_roles_ec2_instances",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "如有必要，创建 IAM 实例角色并将其附加到相应的 EC2 实例。",
+      "Url": "http://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_switch-role-ec2.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

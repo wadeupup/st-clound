@@ -1,0 +1,49 @@
+{
+  "Provider": "aws",
+  "CheckID": "ecs_task_definitions_host_networking_mode_users",
+  "CheckTitle": "Amazon ECS タスク定義がホストネットワークモードを使用していない、または非特権コンテナが非 root ユーザーを指定している",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices/Network Reachability",
+    "Software and Configuration Checks/AWS Security Best Practices/Runtime Behavior Analysis",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/CIS Host Hardening Benchmarks",
+    "TTPs/Privilege Escalation",
+    "TTPs/Lateral Movement"
+  ],
+  "ServiceName": "ecs",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsEcsTaskDefinition",
+  "ResourceGroup": "container",
+  "Description": "`host` ネットワークモードの **Amazon ECS タスク定義** について、`privileged=false` でコンテナ `user` が `root` または未設定のコンテナが評価されます。",
+  "Risk": "ホストネットワークを共有すると、コンテナがホストインターフェースに直接アクセスできるようになります。**root** ユーザー（またはユーザーが設定されていない）として実行すると、低ポートへのバインド、トラフィックのスニッフィング、またはサービスのなりすましの可能性が増加し、カーネルの欠陥がより悪用しやすくなります - データ窃取、改ざん、中断を可能にし、**機密性**、**整合性**、および **可用性** に影響を与えます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-networking.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/ecs-controls.html#ecs-6",
+    "https://docs.aws.amazon.com/config/latest/developerguide/ecs-task-definition-user-for-host-mode-check.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/ecs-controls.html",
+    "https://docs.aws.amazon.com/AmazonECS/latest/developerguide/update-task-definition-console-v2.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation: ECS task definition not using host network mode\nResources:\n  <example_resource_name>:\n    Type: AWS::ECS::TaskDefinition\n    Properties:\n      NetworkMode: awsvpc  # CRITICAL: avoids host mode to pass the check\n      ContainerDefinitions:\n        - Name: <example_resource_name>\n          Image: <image>\n```",
+      "Other": "1. Amazon ECS コンソールを開き、タスク定義に移動します\n2. タスク定義を選択し、最新のリビジョンを選択します\n3. 新しいリビジョンを作成をクリックします\n4. ネットワークモードを awsvpc（host ではない）に設定します\n5. リビジョンを保存し、サービスで使用されている場合は、サービスをこの新しいリビジョンに更新します\n6. host モードを維持する必要がある場合：各非特権コンテナを編集し、ユーザーを非 root 値（例：1000）に設定し、新しいリビジョンを保存します",
+      "Terraform": "```hcl\n# ECS task definition not using host network mode\nresource \"aws_ecs_task_definition\" \"<example_resource_name>\" {\n  family                = \"<example_resource_name>\"\n  network_mode          = \"awsvpc\"  # CRITICAL: avoids host mode to pass the check\n  container_definitions = jsonencode([\n    {\n      name  = \"<example_resource_name>\"\n      image = \"nginx\"\n    }\n  ])\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "分離のために **`awsvpc`** を優先します。`host` が必要な場合は、**最小権限** を強制します：\n- 非 root `user` として実行します\n- 厳密に正当化されない限り `privileged` を避けます\n- 機能と公開されたポートを制限します\n\nネットワークセグメンテーションと最小限の IAM 権限で **多層防御** を適用します。",
+      "Url": "https://hub.prowler.com/check/ecs_task_definitions_host_networking_mode_users"
+    }
+  },
+  "Categories": [
+    "container-security",
+    "trust-boundaries"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

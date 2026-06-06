@@ -1,0 +1,38 @@
+{
+  "Provider": "aws",
+  "CheckID": "ec2_networkacl_allow_ingress_any_port",
+  "CheckTitle": "确保没有网络 ACL 允许从 0.0.0.0/0 到任何端口的入站访问",
+  "CheckType": [
+    "Software and Configuration Checks",
+    "Industry and Regulatory Standards",
+    "CIS AWS Foundations Benchmark"
+  ],
+  "ServiceName": "ec2",
+  "SubServiceName": "networkacl",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "medium",
+  "ResourceType": "AwsEc2NetworkAcl",
+  "ResourceGroup": "network",
+  "Description": "确保没有网络 ACL 允许从 0.0.0.0/0 到任何端口的入站访问",
+  "Risk": "即使有边界防火墙，开放网络 ACL 也允许任何具有 VPC 访问权限的用户或恶意软件扫描已知和敏感端口并获得对实例的访问权限。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "应用零信任方法。实施一个流程来扫描和修复不受限制或过于宽松的网络 ACL。推荐的最佳实践是缩小所需最小端口的定义范围。",
+      "Url": "https://docs.aws.amazon.com/vpc/latest/userguide/vpc-network-acls.html"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "Infrastructure Security"
+}
+

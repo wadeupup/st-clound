@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "sqlserver_auditing_retention_90_days",
+  "CheckTitle": "确保“Auditing”保留期“大于 90 天”",
+  "CheckType": [],
+  "ServiceName": "sqlserver",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "SQLServer",
+  "ResourceGroup": "database",
+  "Description": "SQL Server 审计保留期应配置为大于 90 天。",
+  "Risk": "审计日志可用于检查异常，并为疑似入侵、信息滥用或访问滥用提供洞察。",
+  "RelatedUrl": "https://docs.microsoft.com/en-us/azure/sql-database/sql-database-auditing",
+  "Remediation": {
+    "Code": {
+      "CLI": "Set-AzSqlServerAudit -ResourceGroupName resource_group_name -ServerName SQL_Server_name -RetentionInDays 100 -LogAnalyticsTargetState Enabled -WorkspaceResourceId '/subscriptions/subscription_ID/resourceGroups/insights-integration/providers/Microsoft.OperationalInsights/workspaces/workspace_name'",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity-staging/knowledge-base/azure/Sql/auditing-retention.html#",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-logging-policies/bc_azr_logging_3"
+    },
+    "Recommendation": {
+      "Text": "1. 进入 SQL servers。2. 对每个服务器实例。3. 点击 Auditing。4. 若选择了 storage，展开 Advanced properties。5. 将 Retention (days) 设置为大于 90 天，或设为 0（无限保留）。6. 选择 Save。",
+      "Url": "https://learn.microsoft.com/en-us/purview/audit-log-retention-policies"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "elbv2_ssl_listeners",
+  "CheckTitle": "ELBv2 Application Load Balancer 监听器使用 HTTPS 或将 HTTP 重定向到 HTTPS",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Effects/Data Exposure"
+  ],
+  "ServiceName": "elbv2",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsElbv2LoadBalancer",
+  "ResourceGroup": "network",
+  "Description": "会评估 **Application Load Balancer 监听器**是否实现**加密入口流量**：要么仅存在 `HTTPS` 监听器，要么任意 `HTTP` 监听器都会重定向到 `HTTPS`。",
+  "Risk": "暴露的 `HTTP` 路径会使流量以明文传输，导致拦截、凭证窃取、会话劫持和响应篡改。这会削弱机密性与完整性，并使公共或共享网络上的 **MITM** 攻击成为可能。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/elb-controls.html#elb-1",
+    "https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws elbv2 modify-listener --listener-arn <listener_arn> --default-actions '[{\"Type\":\"redirect\",\"RedirectConfig\":{\"Protocol\":\"HTTPS\",\"Port\":\"443\",\"StatusCode\":\"HTTP_301\"}}]'",
+      "NativeIaC": "```yaml\n# CloudFormation: Redirect HTTP listener to HTTPS\nResources:\n  <example_resource_name>:\n    Type: AWS::ElasticLoadBalancingV2::Listener\n    Properties:\n      LoadBalancerArn: <example_resource_id>\n      Protocol: HTTP\n      Port: 80\n      DefaultActions:\n        - Type: redirect\n          RedirectConfig:\n            Protocol: HTTPS  # Critical: redirect HTTP to HTTPS\n            Port: '443'      # Critical: target HTTPS port\n            StatusCode: HTTP_301  # Critical: enforce redirect\n```",
+      "Other": "1. 打开 EC2 控制台并进入 Load Balancers\n2. 选择 Application Load Balancer 并打开 Listeners 标签\n3. 选择 HTTP:80 监听器并点击 Edit（或 View/edit rules）\n4. 将默认动作设置为 Redirect to，Protocol: HTTPS，Port: 443，Status code: HTTP_301\n5. 保存更改",
+      "Terraform": "```hcl\n# Terraform: Redirect HTTP listener to HTTPS\nresource \"aws_lb_listener\" \"<example_resource_name>\" {\n  load_balancer_arn = \"<example_resource_id>\"\n  protocol          = \"HTTP\"\n  port              = 80\n\n  default_action {\n    type = \"redirect\"\n    redirect {\n      protocol   = \"HTTPS\"   # Critical: redirect to HTTPS\n      port       = \"443\"     # Critical: target HTTPS port\n      status_code = \"HTTP_301\" # Critical: enforce redirect\n    }\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "强制**全链路 TLS**：使用 `HTTPS` 监听器，并将所有 `HTTP` 监听器仅重定向至 `HTTPS`。不要转发明文流量。结合强 TLS 策略与托管证书实施**纵深防御**，并可考虑启用 `HSTS` 防止用户访问 `http`。",
+      "Url": "https://hub.prowler.com/check/elbv2_ssl_listeners"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

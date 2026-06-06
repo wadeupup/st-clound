@@ -1,0 +1,40 @@
+{
+  "Provider": "aws",
+  "CheckID": "memorydb_cluster_auto_minor_version_upgrades",
+  "CheckTitle": "MemoryDB クラスターは自動マイナーバージョンアップグレードが有効になっています",
+  "CheckType": [
+    "ソフトウェアと構成のチェック/パッチ管理",
+    "ソフトウェアと構成のチェック/AWS セキュリティベストプラクティス"
+  ],
+  "ServiceName": "memorydb",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "database",
+  "Description": "**MemoryDB クラスター**は、新しいマイナーエンジンバージョンを自動的に適用する`auto_minor_version_upgrade`設定が評価されます。",
+  "Risk": "自動マイナーアップグレードがない場合、クラスターは**既知の脆弱なエンジンバージョン**を実行する可能性があります。\n- 悪用可能な CVE により、無許可の読み取り/書き込みが可能になります（機密性、完全性）\n- 未修正のバグは、**DoS** やデータ損失を引き起こす可能性があります（可用性）\n- バージョンドリフトは運用リスクを高め、インシデント対応を遅らせます",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/memorydb/latest/devguide/engine-versions.html",
+    "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_UpgradeDBInstance.Upgrading.html#USER_UpgradeDBInstance.Upgrading.AutoMinorVersionUpgrades"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws memorydb update-cluster --cluster-name <cluster-name> --auto-minor-version-upgrade",
+      "NativeIaC": "```yaml\n# MemoryDB クラスターの自動マイナーバージョンアップグレードを有効にします\nResources:\n  <example_resource_name>:\n    Type: AWS::MemoryDB::Cluster\n    Properties:\n      ClusterName: <example_resource_name>\n      ACLName: <example_acl_name>\n      NodeType: <example_node_type>\n      NumShards: 1\n      AutoMinorVersionUpgrade: true  # 重要: 自動マイナーバージョンアップグレードを有効にします\n```",
+      "Other": "1. AWS コンソールで、MemoryDB > クラスターに移動します\n2. クラスター <cluster-name> を選択し、編集をクリックします\n3. \"Auto minor version upgrade\" を有効にします\n4. 変更を保存をクリックします",
+      "Terraform": "```hcl\nresource \"aws_memorydb_cluster\" \"<example_resource_name>\" {\n  name       = \"<example_resource_name>\"\n  acl_name   = \"<example_acl_name>\"\n  node_type  = \"<example_node_type>\"\n  num_shards = 1\n\n  auto_minor_version_upgrade = true  # 重要: 自動マイナーバージョンアップグレードを有効にします\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "すべてのクラスターに対して**自動マイナーバージョンアップグレード** (`auto_minor_version_upgrade=true`) を有効にします。メンテナンスウィンドウで更新をスケジュールし、ステージングで検証し、ロールバック計画を維持します。リリース間の露出を制限するために、厳格な ACL と監視を使用して**多層防御**を適用します。",
+      "Url": "https://hub.prowler.com/check/memorydb_cluster_auto_minor_version_upgrades"
+    }
+  },
+  "Categories": [
+    "vulnerabilities"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "defender_ensure_defender_for_dns_is_on",
+  "CheckTitle": "确保 Microsoft Defender for DNS 设置为“开启”",
+  "CheckType": [],
+  "ServiceName": "defender",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AzureDefenderPlan",
+  "ResourceGroup": "security",
+  "Description": "确保 Microsoft Defender for DNS 设置为“开启”",
+  "Risk": "订阅中的 DNS 查询会被扫描，并与可能构成潜在安全威胁的网站动态列表进行比对。这些威胁可能源自你服务中的安全入侵，因此对其进行扫描可防止潜在安全威胁被引入。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "默认情况下，Microsoft Defender for Cloud 不会为你的 App Service 实例启用。为 App Service 实例启用 Defender 安全服务，可借助 Microsoft Security Response Center 提供的威胁检测能力，实现高级安全防护。",
+      "Url": ""
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

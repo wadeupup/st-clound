@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "storage_ensure_file_shares_soft_delete_is_enabled",
+  "CheckTitle": "Azure File Shares の soft delete が有効化されていることを確認する",
+  "CheckType": [],
+  "ServiceName": "storage",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AzureStorageAccount",
+  "ResourceGroup": "storage",
+  "Description": "重要データの誤削除または悪意ある削除から保護するため、Azure File Shares で soft delete が有効化されていることを確認します。この機能により、削除されたファイル共有は指定期間保持され、その期間中は完全削除前に復旧できます。",
+  "Risk": "soft delete が有効でない場合、ファイル共有の誤削除または悪意ある削除は永久的なデータ損失につながり、別途バックアップ機構がない限り復旧できません。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/storage/files/storage-files-prevent-file-share-deletion?tabs=azure-portal",
+  "Remediation": {
+    "Code": {
+      "CLI": "az storage account file-service-properties update --account-name <storage-account-name> --enable-delete-retention true --delete-retention-days <number-of-days>",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity-staging/knowledge-base/azure/StorageAccounts/enable-soft-delete-for-file-shares.html",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "Azure Storage Account の file shares で soft delete を有効化し、構成した保持期間内で削除済み共有を復旧できるようにします。",
+      "Url": "https://learn.microsoft.com/en-us/azure/storage/files/storage-files-prevent-file-share-deletion?tabs=azure-portal"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

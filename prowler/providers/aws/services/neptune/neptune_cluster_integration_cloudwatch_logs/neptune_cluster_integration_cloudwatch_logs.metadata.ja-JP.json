@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "neptune_cluster_integration_cloudwatch_logs",
+  "CheckTitle": "Neptune クラスターには CloudWatch 監査ログが有効になっています",
+  "CheckType": [
+    "ソフトウェアと構成のチェック/AWS セキュリティベストプラクティス/ランタイム動作分析",
+    "ソフトウェアと構成のチェック/業界および規制基準/AWS 基礎セキュリティベストプラクティス"
+  ],
+  "ServiceName": "neptune",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "database",
+  "Description": "Neptune DB クラスターは、**監査**イベントの CloudWatch エクスポートについて検査されます。この所見は、クラスターが `audit` ログを CloudWatch に公開しているかどうかを示します。レポートで失敗のステータスが表示される場合、`audit` エクスポートが有効になっておらず、監査記録が集中ログとレビューのために CloudWatch に転送されていないことを意味します。",
+  "Risk": "**監査ログ**が欠如すると、**検出可能性**と**説明責任**が低下します:\n\n- 調査者はクエリ、クライアントの起源、またはタイムラインを再構築できません\n- 不正なクエリ、データの流出、または権限の誤用が検出されない可能性があります\n\nこれにより、機密性と整合性が低下し、インシデント対応が遅れます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/neptune/latest/userguide/auditing.html",
+    "https://docs.aws.amazon.com/neptune/latest/userguide/cloudwatch-logs.html",
+    "https://cloudanix.com/docs/aws/audit/rdsmonitoring/rules/neptune_cluster_cloudwatch_log_export_enabled_remediation",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/neptune-controls.html#neptune-2"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws neptune modify-db-cluster --db-cluster-identifier <DB_CLUSTER_IDENTIFIER> --cloudwatch-logs-export-configuration '{\"EnableLogTypes\":[\"audit\"]}'",
+      "NativeIaC": "```yaml\nResources:\n  NeptuneCluster:\n    Type: AWS::Neptune::DBCluster\n    Properties:\n      DBClusterIdentifier: \"<DB_CLUSTER_IDENTIFIER>\"\n      EnableCloudwatchLogsExports:\n        - audit  # 監査ログを CloudWatch にエクスポートして監視とフォレンジックを行います\n```",
+      "Terraform": "```hcl\nresource \"aws_neptune_cluster\" \"example_resource\" {\n  cluster_identifier               = \"<db_cluster_identifier>\"\n  enabled_cloudwatch_logs_exports = [\"audit\"]  # 監査ログを CloudWatch にエクスポートして監視とフォレンジックを行います\n}\n```",
+      "Other": "1. AWS マネジメントコンソールにサインインし、Amazon Neptune を開きます\n2. データベースに移動し、Neptune DB クラスターを選択します\n3. アクション > 修正\n4. ログエクスポートで「監査」をチェック\n5. 続行 > DB クラスターを修正"
+    },
+    "Recommendation": {
+      "Text": "Neptune の **監査ログ**を有効化し、集中化するために、`audit` イベントを CloudWatch Logs にエクスポートし、監視または SIEM と統合します。\n\n- ログアクセスに対する**最小特権**を強制\n- 異常なクエリに対する保持、暗号化、アラートを設定\n\nこれにより、積極的な検出とフォレンジックの準備がサポートされます。",
+      "Url": "https://hub.prowler.com/check/neptune_cluster_integration_cloudwatch_logs"
+    }
+  },
+  "Categories": [
+    "logging",
+    "forensics-ready"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

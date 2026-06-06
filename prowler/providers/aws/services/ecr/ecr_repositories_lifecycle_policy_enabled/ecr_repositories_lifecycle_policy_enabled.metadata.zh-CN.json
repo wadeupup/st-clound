@@ -1,0 +1,44 @@
+{
+  "Provider": "aws",
+  "CheckID": "ecr_repositories_lifecycle_policy_enabled",
+  "CheckTitle": "ECR 存储库已配置生命周期策略",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Effects/Resource Consumption"
+  ],
+  "ServiceName": "ecr",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "low",
+  "ResourceType": "AwsEcrRepository",
+  "ResourceGroup": "container",
+  "Description": "Amazon ECR 存储库已配置 **生命周期策略**，可根据镜像的年龄、数量或标签自动过期容器镜像。",
+  "Risk": "没有 **生命周期策略**，镜像会无限累积，导致：\n- **可用性** 问题：当配额阻止推送和 CI/CD 时\n- **完整性** 风险：重新部署过时、易受攻击的镜像\n- **成本** 增长：不必要的存储",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/AmazonECR/latest/userguide/LifecyclePolicies.html",
+    "https://docs.aws.amazon.com/AmazonECR/latest/userguide/lp_creation.html",
+    "https://aws.plainenglish.io/automation-deletion-untagged-container-image-in-amazon-ecr-using-ecr-lifecycle-policy-995eae2f5b8d",
+    "https://blog.stackademic.com/title-implementing-lifecycle-policies-in-aws-ecr-a-practical-guide-3860b612b477",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/ECR/lifecycle-policy-in-use.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws ecr put-lifecycle-policy --repository-name <REPOSITORY_NAME> --lifecycle-policy-text '{\"rules\":[{\"rulePriority\":1,\"selection\":{\"tagStatus\":\"untagged\",\"countType\":\"imageCountMoreThan\",\"countNumber\":1},\"action\":{\"type\":\"expire\"}}]}'",
+      "NativeIaC": "```yaml\nResources:\n  <example_resource_name>:\n    Type: AWS::ECR::Repository\n    Properties:\n      # Critical: Adding a lifecycle policy makes the repo PASS this check\n      LifecyclePolicy:\n        # Critical: The policy content; any valid rule satisfies the requirement\n        LifecyclePolicyText: >-\n          {\"rules\":[{\"rulePriority\":1,\"selection\":{\"tagStatus\":\"untagged\",\"countType\":\"imageCountMoreThan\",\"countNumber\":1},\"action\":{\"type\":\"expire\"}}]}\n```",
+      "Other": "1. 打开 AWS 控制台并转到 Amazon ECR > 存储库\n2. 选择目标存储库\n3. 从操作中，选择 \"生命周期策略\"\n4. 点击 \"创建规则\"\n5. 设置镜像状态：未标记，匹配条件：镜像数量超过 = 1，操作：过期\n6. 点击 \"保存\" 以应用生命周期策略",
+      "Terraform": "```hcl\nresource \"aws_ecr_lifecycle_policy\" \"<example_resource_name>\" {\n  repository = \"<example_resource_name>\"\n  # Critical: The policy ensures a lifecycle policy is configured for the repo\n  policy = <<POLICY\n{\"rules\":[{\"rulePriority\":1,\"selection\":{\"tagStatus\":\"untagged\",\"countType\":\"imageCountMoreThan\",\"countNumber\":1},\"action\":{\"type\":\"expire\"}}]}\nPOLICY\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "为每个存储库实施 **生命周期策略**，以过期未标记、过旧或多余的镜像，并保留少量受信任的版本。在应用前验证结果，定期审查规则，并在跨区域复制时保持一致应用。这通过减少镜像攻击面和操作风险来支持 **纵深防御**。",
+      "Url": "https://hub.prowler.com/check/ecr_repositories_lifecycle_policy_enabled"
+    }
+  },
+  "Categories": [
+    "container-security"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

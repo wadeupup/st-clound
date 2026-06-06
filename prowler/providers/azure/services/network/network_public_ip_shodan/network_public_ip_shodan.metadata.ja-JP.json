@@ -1,0 +1,33 @@
+{
+  "Provider": "azure",
+  "CheckID": "network_public_ip_shodan",
+  "CheckTitle": "Azure Public IP が Shodan に公開されていないか確認する（Shodan API KEY が必要）。",
+  "CheckType": [],
+  "ServiceName": "network",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Network",
+  "ResourceGroup": "network",
+  "Description": "Azure Public IP が Shodan に公開されていないか確認する（Shodan API KEY が必要）。",
+  "Risk": "Azure Public IP が Shodan に公開されると、インターネット上の誰でもアクセスできる可能性があります。これにより、リソースへの不正アクセスにつながるおそれがあります。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "特定された IP を確認し、可能であればプライベート IP へ変更し、Shodan から削除することを検討してください。",
+      "Url": "https://www.shodan.io/"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

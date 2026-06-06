@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "app_ensure_auth_is_set_up",
+  "CheckTitle": "Azure App Service のアプリで App Service 認証が設定されていることを確認する",
+  "CheckType": [],
+  "ServiceName": "app",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Microsoft.Web/sites",
+  "ResourceGroup": "serverless",
+  "Description": "Azure App Service 認証は、匿名の HTTP リクエストが Web アプリケーションに到達するのを防いだり、リクエストがアプリに届く前にトークンで認証したりできる機能です。ブラウザーから匿名リクエストを受信すると、App Service はログオン ページへリダイレクトします。ログオン処理を行うために、複数の ID プロバイダーから選択するか、カスタム認証メカニズムを実装できます。",
+  "Risk": "App Service 認証を有効化すると、すべての受信 HTTP リクエストはアプリケーション コードで処理される前にこの機能を通過します。また、指定したプロバイダー（Azure Active Directory、Facebook、Google、Microsoft Account、Twitter）によるユーザー認証、検証、トークンの保存と更新、認証済みセッションの管理、要求ヘッダーへの ID 情報の注入も処理します。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/app-service/overview-authentication-authorization",
+  "Remediation": {
+    "Code": {
+      "CLI": "az webapp auth update --resource-group <RESOURCE_GROUP_NAME> --name <APP_NAME> --enabled true",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/AppService/enable-app-service-authentication.html",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-general-policies/bc_azr_general_2#terraform"
+    },
+    "Recommendation": {
+      "Text": "1. https://portal.azure.com で Azure Portal にログインします 2. App Services に移動します 3. 各アプリをクリックします 4. Setting セクションの Authentication をクリックします 5. ID プロバイダーが未設定の場合は Add identity provider をクリックします 6. 要件に応じて他のパラメーターを選択し、Add をクリックします",
+      "Url": "https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles#website-contributor"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "これは認証が必要な App Service のみに必要です。マーケティングやサポート用サイトなどで有効化すると未認証アクセスを遮断してしまい、望ましくない場合があります。認証要件を追加すると App Service のコストが増加し、認証を実現するための追加セキュリティ コンポーネントが必要になります。"
+}

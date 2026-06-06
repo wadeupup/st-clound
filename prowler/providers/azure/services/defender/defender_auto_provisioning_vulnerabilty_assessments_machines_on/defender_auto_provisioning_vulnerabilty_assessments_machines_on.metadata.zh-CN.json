@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "defender_auto_provisioning_vulnerabilty_assessments_machines_on",
+  "CheckTitle": "确保“机器漏洞评估”的自动预配设置为“开启”",
+  "CheckType": [],
+  "ServiceName": "defender",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AzureDefenderPlan",
+  "ResourceGroup": "security",
+  "Description": "为 Azure 机器和混合（启用 Arc）机器启用机器漏洞评估的自动预配。",
+  "Risk": "机器漏洞评估会扫描多种与安全相关的配置和事件，例如系统更新、操作系统漏洞和终端防护，并针对威胁与漏洞发现生成告警。",
+  "RelatedUrl": "https://docs.microsoft.com/en-us/azure/defender-for-cloud/enable-data-collection?tabs=autoprovision-va",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/SecurityCenter/automatic-provisioning-vulnerability-assessment-machines.html",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "1. 在 Azure Home 中选择 Portal Menu。2. 选择 Microsoft Defender for Cloud。3. 然后进入 Environment Settings。4. 选择一个订阅。5. 点击 Settings & Monitoring。6. 确保 Vulnerability assessment for machines 设置为 On。对其他订阅重复此操作。",
+      "Url": ""
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "此项需要额外许可，且 Azure Arc 的配置会引入超出本建议范围的复杂性。"
+}

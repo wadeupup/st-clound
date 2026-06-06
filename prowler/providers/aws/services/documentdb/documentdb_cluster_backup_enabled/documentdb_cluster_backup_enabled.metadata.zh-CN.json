@@ -1,0 +1,44 @@
+{
+  "Provider": "aws",
+  "CheckID": "documentdb_cluster_backup_enabled",
+  "CheckTitle": "DocumentDB 集群已启用自动备份且保留期至少为 7 天",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Effects/Data Destruction"
+  ],
+  "ServiceName": "documentdb",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsRdsDbCluster",
+  "ResourceGroup": "database",
+  "Description": "**Amazon DocumentDB 集群** 会被评估是否启用 **自动备份**，以及是否配置了足够的 **备份保留期**。集群应将 `backup_retention_period` 设置为至少配置的最小值（默认 `7` 天）。值为 `0` 表示未启用备份；低于阈值的值会被视为保留期不足。",
+  "Risk": "如果缺乏足够的备份，就无法可靠地恢复集群。一旦短备份保留窗口过期，误删、逻辑损坏或勒索软件等事件可能导致不可逆的数据丢失，引发长时间中断、无法满足 RPO/RTO 目标，并且难以回滚恶意或错误变更。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.amazonaws.cn/en_us/documentdb/latest/developerguide/what-is.html",
+    "https://www.trendmicro.com/cloudoneconformity-staging/knowledge-base/aws/DocumentDB/sufficient-backup-retention-period.html#",
+    "https://docs.aws.amazon.com/systems-manager-automation-runbooks/latest/userguide/aws-enabledocdbclusterbackupretentionperiod.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws docdb modify-db-cluster --db-cluster-identifier <DB_CLUSTER_ID> --backup-retention-period 7 --apply-immediately",
+      "NativeIaC": "```yaml\n# CloudFormation：将 DocumentDB 备份保留期设置为至少 7 天\nResources:\n  <example_resource_name>:\n    Type: AWS::DocDB::DBCluster\n    Properties:\n      BackupRetentionPeriod: 7  # 关键：启用自动备份并将保留期设置为 >=7 天\n```",
+      "Other": "1. 打开 Amazon DocumentDB 控制台\n2. 进入 Clusters 并选择 <example_resource_id>\n3. 单击 Modify\n4. 将 Backup retention period 设置为 7（或更高）\n5. 勾选 Apply immediately\n6. 单击 Continue，然后单击 Modify cluster",
+      "Terraform": "```hcl\n# Terraform：确保 DocumentDB 备份保留期至少为 7 天\nresource \"aws_docdb_cluster\" \"<example_resource_name>\" {\n  cluster_identifier      = \"<example_resource_id>\"\n  backup_retention_period = 7  # 关键：启用自动备份并将保留期设置为 >=7 天\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "启用 **自动备份** 并将保留期设置为满足 RPO/RTO 要求（通常为 `7-35` 天）。\n- 定期测试时间点恢复（PITR）\n- 对备份/快照管理应用 **最小权限**\n- 保护备份产物并定义稳定的备份窗口\n- 在经过测试的 **灾难恢复** 预案中包含恢复演练",
+      "Url": "https://hub.prowler.com/check/documentdb_cluster_backup_enabled"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+
+

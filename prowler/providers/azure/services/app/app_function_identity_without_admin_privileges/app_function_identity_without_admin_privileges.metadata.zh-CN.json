@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "app_function_identity_without_admin_privileges",
+  "CheckTitle": "确保 Azure Functions 未配置具有管理员权限的标识",
+  "CheckType": [],
+  "ServiceName": "app",
+  "SubServiceName": "function",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Microsoft.Web/sites",
+  "ResourceGroup": "serverless",
+  "Description": "确保 Azure Functions 未被配置为具有管理权限非常重要，这有助于遵循最小权限原则并减少攻击面。通过限制 Azure Functions 的权限，可以降低潜在安全风险和数据泄露风险。",
+  "Risk": "如果 Azure Functions 配置了管理权限，会增加未授权访问、权限提升和数据泄露的风险。攻击者可利用这些权限访问敏感数据并危及整个系统。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/entra/identity/managed-identities-azure-resources/overview",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/Functions/azure-function-admin-permissions.html",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "为修复此问题，请确保 Azure Functions 未配置为使用具有管理权限的标识。应遵循最小权限原则，仅向 Azure Functions 授予必需权限。更多信息请参阅官方文档：使用最小权限原则。",
+      "Url": "https://docs.microsoft.com/en-us/azure/architecture/framework/security/design-identity-authorization#use-the-principle-of-least-privilege"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "此检查有助于防止权限提升攻击，并确保 Azure Functions 以必要权限运行，从而降低潜在安全事件的影响。"
+}

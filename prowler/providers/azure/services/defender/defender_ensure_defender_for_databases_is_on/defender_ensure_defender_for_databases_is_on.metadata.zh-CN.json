@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "defender_ensure_defender_for_databases_is_on",
+  "CheckTitle": "确保 Microsoft Defender for Databases 设置为“开启”",
+  "CheckType": [],
+  "ServiceName": "defender",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AzureDefenderPlan",
+  "ResourceGroup": "security",
+  "Description": "确保 Microsoft Defender for Databases 设置为“开启”",
+  "Risk": "启用 Microsoft Defender for Azure SQL Databases 可让组织对运行数据库软件的基础设施拥有更细粒度的控制能力",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "启用 Microsoft Defender for Azure SQL Databases",
+      "Url": ""
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

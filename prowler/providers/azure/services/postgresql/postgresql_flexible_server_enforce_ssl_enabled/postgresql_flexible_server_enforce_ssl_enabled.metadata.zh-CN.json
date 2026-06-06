@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "postgresql_flexible_server_enforce_ssl_enabled",
+  "CheckTitle": "确保 PostgreSQL 数据库服务器“Enforce SSL connection”设置为“ENABLED”",
+  "CheckType": [],
+  "ServiceName": "postgresql",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "PostgreSQL",
+  "ResourceGroup": "database",
+  "Description": "在 PostgreSQL 服务器上启用 SSL 连接。",
+  "Risk": "SSL 连接通过使用安全套接层（SSL）将数据库服务器与客户端应用连接起来，提供新的安全层。通过加密服务器与应用之间的数据流，强制数据库服务器与客户端应用使用 SSL 连接，有助于防御“中间人”攻击。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/postgresql/single-server/concepts-ssl-connection-security",
+  "Remediation": {
+    "Code": {
+      "CLI": "az postgres server update --resource-group <resourceGroupName> --name <serverName> --ssl-enforcement Enabled",
+      "NativeIaC": "",
+      "Other": "https://docs.prowler.com/checks/azure/azure-networking-policies/bc_azr_networking_10",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-networking-policies/bc_azr_networking_10#terraform"
+    },
+    "Recommendation": {
+      "Text": "通过 Azure Portal：1. 使用 https://portal.azure.com 登录 Azure Portal。2. 进入 Azure Database for PostgreSQL server。3. 对每个数据库，点击 Connection security。4. 在 SSL settings 中点击 ENABLED 以强制 SSL 连接。5. 点击 Save。通过 Azure CLI：使用以下命令为 PostgreSQL 数据库强制启用 SSL 连接。az postgres server update --resource-group <resourceGroupName> --name <serverName> --ssl-enforcement Enabled。通过 PowerShell：Update-AzPostgreSqlServer -ResourceGroupName <ResourceGroupName > -ServerName <ServerName> -SslEnforcement Enabled",
+      "Url": "https://learn.microsoft.com/en-us/azure/postgresql/single-server/concepts-ssl-connection-security"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "."
+}

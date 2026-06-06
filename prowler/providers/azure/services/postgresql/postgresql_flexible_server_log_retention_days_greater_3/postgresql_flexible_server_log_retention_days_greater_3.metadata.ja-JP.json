@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "postgresql_flexible_server_log_retention_days_greater_3",
+  "CheckTitle": "PostgreSQL Database Server のサーバー パラメーター 'log_retention_days' が 3 日より大きいことを確認する",
+  "CheckType": [],
+  "ServiceName": "postgresql",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "PostgreSQL",
+  "ResourceGroup": "database",
+  "Description": "PostgreSQL サーバーの log_retention_days が適切な値に設定されていることを確認します。",
+  "Risk": "log_retention_days の設定により、Azure Database for PostgreSQL がログ ファイルを保持する日数が決まります。クエリ/エラー ログは、構成エラーや最適でないパフォーマンスの特定、トラブルシュート、修復に利用できます。",
+  "RelatedUrl": "https://docs.microsoft.com/en-us/azure/postgresql/howto-configure-server-parameters-using-portal",
+  "Remediation": {
+    "Code": {
+      "CLI": "az postgres server configuration set --resource-group <resourceGroupName> --server-name <serverName> --name log_retention_days --value <4-7>",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity-staging/knowledge-base/azure/PostgreSQL/log-retention-days.html",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "Azure Portal から 1. Azure Home で Portal Menu を選択します。2. Azure Database for PostgreSQL servers に移動します。3. 各データベースで Server parameters をクリックします。4. log_retention_days を検索します。5. 4〜7（両端含む）の値を入力して Save をクリックします。Azure CLI から log_retention_days 設定を更新するには次のコマンドを使用します。az postgres server configuration set --resource-group <resourceGroupName> -- server-name <serverName> --name log_retention_days --value <4-7>。Powershell から log_retention_days 設定を更新するには次のコマンドを使用します。Update-AzPostgreSqlConfiguration -ResourceGroupName <ResourceGroupName> - ServerName <ServerName> -Name log_retention_days -Value <4-7>",
+      "Url": "https://learn.microsoft.com/en-us/rest/api/postgresql/singleserver/configurations/list-by-server?view=rest-postgresql-singleserver-2017-12-01&tabs=HTTP"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "この設定を構成すると、指定日数分ログが保持されます。高トラフィック サーバーで設定した場合、ログが急速に増えて大量のディスク領域を消費する可能性があります。その場合は、より小さい値に設定することを検討してください。"
+}

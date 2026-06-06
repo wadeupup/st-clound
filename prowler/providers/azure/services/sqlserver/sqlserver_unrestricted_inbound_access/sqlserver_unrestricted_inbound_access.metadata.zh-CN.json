@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "sqlserver_unrestricted_inbound_access",
+  "CheckTitle": "确保没有 Azure SQL 数据库允许来自 0.0.0.0/0（任意 IP）的入站流量",
+  "CheckType": [],
+  "ServiceName": "sqlserver",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "critical",
+  "ResourceType": "SQLServer",
+  "ResourceGroup": "database",
+  "Description": "确保不存在允许来自 0.0.0.0-255.255.255.255 的防火墙规则",
+  "Risk": "Azure SQL 服务器默认提供防火墙并阻止所有 Internet 连接。当使用规则（0.0.0.0-255.255.255.255）时，服务器可被来自 Internet 的任意来源访问，会显著扩大 SQL Server 攻击面。建议使用更细粒度的防火墙规则。",
+  "RelatedUrl": "https://docs.microsoft.com/en-us/azure/sql-database/sql-database-vnet-service-endpoint-rule-overview",
+  "Remediation": {
+    "Code": {
+      "CLI": "az sql server firewall-rule delete --resource-group resource_group_name --server sql_server_name --name rule_name",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/Sql/unrestricted-sql-database-access.html",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-networking-policies/bc_azr_networking_4#terraform"
+    },
+    "Recommendation": {
+      "Text": "移除允许所有来源的防火墙规则，并改用更细粒度规则",
+      "Url": ""
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

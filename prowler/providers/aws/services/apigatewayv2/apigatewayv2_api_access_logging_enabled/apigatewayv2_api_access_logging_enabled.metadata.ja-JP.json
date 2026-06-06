@@ -1,0 +1,45 @@
+{
+  "Provider": "aws",
+  "CheckID": "apigatewayv2_api_access_logging_enabled",
+  "CheckTitle": "API Gateway V2 API ステージでアクセスログが有効になっています",
+  "CheckAliases": [
+    "apigatewayv2_access_logging_enabled"
+  ],
+  "CheckType": [
+    "ソフトウェアと設定チェック/AWS セキュリティベストプラクティス"
+  ],
+  "ServiceName": "apigatewayv2",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsApiGatewayV2Stage",
+  "ResourceGroup": "api_gateway",
+  "Description": "**API Gateway v2** ステージには、リクエストの詳細をキャプチャし、それらをログ記録先（例：CloudWatch Logs または Firehose）に配信する**アクセスログ**が設定されています。この評価は、各 API ステージでログが有効になっているかどうかを確認します。",
+  "Risk": "アクセスログがない場合、API 呼び出しには追跡可能性がなく、資格情報の悪用、ルートの悪用、または異常なトラフィックを発見することが困難になります。\n\nこれにより、検出されていないデータアクセスまたは操作により機密性と整合性が低下し、インシデント対応が遅れることで可用性に影響を与えます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/apigateway/latest/developerguide/security-monitoring.html",
+    "https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-logging.html",
+    "https://support.icompaas.com/support/solutions/articles/62000229562-ensure-api-gateway-v2-has-access-logging-enabled",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/APIGateway/api-gateway-stage-access-logging.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws apigatewayv2 update-stage --api-id <API_ID> --stage-name <STAGE_NAME> --access-log-settings DestinationArn=<LOG_GROUP_ARN>,Format='{\"requestId\":\"$context.requestId\"}'",
+      "NativeIaC": "```yaml\n# CloudFormation: API Gateway V2 ステージでアクセスログを有効にします\nResources:\n  <example_resource_name>:\n    Type: AWS::ApiGatewayV2::Stage\n    Properties:\n      ApiId: <example_resource_id>\n      StageName: <example_resource_name>\n      AccessLogSettings: # 重要：ステージのアクセスログを有効にします\n        DestinationArn: <example_log_group_arn> # CloudWatch Logs ロググループ ARN\n        Format: '{\"requestId\":\"$context.requestId\"}' # 最小限の必須フォーマット\n```",
+      "Other": "1. AWS コンソールで、API Gateway > HTTP/WebSocket API に移動します\n2. Stages を開き、ターゲットステージを選択します\n3. Access logging で、Access logging を有効にします\n4. Log destination ARN を CloudWatch ロググループ（または Firehose ストリーム）に設定します\n5. Log format を次のように設定します：{\"requestId\":\"$context.requestId\"}\n6. Save をクリックします",
+      "Terraform": "```hcl\n# Terraform: API Gateway V2 ステージでアクセスログを有効にします\nresource \"aws_apigatewayv2_stage\" \"<example_resource_name>\" {\n  api_id = \"<example_resource_id>\"\n  name   = \"<example_resource_name>\"\n\n  access_log_settings { # 重要：ステージのアクセスログを有効にします\n    destination_arn = \"<example_log_group_arn>\"\n    format          = \"{\\\"requestId\\\":\\\"$context.requestId\\\"}\"\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "集中化された宛先への**ステージレベルのアクセスログ**を有効にし、構造化フォーマットを使用します。適切な保持を適用し、**最小権限**に従ってログアクセスを制限します。ログを監視とアラートに統合して異常を検出し、**多層防御**コントロールで補完します。",
+      "Url": "https://hub.prowler.com/check/apigatewayv2_api_access_logging_enabled"
+    }
+  },
+  "Categories": [
+    "logging"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

@@ -1,0 +1,39 @@
+{
+  "Provider": "aws",
+  "CheckID": "elbv2_listeners_underneath",
+  "CheckTitle": "ELBv2 负载均衡器至少配置了一个监听器",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices/Network Reachability",
+    "Effects/Denial of Service"
+  ],
+  "ServiceName": "elbv2",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsElbv2LoadBalancer",
+  "ResourceGroup": "network",
+  "Description": "**ELBv2 负载均衡器**需要至少一个**监听器**（协议与端口）来接收客户端连接并将请求路由到目标组。该检查用于判断负载均衡器上是否已定义监听器。",
+  "Risk": "如果没有监听器，负载均衡器将无法接收连接，导致后端服务不可达。这会损害**可用性**、引发客户端超时与错误，并中断依赖该负载均衡器 DNS 端点的集成。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-listeners.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws elbv2 create-listener --load-balancer-arn <LOAD_BALANCER_ARN> --protocol HTTP --port 80 --default-actions 'Type=fixed-response,FixedResponseConfig={StatusCode=200}'",
+      "NativeIaC": "```yaml\n# CloudFormation: add a minimal listener to the ELBv2\nResources:\n  <example_resource_name>:\n    Type: AWS::ElasticLoadBalancingV2::Listener\n    Properties:\n      LoadBalancerArn: <example_load_balancer_arn>  # Critical: attaches the listener to the load balancer\n      Port: 80                                      # Critical: defines the listener port\n      Protocol: HTTP                                # Critical: defines the listener protocol\n      DefaultActions:\n        - Type: fixed-response                       # Critical: minimal required default action so the listener is valid\n          FixedResponseConfig:\n            StatusCode: '200'                       # Critical: required for fixed-response action\n```",
+      "Other": "1. 在 AWS 控制台进入 EC2 > Load Balancing > Load Balancers\n2. 选择存在该问题的负载均衡器\n3. 打开 Listeners 标签并点击 Add listener\n4. 将 Protocol 设置为 HTTP，Port 设置为 80\n5. 在 Default action 中选择 Return fixed response，并将 Status code 设为 200\n6. 点击 Create/Save 添加监听器",
+      "Terraform": "```hcl\n# Terraform: add a minimal listener to the ELBv2\nresource \"aws_lb_listener\" \"<example_resource_name>\" {\n  load_balancer_arn = \"<example_load_balancer_arn>\"  # Critical: attaches the listener to the load balancer\n  port              = 80                               # Critical: defines the listener port\n  protocol          = \"HTTP\"                          # Critical: defines the listener protocol\n\n  default_action {                                     # Critical: required default action so the listener is valid\n    type = \"fixed-response\"\n    fixed_response {\n      status_code = \"200\"                             # Critical: required for fixed-response action\n    }\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "每个负载均衡器至少定义一个监听器。优先使用 `443` 端口上的 **HTTPS** 以保护传输中数据，并仅暴露必需端口。通过仅允许预期流量的协议和规则实施**最小权限**，并设置明确的默认动作以避免意外路由。",
+      "Url": "https://hub.prowler.com/check/elbv2_listeners_underneath"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

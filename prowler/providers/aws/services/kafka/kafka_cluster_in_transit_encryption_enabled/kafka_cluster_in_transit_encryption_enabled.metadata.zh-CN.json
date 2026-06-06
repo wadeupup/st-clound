@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "kafka_cluster_in_transit_encryption_enabled",
+  "CheckTitle": "Kafka 集群已启用传输加密",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践",
+    "软件和配置检查/行业和法规标准/AWS 基础安全最佳实践"
+  ],
+  "ServiceName": "kafka",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsMskCluster",
+  "ResourceGroup": "messaging",
+  "Description": "**Amazon MSK 集群**在两个路径上评估**传输加密**：**client-broker**设置为仅 `TLS`，并启用**inter-broker**加密。*无服务器集群默认提供此功能*。\n\n该发现强调了客户端-代理流量不是仅 `TLS` 或代理间加密关闭的集群。",
+  "Risk": "未加密或混合（`TLS_PLAINTEXT`/`PLAINTEXT`）流量允许拦截记录、凭证和元数据，支持**中间人攻击**、重放和消息篡改。\n\n明文代理间链接暴露了 VPC 内的复制数据，允许**横向移动**和主题中毒，降低数据的**机密性**和**完整性**。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/msk/latest/developerguide/msk-encryption.html",
+    "https://docs.aws.amazon.com/msk/latest/developerguide/msk-working-with-encryption.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/MSK/encryption-in-transit-for-msk.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation：MSK 集群强制执行传输加密\nResources:\n  <example_resource_name>:\n    Type: AWS::MSK::Cluster\n    Properties:\n      ClusterName: <example_resource_name>\n      KafkaVersion: <VERSION>\n      NumberOfBrokerNodes: 3\n      BrokerNodeGroupInfo:\n        ClientSubnets:\n          - <example_resource_id>\n          - <example_resource_id>\n        InstanceType: kafka.m5.large\n      EncryptionInfo:\n        EncryptionInTransit:\n          ClientBroker: TLS  # 关键：强制客户端到代理仅使用 TLS\n          InCluster: true    # 关键：启用代理间加密\n```",
+      "Other": "1. 在 AWS 控制台中，转到 Amazon MSK > 集群并选择您的集群\n2. 点击编辑（安全性）\n3. 在传输加密下，将客户端-代理设置为仅 TLS\n4. 保存更改\n5. 验证代理间（集群内）加密是否启用；如果禁用（不可变），则创建一个新集群：\n   - 传输加密：客户端-代理 = 仅 TLS，代理间加密 = 启用\n   - 将客户端迁移到新集群，然后退役旧集群",
+      "Terraform": "```hcl\n# Terraform：MSK 集群强制执行传输加密\nresource \"aws_msk_cluster\" \"<example_resource_name>\" {\n  cluster_name           = \"<example_resource_name>\"\n  kafka_version          = \"<VERSION>\"\n  number_of_broker_nodes = 3\n\n  broker_node_group_info {\n    instance_type  = \"kafka.m5.large\"\n    client_subnets = [\n      \"subnet-<example_resource_id>\",\n      \"subnet-<example_resource_id>\",\n    ]\n  }\n\n  encryption_info {\n    encryption_in_transit {\n      client_broker = \"TLS\"  # 关键：强制客户端到代理仅使用 TLS\n      in_cluster    = true    # 关键：启用代理间加密\n    }\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "强制实施端到端传输保护：\n- 要求所有客户端使用 `client_broker=TLS`\n- 启用 `in_cluster=true` 用于代理间链接\n\n应用**深度防御**：限制网络路径，优先使用私有连接，并使用强客户端身份验证和**最小权限**授权以限制影响范围。",
+      "Url": "https://hub.prowler.com/check/kafka_cluster_in_transit_encryption_enabled"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

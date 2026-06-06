@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "vm_backup_enabled",
+  "CheckTitle": "Azure Virtual Machines でバックアップが有効化されていることを確認する",
+  "CheckType": [],
+  "ServiceName": "vm",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Microsoft.Compute/virtualMachines",
+  "ResourceGroup": "compute",
+  "Description": "誤削除や破損から保護するため、Azure 仮想マシン（VM）で Microsoft Azure Backup サービスが使用されていることを確認します。",
+  "Risk": "Azure Backup が有効でない場合、VM は誤削除、破損、またはその他の障害によるデータ損失リスクにさらされ、復旧手段が限定されます。",
+  "RelatedUrl": "https://docs.microsoft.com/en-us/azure/backup/backup-overview",
+  "Remediation": {
+    "Code": {
+      "CLI": "az backup protection enable-for-vm --resource-group <resource-group> --vm <vm-name> --vault-name <vault-name> --policy-name DefaultPolicy",
+      "NativeIaC": "",
+      "Other": "https://learn.microsoft.com/en-us/azure/backup/quick-backup-vm-portal",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "各 VM を Recovery Services vault とバックアップポリシーに関連付けることで、Azure Backup を有効化してください。",
+      "Url": "https://docs.microsoft.com/en-us/azure/backup/quick-backup-vm-portal"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

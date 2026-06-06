@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "keyvault_key_rotation_enabled",
+  "CheckTitle": "确保在 Azure Key Vault 中为受支持服务启用自动密钥轮换",
+  "CheckType": [],
+  "ServiceName": "keyvault",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "KeyVault",
+  "ResourceGroup": "security",
+  "Description": "自动密钥轮换当前处于公共预览阶段。当前受支持的应用包括 Key Vault、托管磁盘以及访问 Key Vault 中密钥的存储账户。受支持应用数量将逐步增加。",
+  "Risk": "配置完成后，自动私钥轮换可在密钥按组织策略设定的周期到期时，免除手动管理需求。推荐密钥生命周期为 2 年。组织应自行确定其密钥过期策略。",
+  "RelatedUrl": "https://docs.microsoft.com/en-us/azure/key-vault/keys/how-to-configure-key-rotation",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "注意：Azure CLI 和 PowerShell 使用 ISO8601 标记输入时间跨度。所有时间跨度输入格式均为 P<timespanInISO8601Format>(Y,M,D)。前导 P 必须保留，表示 period。（Y,M,D）分别表示年、月、日。2 年 2 个月 2 天应写为 (P2Y2M2D)。通过 Azure 门户：1. 在 Azure 门户左上角选择 Portal Menu。2. 选择 Key Vaults。3. 选择要审计的 Key Vault。4. 在 Objects 下选择 Keys。5. 选择要审计的密钥。6. 在顶部栏选择 Rotation policy。7. 选择 Expiry time。8. 将 Enable auto rotation 设置为 Enabled。9. 设置合适的 Rotation option 和 Rotation time。10. 可选设置 Notification time。11. 选择 Save。12. 对每个 Key Vault 和密钥重复步骤 3-11。通过 PowerShell：对每个密钥运行以下命令更新策略：Set-AzKeyVaultKeyRotationPolicy -VaultName test-kv -Name test-key -PolicyPath rotation_policy.json",
+      "Url": "https://docs.microsoft.com/en-us/azure/storage/common/customer-managed-keys-overview#update-the-key-version"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "运行所需应用的每次操作都会产生额外成本。"
+}

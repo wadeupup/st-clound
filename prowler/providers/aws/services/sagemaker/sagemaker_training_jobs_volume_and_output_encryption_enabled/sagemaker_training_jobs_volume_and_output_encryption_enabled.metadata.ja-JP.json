@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "sagemaker_training_jobs_volume_and_output_encryption_enabled",
+  "CheckTitle": "Amazon SageMaker のトレーニングジョブのボリュームで KMS 暗号化が有効になっています",
+  "CheckType": [
+    "ソフトウェアと構成チェック/AWSセキュリティのベストプラクティス",
+    "ソフトウェアと設定のチェック/業界および規制基準/AWS 基盤セキュリティのベストプラクティス",
+    "影響／データ露出"
+  ],
+  "ServiceName": "sagemaker",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Other",
+  "ResourceGroup": "ai_ml",
+  "Description": "**Amazon SageMaker のトレーニングジョブ** は、`VolumeKmsKeyId` を介して、接続された ML ストレージボリュームに **KMS 暗号化** を使用します。\n\nこの検出結果は、ボリューム暗号化キーが設定されていないトレーニングジョブを特定します。",
+  "Risk": "**CMEK** が欠如していると、トレーニングデータ、チェックポイント、およびログが、テナント管理の暗号化なしでボリューム上に残ります。これにより **機密性** が低下し、スナップショットや特権アクセスを介したデータ露出が可能になり、キーのポリシー、ローテーション、および緊急時の失効に対する制御が制限されます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/sagemaker/latest/dg/key-management.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation: KMS暗号化が有効なEBSボリュームを使用するSageMaker TrainingJob\nResources:\n  <example_resource_name>:\n    Type: AWS::SageMaker::TrainingJob\n    Properties:\n      TrainingJobName: <example_resource_name>\n      RoleArn: <example_role_arn>\n      AlgorithmSpecification:\n        TrainingImage: <example_ecr_image_uri>\n        TrainingInputMode: File\n      OutputDataConfig:\n        S3OutputPath: s3://<example_bucket>\n      ResourceConfig:\n        InstanceType: ml.m5.large\n        InstanceCount: 1\n        VolumeSizeInGB: 10\n        VolumeKmsKeyId: <example_kms_key_arn>  # 重大: 指定されたKMSキーでトレーニングEBSボリュームを暗号化します\n      StoppingCondition:\n        MaxRuntimeInSeconds: 3600\n```",
+      "Other": "1. AWSコンソールで、SageMaker > Training > Training jobs に移動します\n2. 暗号化されていないジョブを選択し、Clone をクリックして新しいジョブを作成します\n3. Resource configuration で、Volume encryption key をお使いの KMS キー（カスタマー管理キー）に設定します\n4. 必須項目を入力し、Create training job をクリックします\n5. 新しいジョブの Volume encryption に KMS キーが表示されていることを確認します",
+      "Terraform": "```hcl\n# EBS ボリュームの KMS 暗号化が有効になっている SageMaker トレーニングジョブ\nresource \"aws_sagemaker_training_job\" \"<example_resource_name>\" {\n  name     = \"<example_resource_name>\"\n  role_arn = \"<example_role_arn>\"\n\n  algorithm_specification {\n    training_image      = \"<example_ecr_image_uri>\"\n    training_input_mode = \"File\"\n  }\n\n  output_data_config {\n    s3_output_path = \"s3://<example_bucket>\"\n  }\n\n  resource_config {\n    instance_type     = \"ml.m5.large\"\n    instance_count    = 1\n    volume_size_in_gb = 10\n    volume_kms_key_id = \"<example_kms_key_arn>\" # 重大: トレーニングEBSボリュームのKMS暗号化を有効にします\n  }\n\n  stopping_condition {\n    max_runtime_in_seconds = 3600\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "トレーニングボリュームを**顧客管理のKMSキー**で暗号化し、S3の入力/出力にも同じことを適用します。\n\nキーポリシーでは**最小権限**を使用し、**ローテーション**を有効にし、付与を制限し、暗号化されていないアーティファクトの保存を防いで**多層防御**を実現します。",
+      "Url": "https://hub.prowler.com/check/sagemaker_training_jobs_volume_and_output_encryption_enabled"
+    }
+  },
+  "Categories": [
+    "encryption",
+    "gen-ai"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

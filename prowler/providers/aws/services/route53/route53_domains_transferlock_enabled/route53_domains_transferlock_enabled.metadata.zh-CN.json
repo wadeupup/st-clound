@@ -1,0 +1,39 @@
+{
+  "Provider": "aws",
+  "CheckID": "route53_domains_transferlock_enabled",
+  "CheckTitle": "Route 53 域名已启用转移锁定",
+  "CheckType": [
+    "软件和配置检查/AWS安全最佳实践",
+    "TTPs/初始访问/未授权访问"
+  ],
+  "ServiceName": "route53",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Other",
+  "ResourceGroup": "network",
+  "Description": "**Route 53 已注册域名**会被评估是否处于转移锁定状态，该状态由域名上的 `clientTransferProhibited` 状态指示。",
+  "Risk": "如果没有**转移锁定**，域名可能被非法转移到另一家注册商，从而导致**域名劫持**。攻击者可能会更改 DNS、重定向流量、窃取凭证，并扰乱电子邮件和应用程序——从而危及**机密性**、**完整性**和**可用性**。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/domain-lock.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws route53domains enable-domain-transfer-lock --domain-name <example_domain_name>",
+      "NativeIaC": "",
+      "Other": "1. 打开 AWS 管理控制台并前往 Route 53\n2. 在左侧窗格中，选择已注册域\n3. 点击域名 <example_domain_name>\n4. 在“操作”中，选择启用转移锁定\n5. 确认以启用锁定",
+      "Terraform": "```hcl\nresource \"aws_route53domains_registered_domain\" \"<example_resource_name>\" {\n  domain_name   = \"<example_domain_name>\"\n  transfer_lock = true  # 启用转移锁定（设置 clientTransferProhibited）\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "在域名上启用**转移锁定**，以防止未经授权的注册商转移。对域名管理实施**最小权限**，要求使用**多因素身份验证（MFA）**，并监控状态变化。*对于计划内转移*，仅在经批准的变更控制下移除锁定，并在之后立即重新启用。",
+      "Url": "https://hub.prowler.com/check/route53_domains_transferlock_enabled"
+    }
+  },
+  "Categories": [
+    "identity-access"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

@@ -1,0 +1,49 @@
+{
+  "Provider": "aws",
+  "CheckID": "cloudwatch_log_group_retention_policy_specific_days_enabled",
+  "CheckTitle": "CloudWatch 日志组的保留策略满足至少配置的最小天数或永不过期",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/NIST 800-53 Controls (USA)",
+    "Software and Configuration Checks/Industry and Regulatory Standards/PCI-DSS",
+    "Software and Configuration Checks/Industry and Regulatory Standards/SOC 2"
+  ],
+  "ServiceName": "cloudwatch",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsLogsLogGroup",
+  "ResourceGroup": "monitoring",
+  "Description": "评估 **CloudWatch 日志组** 的保留期是否达到或高于配置的阈值（例如 `365` 天），或被设置为 **永不过期**。保留期更短的日志组会被识别出来。",
+  "Risk": "较短的日志保留期会削弱审计证据。攻击者可以等待窗口期过去，从而在检测、取证和合规报告中制造空白。这会降低历史日志的 **可用性**，并损害事件时间线的 **完整性**。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://trendmicro.com/cloudoneconformity/knowledge-base/aws/CloudWatchLogs/cloudwatch-logs-retention-period.html",
+    "https://boto3.amazonaws.com/v1/documentation/api/1.26.93/reference/services/logs/client/put_retention_policy.html",
+    "https://medium.com/pareture/aws-cloudwatch-log-group-retention-periods-bb8a2fb9c358",
+    "https://www.blinkops.com/blog/cloudwatch-retention",
+    "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/AWS_Logs.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws logs put-retention-policy --log-group-name <LOG_GROUP_NAME> --retention-in-days <DAYS>",
+      "NativeIaC": "```yaml\n# CloudFormation: set retention on a CloudWatch Log Group\nResources:\n  <example_resource_name>:\n    Type: AWS::Logs::LogGroup\n    Properties:\n      LogGroupName: \"<example_resource_name>\"\n      RetentionInDays: <DAYS>  # Critical: sets log retention to the required minimum to pass the check\n```",
+      "Other": "1. 在 AWS 控制台中，转到 CloudWatch > 日志组\n2. 选择目标日志组\n3. 在“到期时间/保留期”列中点击当前值\n4. 选择一个保留期 >= <DAYS> 或选择“永不过期”\n5. 点击保存",
+      "Terraform": "```hcl\n# Set retention on a CloudWatch Log Group\nresource \"aws_cloudwatch_log_group\" \"<example_resource_name>\" {\n  name              = \"<example_resource_name>\"\n  retention_in_days = <DAYS> # Critical: set to at least the required minimum to pass the check\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "根据法律和调查需要定义一个最小保留基线（例如 `>=365` 天）。一致性地应用该基线，并对例外情况进行文档化说明。自动化执行、监控变更，并在 **最小权限原则** 和 **纵深防御** 下限制可修改保留期的主体。",
+      "Url": "https://hub.prowler.com/check/cloudwatch_log_group_retention_policy_specific_days_enabled"
+    }
+  },
+  "Categories": [
+    "logging",
+    "forensics-ready"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+
+

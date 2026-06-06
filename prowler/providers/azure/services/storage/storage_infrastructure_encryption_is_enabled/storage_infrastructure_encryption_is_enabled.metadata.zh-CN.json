@@ -1,0 +1,33 @@
+{
+  "Provider": "azure",
+  "CheckID": "storage_infrastructure_encryption_is_enabled",
+  "CheckTitle": "确保 Azure 存储中每个存储账户的“启用基础结构加密”设置为“已启用”",
+  "CheckType": [],
+  "ServiceName": "storage",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "low",
+  "ResourceType": "AzureRole",
+  "ResourceGroup": "IAM",
+  "Description": "确保 Azure 存储中每个存储账户的“启用基础结构加密”设置为“已启用”",
+  "Risk": "对 Azure 存储数据进行双重加密可防止其中一种加密算法或密钥被攻破时带来的风险。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "在默认软件加密之上，为访问 Azure 存储解决方案的存储账户启用硬件级双重加密。",
+      "Url": ""
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

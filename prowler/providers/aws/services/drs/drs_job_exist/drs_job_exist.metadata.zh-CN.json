@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "drs_job_exist",
+  "CheckTitle": "区域已启用 AWS Elastic Disaster Recovery (DRS) 并至少存在一个恢复作业",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices"
+  ],
+  "ServiceName": "drs",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "compute",
+  "Description": "**AWS Elastic Disaster Recovery** 按区域进行评估，以验证服务已**初始化**，并且至少存在一个**恢复或演练作业**，证明已执行过故障转移。",
+  "Risk": "如果未启用 DRS 或没有任何先前的作业，工作负载将**不受保护且未经测试**，这会削弱**可用性**。\n在中断或勒索软件攻击期间，恢复可能会延迟或失败，增加 RTO/RPO，导致**数据丢失**和长时间停机。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://aws.amazon.com/blogs/storage/cross-region-disaster-recovery-using-aws-elastic-disaster-recovery/",
+    "https://docs.aws.amazon.com/drs/latest/userguide/quick-start-guide-gs.html",
+    "https://aws.amazon.com/disaster-recovery/",
+    "https://docs.aws.amazon.com/drs/latest/userguide/recovery-job.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "1. 在 AWS 控制台中，切换到目标区域\n2. 打开 Elastic Disaster Recovery (DRS)\n3. 点击“Set default replication settings”（或 Settings > Initialize），选择“Configure and initialize”以在此区域启用 DRS\n4. 转到“Source servers”>“Add server”，复制安装命令，在一台服务器上运行，并等待直到显示 Data replication status = Healthy 和 Ready for recovery\n5. 选择该服务器，选择“Initiate recovery drill”（或“Initiate recovery”）并确认以创建作业\n6. 在“Recovery job history”下验证作业是否完成",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "在所需区域启用 DRS 并保护关键工作负载。定义 RTO/RPO 并运行**定期恢复演练**以验证启动设置和依赖项。应用**最小权限**，监控复制运行状况，并记录故障转移程序，以确保一致且可重复的恢复。",
+      "Url": "https://hub.prowler.com/check/drs_job_exist"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

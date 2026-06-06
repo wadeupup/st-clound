@@ -1,0 +1,39 @@
+{
+  "Provider": "aws",
+  "CheckID": "shield_advanced_protection_in_cloudfront_distributions",
+  "CheckTitle": "CloudFront ディストリビューションは AWS Shield Advanced によって保護されています",
+  "CheckType": [
+    "ソフトウェアおよび設定のチェック/AWS セキュリティのベストプラクティス/ネットワーク到達可能性",
+    "サービスへの影響/拒否"
+  ],
+  "ServiceName": "shield",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsCloudFrontDistribution",
+  "ResourceGroup": "network",
+  "Description": "**CloudFront ディストリビューション** は、保護対象リソースとして **AWS Shield Advanced** に関連付けられています。\n\nこの評価では、この保護マッピングが欠けているディストリビューションを特定します。",
+  "Risk": "**Shield Advanced** がないと、ディストリビューションは大規模な **DDoS** にさらされ、L3/L4 フラッドや L7 リクエスト急増によって **可用性** が低下します。影響には、エッジの飽和、レイテンシ、停止に加え、**コスト保護** と専門家によるサポートの喪失が含まれ、予期しない支出や復旧の長期化を招きます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/waf/latest/developerguide/configure-new-protection.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws shield create-protection --region us-east-1 --name <example_resource_name> --resource-arn <example_resource_arn>",
+      "NativeIaC": "```yaml\n# CloudFormation: CloudFront distribution に Shield Advanced 保護を追加する\nResources:\n  ShieldProtection:\n    Type: AWS::Shield::Protection\n    Properties:\n      Name: <example_resource_name>\n      ResourceArn: <example_resource_arn>  # 重大: Shield Advanced 保護を CloudFront ディストリビューション ARN に関連付けます\n```",
+      "Other": "1. AWS コンソールで、WAF & Shield を開きます\n2. AWS Shield > Protected resources に移動します\n3. Add resources to protect をクリックします\n4. Scope を Global に設定し、CloudFront distributions を選択してから、Load resources をクリックします\n5. 対象の distribution を選択します\n6. Protect with Shield Advanced をクリックします",
+      "Terraform": "```hcl\n# CloudFront ディストリビューションに Shield Advanced 保護を追加する\nresource \"aws_shield_protection\" \"example\" {\n  name         = \"<example_resource_name>\"\n  resource_arn = \"<example_resource_arn>\"  # 重大: Shield Advanced 保護を CloudFront ディストリビューション ARN に関連付けます\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "重要な CloudFront ディストリビューションを **AWS Shield Advanced** に登録し、保護対象リソースとして継続的に一覧に保持してください。\n\n多層防御を採用してください: **AWS WAF**、レート制限、および継続的なモニタリング。DDoS ランブックを維持し、DRT サポートを利用してください。保護を変更できるユーザーには **最小権限** を適用してください。",
+      "Url": "https://hub.prowler.com/check/shield_advanced_protection_in_cloudfront_distributions"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

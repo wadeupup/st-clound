@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "app_ensure_http_is_redirected_to_https",
+  "CheckTitle": "Azure App Service の Web アプリがすべての HTTP トラフィックを HTTPS にリダイレクトすることを確認する",
+  "CheckType": [],
+  "ServiceName": "app",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Microsoft.Web/sites/config",
+  "ResourceGroup": "serverless",
+  "Description": "既定では、Azure Web Apps はサイトを HTTP と HTTPS の両方で実行できます。既定では、Web アプリは非セキュアな HTTP リンクを使用して誰でもアクセスできます。非セキュアな HTTP 要求を制限し、すべての HTTP 要求をセキュアな HTTPS ポートへリダイレクトできます。HTTPS のみのトラフィックを強制することが推奨されます。",
+  "Risk": "HTTPS のみのトラフィックを有効にすると、すべての非セキュアな HTTP 要求は HTTPS ポートへリダイレクトされます。HTTPS は TLS/SSL プロトコルを使用して、暗号化および認証された安全な接続を提供します。したがって、セキュリティ上の利点のために HTTPS をサポートすることが重要です。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/app-service/configure-ssl-bindings#enforce-https",
+  "Remediation": {
+    "Code": {
+      "CLI": "az webapp update --resource-group <RESOURCE_GROUP_NAME> --name <APP_NAME> --set httpsOnly=true",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/AppService/enable-https-only-traffic.html#",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-networking-policies/bc_azr_networking_5#terraform"
+    },
+    "Recommendation": {
+      "Text": "1. https://portal.azure.com で Azure Portal にログインします 2. App Services に移動します 3. 各アプリをクリックします 4. Setting セクションで Configuration をクリックします 5. General Settings セクションで HTTPS Only を On に設定します 6. Save をクリックします",
+      "Url": "https://learn.microsoft.com/en-us/security/benchmark/azure/security-controls-v3-data-protection#dp-3-encrypt-sensitive-data-in-transit"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "有効化すると、受信するすべての HTTP 要求は HTTPS ポートへリダイレクトされます。これにより、アプリへの HTTP 要求に対して追加のセキュリティ層が加わります。"
+}

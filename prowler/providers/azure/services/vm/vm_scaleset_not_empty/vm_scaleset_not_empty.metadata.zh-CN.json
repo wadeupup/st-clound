@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "vm_scaleset_not_empty",
+  "CheckTitle": "检查空的虚拟机规模集",
+  "CheckType": [],
+  "ServiceName": "vm",
+  "SubServiceName": "scaleset",
+  "ResourceIdTemplate": "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachineScaleSets/{vmScaleSetName}",
+  "Severity": "low",
+  "ResourceType": "Microsoft.Compute/virtualMachineScaleSets",
+  "ResourceGroup": "compute",
+  "Description": "识别并移除 Azure 云账户中的空虚拟机规模集。",
+  "Risk": "空的虚拟机规模集可能产生不必要的成本并增加云资源管理复杂度，影响成本优化和合规性。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/virtual-machine-scale-sets/overview",
+  "Remediation": {
+    "Code": {
+      "CLI": "az vmss delete --name <scale-set-name> --resource-group <resource-group>",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/VirtualMachines/empty-vm-scale-sets.html",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "移除空的 Azure 虚拟机规模集，以优化成本并简化管理。",
+      "Url": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/VirtualMachines/empty-vm-scale-sets.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

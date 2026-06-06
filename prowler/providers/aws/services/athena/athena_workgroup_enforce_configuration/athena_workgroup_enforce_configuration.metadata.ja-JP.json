@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "athena_workgroup_enforce_configuration",
+  "CheckTitle": "Athena ワークグループがワークグループ設定を強制し、クライアント側設定で上書きできません",
+  "CheckType": [
+    "ソフトウェアと設定チェック/AWS セキュリティベストプラクティス",
+    "ソフトウェアと設定チェック/業界および規制基準/AWS 基礎セキュリティベストプラクティス"
+  ],
+  "ServiceName": "athena",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsAthenaWorkGroup",
+  "ResourceGroup": "analytics",
+  "Description": "`enforce_workgroup_configuration=true` を設定した**Athena ワークグループ**は、**ワークグループの設定**をすべてのクエリに適用し、結果の場所、期待されるバケット所有者、暗号化、および結果バケットに書き込まれるオブジェクトの制御に関するクライアント側オプションを上書きします。",
+  "Risk": "強制がない場合、クライアントは結果の**暗号化**を無効にしたり変更したり、出力を意図しないまたはクロスアカウントバケットにリダイレクトし、保持制御をバイパスする可能性があります。\n\nこれにより、データの露出（機密性）、結果の改ざん（整合性）、弱い監査可能性が可能になり、インシデント対応が複雑になります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/athena/latest/ug/workgroups-settings-override.html",
+    "https://support.icompaas.com/support/solutions/articles/62000233407-ensure-that-workgroup-configuration-is-enforced-so-it-cannot-be-overriden-by-client-side-settings-"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws athena update-work-group --work-group <workgroup_name> --configuration-updates EnforceWorkGroupConfiguration=true",
+      "NativeIaC": "```yaml\n# CloudFormation: ワークグループ設定の強制を有効にします\nResources:\n  <example_resource_name>:\n    Type: AWS::Athena::WorkGroup\n    Properties:\n      Name: <example_resource_name>\n      WorkGroupConfiguration:\n        EnforceWorkGroupConfiguration: true  # 重要：ワークグループ設定がクライアント側設定を上書きすることを強制します\n```",
+      "Other": "1. AWS マネジメントコンソールを開き、Amazon Athena に移動します\n2. Workgroups をクリックし、ターゲットワークグループを選択します\n3. Edit workgroup をクリックします\n4. Override client-side settings（ワークグループ設定を強制）をチェックします\n5. Save をクリックします",
+      "Terraform": "```hcl\n# Terraform: ワークグループ設定の強制を有効にします\nresource \"aws_athena_workgroup\" \"<example_resource_name>\" {\n  name = \"<example_resource_name>\"\n\n  configuration {\n    enforce_workgroup_configuration = true  # 重要：ワークグループ設定がクライアント側設定を上書きすることを強制します\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "集中制御のために `enforce_workgroup_configuration=true` を設定します。\n\n**暗号化された結果**（**SSE-KMS** を優先）を要求し、期待されるバケット所有者を持つ承認された S3 場所に出力を制限し、**最小権限**を適用します。**多層防御**の一部として、結果へのアクセスとログを監視します。",
+      "Url": "https://hub.prowler.com/check/athena_workgroup_enforce_configuration"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

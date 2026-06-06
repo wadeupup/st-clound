@@ -1,0 +1,48 @@
+{
+  "Provider": "aws",
+  "CheckID": "accessanalyzer_enabled",
+  "CheckTitle": "IAM Access Analyzer が有効になっています",
+  "CheckType": [
+    "ソフトウェアと設定チェック/AWS セキュリティベストプラクティス",
+    "ソフトウェアと設定チェック/業界および規制基準/AWS 基礎セキュリティベストプラクティス"
+  ],
+  "ServiceName": "accessanalyzer",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "low",
+  "ResourceType": "Other",
+  "ResourceGroup": "security",
+  "Description": "**IAM Access Analyzer** の存在とステータスは、アカウントとリージョンごとに評価されます。`ACTIVE` 状態のアナライザーは、サポートされているリソースと IAM アクティビティの継続的な分析を示し、外部、内部、および未使用のアクセスを識別します。",
+  "Risk": "アクティブなアナライザーがない場合、意図しないパブリックアクセス、クロスアカウントアクセス、またはリスクのある内部アクセスへの可視性が失われます。攻撃者は、露出した S3、スナップショット、KMS キー、または許可的なロール信頼を悪用して、データ流出とエスカレーションを行う可能性があります。未使用の権限が残り、攻撃面が拡大します。これにより、機密性と整合性が低下します。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/IAM/latest/UserGuide/access-analyzer-manage-external.html",
+    "https://aws.amazon.com/iam/access-analyzer/",
+    "https://docs.aws.amazon.com/IAM/latest/UserGuide/access-analyzer-getting-started.html",
+    "https://docs.aws.amazon.com/access-analyzer/latest/APIReference/API_CreateAnalyzer.html",
+    "https://docs.aws.amazon.com/IAM/latest/UserGuide/what-is-access-analyzer.html",
+    "https://docs.aws.amazon.com/IAM/latest/UserGuide/access-analyzer-create-external.html",
+    "https://docs.aws.amazon.com/access-analyzer/latest/APIReference/Welcome.html",
+    "https://docs.aws.amazon.com/IAM/latest/UserGuide/access-analyzer-create-internal.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws accessanalyzer create-analyzer --analyzer-name example_resource --type ACCOUNT",
+      "NativeIaC": "```yaml\nResources:\n  example_resource:\n    Type: AWS::AccessAnalyzer::Analyzer  # このリソースは IAM Access Analyzer を有効にします\n    Properties:\n      AnalyzerName: example_resource\n      Type: ACCOUNT  # この行はセキュリティ問題を修正します\n```",
+      "Other": "1. AWS コンソールで、IAM を開きます\n2. Access analyzer > Analyzer settings に移動します\n3. 希望するリージョンを確認します\n4. Create analyzer をクリックします\n5. Resource analysis - External access を選択します\n6. Name を \"example_resource\" に設定し、Zone of trust を \"Current account\" に設定します\n7. Create をクリックします",
+      "Terraform": "```hcl\nresource \"aws_accessanalyzer_analyzer\" \"example_resource\" {\n  analyzer_name = \"example_resource\"\n  type          = \"ACCOUNT\" # この行はセキュリティ問題を修正します\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "すべてのアカウントとアクティブなリージョン（*または組織全体*）で **IAM Access Analyzer** を有効にします。最小権限の原則に従って操作します：調査結果を継続的に確認し、意図しないアクセスを削除し、未使用の権限を削減します。アーカイブルールは控えめに使用し、レビューを変更/CI/CD ワークフローに統合し、ポリシー変更時に職務の分離を強制します。",
+      "Url": "https://hub.prowler.com/check/accessanalyzer_enabled"
+    }
+  },
+  "Categories": [
+    "identity-access",
+    "trust-boundaries"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

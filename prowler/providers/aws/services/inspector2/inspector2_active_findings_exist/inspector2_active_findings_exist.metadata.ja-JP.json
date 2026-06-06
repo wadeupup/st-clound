@@ -1,0 +1,44 @@
+{
+  "Provider": "aws",
+  "CheckID": "inspector2_active_findings_exist",
+  "CheckTitle": "Inspector2 は有効化されていますが、アクティブな検出結果はありません",
+  "CheckAliases": [
+    "inspector2_findings_exist"
+  ],
+  "CheckType": [
+    "ソフトウェアと構成のチェック/脆弱性/CVE",
+    "ソフトウェアと構成のチェック/パッチ管理",
+    "ソフトウェアと構成のチェック/AWS セキュリティベストプラクティス",
+    "業界および規制基準/AWS 基礎セキュリティベストプラクティス"
+  ],
+  "ServiceName": "inspector2",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Other",
+  "ResourceGroup": "security",
+  "Description": "**Amazon Inspector2** のアクティブな検出結果は、サービスが `ENABLED` のときに対象リソース全体で評価されます。\n\n検出結果が **Active** 状態にあるかどうかを示します。",
+  "Risk": "**未修正の Inspector2 検出結果** は、既知の脆弱性や露出がワークロード上に残っていることを意味します。\n\nこれにより以下が可能になります:\n- 不正アクセスとデータの流出 (C)\n- コードの改ざんと権限の昇格 (I)\n- 悪用やマルウェアによるサービスの中断 (A)",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/Inspector/amazon-inspector-findings.html",
+    "https://docs.aws.amazon.com/inspector/latest/user/findings-understanding.html",
+    "https://docs.aws.amazon.com/inspector/latest/user/what-is-inspector.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws inspector2 create-filter --name <example_resource_name> --action SUPPRESS --filter-criteria '{\"findingStatus\":[{\"comparison\":\"EQUALS\",\"value\":\"ACTIVE\"}]}'",
+      "NativeIaC": "```yaml\n# CloudFormation: すべてのアクティブな Inspector 検出結果を抑制\nResources:\n  <example_resource_name>:\n    Type: AWS::InspectorV2::Filter\n    Properties:\n      Name: <example_resource_name>\n      Action: SUPPRESS  # 重要: 一致する検出結果をアクティブではなく抑制済みに変換します\n      FilterCriteria:\n        FindingStatus:\n          - Comparison: EQUALS\n            Value: ACTIVE  # 重要: すべてのアクティブな検出結果を対象とします\n```",
+      "Other": "1. AWS コンソールで Amazon Inspector に移動します\n2. 抑制ルール（またはフィルター）を開き、抑制ルールを作成をクリックします\n3. 条件を設定: 検出結果のステータス = Active\n4. アクションを抑制に設定し、作成をクリックします\n5. ダッシュボードでアクティブな検出結果の数が 0 であることを確認します",
+      "Terraform": "```hcl\n# Terraform: すべてのアクティブな Inspector 検出結果を抑制\nresource \"aws_inspector2_filter\" \"<example_resource_name>\" {\n  name   = \"<example_resource_name>\"\n  action = \"SUPPRESS\"  # 重要: 一致する検出結果をアクティブではなく抑制済みに変換します\n\n  filter_criteria {\n    finding_status {\n      comparison = \"EQUALS\"\n      value      = \"ACTIVE\"  # 重要: すべてのアクティブな検出結果を対象とします\n    }\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "**アクティブな検出結果** を迅速に優先して修正します: ホストとランタイムをパッチし、イメージを更新/再構築し、脆弱なコードを修正し、意図しない露出を閉じます。\n\n**最小特権** を適用し、**多層防御** を使用し、広範な抑制を避けます。検出結果を CI/CD と脆弱性管理に統合して継続的な予防を行います。",
+      "Url": "https://hub.prowler.com/check/inspector2_active_findings_exist"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

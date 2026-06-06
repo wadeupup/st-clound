@@ -1,0 +1,36 @@
+{
+  "Provider": "aws",
+  "CheckID": "ec2_instance_port_ftp_exposed_to_internet",
+  "CheckTitle": "EC2 インスタンスがインターネットからの TCP ポート 20 または 21 (FTP) へのインバウンドを許可していないことを確認",
+  "CheckType": [
+    "Infrastructure Security"
+  ],
+  "ServiceName": "ec2",
+  "SubServiceName": "instance",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "critical",
+  "ResourceType": "AwsEc2Instance",
+  "ResourceGroup": "compute",
+  "Description": "EC2 インスタンスがインターネットからの TCP ポート 20 または 21 (FTP) へのインバウンドを許可していないことを確認",
+  "Risk": "FTP は安全でないプロトコルであり、使用すべきではありません。FTP が必要な場合は、FTPS や SFTP などの安全なチャネルで使用する必要があります。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "セキュリティグループを変更して、インターネットからの TCP ポート 20 または 21 (FTP) へのインバウンドを許可するルールを削除します。",
+      "Url": "https://docs.aws.amazon.com/vpc/latest/userguide/VPC_SecurityGroups.html"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

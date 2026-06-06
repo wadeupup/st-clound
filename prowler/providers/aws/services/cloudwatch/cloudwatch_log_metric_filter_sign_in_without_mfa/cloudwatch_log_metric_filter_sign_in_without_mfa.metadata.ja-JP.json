@@ -1,0 +1,48 @@
+{
+  "Provider": "aws",
+  "CheckID": "cloudwatch_log_metric_filter_sign_in_without_mfa",
+  "CheckTitle": "MFA を使用しないマネジメントコンソールサインインに対する CloudWatch ログメトリクスフィルターとアラームが存在すること",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/CIS AWS Foundations Benchmark",
+    "TTPs/Initial Access",
+    "Unusual Behaviors/User"
+  ],
+  "ServiceName": "cloudwatch",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsCloudWatchAlarm",
+  "ResourceGroup": "monitoring",
+  "Description": "CloudWatch に保存された **CloudTrail ログ** について、`$.eventName = ConsoleLogin` かつ `$.additionalEventData.MFAUsed != \\\"Yes\\\"` となるコンソールログインを検知するメトリクスフィルターとアラームが存在するかを評価します。\n\nこれは、**MFA を使用していない**サインインに対するアラートが構成されているかどうかを示します。",
+  "Risk": "MFA を伴わないコンソールログインにアラートがない場合、盗まれたパスワードの悪用が**検知されない**ままとなり、次のような事態を招く可能性があります：\n- 不正なコンソールアクセスおよび IAM 変更\n- データの流出または削除\n\n結果として、**機密性**と**完全性**の喪失、および**可用性**の障害につながるおそれがあります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudwatch-alarms-for-cloudtrail.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/CloudWatchLogs/console-sign-in-without-mfa.html",
+    "https://www.tenable.com/audits/items/CIS_Amazon_Web_Services_Foundations_v3.0.0_L1.audit:1957056ee174cc38502d5f5f1864333b",
+    "https://www.clouddefense.ai/compliance-rules/gdpr/data-protection/log-metric-filter-console-login-mfa",
+    "https://www.intelligentdiscovery.io/controls/cloudwatch/cloudwatch-alarm-no-mfa",
+    "https://support.icompaas.com/support/solutions/articles/62000083605-ensure-a-log-metric-filter-and-alarm-exist-for-management-console-sign-in-without-mfa"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation：MFA なしのコンソールサインイン用メトリクスフィルターとアラームを作成\nResources:\n  NoMFAConsoleSigninMetricFilter:\n    Type: AWS::Logs::MetricFilter\n    Properties:\n      LogGroupName: \"<example_resource_name>\"\n      FilterPattern: '{ ($.eventName = \"ConsoleLogin\") && ($.additionalEventData.MFAUsed != \"Yes\") }' # 重要：MFA を使用していない ConsoleLogin イベントを検知\n      MetricTransformations:\n        - MetricName: \"<example_resource_name>\"\n          MetricNamespace: \"<example_resource_name>\"\n          MetricValue: \"1\"  # 重要：一致するたびにメトリクスを発行\n\n  NoMFAConsoleSigninAlarm:\n    Type: AWS::CloudWatch::Alarm\n    Properties:\n      MetricName: \"<example_resource_name>\"   # 重要：フィルターで作成されたメトリクスに対してアラーム\n      Namespace: \"<example_resource_name>\"\n      ComparisonOperator: GreaterThanOrEqualToThreshold\n      EvaluationPeriods: 1\n      Period: 300\n      Statistic: Sum\n      Threshold: 1  # 重要：最初の発生でアラームを上げる\n```",
+      "Other": "1. AWS コンソールで CloudWatch > Logs > Log groups に移動し、CloudTrail ロググループを開きます\n2. Metric filters > Create metric filter に進みます\n3. Filter pattern を次のように設定します：{ ($.eventName = \"ConsoleLogin\") && ($.additionalEventData.MFAUsed != \"Yes\") }\n4. Next > Filter name、Metric namespace、Metric name を設定し、Metric value = 1 としてメトリクスフィルターを作成します\n5. 新しいフィルターを選択し、Create alarm をクリックします\n6. Statistic = Sum、Period = 5 minutes、Threshold type = Static、Threshold = 1、Whenever >= 1 を設定し、Next をクリックします\n7. 必要に応じてアクションを設定またはスキップし、アラーム名を付けて Create alarm を実行します",
+      "Terraform": "```hcl\n# MFA なしのコンソールサインイン用メトリクスフィルターを作成\nresource \"aws_cloudwatch_log_metric_filter\" \"nomfa\" {\n  name           = \"<example_resource_name>\"\n  log_group_name = \"<example_resource_name>\"\n  pattern        = \"{ ($.eventName = \\\"ConsoleLogin\\\") && ($.additionalEventData.MFAUsed != \\\"Yes\\\") }\"  # 重要：MFA なしの ConsoleLogin を検知\n\n  metric_transformation {\n    name      = \"<example_resource_name>\"\n    namespace = \"<example_resource_name>\"\n    value     = \"1\"  # 重要：一致ごとに 1 をカウント\n  }\n}\n\n# 発行されたメトリクスに対するアラーム\nresource \"aws_cloudwatch_metric_alarm\" \"nomfa\" {\n  alarm_name          = \"<example_resource_name>\"\n  metric_name         = aws_cloudwatch_log_metric_filter.nomfa.metric_transformation[0].name  # 重要：アラームをメトリクスに紐付け\n  namespace           = aws_cloudwatch_log_metric_filter.nomfa.metric_transformation[0].namespace\n  comparison_operator = \"GreaterThanOrEqualToThreshold\"\n  evaluation_periods  = 1\n  period              = 300\n  statistic           = \"Sum\"\n  threshold           = 1  # 重要：最初のイベントでアラーム\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "すべてのコンソールアクセス可能なアイデンティティに対して **MFA** を強制し、`ConsoleLogin` かつ `MFAUsed != \\\"Yes\\\"` のイベントに関するアラートを維持してください。\n\n**最小権限の原則**を適用し、アラームを監視されたチャネルにルーティングし、ノイズを減らすため SSO 環境向けにチューニングします。アラームを定期的にテストし、そのカバレッジを **多層防御（Defense in Depth）** の一環として見直してください。",
+      "Url": "https://hub.prowler.com/check/cloudwatch_log_metric_filter_sign_in_without_mfa"
+    }
+  },
+  "Categories": [
+    "logging"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "ロギングおよびモニタリング"
+}
+
+

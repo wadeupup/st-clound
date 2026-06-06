@@ -1,0 +1,44 @@
+{
+  "Provider": "aws",
+  "CheckID": "firehose_stream_encrypted_at_rest",
+  "CheckTitle": "Kinesis Data Firehose 交付流已启用静态加密",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/NIST 800-53 Controls",
+    "Software and Configuration Checks/Industry and Regulatory Standards/NIST CSF Controls (USA)"
+  ],
+  "ServiceName": "firehose",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsKinesisStream",
+  "ResourceGroup": "messaging",
+  "Description": "**Amazon Data Firehose** 交付流必须启用基于 AWS KMS 的**服务端静态加密**，且与数据源类型无关。上游来源如 **Kinesis Data Streams** 或 **MSK** 已加密，并不能替代对交付流自身的保护。",
+  "Risk": "Firehose 静态数据未加密时，一旦底层存储或备份被访问，数据可能被读取，损害**机密性**与**完整性**。磁盘级访问、快照或目的地配置错误都可能导致数据外泄或篡改。缺少 KMS 支持控制还会降低密钥轮换、职责分离与审计能力。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/Firehose/delivery-stream-encrypted-with-kms-customer-master-keys.html",
+    "https://docs.aws.amazon.com/firehose/latest/dev/encryption.html",
+    "https://docs.aws.amazon.com/AmazonS3/latest/userguide/UsingKMSEncryption.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/datafirehose-controls.html#datafirehose-1"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws firehose start-delivery-stream-encryption --delivery-stream-name <delivery-stream-name> --delivery-stream-encryption-configuration-input KeyType=AWS_OWNED_CMK",
+      "NativeIaC": "```yaml\n# CloudFormation: Enable at-rest encryption for a Firehose delivery stream\nResources:\n  <example_resource_name>:\n    Type: AWS::KinesisFirehose::DeliveryStream\n    Properties:\n      DeliveryStreamEncryptionConfigurationInput:\n        KeyType: AWS_OWNED_CMK  # critical: enables SSE at rest using AWS owned KMS key\n      ExtendedS3DestinationConfiguration:\n        BucketARN: arn:aws:s3:::<example_resource_name>\n        RoleARN: arn:aws:iam::<example_account_id>:role/<example_resource_name>\n```",
+      "Other": "1. 在 AWS 控制台进入 Amazon Data Firehose\n2. 选择受影响的交付流并点击 Edit\n3. 在 Server-side encryption 下设置为 Enabled（选择 AWS owned key）\n4. 点击 Save changes",
+      "Terraform": "```hcl\n# Terraform: Enable at-rest encryption for a Firehose delivery stream\nresource \"aws_kinesis_firehose_delivery_stream\" \"<example_resource_name>\" {\n  name        = \"<example_resource_name>\"\n  destination = \"extended_s3\"\n\n  server_side_encryption {\n    enabled = true  # critical: turns on SSE at rest (uses AWS owned KMS key by default)\n  }\n\n  extended_s3_configuration {\n    role_arn   = \"arn:aws:iam::<example_account_id>:role/<example_resource_name>\"\n    bucket_arn = \"arn:aws:s3:::<example_resource_name>\"\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "为 Firehose 启用基于 AWS KMS 的**服务端加密**。优先使用**客户管理密钥**（`CMEK`）以落实**最小权限**、密钥轮换与审计。确保上游 **Kinesis** 来源已加密，并确认 MSK 默认设置符合策略。监控 KMS 健康信号并拒绝未加密写入。在目标端实施**纵深防御**。",
+      "Url": "https://hub.prowler.com/check/firehose_stream_encrypted_at_rest"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

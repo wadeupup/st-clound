@@ -1,0 +1,44 @@
+{
+  "Provider": "aws",
+  "CheckID": "sns_topics_kms_encryption_at_rest_enabled",
+  "CheckTitle": "SNS トピックは KMS によって保管時に暗号化されています",
+  "CheckType": [
+    "ソフトウェアと構成チェック/AWSセキュリティのベストプラクティス",
+    "ソフトウェアと設定のチェック/業界および規制基準/AWS 基盤セキュリティのベストプラクティス",
+    "ソフトウェアおよび構成チェック/業界および規制基準/NIST 800-53 管理策（米国）",
+    "ソフトウェアおよび構成のチェック/業界および規制基準/NIST CSF コントロール（米国）",
+    "ソフトウェアおよび設定チェック／業界および規制基準／PCI-DSS",
+    "ソフトウェアおよび構成のチェック／業界および規制基準／ISO 27001管理策"
+  ],
+  "ServiceName": "sns",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsSnsTopic",
+  "ResourceGroup": "messaging",
+  "Description": "**Amazon SNS トピック**は、**AWS KMS** を使用した**サーバー側暗号化**について評価されます。KMS キーが設定されていないトピック（例: `kms_master_key_id` がない）は、保管時に暗号化されていないものとして特定されます。",
+  "Risk": "KMS によって裏付けられた SSE がない場合、SNS はメッセージ本文を保存時に暗号化せずに保管するため、**機密性**が損なわれます。\n\n特権を持つ内部関係者や侵害されたサービスコンポーネントが、永続化の間のタイミングで平文にアクセスできる可能性があり、データ漏えいを引き起こします。また、キーポリシー、ローテーション、詳細な監査証跡などの KMS コントロールも失われます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/SNS/topic-encrypted-with-kms-customer-master-keys.html",
+    "https://docs.aws.amazon.com/sns/latest/dg/sns-server-side-encryption.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws sns set-topic-attributes --topic-arn <TOPIC_ARN> --attribute-name KmsMasterKeyId --attribute-value alias/aws/sns",
+      "NativeIaC": "```yaml\n# CloudFormation: SNSトピックのSSEを有効化する\nResources:\n  <example_resource_name>:\n    Type: AWS::SNS::Topic\n    Properties:\n      KmsMasterKeyId: alias/aws/sns  # 重大: AWS マネージド KMS キーによる保管時の暗号化を有効にします\n```",
+      "Other": "1. AWS コンソールを開き、Amazon SNS > Topics に移動します\n2. トピックを選択し、Edit をクリックします\n3. Encryption の下で、暗号化を有効にし、SNS 用の AWS マネージドキー (alias/aws/sns) を選択します\n4. Save changes をクリックします",
+      "Terraform": "```hcl\n# SNS トピックの SSE を有効にする\nresource \"aws_sns_topic\" \"<example_resource_name>\" {\n  name               = \"<example_resource_name>\"\n  kms_master_key_id  = \"alias/aws/sns\" # 重大: 保存時の暗号化を有効にします\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "すべてのSNSトピックで **サーバー側暗号化** を **AWS KMS** で有効にし、制御性のために **カスタマー管理キー** を優先してください。\n\nキーの使用には **最小権限** を適用し、ローテーションを強制し、キー/アクセスログを監視してください。メッセージ内の機密データを最小限に抑え、可能な場合は多層防御を追加するためにエンドツーエンド暗号化を使用してください。",
+      "Url": "https://hub.prowler.com/check/sns_topics_kms_encryption_at_rest_enabled"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "defender_ensure_system_updates_are_applied",
+  "CheckTitle": "确保 Microsoft Defender 对“应用系统更新”的建议状态为“已完成”",
+  "CheckType": [],
+  "ServiceName": "defender",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AzureDefenderRecommendation",
+  "ResourceGroup": "security",
+  "Description": "确保所有虚拟机均已应用最新的操作系统补丁。",
+  "Risk": "Azure Security Center 会根据 Windows VM 上配置的服务，从 Windows Update 或 Windows Server Update Services（WSUS）获取可用安全更新和关键更新列表。安全中心还会检查 Linux 系统中的最新更新。如果 VM 缺少系统更新，安全中心会建议应用系统更新。",
+  "RelatedUrl": "https://docs.microsoft.com/en-us/security/benchmark/azure/security-controls-v3-posture-vulnerability-management#pv-7-rapidly-and-automatically-remediate-software-vulnerabilities",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/VirtualMachines/apply-latest-os-patches.html",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "请按照 Microsoft Azure 文档从安全中心应用安全补丁。或者，你也可以使用自有的补丁评估与管理工具，定期评估、报告并安装操作系统所需的安全补丁。",
+      "Url": "https://learn.microsoft.com/en-us/azure/virtual-machines/updates-maintenance-overview"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "运行 Microsoft Defender for Cloud 会对每个受监控资源产生额外费用。具体每小时费用请参见附带参考。"
+}

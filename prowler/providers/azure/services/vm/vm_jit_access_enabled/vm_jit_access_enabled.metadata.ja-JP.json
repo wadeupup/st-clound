@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "vm_jit_access_enabled",
+  "CheckTitle": "Virtual Machines で Just-In-Time アクセスを有効化する",
+  "CheckType": [],
+  "ServiceName": "vm",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/{vmName}",
+  "Severity": "high",
+  "ResourceType": "Microsoft.Compute/virtualMachines",
+  "ResourceGroup": "compute",
+  "Description": "Microsoft Azure 仮想マシンが Just-in-Time（JIT）アクセスを使用するよう構成されていることを確認します。",
+  "Risk": "JIT アクセスがない場合、22（SSH）や 3389（RDP）などの管理ポートが公開される可能性があり、ブルートフォース攻撃や DDoS 攻撃のリスクが高まります。",
+  "RelatedUrl": "https://docs.microsoft.com/en-us/azure/security-center/security-center-just-in-time?tabs=jit-config-asc%2Cjit-request-asc",
+  "Remediation": {
+    "Code": {
+      "CLI": "az security jit-policy list --query '[*].virtualMachines[*].id | []'",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "Azure Portal の Security Center > Just-in-time VM access から、Microsoft Azure 仮想マシンの Just-in-Time（JIT）ネットワークアクセスを有効化してください。",
+      "Url": "https://docs.microsoft.com/en-us/azure/security-center/security-center-just-in-time?tabs=jit-config-asc%2Cjit-request-asc"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "JIT アクセスは Azure Portal からのみ有効化できます。Security Center のサーバー向け標準価格レベルが有効になっていることを確認してください。"
+}

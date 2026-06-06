@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "cloudfront_distributions_https_sni_enabled",
+  "CheckTitle": "CloudFrontディストリビューションがSNIを使用してHTTPSリクエストを提供している",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices/Network Reachability"
+  ],
+  "ServiceName": "cloudfront",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "low",
+  "ResourceType": "AwsCloudFrontDistribution",
+  "ResourceGroup": "network",
+  "Description": "**カスタムSSL/TLS証明書**を使用する**CloudFrontディストリビューション**は、**サーバー名指示**（`ssl_support_method: sni-only`）を使用して**HTTPS**を提供するように設定されています。TLSハンドシェイク中に専用IPではなくSNIの使用を評価します。",
+  "Risk": "**SNI**がない場合、ディストリビューションは専用IP SSLを使用し、コストが高くなり、IP使用が非効率になります。専用IPはクォータを圧迫し、スケーリングを妨げ、**可用性**を低下させる可能性があります。IPバインド証明書の管理は、ローテーションと拡張中に**運用リスク**を増加させます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/CloudFront/cloudfront-sni.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/cloudfront-controls.html#cloudfront-8",
+    "https://support.icompaas.com/support/solutions/articles/62000223557-ensure-cloudfront-sni-enabled",
+    "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/cnames-https-dedicated-ip-or-sni.html#cnames-https-sni"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws cloudfront get-distribution-config --id <DISTRIBUTION_ID> --output json > current-config.json && echo 'Manually edit current-config.json to change ViewerCertificate.SslSupportMethod to sni-only', then run:' && echo 'aws cloudfront update-distribution --id <DISTRIBUTION_ID> --distribution-config file://current-config.json --if-match $(aws cloudfront get-distribution-config --id <DISTRIBUTION_ID> --query \"ETag\" --output text)'",
+      "NativeIaC": "```yaml\nResources:\n  <example_resource_name>:\n    Type: AWS::CloudFront::Distribution\n    Properties:\n      DistributionConfig:\n        Enabled: true\n        Origins:\n          - Id: <example_origin_id>\n            DomainName: <example_origin_domain>\n            S3OriginConfig:\n              OriginAccessIdentity: ''\n        DefaultCacheBehavior:\n          TargetOriginId: <example_origin_id>\n          ViewerProtocolPolicy: allow-all\n          ForwardedValues:\n            QueryString: false\n            Cookies:\n              Forward: none\n          MinTTL: 0\n        ViewerCertificate:\n          AcmCertificateArn: <example_certificate_arn>\n          SslSupportMethod: sni-only  # 重要：HTTPSでSNIを有効化\n          MinimumProtocolVersion: TLSv1  # SNIとカスタム証明書を使用する場合に必要\n```",
+      "Other": "1. AWSコンソールで、CloudFrontに移動し、ディストリビューションを開く\n2. 設定/一般タブを選択し、編集をクリック\n3. SSL証明書の下で、カスタム証明書が選択されていることを確認\n4. クライアントサポートをSNIのみに設定\n5. 変更を保存",
+      "Terraform": "```hcl\nresource \"aws_cloudfront_distribution\" \"<example_resource_name>\" {\n  enabled = true\n\n  origin {\n    domain_name = \"<example_origin_domain>\"\n    origin_id   = \"<example_origin_id>\"\n  }\n\n  default_cache_behavior {\n    target_origin_id       = \"<example_origin_id>\"\n    viewer_protocol_policy = \"allow-all\"\n    forwarded_values {\n      query_string = false\n      cookies { forward = \"none\" }\n    }\n    min_ttl = 0\n  }\n\n  viewer_certificate {\n    acm_certificate_arn      = \"<example_certificate_arn>\"\n    ssl_support_method       = \"sni-only\"  # 重要：HTTPSでSNIを有効化\n    minimum_protocol_version = \"TLSv1\"     # SNI使用時に必要\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "カスタム証明書を使用した**HTTPS**に**SNI**（`sni-only`）を使用します。重要な非SNIクライアントが必要な場合を除き、専用IPを避けます。例外を文書化し、定期的に確認し、クライアントのアップグレードを計画し、最新の**TLSセキュリティポリシー**を採用して、安全でモダンな設定を標準化します。",
+      "Url": "https://hub.prowler.com/check/cloudfront_distributions_https_sni_enabled"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

@@ -1,0 +1,44 @@
+{
+  "Provider": "aws",
+  "CheckID": "dms_replication_task_target_logging_enabled",
+  "CheckTitle": "DMS 复制任务已为 TARGET_APPLY 和 TARGET_LOAD 启用日志且严重级别至少为 Default",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "TTPs/Defense Evasion"
+  ],
+  "ServiceName": "dms",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsDmsReplicationTask",
+  "ResourceGroup": "database",
+  "Description": "**AWS DMS 复制任务** 已启用目标端日志记录，包括 `TARGET_APPLY` 和 `TARGET_LOAD`，且二者的严重级别均设置为至少 `LOGGER_SEVERITY_DEFAULT`。",
+  "Risk": "目标端日志不足会限制对加载/应用活动的可见性，从而掩盖故障与异常。这会危及**数据完整性**（静默数据漂移、部分加载）和**可用性**（事故定位和恢复时间变长），并降低迁移事件的**可审计性**。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://repost.aws/knowledge-center/dms-debug-logging",
+    "https://docs.aws.amazon.com/dms/latest/userguide/CHAP_Tasks.CustomizingTasks.TaskSettings.Logging.html",
+    "https://stackoverflow.com/questions/46913913/aws-dms-with-cloudformation-enabling-logging-needs-a-log-group",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/dms-controls.html#dms-7"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws dms modify-replication-task --replication-task-arn <task-arn> --replication-task-settings '{\"Logging\":{\"EnableLogging\":true,\"LogComponents\":[{\"Id\":\"TARGET_APPLY\",\"Severity\":\"LOGGER_SEVERITY_DEFAULT\"},{\"Id\":\"TARGET_LOAD\",\"Severity\":\"LOGGER_SEVERITY_DEFAULT\"}]}}'",
+      "NativeIaC": "```yaml\n# CloudFormation：为目标组件启用 DMS 任务日志\nResources:\n  <example_resource_name>:\n    Type: AWS::DMS::ReplicationTask\n    Properties:\n      ReplicationInstanceArn: <example_resource_arn>\n      SourceEndpointArn: <example_resource_arn>\n      TargetEndpointArn: <example_resource_arn>\n      MigrationType: full-load\n      TableMappings: |\n        {\"rules\":[{\"rule-type\":\"selection\",\"rule-id\":\"1\",\"rule-name\":\"1\",\"object-locator\":{\"schema-name\":\"%\",\"table-name\":\"%\"},\"rule-action\":\"include\"}]}\n      ReplicationTaskSettings: |\n        {\"Logging\":{\"EnableLogging\":true, \"LogComponents\":[\n          {\"Id\":\"TARGET_APPLY\",\"Severity\":\"LOGGER_SEVERITY_DEFAULT\"},  # 关键：确保 TARGET_APPLY 日志至少为默认级别\n          {\"Id\":\"TARGET_LOAD\",\"Severity\":\"LOGGER_SEVERITY_DEFAULT\"}    # 关键：确保 TARGET_LOAD 日志至少为默认级别\n        ]}}\n```",
+      "Other": "1. 在 AWS DMS 控制台中，进入 Database migration tasks\n2. 选择复制任务并点击 Modify\n3. 展开 Task settings (JSON) 或 Logging\n4. 启用 CloudWatch 日志（EnableLogging = true）\n5. 设置日志组件：\n   - TARGET_APPLY 严重级别：DEFAULT\n   - TARGET_LOAD 严重级别：DEFAULT\n6. 保存更改（Modify task），必要时重新运行任务",
+      "Terraform": "```hcl\n# 为目标组件启用 DMS 任务日志\nresource \"aws_dms_replication_task\" \"<example_resource_name>\" {\n  replication_task_id      = \"<example_resource_id>\"\n  replication_instance_arn = \"<example_resource_arn>\"\n  source_endpoint_arn      = \"<example_resource_arn>\"\n  target_endpoint_arn      = \"<example_resource_arn>\"\n  migration_type           = \"full-load\"\n  table_mappings           = jsonencode({ rules = [{\n    \"rule-type\" : \"selection\", \"rule-id\" : \"1\", \"rule-name\" : \"1\",\n    \"object-locator\" : { \"schema-name\" : \"%\", \"table-name\" : \"%\" },\n    \"rule-action\" : \"include\"\n  }]} )\n\n  # 关键：启用日志并将 TARGET_APPLY 与 TARGET_LOAD 设置为所需的最低严重级别\n  replication_task_settings = jsonencode({\n    Logging = {\n      EnableLogging = true\n      LogComponents = [\n        { Id = \"TARGET_APPLY\", Severity = \"LOGGER_SEVERITY_DEFAULT\" },\n        { Id = \"TARGET_LOAD\",  Severity = \"LOGGER_SEVERITY_DEFAULT\" }\n      ]\n    }\n  })\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "为目标组件启用并维持 `LOGGER_SEVERITY_DEFAULT` 或更高等级的 **CloudWatch 日志记录**：\n- 配置 `TARGET_APPLY` 和 `TARGET_LOAD`\n- 对日志访问实施最小权限\n- 监控日志/告警以捕获异常\n- 统一任务设置并对数据进行验证，以实现**纵深防御**",
+      "Url": "https://hub.prowler.com/check/dms_replication_task_target_logging_enabled"
+    }
+  },
+  "Categories": [
+    "logging"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+
+

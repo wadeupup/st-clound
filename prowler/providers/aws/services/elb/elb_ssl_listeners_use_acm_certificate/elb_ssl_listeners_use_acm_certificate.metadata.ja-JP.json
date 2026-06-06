@@ -1,0 +1,40 @@
+{
+  "Provider": "aws",
+  "CheckID": "elb_ssl_listeners_use_acm_certificate",
+  "CheckTitle": "Classic Load Balancer の HTTPS/SSL リスナーで ACM 発行証明書を使用していること",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices"
+  ],
+  "ServiceName": "elb",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsElbLoadBalancer",
+  "ResourceGroup": "network",
+  "Description": "Classic Load Balancer の HTTPS/SSL リスナーで、**AWS Certificate Manager** の **Amazon 発行**証明書（証明書タイプ `AMAZON_ISSUED`）を使用していることを確認します。",
+  "Risk": "インポート証明書や Amazon 非発行証明書の利用は、発行・ローテーションの管理性を低下させ、**期限切れや弱い TLS** のリスクを高めます。これにより **サービス停止** が発生したり、**中間者攻撃** による傍受が可能になったりして、データの **機密性** と **完全性** を損なう可能性があります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/elb-controls.html#elb-2",
+    "https://docs.aws.amazon.com/config/latest/developerguide/elb-acm-certificate-required.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws elb set-load-balancer-listener-ssl-certificate --load-balancer-name <load-balancer-name> --load-balancer-port <port> --ssl-certificate-id <acm_certificate_arn>",
+      "NativeIaC": "```yaml\n# CloudFormation: Attach an Amazon-issued ACM cert to a CLB HTTPS/SSL listener\nResources:\n  <example_resource_name>:\n    Type: AWS::ElasticLoadBalancing::LoadBalancer\n    Properties:\n      AvailabilityZones:\n        - <example_az>\n      Listeners:\n        - LoadBalancerPort: 443\n          InstancePort: 443\n          Protocol: HTTPS\n          SSLCertificateId: <acm_certificate_arn>  # critical: use Amazon-issued ACM certificate to pass ELB.2\n```",
+      "Other": "1. AWS コンソールで EC2 > Load Balancing > Load Balancers（Classic）に移動します\n2. 対象の Classic Load Balancer を選択します\n3. Listeners タブを開き、HTTPS/SSL リスナーを選択します\n4. Edit（または Change SSL certificate）をクリックします\n5. Amazon 発行の ACM 証明書（インポート証明書ではない）を選択します\n6. 変更を保存します",
+      "Terraform": "```hcl\n# Terraform: Attach an Amazon-issued ACM cert to a CLB HTTPS/SSL listener\nresource \"aws_elb\" \"<example_resource_name>\" {\n  availability_zones = [\"<example_az>\"]\n\n  listener {\n    lb_port            = 443\n    lb_protocol        = \"https\"\n    instance_port      = 443\n    instance_protocol  = \"https\"\n    ssl_certificate_id = \"<acm_certificate_arn>\" # critical: Amazon-issued ACM cert to satisfy ELB.2\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "CLB の HTTPS/SSL リスナーでは **Amazon 発行 ACM 証明書** に統一し、管理された検証と **自動更新** を確保してください。\n\n証明書操作には **最小権限** を適用し、ローテーションを自動化し、証明書ヘルスを **多層防御** の一部として監視します。",
+      "Url": "https://hub.prowler.com/check/elb_ssl_listeners_use_acm_certificate"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

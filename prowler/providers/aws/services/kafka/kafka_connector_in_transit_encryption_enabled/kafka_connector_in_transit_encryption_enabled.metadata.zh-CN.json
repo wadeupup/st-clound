@@ -1,0 +1,40 @@
+{
+  "Provider": "aws",
+  "CheckID": "kafka_connector_in_transit_encryption_enabled",
+  "CheckTitle": "MSK Connect 连接器已启用传输中的加密",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践",
+    "软件和配置检查/行业和法规标准/AWS 基础安全最佳实践"
+  ],
+  "ServiceName": "kafka",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Other",
+  "ResourceGroup": "messaging",
+  "Description": "**MSK Connect 连接器**通过在客户端与 Kafka 代理和连接系统之间的连接上使用 `TLS` 来评估**传输中的加密**。",
+  "Risk": "没有 **TLS**，数据流可能在传输中被**拦截**或**修改**。路径上的攻击者可以执行**中间人攻击**、重放或消息**篡改**，暴露记录和秘密。这会降低**机密性**和**完整性**，并可能导致未经授权访问下游系统。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/msk/latest/developerguide/msk-connect.html",
+    "https://docs.aws.amazon.com/msk/latest/developerguide/mkc-create-connector-intro.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation：启用传输中加密的 MSK Connect 连接器\nResources:\n  <example_resource_name>:\n    Type: AWS::KafkaConnect::Connector\n    Properties:\n      ConnectorName: <example_resource_name>\n      KafkaCluster:\n        ApacheKafkaCluster:\n          BootstrapServers: <BOOTSTRAP_SERVERS>\n          Vpc:\n            SecurityGroups: [<example_resource_id>]\n            Subnets: [<example_resource_id>]\n      KafkaClusterClientAuthentication:\n        AuthenticationType: NONE\n      KafkaClusterEncryptionInTransit:\n        EncryptionType: TLS  # 关键：启用传输中的 TLS 加密\n      KafkaConnectVersion: <KAFKA_CONNECT_VERSION>\n      Plugins:\n        - CustomPlugin:\n            CustomPluginArn: <example_resource_id>\n            Revision: 1\n      Capacity:\n        ProvisionedCapacity:\n          McuCount: 1\n          WorkerCount: 1\n      ServiceExecutionRoleArn: <example_resource_id>\n      ConnectorConfiguration:\n        connector.class: <CONNECTOR_CLASS>\n        tasks.max: \"1\"\n```",
+      "Other": "1. 在 AWS 控制台中，转到 Amazon MSK > MSK Connect > 连接器\n2. 选择非 TLS 连接器并选择删除（加密设置无法更改）\n3. 选择创建连接器并选择您的自定义插件和集群\n4. 在安全性部分，将传输中的加密设置为 TLS（必需）\n5. 完成其他必填字段并创建连接器",
+      "Terraform": "```hcl\n# Terraform：启用传输中加密的 MSK Connect 连接器\nresource \"aws_mskconnect_connector\" \"<example_resource_name>\" {\n  name                  = \"<example_resource_name>\"\n  kafkaconnect_version  = \"<KAFKA_CONNECT_VERSION>\"\n\n  kafka_cluster {\n    apache_kafka_cluster {\n      bootstrap_servers = \"<BOOTSTRAP_SERVERS>\"\n      vpc {\n        security_groups = [\"<example_resource_id>\"]\n        subnets         = [\"<example_resource_id>\"]\n      }\n    }\n  }\n\n  kafka_cluster_client_authentication {\n    authentication_type = \"NONE\"\n  }\n\n  kafka_cluster_encryption_in_transit {\n    encryption_type = \"TLS\"  # 关键：启用传输中的 TLS 加密\n  }\n\n  capacity {\n    provisioned_capacity {\n      mcu_count    = 1\n      worker_count = 1\n    }\n  }\n\n  service_execution_role_arn = \"<example_resource_id>\"\n\n  connector_configuration = {\n    \"connector.class\" = \"<CONNECTOR_CLASS>\"\n    \"tasks.max\"       = \"1\"\n  }\n\n  plugin {\n    custom_plugin {\n      arn      = \"<example_resource_id>\"\n      revision = 1\n    }\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "要求所有连接器通信使用 **TLS** 并禁止明文。优先选择私有连接，验证证书，并使用现代加密套件。结合**双向认证**和**最小权限**角色以实现深度防御。定期审查连接器配置以避免非 TLS 端点。",
+      "Url": "https://hub.prowler.com/check/kafka_connector_in_transit_encryption_enabled"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

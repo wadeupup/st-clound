@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "elb_connection_draining_enabled",
+  "CheckTitle": "Classic Load Balancer 已启用连接排空",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices/Network Reachability",
+    "Effects/Denial of Service"
+  ],
+  "ServiceName": "elb",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsElbLoadBalancer",
+  "ResourceGroup": "network",
+  "Description": "**Classic Load Balancer** 已启用**连接排空**，因此在实例注销或不健康时会停止接收新请求，而现有连接可在配置的排空窗口内完成。",
+  "Risk": "如果未启用**连接排空**，实例移除或健康检查失败时，正在进行中的请求可能被中断，导致事务不完整、会话中断和应用状态不一致。这会降低**可用性**，并在部署、扩缩容或故障切换期间影响**数据完整性**。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://aws.amazon.com/blogs/aws/elb-connection-draining-remove-instances-from-service-with-care/",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/ELB/elb-connection-draining-enabled.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/elb-controls.html#elb-7",
+    "https://docs.aws.amazon.com/elasticloadbalancing/latest/classic/config-conn-drain.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws elb modify-load-balancer-attributes --load-balancer-name <example_resource_name> --load-balancer-attributes '{\"ConnectionDraining\":{\"Enabled\":true}}'",
+      "NativeIaC": "```yaml\n# CloudFormation: Enable connection draining on a Classic Load Balancer\nResources:\n  <example_resource_name>:\n    Type: AWS::ElasticLoadBalancing::LoadBalancer\n    Properties:\n      Listeners:\n        - InstancePort: 80\n          LoadBalancerPort: 80\n          Protocol: HTTP\n      AvailabilityZones:\n        - us-east-1a\n      ConnectionDrainingPolicy:\n        Enabled: true  # CRITICAL: turns on connection draining so in-flight requests complete\n        # Timeout is optional; default 300s is used if omitted\n```",
+      "Other": "1. 打开 EC2 控制台并进入 Load Balancers（Classic）\n2. 选择目标 Classic Load Balancer\n3. 选择 Attributes 选项卡，然后点击 Edit\n4. 勾选 Enable connection draining（保留默认超时或按需设置）\n5. 点击 Save changes",
+      "Terraform": "```hcl\n# Terraform: Enable connection draining on a Classic Load Balancer\nresource \"aws_elb\" \"<example_resource_name>\" {\n  name               = \"<example_resource_name>\"\n  availability_zones = [\"us-east-1a\"]\n\n  listener {\n    lb_port           = 80\n    lb_protocol       = \"http\"\n    instance_port     = 80\n    instance_protocol = \"http\"\n  }\n\n  connection_draining = true  # CRITICAL: enables connection draining so existing connections complete\n  # connection_draining_timeout can be omitted (defaults to 300s)\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "在所有 Classic Load Balancer 上启用**连接排空**，并将排空间隔设置为与典型请求延迟匹配。协调自动扩缩容和部署流程，以实现实例平滑下线。监控错误与重试来验证行为，并保守调整 `timeout`，以保护**可用性**和**完整性**。",
+      "Url": "https://hub.prowler.com/check/elb_connection_draining_enabled"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

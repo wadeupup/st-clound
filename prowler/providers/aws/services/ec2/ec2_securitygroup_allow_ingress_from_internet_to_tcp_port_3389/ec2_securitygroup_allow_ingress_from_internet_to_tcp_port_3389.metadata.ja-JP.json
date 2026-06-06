@@ -1,0 +1,36 @@
+{
+  "Provider": "aws",
+  "CheckID": "ec2_securitygroup_allow_ingress_from_internet_to_tcp_port_3389",
+  "CheckTitle": "いかなるセキュリティグループも 0.0.0.0/0 または ::/0 から RDP ポート 3389 へのインバウンドを許可していないことを確認する",
+  "CheckType": [
+    "Infrastructure Security"
+  ],
+  "ServiceName": "ec2",
+  "SubServiceName": "securitygroup",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "high",
+  "ResourceType": "AwsEc2SecurityGroup",
+  "ResourceGroup": "network",
+  "Description": "いかなるセキュリティグループも 0.0.0.0/0 または ::/0 から RDP ポート 3389 へのインバウンドトラフィックを許可していないことを確認します。",
+  "Risk": "セキュリティグループが適切に設定されていない場合、攻撃対象領域が拡大します。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "aws ec2 revoke-security-group-ingress --group-id <GROUP_ID> --protocol tcp --port 3389 --cidr",
+      "NativeIaC": "https://docs.prowler.com/checks/aws/networking-policies/networking_2#cloudformation",
+      "Other": "https://docs.prowler.com/checks/aws/networking-policies/networking_2",
+      "Terraform": "https://docs.prowler.com/checks/aws/networking-policies/networking_2#terraform"
+    },
+    "Recommendation": {
+      "Text": "ゼロトラストアプローチを採用し、インバウンドトラフィックを可能な限り絞り込みます。南北トラフィックだけでなく東西トラフィックについても制御を検討してください。",
+      "Url": "https://docs.aws.amazon.com/vpc/latest/userguide/VPC_SecurityGroups.html"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

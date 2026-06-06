@@ -1,0 +1,38 @@
+{
+  "Provider": "aws",
+  "CheckID": "fsx_file_system_copy_tags_to_volumes_enabled",
+  "CheckTitle": "FSx ファイルシステムでボリュームへのタグコピーが有効化されていること",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices"
+  ],
+  "ServiceName": "fsx",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "low",
+  "ResourceType": "Other",
+  "ResourceGroup": "storage",
+  "Description": "**Amazon FSx ファイルシステム** が `copy_tags_to_volumes` により **ボリュームへタグをコピー** するよう構成されていることを確認します。\n\nこの検出は、ボリュームリソースがファイルシステムタグを継承しない構成を特定します。",
+  "Risk": "タグ伝播がない場合、ボリュームには **ABAC**、分類、運用自動化に必要な一貫ラベルが付与されません。これによりアクセス制御のスコープ不備で機密性が低下し、未タグ付けボリュームにバックアップや保護策が適用されず可用性にも影響します。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/fsx-controls.html#fsx-1",
+    "https://docs.aws.amazon.com/config/latest/developerguide/fsx-openzfs-copy-tags-enabled.html",
+    "https://docs.aws.amazon.com/fsx/latest/OpenZFSGuide/updating-file-system.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws fsx update-file-system --file-system-id <file-system-id> --open-zfs-configuration CopyTagsToVolumes=true",
+      "NativeIaC": "```yaml\n# CloudFormation: Enable copying tags to volumes for FSx for OpenZFS\nResources:\n  <example_resource_name>:\n    Type: AWS::FSx::FileSystem\n    Properties:\n      FileSystemType: OPENZFS\n      SubnetIds:\n        - <example_resource_id>\n      OpenZFSConfiguration:\n        DeploymentType: SINGLE_AZ_1\n        ThroughputCapacity: 64\n        CopyTagsToVolumes: true  # Critical: ensures volumes inherit file system tags\n```",
+      "Other": "1. AWS コンソールで Amazon FSx に移動します\n2. 対象の FSx for OpenZFS ファイルシステムを選択します\n3. Actions > Update file system をクリックします\n4. Copy tags to volumes を On に設定します\n5. Update をクリックして保存します",
+      "Terraform": "```hcl\n# FSx for OpenZFS with copy tags to volumes enabled\nresource \"aws_fsx_openzfs_file_system\" \"<example_resource_name>\" {\n  deployment_type      = \"SINGLE_AZ_1\"\n  subnet_ids           = [\"<example_resource_id>\"]\n  throughput_capacity  = 64\n  copy_tags_to_volumes = true  # Critical: ensures volumes inherit file system tags\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "`copy_tags_to_volumes` を有効化し、**必須タグポリシー**（owner、environment、data class）を導入してください。タグを使って **最小権限/ABAC** を適用し、バックアップ・保持・監視ワークフローに統合して **多層防御** を強化します。",
+      "Url": "https://hub.prowler.com/check/fsx_file_system_copy_tags_to_volumes_enabled"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

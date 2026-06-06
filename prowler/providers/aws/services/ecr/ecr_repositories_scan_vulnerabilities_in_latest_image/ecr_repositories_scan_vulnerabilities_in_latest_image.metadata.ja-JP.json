@@ -1,0 +1,45 @@
+{
+  "Provider": "aws",
+  "CheckID": "ecr_repositories_scan_vulnerabilities_in_latest_image",
+  "CheckTitle": "ECR リポジトリの最新イメージがスキャンされ、設定された最小重大度以上の脆弱性がない",
+  "CheckType": [
+    "Software and Configuration Checks/Vulnerabilities/CVE",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices"
+  ],
+  "ServiceName": "ecr",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsEcrRepository",
+  "ResourceGroup": "container",
+  "Description": "**Amazon ECR リポジトリ** は、最新のプッシュされたイメージについて評価され、脆弱性スキャンが存在し、正常に完了し、結果が設定された最小重大度（例：`CRITICAL`、`HIGH`、`MEDIUM`）に達していないか超えていないことを確認します。",
+  "Risk": "コンテナイメージ内の未スキャンまたは高重大度の検出により、ワークロードが既知の CVE の悪用にさらされます。\n\n攻撃者はコード実行、データの窃取、サービスの変更、または操作の中断を達成でき、**横方向の移動** とサプライチェーン侵害を可能にし、**機密性**、**整合性**、および **可用性** に影響を与えます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://www.geeksforgeeks.org/devops/how-to-manage-image-security-and-vulnerabilities-in-ecr/",
+    "https://aws.amazon.com/blogs/aws/amazon-inspector-enhances-container-security-by-mapping-amazon-ecr-images-to-running-containers/",
+    "https://docs.aws.amazon.com/inspector/latest/user/scanning-ecr.html",
+    "https://docs.aws.amazon.com/AmazonECR/latest/userguide/image-scanning-enhanced.html",
+    "https://docs.aws.amazon.com/AmazonECR/latest/userguide/image-scanning.html",
+    "https://docs.aws.amazon.com/AmazonECR/latest/userguide/image-scanning-basic.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# Enable scan on push so the latest image is automatically scanned\nResources:\n  EcrRepository:\n    Type: AWS::ECR::Repository\n    Properties:\n      RepositoryName: <example_resource_name>\n      ImageScanningConfiguration:\n        ScanOnPush: true  # CRITICAL: ensures each pushed image is scanned so the latest has scan results\n```",
+      "Other": "1. AWS コンソールで、ECR > リポジトリ > <example_resource_name> に移動します\n2. 編集をクリックし、プッシュ時スキャンを有効にして保存します\n3. 脆弱性を削除するためにコンテナイメージを再ビルドし、新しいタグをリポジトリにプッシュします\n4. イメージの詳細を開き、イメージをスキャン（自動スキャンされていない場合）をクリックします\n5. 検出結果に必要な重大度以上の脆弱性が 0 であることを確認します",
+      "Terraform": "```hcl\n# Enable scan on push so the latest image is automatically scanned\nresource \"aws_ecr_repository\" \"<example_resource_name>\" {\n  name = \"<example_resource_name>\"\n\n  image_scanning_configuration {\n    scan_on_push = true  # CRITICAL: ensures each pushed image is scanned so the latest has scan results\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "リポジトリに対して **継続的なスキャン** を有効にし、ポリシーのしきい値（例：`MEDIUM`+）でデプロイメントゲートを強制します。\n\nパッチが適用されたコンポーネントと更新されたベースイメージでイメージを再ビルドし、イメージを最小限に保ち、**最小権限** を適用します。**イメージ署名** と CI/CD チェックを使用して、スキャン済みで準拠したイメージのみが実行できるようにします。",
+      "Url": "https://hub.prowler.com/check/ecr_repositories_scan_vulnerabilities_in_latest_image"
+    }
+  },
+  "Categories": [
+    "container-security"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

@@ -1,0 +1,46 @@
+{
+  "Provider": "aws",
+  "CheckID": "dms_instance_no_public_access",
+  "CheckTitle": "DMS 复制实例未对互联网公开暴露",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices/Network Reachability",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/CIS AWS Foundations Benchmark",
+    "TTPs/Initial Access"
+  ],
+  "ServiceName": "dms",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "critical",
+  "ResourceType": "AwsDmsReplicationInstance",
+  "ResourceGroup": "database",
+  "Description": "**AWS DMS 复制实例** 会被评估其是否存在 **公网暴露**。当启用了 `PubliclyAccessible` 且关联安全组允许来自任意地址的入站流量时，即被视为暴露；私有或仅允许名单访问的实例不视为暴露。",
+  "Risk": "可从公网访问的复制实例会威胁：\n- 机密性：迁移数据和凭据可能被截获或外泄；\n- 完整性：攻击者可能篡改任务或注入记录；\n- 可用性：滥用或 DDoS 可能导致复制任务停止，延迟割接。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/dms-controls.html#dms-1",
+    "https://docs.aws.amazon.com/amazonq/detector-library/terraform/restrict-public-access-dms-terraform/",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/DMS/publicly-accessible.html",
+    "https://support.icompaas.com/support/solutions/articles/62000233448-ensure-dms-instances-are-not-publicly-accessible"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation：使 DMS 实例不可从公网访问\nResources:\n  <example_resource_name>:\n    Type: AWS::DMS::ReplicationInstance\n    Properties:\n      ReplicationInstanceClass: dms.t3.micro\n      PubliclyAccessible: false  # 关键：禁用公网访问以防止暴露到互联网\n```",
+      "Other": "1. 在 AWS 控制台中，打开 Database Migration Service > Replication instances 并选择实例\n2. 在 Details > Networking 中，点击每个已关联的 Security Group ID，在 EC2 控制台中打开\n3. 在入站规则 (Inbound rules) 中，删除任何来源为 0.0.0.0/0 或 ::/0 的规则\n4. 为每个安全组保存规则",
+      "Terraform": "```hcl\n# DMS 实例不可从公网访问\nresource \"aws_dms_replication_instance\" \"<example_resource_name>\" {\n  replication_instance_id    = \"<example_resource_id>\"\n  replication_instance_class = \"dms.t3.micro\"\n  publicly_accessible        = false  # 关键：禁用公网访问以防止暴露到互联网\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "采用 **仅私有** 的设计：\n- 禁用 `PubliclyAccessible`，将实例放在私有子网中；\n- 强制执行 **最小权限** 安全组策略（禁止 `0.0.0.0/0`），仅允许必要来源和端口；\n- 通过 **VPN**、对等连接或 Direct Connect 提供访问；\n- 叠加使用 ACL、监控等控制，并将 IAM 权限限制在必要操作范围内。",
+      "Url": "https://hub.prowler.com/check/dms_instance_no_public_access"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+
+

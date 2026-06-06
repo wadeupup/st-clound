@@ -1,0 +1,39 @@
+{
+  "Provider": "aws",
+  "CheckID": "guardduty_eks_runtime_monitoring_enabled",
+  "CheckTitle": "GuardDuty detector 已启用 EKS 运行时监控",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices/Runtime Behavior Analysis",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices"
+  ],
+  "ServiceName": "guardduty",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsGuardDutyDetector",
+  "ResourceGroup": "security",
+  "Description": "会评估 GuardDuty detector 是否为 Amazon EKS 启用了 **EKS 运行时监控**。该配置位于 detector 级别，关系到对 EKS 节点与容器中*进程、文件和网络*活动的可见性。",
+  "Risk": "缺少 **EKS 运行时监控** 时，集群内活动将处于检测盲区。攻击者可运行恶意软件或挖矿程序、通过 Pod 外泄敏感信息、篡改工作负载，或横向转移到其他服务，进而削弱机密性、破坏完整性并耗尽资源（可用性）。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/guardduty/latest/ug/runtime-monitoring-configuration.html",
+    "https://docs.aws.amazon.com/config/latest/developerguide/guardduty-eks-protection-runtime-enabled.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/guardduty-controls.html#guardduty-7"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws guardduty update-detector --detector-id <detector-id> --features name=EKS_RUNTIME_MONITORING,status=ENABLED",
+      "NativeIaC": "```yaml\nResources:\n  <example_resource_name>:\n    Type: AWS::GuardDuty::Detector\n    Properties:\n      Enable: true\n      Features:\n        - Name: EKS_RUNTIME_MONITORING   # Critical: selects EKS Runtime Monitoring feature\n          Status: ENABLED                # Critical: enables the feature to pass the check\n```",
+      "Other": "1. 打开 AWS Console 并进入 Amazon GuardDuty\n2. 在左侧面板选择 Settings > Runtime monitoring\n3. 在 EKS Runtime Monitoring 下将状态切换为 Enabled\n4. 点击 Save changes",
+      "Terraform": "```hcl\nresource \"aws_guardduty_detector\" \"<example_resource_name>\" {\n  enable = true\n\n  features {\n    name   = \"EKS_RUNTIME_MONITORING\"  # Critical: selects EKS Runtime Monitoring feature\n    status = \"ENABLED\"                 # Critical: enables the feature to pass the check\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "- 在所有账号和集群中启用带自动代理管理的 **EKS 运行时监控**\n- 对代理实施**最小权限**并隔离集群访问\n- 将发现结果接入响应流程，并定期验证运行时覆盖范围",
+      "Url": "https://hub.prowler.com/check/guardduty_eks_runtime_monitoring_enabled"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

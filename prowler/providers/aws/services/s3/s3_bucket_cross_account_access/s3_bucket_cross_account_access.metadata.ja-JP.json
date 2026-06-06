@@ -1,0 +1,33 @@
+{
+  "Provider": "aws",
+  "CheckID": "s3_bucket_cross_account_access",
+  "CheckTitle": "汎用バケットポリシーが他のAWSアカウントへのアクセスを制限していることを確認してください。",
+  "CheckType": [
+    "影響／データ露出"
+  ],
+  "ServiceName": "s3",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:s3:::bucket_name",
+  "Severity": "high",
+  "ResourceType": "AwsS3Bucket",
+  "ResourceGroup": "storage",
+  "Description": "このチェックは、S3 バケットポリシーが意図された AWS アカウントのみにアクセスを制限するよう構成されていることを確認し、外部または意図しないアカウントによる不正アクセスを防止します。",
+  "Risk": "他のAWSアカウントがあなたのS3バケットに対して機密性の高い操作（例：バケットポリシー、ACL、または暗号化設定の変更）を実行できるようにすると、データ漏えい、不正アクセス、または設定ミスにつながる可能性があり、内部脅威や攻撃のリスクが高まります。",
+  "RelatedUrl": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-control-block-public-access.html",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://docs.aws.amazon.com/securityhub/latest/userguide/s3-controls.html#s3-6",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "S3 バケットポリシーを見直して更新し、外部の AWS アカウントに重要なアクションへのアクセスを許可する権限を削除し、最小権限の原則を実装して、機密性の高い操作が信頼できるアカウントのみに制限されるようにしてください",
+      "Url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-control-block-public-access.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

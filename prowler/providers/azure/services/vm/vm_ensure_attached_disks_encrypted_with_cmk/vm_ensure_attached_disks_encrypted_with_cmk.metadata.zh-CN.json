@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "vm_ensure_attached_disks_encrypted_with_cmk",
+  "CheckTitle": "确保“OS 和数据”磁盘使用客户管理密钥（CMK）进行加密",
+  "CheckType": [],
+  "ServiceName": "vm",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Microsoft.Compute/virtualMachines",
+  "ResourceGroup": "compute",
+  "Description": "确保 OS 磁盘（启动卷）和数据磁盘（非启动卷）使用 CMK（客户管理密钥）加密。客户管理密钥可以是 ADE 或服务器端加密（SSE）。",
+  "Risk": "对 IaaS 虚拟机的 OS 磁盘（启动卷）和数据磁盘（非启动卷）进行加密，可确保在没有密钥的情况下无法恢复其全部内容，从而保护卷不被未授权读取。Azure 托管磁盘默认启用 PMK（平台管理密钥），可提供静态数据加密。推荐使用 CMK，因为它允许客户控制用于磁盘加密和解密的具体密钥。随后客户可通过更换密钥，或禁用密钥来提升安全性，而不是依赖长期不变的 PMK。还可以通过自动轮换密钥进一步提升安全性，以确保对磁盘的访问受到限制。组织应根据磁盘中存储数据的安全需求进行评估。对于高风险数据，必须使用 CMK，因为其可提供额外安全步骤。若数据风险较低，默认启用的 PMK 通常可提供足够的数据安全性。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/virtual-machines/disk-encryption-overview",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/VirtualMachines/sse-boot-disk-cmk.html#",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-general-policies/bc_azr_general_1#terraform"
+    },
+    "Recommendation": {
+      "Text": "注意：更改磁盘加密前需先将磁盘从 VM 分离。1. 进入 Virtual machines。2. 对每台虚拟机进入 Settings。3. 点击 Disks。4. 点击省略号（...）并选择 Detach，将磁盘从 VM 分离。5. 搜索 Disks 并定位未附加的磁盘。6. 点击该磁盘并选择 Encryption。7. 更改加密类型并选择加密集。8. 点击 Save。9. 返回 VM 并重新附加该磁盘。",
+      "Url": "https://learn.microsoft.com/en-us/azure/security/fundamentals/data-encryption-best-practices#protect-data-at-rest"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "使用 CMK/BYOK 会带来额外的密钥管理工作。"
+}

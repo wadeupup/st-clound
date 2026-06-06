@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "elb_desync_mitigation_mode",
+  "CheckTitle": "Classic Load Balancer の desync 緩和モードが defensive または strictest であること",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "TTPs/Initial Access",
+    "TTPs/Defense Evasion"
+  ],
+  "ServiceName": "elb",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsElbLoadBalancer",
+  "ResourceGroup": "network",
+  "Description": "**Classic Load Balancer** の `desync_mitigation_mode` が **`defensive`** または **`strictest`** に構成されているかを評価します。`monitor` など他のモードは要対応として特定されます。",
+  "Risk": "厳格な desync 緩和がない場合、**HTTP リクエストスマグリング** が発生し、以下を招く可能性があります：\n- キャッシュ/キュー汚染（**完全性**）\n- セッションハイジャックとデータ露出（**機密性**）\n- 意図しないバックエンド操作と悪用（**可用性**）",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/elasticloadbalancing/latest/classic/config-desync-mitigation-mode.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/elb-controls.html#elb-14",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/ELB/enable-configure-desync-mitigation-mode.html",
+    "https://support.icompaas.com/support/solutions/articles/62000233337-ensure-classic-load-balancer-is-configured-with-defensive-or-strictest-desync-mitigation-mode"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws elb modify-load-balancer-attributes --load-balancer-name <load-balancer-name> --load-balancer-attributes '{\"AdditionalAttributes\":[{\"Key\":\"elb.http.desyncmitigationmode\",\"Value\":\"defensive\"}]}'",
+      "NativeIaC": "",
+      "Other": "1. AWS マネジメントコンソールを開き、EC2 に移動します\n2. Load Balancing 配下で Load Balancers を選択します\n3. 対象の Classic Load Balancer を選択します\n4. Attributes タブで Edit をクリックします\n5. Desync mitigation mode を Defensive または Strictest に設定します\n6. Save changes をクリックします",
+      "Terraform": "```hcl\nresource \"aws_elb\" \"<example_resource_name>\" {\n  name               = \"<example_resource_name>\"\n  availability_zones = [\"<example_az>\"]\n\n  listener {\n    instance_port     = 80\n    instance_protocol = \"http\"\n    lb_port           = 80\n    lb_protocol       = \"http\"\n  }\n\n  desync_mitigation_mode = \"defensive\" # Critical: sets CLB desync mitigation to defensive to pass the check\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "CLB の desync 緩和を **`defensive`**（互換性があれば **`strictest`**）に設定してください。クライアント影響を避けるため、ステージングで検証します。**多層防御** を適用し、厳格なヘッダー処理を強制し、WAF 制御と組み合わせ、非準拠リクエストの指標を監視してください。",
+      "Url": "https://hub.prowler.com/check/elb_desync_mitigation_mode"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

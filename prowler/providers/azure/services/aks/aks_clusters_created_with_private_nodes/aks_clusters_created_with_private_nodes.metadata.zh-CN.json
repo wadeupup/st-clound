@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "aks_clusters_created_with_private_nodes",
+  "CheckTitle": "确保群集使用私有节点创建",
+  "CheckType": [],
+  "ServiceName": "aks",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Microsoft.ContainerService/ManagedClusters",
+  "ResourceGroup": "container",
+  "Description": "为群集节点禁用公共 IP 地址，使其仅具有私有 IP 地址。私有节点是不包含公共 IP 地址的节点。",
+  "Risk": "在群集节点上禁用公共 IP 地址可将访问限制为仅内部网络，从而迫使攻击者在尝试入侵底层 Kubernetes 主机之前先获取本地网络访问权限。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/aks/private-clusters",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "",
+      "Url": "https://learn.microsoft.com/en-us/azure/aks/access-private-cluster"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

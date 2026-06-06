@@ -1,0 +1,36 @@
+{
+  "Provider": "aws",
+  "CheckID": "ec2_instance_imdsv2_enabled",
+  "CheckTitle": "EC2 インスタンスメタデータサービスバージョン 2 (IMDSv2) が有効になっていて必須になっているか確認",
+  "CheckType": [
+    "Infrastructure Security"
+  ],
+  "ServiceName": "ec2",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "high",
+  "ResourceType": "AwsEc2Instance",
+  "ResourceGroup": "compute",
+  "Description": "EC2 インスタンスメタデータサービスバージョン 2 (IMDSv2) が有効になっていて必須になっているか確認",
+  "Risk": "IMDSv2 を使用すると、設定ミスや SSRF 脆弱性から保護されます。IMDSv1 では保護されません。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "aws ec2 modify-instance-metadata-options --instance-id <instance-id> --http-tokens required --http-endpoint enabled",
+      "NativeIaC": "https://docs.prowler.com/checks/aws/general-policies/bc_aws_general_31#cloudformation",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/EC2/require-imds-v2.html",
+      "Terraform": "https://docs.prowler.com/checks/aws/general-policies/bc_aws_general_31#terraform"
+    },
+    "Recommendation": {
+      "Text": "IMDS が不要な場合は、オフにすることができます。aws-cli を使用して、インスタンスに IMDSv2 のみを使用するように強制できます。",
+      "Url": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/configuring-instance-metadata-service.html#configuring-instance-metadata-options"
+    }
+  },
+  "Categories": [
+    "ec2-imdsv1"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

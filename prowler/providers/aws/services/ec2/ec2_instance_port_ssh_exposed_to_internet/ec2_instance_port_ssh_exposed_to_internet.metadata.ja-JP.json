@@ -1,0 +1,36 @@
+{
+  "Provider": "aws",
+  "CheckID": "ec2_instance_port_ssh_exposed_to_internet",
+  "CheckTitle": "EC2 インスタンスがインターネットからの TCP ポート 22 (SSH) へのインバウンドを許可していないことを確認",
+  "CheckType": [
+    "Infrastructure Security"
+  ],
+  "ServiceName": "ec2",
+  "SubServiceName": "instance",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "critical",
+  "ResourceType": "AwsEc2Instance",
+  "ResourceGroup": "compute",
+  "Description": "EC2 インスタンスがインターネットからの TCP ポート 22 (SSH) へのインバウンドを許可していないことを確認",
+  "Risk": "SSH はブルートフォース攻撃の一般的なターゲットです。EC2 インスタンスがインターネットからの TCP ポート 22 へのインバウンドを許可している場合、侵害されるリスクがあります。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "EC2 インスタンスに関連付けられたセキュリティグループを変更して、インターネットからの TCP ポート 22 へのインバウンドを許可するルールを削除します。",
+      "Url": "https://docs.aws.amazon.com/vpc/latest/userguide/VPC_SecurityGroups.html"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "elb_logging_enabled",
+  "CheckTitle": "Elastic Load Balancer で S3 へのアクセスログが設定されていること",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/CIS AWS Foundations Benchmark"
+  ],
+  "ServiceName": "elb",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsElbLoadBalancer",
+  "ResourceGroup": "network",
+  "Description": "**Elastic Load Balancer** で **アクセスログ** が設定され、リクエストメタデータ（クライアント IP、パス、ステータス、TLS 詳細）が **Amazon S3** に配信されていることを確認します",
+  "Risk": "**ELB アクセスログ** がないと、エッジトラフィックの **可視性** を失い、偵察、ブルートフォース、悪用試行の検知能力が低下します。これによりフォレンジックとインシデント時系列の把握が困難になり、未検知のデータ流出（機密性）、追跡不能な変更（完全性）、障害や DDoS への対応遅延（可用性）のリスクが高まります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/elasticloadbalancing/latest/network/enable-access-logs.html",
+    "https://docs.aws.amazon.com/elasticloadbalancing/latest/classic/access-log-collection.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/ElasticBeanstalk/enable-access-logs.html",
+    "https://docs.aws.amazon.com/elasticloadbalancing/latest/application/enable-access-logging.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws elb modify-load-balancer-attributes --load-balancer-name <lb_name> --load-balancer-attributes AccessLog={Enabled=true,S3BucketName=<bucket_name>}",
+      "NativeIaC": "```yaml\n# CloudFormation: Enable access logs for a Classic Load Balancer (CLB)\nResources:\n  <example_resource_name>:\n    Type: AWS::ElasticLoadBalancing::LoadBalancer\n    Properties:\n      Listeners:\n        - LoadBalancerPort: 80\n          InstancePort: 80\n          Protocol: HTTP\n      AvailabilityZones:\n        - <example_resource_id>\n      AccessLoggingPolicy:               # CRITICAL: Enables S3 access logs\n        Enabled: true                    # CRITICAL: Turn on access logging\n        S3BucketName: <example_resource_name>  # CRITICAL: S3 bucket to store logs\n```",
+      "Other": "1. AWS コンソールで EC2 > Load Balancers に移動します\n2. 対象ロードバランサーを選択し、Edit attributes（または Attributes タブ）を開きます\n3. Access logs を有効化します\n4. S3 URI（例: s3://<bucket_name>）を入力します\n5. Save をクリックします",
+      "Terraform": "```hcl\n# Enable access logs for an ELBv2 load balancer (minimal)\nresource \"aws_lb\" \"<example_resource_name>\" {\n  load_balancer_type = \"network\"\n  subnets            = [\"<example_resource_id>\", \"<example_resource_id>\"]\n\n  access_logs {                   # CRITICAL: Enables S3 access logs\n    bucket  = \"<example_resource_name>\"  # CRITICAL: S3 bucket for logs\n    enabled = true                 # CRITICAL: Turn on access logging\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "Amazon S3 への **アクセスログ**（`access_logs.s3.enabled=true`）を有効化してください。バケットには **最小権限** ポリシーを適用し、オブジェクトを暗号化して読み取りアクセスを制限します。ライフサイクル保持を定義し、分析を集中化してください。配信失敗を監視し、異常時にアラートを発報します。**多層防御** の一環として、IaC で全ロードバランサーへ標準適用してください。",
+      "Url": "https://hub.prowler.com/check/elb_logging_enabled"
+    }
+  },
+  "Categories": [
+    "logging"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

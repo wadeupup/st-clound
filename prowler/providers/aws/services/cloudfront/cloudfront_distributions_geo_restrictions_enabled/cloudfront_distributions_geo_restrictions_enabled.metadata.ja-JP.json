@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "cloudfront_distributions_geo_restrictions_enabled",
+  "CheckTitle": "CloudFrontディストリビューションに地理的制限が有効になっている",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices/Network Reachability"
+  ],
+  "ServiceName": "cloudfront",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "low",
+  "ResourceType": "AwsCloudFrontDistribution",
+  "ResourceGroup": "network",
+  "Description": "**CloudFrontディストリビューション**は、許可リストまたはブロックリスト（`RestrictionType`が`none`ではない）を使用して国別にアクセスを制限する**地理的制限**が設定されています。",
+  "Risk": "地理的制限がない場合、コンテンツは世界中でアクセス可能になり、以下を可能にします：\n- 制裁または未許可のリージョンからのアクセス（機密性/コンプライアンス）\n- より広範なボット悪用、スクレイピング、DDoS準備（可用性）\n- アプリケーションに対するより多くの資格情報スタッフィングと詐欺の試み",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://repost.aws/knowledge-center/cloudfront-geo-restriction",
+    "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/georestrictions.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/CloudFront/geo-restriction.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws cloudfront get-distribution-config --id <DISTRIBUTION_ID> --output json > current-config.json && echo 'Manually edit current-config.json to add Restrictions.GeoRestriction with RestrictionType: \"whitelist\" and Locations: [\"US\"], then run:' && echo 'aws cloudfront update-distribution --id <DISTRIBUTION_ID> --distribution-config file://current-config.json --if-match $(aws cloudfront get-distribution-config --id <DISTRIBUTION_ID> --query \"ETag\" --output text)'",
+      "NativeIaC": "```yaml\nResources:\n  <example_resource_name>:\n    Type: AWS::CloudFront::Distribution\n    Properties:\n      DistributionConfig:\n        Enabled: true\n        Origins:\n          - DomainName: \"<example_origin_domain>\"\n            Id: \"<example_origin_id>\"\n        DefaultCacheBehavior:\n          TargetOriginId: \"<example_origin_id>\"\n          ViewerProtocolPolicy: allow-all\n          CachePolicyId: \"<example_cache_policy_id>\"\n        Restrictions:\n          GeoRestriction:\n            RestrictionType: whitelist  # 重要：地理的制限を有効化\n            Locations:                  # 重要：少なくとも1つの許可された国\n              - US\n```",
+      "Other": "1. AWSコンソールで、CloudFront > ディストリビューションに移動\n2. ターゲットディストリビューションを選択\n3. セキュリティタブ > 地理的制限 > 編集を開く\n4. 許可リスト（またはブロックリスト）を選択\n5. リストに少なくとも1つの国を追加\n6. 変更を保存",
+      "Terraform": "```hcl\nresource \"aws_cloudfront_distribution\" \"<example_resource_name>\" {\n  enabled = true\n\n  origins {\n    domain_name = \"<example_origin_domain>\"\n    origin_id   = \"<example_origin_id>\"\n  }\n\n  default_cache_behavior {\n    target_origin_id       = \"<example_origin_id>\"\n    viewer_protocol_policy = \"allow-all\"\n    cache_policy_id        = \"<example_cache_policy_id>\"\n  }\n\n  restrictions {\n    geo_restriction {\n      restriction_type = \"whitelist\" # 重要：地理的制限を有効化\n      locations        = [\"US\"]      # 重要：少なくとも1つの許可された国\n    }\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "ディストリビューションスコープに**最小権限**を適用：可能な場合は国の**許可リスト**で地理的制限を有効化するか、法的、ライセンス、脅威モデルに一致する正確なブロックリストを維持します。\n\n**多層防御**をレイヤー化：WAF/ボット制御、署名付きURLまたはCookie、監視を使用して悪用と設定のドリフトを検出します。",
+      "Url": "https://hub.prowler.com/check/cloudfront_distributions_geo_restrictions_enabled"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "Infrastructure Security"
+}
+

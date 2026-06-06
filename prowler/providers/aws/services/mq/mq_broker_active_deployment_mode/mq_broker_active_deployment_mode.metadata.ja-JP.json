@@ -1,0 +1,44 @@
+{
+  "Provider": "aws",
+  "CheckID": "mq_broker_active_deployment_mode",
+  "CheckTitle": "Apache ActiveMQ ブローカーは、アクティブ/スタンバイのマルチAZデプロイメントモードで構成されています",
+  "CheckType": [
+    "ソフトウェアと構成のチェック/AWS セキュリティベストプラクティス",
+    "ソフトウェアと構成のチェック/業界および規制基準/AWS 基礎セキュリティベストプラクティス",
+    "ソフトウェアと構成のチェック/業界および規制基準/NIST 800-53 コントロール",
+    "影響/サービス拒否"
+  ],
+  "ServiceName": "mq",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "low",
+  "ResourceType": "AwsAmazonMQBroker",
+  "ResourceGroup": "messaging",
+  "Description": "**ActiveMQ ブローカーデプロイメントモード**は**アクティブ/スタンバイ** (`ACTIVE_STANDBY_MULTI_AZ`) として構成されており、可用性ゾーン間で動作する冗長ペアを示しています",
+  "Risk": "**アクティブ/スタンバイ**がない場合、単一インスタンスのブローカーは**単一障害点**となり、**可用性**が低下し、障害やメンテナンス中に**メッセージの損失や重複**のリスクがあります。これにより、メッセージフローが停滞し、バックログが増加し、依存サービス間での処理が不整合になる可能性があります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/MQ/deployment-mode.html",
+    "https://docs.aws.amazon.com/amazon-mq/latest/developer-guide/amazon-mq-basic-elements.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/mq-controls.html#mq-5",
+    "https://docs.aws.amazon.com/amazon-mq/latest/developer-guide/amazon-mq-broker-architecture.html#active-standby-broker-deployment"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation: アクティブ/スタンバイ マルチAZで ActiveMQ ブローカーを作成します\nResources:\n  <example_resource_name>:\n    Type: AWS::AmazonMQ::Broker\n    Properties:\n      BrokerName: <example_resource_name>\n      EngineType: ACTIVEMQ\n      EngineVersion: <example_resource_name>\n      HostInstanceType: mq.t3.micro\n      PubliclyAccessible: false\n      DeploymentMode: ACTIVE_STANDBY_MULTI_AZ  # 重要: チェックを通過するためにアクティブ/スタンバイ マルチAZを設定します\n      SubnetIds:\n        - <example_resource_id>\n        - <example_resource_id>  # 重要: アクティブ/スタンバイには異なるAZの2つのサブネットが必要です\n      SecurityGroups:\n        - <example_resource_id>\n      Users:\n        - Username: <example_resource_name>\n          Password: <example_resource_id>\n```",
+      "Other": "1. AWS コンソールで、Amazon MQ > Brokers > Create broker に移動します\n2. エンジンを選択: ActiveMQ\n3. デプロイメントモードをアクティブ/スタンバイブローカー (マルチAZ) に設定します\n4. 異なるAZの2つのサブネットとセキュリティグループを選択します\n5. ブローカー名、インスタンスタイプを入力し、ユーザー（ユーザー名/パスワード）を作成します\n6. ブローカーを作成し、クライアントを新しいエンドポイントに更新してから、古い単一インスタンスのブローカーを削除します",
+      "Terraform": "```hcl\n# アクティブ/スタンバイ マルチAZで ActiveMQ ブローカーを作成します\nresource \"aws_mq_broker\" \"<example_resource_name>\" {\n  broker_name         = \"<example_resource_name>\"\n  engine_type         = \"ActiveMQ\"\n  engine_version      = \"<example_resource_name>\"\n  host_instance_type  = \"mq.t3.micro\"\n  publicly_accessible = false\n  deployment_mode     = \"ACTIVE_STANDBY_MULTI_AZ\"  # 重要: チェックを通過するためにアクティブ/スタンバイ マルチAZを有効にします\n\n  subnet_ids      = [\"<example_resource_id>\", \"<example_resource_id>\"]  # 重要: 異なるAZの2つのサブネット\n  security_groups = [\"<example_resource_id>\"]\n\n  user {\n    username = \"<example_resource_name>\"\n    password = \"<example_resource_id>\"\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "ActiveMQ ブローカーにマルチAZのレジリエンスを提供するために**アクティブ/スタンバイデプロイメント**を採用します。\n\nクライアントを**フェイルオーバー**に備えてリトライと冪等処理を設計し、定期的な**フェイルオーバーテスト**で回復を検証し、ブローカーの健康状態を監視し、**最小特権**を適用して影響範囲を制限します。",
+      "Url": "https://hub.prowler.com/check/mq_broker_active_deployment_mode"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

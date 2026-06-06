@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "vm_scaleset_associated_with_load_balancer",
+  "CheckTitle": "虚拟机规模集应关联负载均衡器",
+  "CheckType": [],
+  "ServiceName": "vm",
+  "SubServiceName": "scaleset",
+  "ResourceIdTemplate": "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachineScaleSets/{vmScaleSetName}",
+  "Severity": "medium",
+  "ResourceType": "Microsoft.Compute/virtualMachineScaleSets",
+  "ResourceGroup": "compute",
+  "Description": "确保 Azure 虚拟机规模集使用负载均衡器进行流量分发。",
+  "Risk": "若未集成负载均衡器，Azure 虚拟机规模集在流量突增或实例故障期间可能出现可用性下降和潜在服务中断，导致用户体验变差并可能带来业务影响。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/virtual-network/network-overview",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/VirtualMachines/associated-load-balancers.html",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "将负载均衡器附加到 Azure 虚拟机规模集，以确保高可用性和最佳流量分发。",
+      "Url": "https://docs.microsoft.com/en-us/azure/load-balancer/load-balancer-overview"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

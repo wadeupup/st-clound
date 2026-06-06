@@ -1,0 +1,33 @@
+{
+  "Provider": "aws",
+  "CheckID": "iam_administrator_access_with_mfa",
+  "CheckTitle": "确保具有 AdministratorAccess 策略的组中的用户已启用 MFA 令牌",
+  "CheckType": [
+    "Infrastructure Security"
+  ],
+  "ServiceName": "iam",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "high",
+  "ResourceType": "AwsIamUser",
+  "ResourceGroup": "IAM",
+  "Description": "确保具有 AdministratorAccess 策略的组中的用户已启用 MFA 令牌",
+  "Risk": "该策略可能允许匿名用户执行操作。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "确保此仓库及其内容应可被公开访问。",
+      "Url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_mfa_enable_virtual.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

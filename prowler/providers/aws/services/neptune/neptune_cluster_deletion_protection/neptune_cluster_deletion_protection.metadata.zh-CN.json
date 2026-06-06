@@ -1,0 +1,40 @@
+{
+  "Provider": "aws",
+  "CheckID": "neptune_cluster_deletion_protection",
+  "CheckTitle": "Neptune 集群已启用删除保护",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践",
+    "行业和法规标准/AWS 基础安全最佳实践",
+    "影响/数据销毁"
+  ],
+  "ServiceName": "neptune",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "database",
+  "Description": "Neptune DB 集群已启用**删除保护**。",
+  "Risk": "缺乏**删除保护**会削弱**可用性**和**完整性**：集群可能因管理员的意外操作、恶意自动化或凭证泄露而被删除。\n\n集群删除会导致立即的服务中断、潜在的永久数据丢失，以及如果备份或恢复不足时的延长恢复时间。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/neptune-controls.html#neptune-4"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws neptune modify-db-cluster --db-cluster-identifier <DB_CLUSTER_IDENTIFIER> --deletion-protection --apply-immediately",
+      "NativeIaC": "```yaml\nResources:\n  NeptuneCluster:\n    Type: AWS::Neptune::DBCluster\n    Properties:\n      DBClusterIdentifier: <CLUSTER_ID>\n      DeletionProtection: true  # 防止意外或恶意的集群删除\n```",
+      "Terraform": "```hcl\nresource \"aws_neptune_cluster\" \"example_resource\" {\n  cluster_identifier  = \"<CLUSTER_ID>\"\n  deletion_protection = true  # 防止意外或恶意的集群删除\n}\n```",
+      "Other": "1. 登录 AWS 管理控制台并打开 Amazon Neptune\n2. 在导航窗格中，选择数据库\n3. 选择 DB 集群并选择修改\n4. 启用删除保护\n5. 选择立即应用（如果显示）然后修改 DB 集群"
+    },
+    "Recommendation": {
+      "Text": "为生产 Neptune 集群启用**删除保护**，并应用**最小权限**和**职责分离**原则进行删除操作。\n\n实施变更控制审批，将删除权限限制为经过审计的角色，并限制能够执行破坏性操作的自动化工作流程，以防止意外或恶意删除。",
+      "Url": "https://hub.prowler.com/check/neptune_cluster_deletion_protection"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

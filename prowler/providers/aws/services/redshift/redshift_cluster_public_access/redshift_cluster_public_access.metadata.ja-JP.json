@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "redshift_cluster_public_access",
+  "CheckTitle": "Redshift クラスターはインターネットに公開されていません",
+  "CheckType": [
+    "ソフトウェアと構成のチェック/AWS セキュリティベストプラクティス/ネットワーク到達可能性",
+    "ソフトウェアと構成のチェック/業界および規制基準/AWS 基礎セキュリティベストプラクティス"
+  ],
+  "ServiceName": "redshift",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "critical",
+  "ResourceType": "AwsRedshiftCluster",
+  "ResourceGroup": "analytics",
+  "Description": "Amazon Redshift クラスターで、**パブリックサブネット**にある `publicly accessible` エンドポイントと、`0.0.0.0/0` または `::/0` からの TCP を許可するセキュリティグループは、インターネットに公開されていると識別されます。\n\nプライベートサブネットや制限的なルールによりインターネット到達性がないパブリックエンドポイントは、別途認識されます。",
+  "Risk": "インターネットに公開された Redshift エンドポイントは、任意のホストからの直接的な DB アクセスを許可し、以下に影響を与えます:\n- **機密性**: 資格情報のブルートフォース攻撃、無許可のクエリ、データの流出\n- **完全性**: 無許可の書き込みやスキーマ変更\n- **可用性**: スキャン/悪用による接続の枯渇や中断",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/de_de/redshift/latest/mgmt/rs-ra3-VPC-public-private.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/Redshift/redshift-cluster-publicly-accessible.html",
+    "https://docs.aws.amazon.com/redshift/latest/mgmt/managing-clusters-vpc.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws redshift modify-cluster --cluster-identifier <CLUSTER_ID> --no-publicly-accessible",
+      "NativeIaC": "```yaml\n# CloudFormation: Redshift クラスターは公開アクセスできません\nResources:\n  <example_resource_name>:\n    Type: AWS::Redshift::Cluster\n    Properties:\n      ClusterType: single-node\n      DBName: <example_db_name>\n      MasterUsername: <example_username>\n      MasterUserPassword: <example_password>\n      NodeType: dc2.large\n      PubliclyAccessible: false  # 重要: インターネットへの公開を防ぐためにパブリックアクセスを無効にします\n```",
+      "Other": "1. AWS マネジメントコンソールを開き、Amazon Redshift に移動します\n2. クラスターを選択します\n3. 編集 (または Actions > Modify) をクリックします\n4. Publicly accessible を Off/No に設定します\n5. 変更を保存し、修正を適用します",
+      "Terraform": "```hcl\n# Redshift クラスターは公開アクセスできません\nresource \"aws_redshift_cluster\" \"<example_resource_name>\" {\n  cluster_identifier  = \"<example_resource_id>\"\n  node_type           = \"dc2.large\"\n  cluster_type        = \"single-node\"\n  master_username     = \"<example_username>\"\n  master_password     = \"<example_password>\"\n\n  publicly_accessible = false  # 重要: インターネットへの公開を防ぐためにパブリックアクセスを無効にします\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "**プライベート接続**を優先します: パブリックアクセスを無効にし、クラスターをプライベートサブネットに配置し、信頼できる CIDR または VPC ソースに限定された **最小特権** のセキュリティグループを適用します。VPN/ピアリング/エンドポイント、強力な認証、監視を用いた **多層防御** を使用します。データベースポートへの `0.0.0.0/0` または `::/0` の使用を避けます。",
+      "Url": "https://hub.prowler.com/check/redshift_cluster_public_access"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

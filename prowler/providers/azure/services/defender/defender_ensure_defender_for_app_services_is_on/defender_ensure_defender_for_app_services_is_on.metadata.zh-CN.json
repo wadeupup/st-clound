@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "defender_ensure_defender_for_app_services_is_on",
+  "CheckTitle": "确保 Microsoft Defender for App Services 设置为“开启”",
+  "CheckType": [],
+  "ServiceName": "defender",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AzureDefenderPlan",
+  "ResourceGroup": "security",
+  "Description": "确保 Microsoft Defender for App Services 设置为“开启”",
+  "Risk": "开启 Microsoft Defender for App Service 可为 App Service 启用威胁检测，并在 Microsoft Defender for Cloud 中提供威胁情报、异常检测和行为分析能力。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/SecurityCenter/defender-app-service.html",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-general-policies/ensure-that-azure-defender-is-set-to-on-for-app-service#terraform"
+    },
+    "Recommendation": {
+      "Text": "默认情况下，Microsoft Defender for Cloud 未对你的 App Service 实例启用。为 App Service 实例启用 Defender 安全服务可借助 Microsoft Security Response Center 提供的威胁检测能力，实现高级安全防护。",
+      "Url": ""
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

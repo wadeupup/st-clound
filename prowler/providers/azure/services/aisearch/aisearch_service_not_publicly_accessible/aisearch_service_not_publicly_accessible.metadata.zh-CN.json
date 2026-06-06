@@ -1,0 +1,33 @@
+{
+  "Provider": "azure",
+  "CheckID": "aisearch_service_not_publicly_accessible",
+  "CheckTitle": "限制 AI Search 服务的公共网络访问",
+  "CheckType": [],
+  "ServiceName": "aisearch",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AzureSearchService",
+  "ResourceGroup": "database",
+  "Description": "确保限制对 Search 服务的公共网络访问。",
+  "Risk": "公开可访问会使 Search 服务暴露于潜在攻击、未授权使用与数据泄露风险。限制访问可减少攻击面，并确保只有获授权的网络能够访问该搜索服务。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/search/service-configure-firewall#configure-network-access-in-azure-portal",
+  "Remediation": {
+    "Code": {
+      "CLI": "az search service update --resource-group <resource_group_name> --name <service_name> --public-access disabled",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "在限制公共访问后，确保已配置必要的虚拟网络设置或 IP 规则，以允许所需服务访问。定期审查网络访问设置以维持安全环境。要限制 Search 服务的公共网络访问：1. 在 Azure 门户中打开你的 Search 服务。2. 在“设置”->“网络”下，将“公共网络访问”设置为“已禁用”。3. 按需设置虚拟网络服务终结点或专用终结点以实现安全访问。4. 按需审查并调整 IP 访问规则。",
+      "Url": "https://learn.microsoft.com/en-us/azure/search/service-configure-firewall#configure-network-access-in-azure-portal"
+    }
+  },
+  "Categories": [
+    "gen-ai"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

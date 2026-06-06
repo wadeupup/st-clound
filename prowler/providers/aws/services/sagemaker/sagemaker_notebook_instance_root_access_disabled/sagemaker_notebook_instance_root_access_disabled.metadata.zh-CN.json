@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "sagemaker_notebook_instance_root_access_disabled",
+  "CheckTitle": "Amazon SageMaker notebook 实例已禁用 root 访问权限",
+  "CheckType": [
+    "软件和配置检查/AWS安全最佳实践",
+    "软件和配置检查/行业和监管标准/AWS 基础安全最佳实践",
+    "TTPs/权限提升"
+  ],
+  "ServiceName": "sagemaker",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsSageMakerNotebookInstance",
+  "ResourceGroup": "ai_ml",
+  "Description": "禁用用户 **root 访问权限** 的 **Amazon SageMaker 笔记本实例**。该评估会检查交互式用户是否能够在实例上获得 root 权限，并突出显示 `RootAccess` 未设置为 `Disabled` 的笔记本。",
+  "Risk": "允许用户拥有**root 访问权限**会使其能够完全控制系统，从而危及**完整性**（篡改代码、软件包和内核）、**机密性**（读取机密、凭证、数据副本）以及**可用性**（禁用代理或破坏环境）。笔记本一旦被攻陷，可能会通过实例角色导致横向移动。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/sagemaker/latest/dg/nbi-root-access.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws sagemaker update-notebook-instance --notebook-instance-name <example_resource_name> --root-access Disabled",
+      "NativeIaC": "```yaml\n# CloudFormation：在 SageMaker Notebook Instance 上禁用 root 访问\nResources:\n  Notebook:\n    Type: AWS::SageMaker::NotebookInstance\n    Properties:\n      InstanceType: ml.t3.medium\n      RoleArn: <example_role_arn>\n      RootAccess: Disabled  # 关键：禁用用户 root 访问以通过检查\n```",
+      "Other": "1. 在 AWS 控制台中，前往 SageMaker > Notebook instances\n2. 选择 <example_resource_name>，如果它正在运行则点击 Stop\n3. 停止后，点击 Edit\n4. 将 Root access 设置为 Disabled\n5. 保存更改，然后点击 Start",
+      "Terraform": "```hcl\n# Terraform：在 SageMaker Notebook Instance 上禁用 root 访问\nresource \"aws_sagemaker_notebook_instance\" \"notebook\" {\n  name          = \"<example_resource_name>\"\n  role_arn      = \"<example_role_arn>\"\n  instance_type = \"ml.t3.medium\"\n  root_access   = \"Disabled\"  # 关键：禁用用户 root 访问以通过检查\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "应用**最小权限**：将笔记本用户的 `RootAccess` 设置为 `Disabled`。通过**托管镜像**或**生命周期自动化**提供所需软件，而不是临时的 root 安装。限制笔记本 IAM 角色，强制执行**纵深防御**（网络隔离和监控），并要求对特权更改采用受控的管理员工作流。",
+      "Url": "https://hub.prowler.com/check/sagemaker_notebook_instance_root_access_disabled"
+    }
+  },
+  "Categories": [
+    "identity-access",
+    "gen-ai"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

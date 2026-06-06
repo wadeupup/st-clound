@@ -1,0 +1,33 @@
+{
+  "Provider": "aws",
+  "CheckID": "iam_role_cross_account_readonlyaccess_policy",
+  "CheckTitle": "确保 IAM 角色没有对外部 AWS 账户的 ReadOnlyAccess 访问权限",
+  "CheckType": [],
+  "ServiceName": "iam",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "high",
+  "ResourceType": "AwsIamRole",
+  "ResourceGroup": "IAM",
+  "Description": "确保 IAM 角色没有对外部 AWS 账户的 ReadOnlyAccess 访问权限",
+  "Risk": "AWS 管理的 ReadOnlyAccess 策略非常强大，会使客户面临显著的数据泄露威胁。应非常谨慎地授予此权限。对于授予第三方供应商的访问权限，考虑使用其他托管策略，例如 ViewOnlyAccess 或 SecurityAudit。",
+  "RelatedUrl": "https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_job-functions.html#awsmp_readonlyaccess",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "从所有具有信任策略的角色中移除 AWS 管理的 ReadOnlyAccess 策略，包括第三方云账户，或者从所有需要 ReadOnlyAccess 策略的角色的信任策略中移除第三方云账户。",
+      "Url": "https://docs.securestate.vmware.com/rule-docs/aws-iam-role-cross-account-readonlyaccess-policy"
+    }
+  },
+  "Categories": [
+    "trust-boundaries"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "CAF 安全史诗：IAM"
+}

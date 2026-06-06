@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "sqlserver_tde_encryption_enabled",
+  "CheckTitle": "确保 SQL 服务器的透明数据加密（TDE）保护器已加密",
+  "CheckType": [],
+  "ServiceName": "sqlserver",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "SQLServer",
+  "ResourceGroup": "database",
+  "Description": "在每个 SQL 服务器上启用透明数据加密。",
+  "Risk": "Azure SQL Database 透明数据加密可通过对静态数据库、关联备份和事务日志文件进行实时加密与解密来防护恶意活动威胁，且无需修改应用程序。",
+  "RelatedUrl": "https://docs.microsoft.com/en-us/sql/relational-databases/security/encryption/transparent-data-encryption-with-azure-sql-database",
+  "Remediation": {
+    "Code": {
+      "CLI": "az sql db tde set --resource-group resourceGroup --server dbServerName --database dbName --status Enabled",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity-staging/knowledge-base/azure/Sql/data-encryption.html#",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "1. 进入 SQL databases。2. 对每个数据库实例。3. 点击 Transparent data encryption。4. 将 Data encryption 设置为 On。",
+      "Url": "https://learn.microsoft.com/en-us/azure/azure-sql/database/transparent-data-encryption-byok-overview?view=azuresql"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "storage_ensure_azure_services_are_trusted_to_access_is_enabled",
+  "CheckTitle": "确保为存储账户启用“Allow trusted Microsoft services to access this storage account”",
+  "CheckType": [],
+  "ServiceName": "storage",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AzureStorageAccount",
+  "ResourceGroup": "storage",
+  "Description": "确保在 Azure 存储账户配置中启用“Allow trusted Microsoft services to access this storage account”，以授予受信任云服务访问权限。",
+  "Risk": "如果不允许 Azure 服务访问存储账户，则以下服务将无法获得访问权限：Azure Backup、Azure Event Grid、Azure Site Recovery、Azure DevTest Labs、Azure Event Hubs、Azure Networking、Azure Monitor 以及 Azure SQL Data Warehouse（在订阅中注册时）。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "az storage account update --name <StorageAccountName> --resource-group <resourceGroupName> --bypass AzureServices",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/StorageAccounts/enable-trusted-microsoft-services.html",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-networking-policies/enable-trusted-microsoft-services-for-storage-account-access#terraform"
+    },
+    "Recommendation": {
+      "Text": "为使这些 Azure 服务按预期工作并能访问你的存储账户资源，需要添加例外规则，使受信任的 Microsoft Azure 服务可以绕过你的网络规则。",
+      "Url": ""
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

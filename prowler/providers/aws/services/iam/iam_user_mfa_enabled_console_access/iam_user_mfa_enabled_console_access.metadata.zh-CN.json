@@ -1,0 +1,35 @@
+{
+  "Provider": "aws",
+  "CheckID": "iam_user_mfa_enabled_console_access",
+  "CheckTitle": "确保为所有具有控制台密码的 IAM 用户启用多因素身份验证 (MFA)。",
+  "CheckType": [
+    "软件和配置检查",
+    "行业和监管标准",
+    "CIS AWS 基础基准"
+  ],
+  "ServiceName": "iam",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "high",
+  "ResourceType": "AwsIamUser",
+  "ResourceGroup": "IAM",
+  "Description": "确保为所有具有控制台密码的 IAM 用户启用多因素身份验证 (MFA)。",
+  "Risk": "如果密码不安全或以任何方式泄露，可能会导致对该关键账户的未经授权访问。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "为用户账户启用 MFA。MFA 是一种简单的最佳实践，它在用户名和密码的基础上增加了一层额外的保护。建议使用硬件密钥而不是虚拟 MFA。",
+      "Url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_mfa_enable_virtual.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

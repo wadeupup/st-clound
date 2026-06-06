@@ -1,0 +1,45 @@
+{
+  "Provider": "aws",
+  "CheckID": "cloudtrail_threat_detection_enumeration",
+  "CheckTitle": "CloudTrail ログに潜在的な列挙活動が表示されない",
+  "CheckType": [
+    "TTPs/Discovery",
+    "Software and Configuration Checks/AWS Security Best Practices/Runtime Behavior Analysis",
+    "Unusual Behaviors/User"
+  ],
+  "ServiceName": "cloudtrail",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "critical",
+  "ResourceType": "AwsCloudTrailTrail",
+  "ResourceGroup": "monitoring",
+  "Description": "**CloudTrail アクティビティ** が分析され、最近の時間ウィンドウ内で `List*`、`Describe*`、`Get*` などの幅広い発見 API を実行している AWS ID が検出されます。\n\nこれらのアクションの設定可能な比率を超える ID は、そのプリンシパルによる潜在的な列挙動作を示します。",
+  "Risk": "集中的な発見アクティビティは、有効な資格情報を使用した **偵察** を示します。攻撃者は資産とポリシーをマッピングして **権限昇格** を有効にし、データストアを **窃取**（機密性）の対象とし、破壊するサービス（可用性）を識別して、ステルスな横方向の移動をサポートできます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://medium.com/falconforce/falconfriday-detecting-enumeration-in-aws-0xff25-orangecon-25-edition-4aee83651088",
+    "https://www.elastic.co/guide/en/security/8.19/aws-discovery-api-calls-via-cli-from-a-single-resource.html",
+    "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-concepts.html#cloudtrail-concepts-logging-data-events",
+    "https://aws.plainenglish.io/aws-cloudtrail-event-cheatsheet-a-detection-engineers-guide-to-critical-api-calls-part-1-04fb1588556f",
+    "https://support.icompaas.com/support/solutions/articles/62000233455-ensure-there-are-no-potential-enumeration-threats-in-cloudtrail-"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws iam update-access-key --user-name <USER_NAME> --access-key-id <ACCESS_KEY_ID> --status Inactive",
+      "NativeIaC": "```yaml\n# CloudFormation: deny common enumeration APIs for a specific IAM user\nResources:\n  DenyEnumerationPolicy:\n    Type: AWS::IAM::Policy\n    Properties:\n      PolicyName: deny-enumeration\n      PolicyDocument:\n        Version: \"2012-10-17\"\n        Statement:\n          - Effect: Deny  # CRITICAL: blocks typical enumeration calls\n            Action:\n              - ec2:Describe*   # CRITICAL: deny EC2 describe APIs\n              - iam:List*       # CRITICAL: deny IAM list APIs\n              - s3:List*        # CRITICAL: deny S3 list APIs\n              - s3:Get*         # CRITICAL: deny S3 get APIs (e.g., GetBucketAcl)\n            Resource: \"*\"\n      Users:\n        - \"<example_resource_name>\"  # CRITICAL: target the enumerating user\n```",
+      "Other": "1. AWS コンソールで、IAM > ユーザーに移動し、アラートに表示されているユーザー（検出結果の ARN）を開きます\n2. セキュリティ認証情報タブを選択します\n3. 各アクティブなアクセスキーについて、無効化をクリックしてステータスを非アクティブに設定します\n4. アクティビティが EC2 インスタンスロールから来た場合：EC2 > インスタンス > インスタンスを選択 > セキュリティ > IAM ロール > IAM ロールをデタッチに移動します\n5. チェックを再実行して、新しい列挙イベントが発生しないことを確認します",
+      "Terraform": "```hcl\n# Deny common enumeration APIs for a specific IAM user\nresource \"aws_iam_user_policy\" \"<example_resource_name>\" {\n  name = \"deny-enumeration\"\n  user = \"<example_user_name>\"\n\n  policy = jsonencode({\n    Version = \"2012-10-17\",\n    Statement = [{\n      Effect   = \"Deny\", # CRITICAL: blocks typical enumeration calls\n      Action   = [\n        \"ec2:Describe*\",   # CRITICAL\n        \"iam:List*\",       # CRITICAL\n        \"s3:List*\",        # CRITICAL\n        \"s3:Get*\"          # CRITICAL\n      ],\n      Resource = \"*\"\n    }]\n  })\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "**最小権限の原則** を適用して、`List*`/`Describe*`/`Get*` を必要なリソースとロールに制限します。**職務分離** を使用します。\n- MFA と短期セッションを強制します\n- **SCP** を使用して不要な発見を抑制します\n- 期待される読み取りをベースライン化し、ピーク時にアラートを発行して **多層防御** を実現します",
+      "Url": "https://hub.prowler.com/check/cloudtrail_threat_detection_enumeration"
+    }
+  },
+  "Categories": [
+    "threat-detection"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

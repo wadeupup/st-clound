@@ -1,0 +1,34 @@
+{
+  "Provider": "aws",
+  "CheckID": "ec2_securitygroup_from_launch_wizard",
+  "CheckTitle": "由 EC2 启动向导创建的安全组",
+  "CheckType": [
+    "Infrastructure Security"
+  ],
+  "ServiceName": "ec2",
+  "SubServiceName": "securitygroup",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "medium",
+  "ResourceType": "AwsEc2SecurityGroup",
+  "ResourceGroup": "network",
+  "Description": "由 EC2 启动向导创建的安全组。",
+  "Risk": "使用 EC2 向导在 AWS 控制台中创建的安全组可能允许从 0.0.0.0/0 访问端口 22。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/EC2/security-group-prefixed-with-launch-wizard.html",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "采用零信任（Zero Trust）方法。实施流程以扫描和修复由 EC2 向导创建的安全组。推荐的最佳实践是使用授权的安全组。",
+      "Url": "https://docs.aws.amazon.com/eks/latest/userguide/sec-group-reqs.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

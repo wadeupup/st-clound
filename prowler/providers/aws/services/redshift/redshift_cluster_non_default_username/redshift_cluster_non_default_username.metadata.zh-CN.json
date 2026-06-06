@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "redshift_cluster_non_default_username",
+  "CheckTitle": "Amazon Redshift 集群不使用默认管理员用户名",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践",
+    "TTPs/初始访问/未经授权的访问"
+  ],
+  "ServiceName": "redshift",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsRedshiftCluster",
+  "ResourceGroup": "analytics",
+  "Description": "**Amazon Redshift 集群**会被评估是否使用**非默认管理员用户名**；使用已知默认 `awsuser` 的集群会被识别出来。",
+  "Risk": "默认管理员名称使账户变得可预测，从而启用用户名枚举、密码喷洒和暴力破解尝试。接管可能会暴露仓库数据（**机密性**），启用未经授权的查询或架构更改（**完整性**），并中断分析工作负载（**可用性**）。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/redshift-controls.html#redshift-8",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/Redshift/master-username.html",
+    "https://docs.aws.amazon.com/redshift/latest/gsg/rs-gsg-prereq.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation：具有非默认管理员用户名的 Redshift 集群\nResources:\n  <example_resource_name>:\n    Type: AWS::Redshift::Cluster\n    Properties:\n      ClusterType: single-node\n      NodeType: <example_node_type>\n      MasterUsername: <new-username>  # 关键：不是 'awsuser' 以通过检查\n      MasterUserPassword: <password>\n```",
+      "Other": "1. 在 Amazon Redshift 控制台中，选择创建集群\n2. 将管理员用户名设置为除 awsuser 以外的值（关键）\n3. 输入所需的最小设置（密码、节点类型）并创建集群\n4. 如有需要，从旧集群迁移数据\n5. 删除使用 awsuser 管理员的旧集群以移除失败的资源",
+      "Terraform": "```hcl\nresource \"aws_redshift_cluster\" \"<example_resource_name>\" {\n  cluster_identifier = \"<example_resource_id>\"\n  node_type          = \"<example_node_type>\"\n  cluster_type       = \"single-node\"\n  master_username    = \"<new-username>\"  # 关键：不是 'awsuser' 以通过检查\n  master_password    = \"<password>\"\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "在创建时使用**唯一且不可预测**的管理员用户名，而不是 `awsuser`。通过使用专用角色和限制超级用户使用来应用**最小权限**。强制执行强身份验证，轮换凭证，并审核访问。*对于现有集群*，创建一个具有唯一管理员的新集群并进行迁移。",
+      "Url": "https://hub.prowler.com/check/redshift_cluster_non_default_username"
+    }
+  },
+  "Categories": [
+    "identity-access"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

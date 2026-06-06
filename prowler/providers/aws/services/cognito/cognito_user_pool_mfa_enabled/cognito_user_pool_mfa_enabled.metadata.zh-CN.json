@@ -1,0 +1,32 @@
+{
+  "Provider": "aws",
+  "CheckID": "cognito_user_pool_mfa_enabled",
+  "CheckTitle": "确保为 Amazon Cognito 用户池启用多因素身份验证（MFA）",
+  "CheckType": [],
+  "ServiceName": "cognito",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:aws:cognito-idp:region:account:userpool/userpool-id",
+  "Severity": "medium",
+  "ResourceType": "AwsCognitoUserPool",
+  "ResourceGroup": "IAM",
+  "Description": "检查是否为 Amazon Cognito 用户池启用了多因素身份验证（MFA）。",
+  "Risk": "如果未启用 MFA，未经授权的用户可能获得对用户池的访问权限，并可能危及应用程序的安全性。",
+  "RelatedUrl": "https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-settings-mfa.html",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "要为 Amazon Cognito 用户池启用 MFA，请按照 Amazon Cognito 文档中的说明操作。",
+      "Url": "https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-settings-mfa.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

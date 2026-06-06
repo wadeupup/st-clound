@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "elb_internet_facing",
+  "CheckTitle": "Elastic Load Balancer が internet-facing ではないこと",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices/Network Reachability",
+    "Effects/Data Exposure",
+    "TTPs/Initial Access"
+  ],
+  "ServiceName": "elb",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsElbLoadBalancer",
+  "ResourceGroup": "network",
+  "Description": "Elastic Load Balancer の `scheme` を評価し、**internet-facing** か internal かを判定します。これにより、エンドポイントがパブリック DNS 名で公開到達可能かを確認します。",
+  "Risk": "意図しない **internet-facing** ロードバランサーはバックエンドをインターネットに公開し、偵察、クレデンシャルスタッフィング、アプリ脆弱性の悪用を可能にします。結果として、データ露出（機密性）、不正変更（完全性）、**DDoS** やリソース枯渇（可用性）につながる可能性があります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/waf/latest/developerguide/web-acl-associating-aws-resource.html",
+    "https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-elasticloadbalancingv2-loadbalancer.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/ELB/internet-facing-load-balancers.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation: create an internal load balancer\nResources:\n  <example_resource_name>:\n    Type: AWS::ElasticLoadBalancingV2::LoadBalancer\n    Properties:\n      Scheme: internal  # CRITICAL: makes the load balancer internal (not internet-facing)\n      Subnets:\n        - <example_resource_id>\n        - <example_resource_id>\n      SecurityGroups:\n        - <example_resource_id>\n```",
+      "Other": "1. AWS コンソールで EC2 > Load Balancers に移動します\n2. Create load balancer（Application または Network）をクリックします\n3. Scheme を Internal に設定します\n4. 少なくとも 2 つのサブネットと 1 つのセキュリティグループを選択し、必要に応じてリスナー/ターゲットグループを再作成します\n5. 新しいロードバランサーを作成し、DNS をその DNS 名へ更新します\n6. 旧 internet-facing ロードバランサーを削除します",
+      "Terraform": "```hcl\nresource \"aws_lb\" \"<example_resource_name>\" {\n  internal        = true  # CRITICAL: sets scheme to internal so it's not internet-facing\n  subnets         = [\"<example_resource_id>\", \"<example_resource_id>\"]\n  security_groups = [\"<example_resource_id>\"]\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "プライベートサービスには `internal` ロードバランサーを使用し、**security groups**、サブネット、許可リストで露出を制限してください。公開エンドポイントには **多層防御** を適用し、**AWS WAF** Web ACL（*対応時*）の関連付け、**TLS** 強制、最小権限ネットワークルール、さらに **Shield** やレート制限を検討します。公開アクセスの必要性を定期的に見直してください。",
+      "Url": "https://hub.prowler.com/check/elb_internet_facing"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

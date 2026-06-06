@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "awslambda_function_using_supported_runtimes",
+  "CheckTitle": "Lambda関数がサポートされているランタイムを使用している",
+  "CheckType": [
+    "Software and Configuration Checks/Patch Management",
+    "Software and Configuration Checks/AWS Security Best Practices"
+  ],
+  "ServiceName": "awslambda",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsLambdaFunction",
+  "ResourceGroup": "serverless",
+  "Description": "**廃止されたランタイム**（`python3.8`、`nodejs14.x`、`go1.x`、`ruby2.7`など）を使用している**Lambda関数**は、非推奨のランタイム識別子のリストに対して識別されます。",
+  "Risk": "メンテナンスされていないランタイムはセキュリティパッチがなく、コードとライブラリを既知のCVEにさらします（**機密性、整合性**）。\n\n非推奨化により、作成/更新がブロックされ、ビルドが破損し、デプロイメントの失敗やランタイムエラー（**可用性**）が発生する可能性があります。ツールがビルドのサポートを停止し、修正と回復が遅くなる可能性があります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://aws.amazon.com/blogs/compute/managing-aws-lambda-runtime-upgrades/",
+    "https://docs.aws.amazon.com/lambda/latest/dg/runtime-support-policy.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/Lambda/supported-runtime-environment.html",
+    "https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws lambda update-function-configuration --function-name <FUNCTION_NAME> --runtime <SUPPORTED_RUNTIME>",
+      "NativeIaC": "```yaml\n# CloudFormation：Lambdaをサポートされているランタイムに設定\nResources:\n  <example_resource_name>:\n    Type: AWS::Lambda::Function\n    Properties:\n      Role: <example_role_arn>\n      Handler: <example_handler>\n      Runtime: <SUPPORTED_RUNTIME>  # 修正：サポートされているランタイム（例：python3.12）に変更してチェックをパス\n      Code:\n        S3Bucket: <example_bucket_name>\n        S3Key: <example_object_key>\n```",
+      "Other": "1. AWS Lambdaコンソールを開き、関数を選択\n2. 設定 > ランタイム設定 > 編集に移動\n3. ランタイムで、サポートされているランタイム（例：python3.12）を選択して保存をクリック",
+      "Terraform": "```hcl\n# Lambdaをサポートされているランタイムに設定\nresource \"aws_lambda_function\" \"<example_resource_name>\" {\n  function_name = \"<example_resource_name>\"\n  role          = \"<example_role_arn>\"\n  handler       = \"<example_handler>\"\n  runtime       = \"<SUPPORTED_RUNTIME>\" # 修正：サポートされているランタイム（例：python3.12）を使用してチェックをパス\n  filename      = \"<example_package.zip>\"\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "**サポートされているLTSランタイム**（AL2/AL2023）にアップグレードし、ランタイムアップグレードを安全なSDLCに含めます。\n\nステージング環境でテストし、バージョン/エイリアス経由でデプロイし、依存関係を最新の状態に保ちます。非推奨通知を監視します。非推奨の`runtime`値をブロックし、承認されたランタイムのみを許可するガードレールを適用し、**多層防御**と一致させます。",
+      "Url": "https://hub.prowler.com/check/awslambda_function_using_supported_runtimes"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

@@ -1,0 +1,45 @@
+{
+  "Provider": "aws",
+  "CheckID": "ecr_repositories_scan_vulnerabilities_in_latest_image",
+  "CheckTitle": "ECR 存储库最新镜像已扫描，且没有达到或超过配置的最小严重性的漏洞",
+  "CheckType": [
+    "Software and Configuration Checks/Vulnerabilities/CVE",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices"
+  ],
+  "ServiceName": "ecr",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsEcrRepository",
+  "ResourceGroup": "container",
+  "Description": "评估 **Amazon ECR 存储库** 的最新推送镜像，以确认存在漏洞扫描、成功完成，并且没有结果达到或超过配置的最小严重性（例如，`CRITICAL`、`HIGH`、`MEDIUM`）。",
+  "Risk": "容器镜像中未扫描或高严重性的发现使工作负载面临已知 CVE 的利用。\n\n攻击者可以获得代码执行、窃取数据、更改服务或中断操作，从而实现 **横向移动** 和供应链攻击，影响 **机密性**、**完整性** 和 **可用性**。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://www.geeksforgeeks.org/devops/how-to-manage-image-security-and-vulnerabilities-in-ecr/",
+    "https://aws.amazon.com/blogs/aws/amazon-inspector-enhances-container-security-by-mapping-amazon-ecr-images-to-running-containers/",
+    "https://docs.aws.amazon.com/inspector/latest/user/scanning-ecr.html",
+    "https://docs.aws.amazon.com/AmazonECR/latest/userguide/image-scanning-enhanced.html",
+    "https://docs.aws.amazon.com/AmazonECR/latest/userguide/image-scanning.html",
+    "https://docs.aws.amazon.com/AmazonECR/latest/userguide/image-scanning-basic.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# Enable scan on push so the latest image is automatically scanned\nResources:\n  EcrRepository:\n    Type: AWS::ECR::Repository\n    Properties:\n      RepositoryName: <example_resource_name>\n      ImageScanningConfiguration:\n        ScanOnPush: true  # CRITICAL: ensures each pushed image is scanned so the latest has scan results\n```",
+      "Other": "1. 在 AWS 控制台中，转到 ECR > 存储库 > <example_resource_name>\n2. 点击编辑并启用推送时扫描，然后保存\n3. 重新构建容器镜像以移除漏洞，并将新标签推送到存储库\n4. 打开镜像详情并点击扫描镜像（如果未自动扫描）\n5. 确认发现结果显示 0 个达到或超过所需严重性的漏洞",
+      "Terraform": "```hcl\n# Enable scan on push so the latest image is automatically scanned\nresource \"aws_ecr_repository\" \"<example_resource_name>\" {\n  name = \"<example_resource_name>\"\n\n  image_scanning_configuration {\n    scan_on_push = true  # CRITICAL: ensures each pushed image is scanned so the latest has scan results\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "为存储库启用 **持续扫描**，并在策略阈值（例如，`MEDIUM`+）处强制执行部署门禁。\n\n使用修补的组件和更新的基础镜像重新构建镜像，保持镜像最小化，并应用 **最小权限**。使用 **镜像签名** 和 CI/CD 检查，以便只有经过扫描、合规的镜像才能运行。",
+      "Url": "https://hub.prowler.com/check/ecr_repositories_scan_vulnerabilities_in_latest_image"
+    }
+  },
+  "Categories": [
+    "container-security"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

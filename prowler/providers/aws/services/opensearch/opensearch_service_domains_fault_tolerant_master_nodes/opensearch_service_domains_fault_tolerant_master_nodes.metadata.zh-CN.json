@@ -1,0 +1,40 @@
+{
+  "Provider": "aws",
+  "CheckID": "opensearch_service_domains_fault_tolerant_master_nodes",
+  "CheckTitle": "OpenSearch 域至少有 3 个专用主节点",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践",
+    "影响/拒绝服务"
+  ],
+  "ServiceName": "opensearch",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsOpenSearchServiceDomain",
+  "ResourceGroup": "database",
+  "Description": "**Amazon OpenSearch 域**启用了**专用主节点**，主节点数量至少为 `3`，以支持稳定的集群协调和选举",
+  "Risk": "如果少于 `3` 个或禁用了**专用主节点**，集群可能会失去**法定人数**，阻止领导者选举。\n\n影响包括集群状态更新停滞、读取/写入失败、分片分配问题以及可能的脑裂，降低**可用性**和**完整性**。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/opensearch-controls.html#opensearch-11",
+    "https://docs.aws.amazon.com/opensearch-service/latest/developerguide/managedomains-dedicatedmasternodes.html#dedicatedmasternodes-number"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws opensearch update-domain-config --domain-name <name> --cluster-config \"DedicatedMasterEnabled=true,DedicatedMasterType=<instance_type>,DedicatedMasterCount=3\"",
+      "NativeIaC": "```yaml\n# CloudFormation：设置至少 3 个专用主节点\nResources:\n  <example_resource_name>:\n    Type: AWS::OpenSearchService::Domain\n    Properties:\n      ClusterConfig:\n        DedicatedMasterEnabled: true  # 关键：启用专用主节点\n        DedicatedMasterCount: 3       # 关键：确保至少有 3 个主节点\n        DedicatedMasterType: \"<instance_type>\"  # 关键：启用主节点时必需\n```",
+      "Other": "1. 登录 AWS 控制台并打开 Amazon OpenSearch Service\n2. 选择您的域并选择编辑\n3. 在集群配置中：\n   - 启用专用主节点\n   - 将专用主节点数量设置为 3\n   - 选择一个专用主实例类型\n4. 选择保存更改",
+      "Terraform": "```hcl\n# Terraform：设置至少 3 个专用主节点\nresource \"aws_opensearch_domain\" \"<example_resource_name>\" {\n  domain_name = \"<example_resource_name>\"\n\n  cluster_config {\n    dedicated_master_enabled = true  # 关键：启用专用主节点\n    dedicated_master_count   = 3     # 关键：确保至少有 3 个主节点\n    dedicated_master_type    = \"<instance_type>\"  # 关键：启用主节点时必需\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "启用**专用主节点**并将数量设置为至少 `3`（使用奇数）以维持**法定人数**。使用*Multi-AZ with standby*将主节点分布在不同区域。调整主实例的大小并监控集群健康状况，以保持高可用性和弹性。",
+      "Url": "https://hub.prowler.com/check/opensearch_service_domains_fault_tolerant_master_nodes"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

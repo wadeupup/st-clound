@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "opensearch_service_domains_not_publicly_accessible",
+  "CheckTitle": "Amazon OpenSearch Service 域名不可公开访问",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践/网络可达性",
+    "软件和配置检查/行业和法规标准/AWS 基础安全最佳实践",
+    "影响/数据暴露",
+    "TTPs/初始访问"
+  ],
+  "ServiceName": "opensearch",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "critical",
+  "ResourceType": "AwsOpenSearchServiceDomain",
+  "ResourceGroup": "database",
+  "Description": "**Amazon OpenSearch 域**通过其基于资源的访问策略进行**公共曝光**评估。在 VPC 内的域被视为**私有可访问**；具有过于宽松策略的域允许广泛的、未经身份验证的访问，被识别为**公开可访问**。",
+  "Risk": "公共曝光允许任何人查询、索引或删除数据，影响**机密性**（记录泄露）、**完整性**（未经授权的写入、索引篡改）和**可用性**（中断、删除）。攻击者可以收集敏感日志/PII，修改分析或清除索引，从而实现横向移动和操作中断。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-vpc.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/Elasticsearch/domain-exposed.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws opensearch update-domain-config --domain-name <DOMAIN_NAME> --access-policies '{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::<ACCOUNT_ID>:root\"},\"Action\":\"es:*\",\"Resource\":\"arn:aws:es:<REGION>:<ACCOUNT_ID>:domain/<DOMAIN_NAME>/*\"}]}'",
+      "NativeIaC": "```yaml\n# CloudFormation：将 OpenSearch 访问策略限制为仅限您的账户\nResources:\n  <example_resource_name>:\n    Type: AWS::OpenSearchService::Domain\n    Properties:\n      DomainName: <example_resource_name>\n      AccessPolicies:  # 关键：限制访问仅限您的账户，移除公共访问\n        Version: '2012-10-17'\n        Statement:\n          - Effect: Allow\n            Principal:\n              AWS: arn:aws:iam::<ACCOUNT_ID>:root  # 关键：仅此账户可以访问\n            Action: es:*\n            Resource: arn:aws:es:<REGION>:<ACCOUNT_ID>:domain/<example_resource_name>/*\n```",
+      "Other": "1. 在 AWS 控制台中，打开 Amazon OpenSearch Service 并选择您的域\n2. 转到安全配置 > 编辑\n3. 选择访问策略 > JSON\n4. 用以下内容替换策略（使用您的值）并保存更改：\n```json\n{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Effect\": \"Allow\",\n      \"Principal\": {\"AWS\": \"arn:aws:iam::<ACCOUNT_ID>:root\"},\n      \"Action\": \"es:*\",\n      \"Resource\": \"arn:aws:es:<REGION>:<ACCOUNT_ID>:domain/<DOMAIN_NAME>/*\"\n    }\n  ]\n}\n```\n5. 验证域端点不再公开可访问，除非通过您账户的 IAM 主体",
+      "Terraform": "```hcl\n# 将 OpenSearch 访问策略限制为仅限您的账户\nresource \"aws_opensearch_domain\" \"<example_resource_name>\" {\n  domain_name = \"<example_resource_name>\"\n\n  # 关键：限制访问到拥有账户，移除公共访问\n  access_policies = jsonencode({\n    Version = \"2012-10-17\"\n    Statement = [{\n      Effect    = \"Allow\"\n      Principal = { AWS = \"arn:aws:iam::<ACCOUNT_ID>:root\" }\n      Action    = \"es:*\"\n      Resource  = \"arn:aws:es:<REGION>:<ACCOUNT_ID>:domain/<example_resource_name>/*\"\n    }]\n  })\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "应用**最小权限**和**深度防御**：\n- 将域放置在**VPC**中，并通过安全组限制可访问性\n- 使用狭窄的资源策略；避免使用 `Principal:\"*\"`\n- 要求经过身份验证的访问（细粒度控制）；*如果不可避免*，通过 IP 和角色限制公共端点\n- 使用日志和警报监控访问",
+      "Url": "https://hub.prowler.com/check/opensearch_service_domains_not_publicly_accessible"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

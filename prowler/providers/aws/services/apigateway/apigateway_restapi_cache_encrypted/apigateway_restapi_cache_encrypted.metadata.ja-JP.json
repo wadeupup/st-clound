@@ -1,0 +1,46 @@
+{
+  "Provider": "aws",
+  "CheckID": "apigateway_restapi_cache_encrypted",
+  "CheckTitle": "API Gateway REST API ステージのキャッシュデータが保存時に暗号化されています",
+  "CheckType": [
+    "ソフトウェアと設定チェック/AWS セキュリティベストプラクティス",
+    "ソフトウェアと設定チェック/業界および規制基準/AWS 基礎セキュリティベストプラクティス"
+  ],
+  "ServiceName": "apigateway",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsApiGatewayStage",
+  "ResourceGroup": "api_gateway",
+  "Description": "キャッシュが有効な API Gateway REST API ステージは、**保存時に暗号化されたキャッシュデータ**を持っています。この評価は、キャッシュが有効なステージを対象とし、保存された応答が `Encrypt cache data` 設定によって保護されていることを確認します。",
+  "Risk": "暗号化されていないキャッシュコンテンツは、キャッシュストレージ、バックアップ、または管理ツールが通常の制御外でアクセスされた場合、応答ペイロード、トークン、または PII（個人識別情報）を露出する可能性があり、**機密性**を損ない、リプレイまたはセッションハイジャックを可能にします。\n\n開示は API パターンも明らかにし、**横方向の移動**と標的化された悪用を助長します。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://www.clouddefense.ai/compliance-rules/nist-800-53-5/au/apigateway-stage-cache-encryption-at-rest-enabled",
+    "https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-caching.html#enable-api-gateway-caching",
+    "https://support.icompaas.com/support/solutions/articles/62000233641-ensure-api-gateway-rest-api-cache-data-is-encrypted-at-rest",
+    "https://docs.fortifyfox.com/docs/aws-foundational-security-best-practices/apigateway/api-gw-cache-encrypted/index.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/apigateway-controls.html#apigateway-5",
+    "https://www.clouddefense.ai/compliance-rules/aws-fs-practices/apigateway/foundational-security-apigateway-5",
+    "https://www.cloudanix.com/docs/aws/audit/apigatewaymonitoring/rules/apigateway_enable_encryption_api_cache"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws apigateway update-stage --rest-api-id <restapi-id> --stage-name <stage-name> --patch-operations op=replace,path=/*/*/caching/dataEncrypted,value=true",
+      "NativeIaC": "```yaml\n# CloudFormation: ステージ内のすべてのキャッシュされたメソッドの暗号化を有効にします\nResources:\n  <example_resource_name>:\n    Type: AWS::ApiGateway::Stage\n    Properties:\n      StageName: <example_resource_name>\n      RestApiId: <example_resource_id>\n      DeploymentId: <example_resource_id>\n      MethodSettings:\n        - ResourcePath: /*\n          HttpMethod: \"*\"\n          CacheDataEncrypted: true  # 重要：すべてのメソッドのキャッシュされた応答を保存時に暗号化します\n```",
+      "Other": "1. AWS コンソールを開き、API Gateway に移動します\n2. REST API を選択し、Stages をクリックして、影響を受けるステージを選択します\n3. Method overrides（または Cache settings）で、Encrypt cache data を有効にします\n4. 変更を保存します",
+      "Terraform": "```hcl\n# ステージ内のすべてのキャッシュされたメソッドの暗号化を有効にします\nresource \"aws_api_gateway_stage\" \"<example_resource_name>\" {\n  rest_api_id   = \"<example_resource_id>\"\n  stage_name    = \"<example_resource_name>\"\n  deployment_id = \"<example_resource_id>\"\n\n  method_settings {\n    resource_path        = \"/*\"\n    http_method          = \"*\"\n    cache_data_encrypted = true  # 重要：保存時にキャッシュされた応答を暗号化します\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "- キャッシュされたステージ（`Encrypt cache data`）に対して**保存時の暗号化**を有効にします。\n- ステージ管理とキャッシュ無効化に**最小権限**を適用します。\n- 機密性の高いエンドポイントのキャッシュを避けます；**多層防御**のために短い TTL とスケジュールされたキャッシュフラッシュを使用します。",
+      "Url": "https://hub.prowler.com/check/apigateway_restapi_cache_encrypted"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "ssm_managed_compliant_patching",
+  "CheckTitle": "EC2托管实例符合Systems Manager修补要求",
+  "CheckType": [
+    "软件和配置检查/补丁管理",
+    "软件和配置检查/行业和监管标准/AWS基础安全最佳实践"
+  ],
+  "ServiceName": "ssm",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsSsmPatchCompliance",
+  "ResourceGroup": "devops",
+  "Description": "**SSM管理的EC2实例**根据定义的基线报告**补丁合规性**。这将从Patch Manager评估每个受管节点的合规性状态，以确定是否根据策略应用了所需的安全更新。",
+  "Risk": "**未修补的实例**暴露了已知的“CVE”漏洞，允许**远程代码执行**、**特权升级**和**横向移动**。\n\n这威胁到**机密性**（数据泄露）、**完整性**（未经授权的更改）和**可用性**（勒索软件、加密货币挖矿、中断）。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/systems-manager/latest/userguide/patch-compliance-identify.html",
+    "https://support.icompaas.com/support/solutions/articles/62000233554-ensure-ec2-instances-managed-by-systems-manager-are-compliant-with-patching-requirements",
+    "https://docs.aws.amazon.com/systems-manager/latest/userguide/compliance-fixing.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws ssm send-command --instance-ids <INSTANCE_ID> --document-name AWS-RunPatchBaseline --parameters Operation=Install",
+      "NativeIaC": "```yaml\n# 创建SSM关联以在实例上安装缺失的补丁\nResources:\n  <example_resource_name>:\n    Type: AWS::SSM::Association\n    Properties:\n      Name: AWS-RunPatchBaseline\n      InstanceId: <example_resource_id>\n      Parameters:\n        Operation:\n          - Install  # 关键：安装缺失的补丁，使实例符合要求\n```",
+      "Other": "1.打开AWS控制台>系统管理器>运行命令\n2.单击“运行”命令\n3.选择文档：AWS RunPatchBaseline\n4.在参数中，设置操作=安装\n5.在Targets中，选择不合规实例\n6.点击运行；等待命令完成并验证Compliance显示Compliance",
+      "Terraform": "```hcl\n# 运行AWS RunPatchBaseline在实例上安装缺失的补丁\nresource \"aws_ssm_association\" \"<example_resource_name>\" {\n  name        = \"AWS-RunPatchBaseline\"\n  instance_id = \"<example_resource_id>\"\n  parameters = {\n    Operation = [\"Install\"]  # 关键：安装补丁以达到合规状态\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "使用SystemsManager采用**自动化补丁管理**：将EC2注册为受管节点，定义严格的**补丁基线**，运行频繁的**合规性扫描**，并**及时安装关键更新**。\n\n应用**深度防御**：修补、分阶段部署、维护窗口和集中合规性报告与警报的最低特权角色。",
+      "Url": "https://hub.prowler.com/check/ssm_managed_compliant_patching"
+    }
+  },
+  "Categories": [
+    "vulnerabilities"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

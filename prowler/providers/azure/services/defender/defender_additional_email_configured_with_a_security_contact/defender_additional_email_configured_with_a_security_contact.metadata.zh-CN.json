@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "defender_additional_email_configured_with_a_security_contact",
+  "CheckTitle": "确保“附加电子邮件地址”已配置安全联系人邮箱",
+  "CheckType": [],
+  "ServiceName": "defender",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AzureEmailNotifications",
+  "ResourceGroup": "monitoring",
+  "Description": "当订阅触发高严重性告警时，Microsoft Defender for Cloud 会向订阅所有者发送邮件。你应在附加电子邮件地址中提供安全联系人邮箱。",
+  "Risk": "Microsoft Defender for Cloud 会向订阅所有者发送安全告警通知。将安全联系人的邮箱添加到“附加电子邮件地址”字段可确保组织安全团队也能收到这些告警，从而让相关人员及时知悉潜在入侵并尽快降低风险。",
+  "RelatedUrl": "https://docs.microsoft.com/en-us/azure/security-center/security-center-provide-security-contact-details",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/SecurityCenter/security-contact-email.html",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-general-policies/ensure-that-security-contact-emails-is-set#terraform"
+    },
+    "Recommendation": {
+      "Text": "1. 在 Azure Home 中选择 Portal Menu 2. 选择 Microsoft Defender for Cloud 3. 点击 Environment Settings 4. 点击对应的 Management Group、Subscription 或 Workspace 5. 点击 Email notifications 6. 在 Additional email addresses 字段中输入有效的安全联系人邮箱（多个地址可用逗号分隔）7. 点击 Save",
+      "Url": "https://learn.microsoft.com/en-us/rest/api/defenderforcloud/security-contacts/list?view=rest-defenderforcloud-2020-01-01-preview&tabs=HTTP"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

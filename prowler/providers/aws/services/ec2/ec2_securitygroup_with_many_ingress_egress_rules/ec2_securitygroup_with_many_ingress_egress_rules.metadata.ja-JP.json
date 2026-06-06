@@ -1,0 +1,34 @@
+{
+  "Provider": "aws",
+  "CheckID": "ec2_securitygroup_with_many_ingress_egress_rules",
+  "CheckTitle": "50 を超えるインバウンドまたはアウトバウンドルールを持つセキュリティグループを検索する",
+  "CheckType": [
+    "Infrastructure Security"
+  ],
+  "ServiceName": "ec2",
+  "SubServiceName": "securitygroup",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "high",
+  "ResourceType": "AwsEc2SecurityGroup",
+  "ResourceGroup": "network",
+  "Description": "50 を超えるインバウンドまたはアウトバウンドルールを持つセキュリティグループを検索します。",
+  "Risk": "セキュリティグループが適切に設定されていない場合、攻撃対象領域が拡大します。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "ゼロトラストアプローチを採用し、インバウンドトラフィックを可能な限り絞り込みます。南北トラフィックだけでなく東西トラフィックについても制御を検討してください。",
+      "Url": "https://docs.aws.amazon.com/vpc/latest/userguide/VPC_SecurityGroups.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "autoscaling_group_using_ec2_launch_template",
+  "CheckTitle": "Amazon EC2 Auto Scaling 组使用 EC2 启动模板",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践"
+  ],
+  "ServiceName": "autoscaling",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsAutoScalingAutoScalingGroup",
+  "ResourceGroup": "compute",
+  "Description": "**EC2 Auto Scaling 组**直接或通过 `mixed instances policy` 使用**EC2 启动模板**来定义实例配置和版本化设置。",
+  "Risk": "没有启动模板，实例设置就没有**版本化、可审计的基线**，增加了配置漂移。不一致的元数据和网络选项可能启用未授权访问或不稳定的部署，降低机密性和可用性。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/AutoScaling/asg-launch-template.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/autoscaling-controls.html#autoscaling-9",
+    "https://docs.aws.amazon.com/autoscaling/ec2/userguide/create-asg-launch-template.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws autoscaling update-auto-scaling-group --auto-scaling-group-name <example_resource_name> --launch-template LaunchTemplateId=<template-id>",
+      "NativeIaC": "```yaml\n# CloudFormation: 将启动模板附加到 ASG\nResources:\n  ASG:\n    Type: AWS::AutoScaling::AutoScalingGroup\n    Properties:\n      MinSize: '0'\n      MaxSize: '1'\n      VPCZoneIdentifier:\n        - <example_subnet_id>\n      LaunchTemplate: # 关键：确保 ASG 使用 EC2 启动模板（修复检查）\n        LaunchTemplateId: <example_launch_template_id> # 引用 EC2 启动模板\n        Version: $Default\n```",
+      "Other": "1. 在 AWS 控制台中，转到 EC2 > Auto Scaling Groups\n2. 选择 <example_resource_name> 并单击 Edit\n3. 在 \"Launch template or configuration\" 下，选择 Launch template 并选择您的模板和版本（Default 或 Latest）\n4. 单击 Update 保存",
+      "Terraform": "```hcl\n# Terraform: 将启动模板附加到 ASG\nresource \"aws_autoscaling_group\" \"example\" {\n  min_size            = 0\n  max_size            = 1\n  vpc_zone_identifier = [\"<example_subnet_id>\"]\n\n  launch_template {\n    id      = \"<example_launch_template_id>\" # 关键：确保 ASG 使用 EC2 启动模板（修复检查）\n    version = \"$Default\"\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "为所有 Auto Scaling 组采用**启动模板**，并将它们包含在任何 `mixed instances policy` 中。使用带审批的版本控制，强制执行加固的默认值（最小权限角色、安全元数据如 `IMDSv2`、加密存储），并应用变更控制以确保一致性和纵深防御。",
+      "Url": "https://hub.prowler.com/check/autoscaling_group_using_ec2_launch_template"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

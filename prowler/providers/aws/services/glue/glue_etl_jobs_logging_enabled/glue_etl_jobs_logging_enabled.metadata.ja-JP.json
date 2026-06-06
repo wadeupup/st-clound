@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "glue_etl_jobs_logging_enabled",
+  "CheckTitle": "Glue ETL ジョブで継続的な CloudWatch ログが有効化されていること",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices/Runtime Behavior Analysis",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices"
+  ],
+  "ServiceName": "glue",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "analytics",
+  "Description": "**AWS Glue ジョブ**について、**継続的な CloudWatch ロギング**が有効かを評価し、`--enable-continuous-cloudwatch-log` 設定によって実行時イベントと出力が **CloudWatch Logs** に送信されることを確認します。",
+  "Risk": "ジョブログがないと実行詳細やアクセスパターンが見えなくなり、認証情報の不正利用、スクリプト内のデータ流出、変換処理の改ざんを見逃す可能性があります。これは機密性と完全性を低下させ、インシデント対応を妨げ、可用性に影響する障害を隠す要因になります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/glue/latest/dg/monitor-continuous-logging.html",
+    "https://docs.aws.amazon.com/glue/latest/dg/monitor-continuous-logging-enable.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/glue-controls.html#glue-2"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws glue update-job --job-name <example_resource_name> --job-update '{\"DefaultArguments\":{\"--enable-continuous-cloudwatch-log\":\"true\"}}'",
+      "NativeIaC": "```yaml\nResources:\n  GlueJob:\n    Type: AWS::Glue::Job\n    Properties:\n      Role: \"<example_resource_id>\"\n      Command:\n        Name: glueetl\n        ScriptLocation: \"s3://<example_resource_name>/script.py\"\n      DefaultArguments:\n        \"--enable-continuous-cloudwatch-log\": \"true\"  # Critical: enables continuous CloudWatch logging to pass the check\n```",
+      "Other": "1. AWS Glue コンソールを開き Jobs に移動します\n2. 対象ジョブを選択して Edit をクリックします\n3. Advanced properties を展開します\n4. Continuous logging で Enable logs in CloudWatch を有効化します\n5. 保存します",
+      "Terraform": "```hcl\nresource \"aws_glue_job\" \"<example_resource_name>\" {\n  name     = \"<example_resource_name>\"\n  role_arn = \"<example_resource_id>\"\n\n  command {\n    script_location = \"s3://<example_resource_name>/script.py\"\n  }\n\n  default_arguments = {\n    \"--enable-continuous-cloudwatch-log\" = \"true\" # Critical: enables continuous CloudWatch logging to pass the check\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "すべての Glue ジョブで **CloudWatch Logs** への**継続的ロギング**を有効にしてください。ログを集中管理し、保持期間と KMS 暗号化を設定し、読み取り権限を制限して異常と失敗をアラート化します。ジョブロールには**最小権限**を適用し、サービス横断のログ相関で**多層防御**を実現します。",
+      "Url": "https://hub.prowler.com/check/glue_etl_jobs_logging_enabled"
+    }
+  },
+  "Categories": [
+    "logging"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "このチェックは削除予定です。現在はすべての AWS Glue ジョブのログが常に Amazon CloudWatch に送信されるためです。"
+}

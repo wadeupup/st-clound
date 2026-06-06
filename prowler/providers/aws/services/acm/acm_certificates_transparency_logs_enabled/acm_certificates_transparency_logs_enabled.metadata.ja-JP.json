@@ -1,0 +1,40 @@
+{
+  "Provider": "aws",
+  "CheckID": "acm_certificates_transparency_logs_enabled",
+  "CheckTitle": "ACM 証明書がインポートされているか、証明書透過性ログが有効になっています",
+  "CheckType": [
+    "ソフトウェアと設定チェック/AWS セキュリティベストプラクティス"
+  ],
+  "ServiceName": "acm",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsCertificateManagerCertificate",
+  "ResourceGroup": "security",
+  "Description": "**ACM 発行の証明書**について、**証明書透過性（CT）ログ**が有効になっているかどうかがチェックされます。タイプが `IMPORTED` の証明書は評価対象外です。",
+  "Risk": "**CT ログ**を無効にすると、**誤発行または不正な証明書**への可視性が低下し、機密性と整合性が弱まります。攻撃者は**サイトを偽装**したり、**TLS 中間者攻撃**を実行したりして、タイムリーに検出されない可能性があります。ログが記録されていないパブリック証明書は、ブラウザによって信頼されない可能性があり、可用性とユーザーの信頼に影響を与えます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://aws.amazon.com/blogs/security/how-to-get-ready-for-certificate-transparency/",
+    "https://support.icompaas.com/support/solutions/articles/62000129491-ensure-acm-certificates-have-certificate-transparency-logging-enabled"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws acm update-certificate-options --certificate-arn <CERTIFICATE_ARN> --options CertificateTransparencyLoggingPreference=ENABLED",
+      "NativeIaC": "```yaml\n# CloudFormation: ACM 証明書で証明書透過性ログを有効にします\nResources:\n  <example_resource_name>:\n    Type: AWS::CertificateManager::Certificate\n    Properties:\n      DomainName: <example_domain_name>\n      CertificateTransparencyLoggingPreference: ENABLED  # 重要：CT ログを有効にしてチェックを通過します\n```",
+      "Other": "1. AWS Certificate Manager (ACM) コンソールを開きます\n2. 透過性ログが無効になっている証明書を選択します\n3. Actions > Edit transparency logging をクリックします\n4. Enable transparency logging を選択します\n5. Save をクリックします",
+      "Terraform": "```hcl\n# ACM 証明書で証明書透過性ログを有効にします\nresource \"aws_acm_certificate\" \"<example_resource_name>\" {\n  domain_name = \"<example_domain_name>\"\n  options {\n    certificate_transparency_logging_preference = \"ENABLED\"  # 重要：CT ログを有効にしてチェックを通過します\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "透明性と迅速な取り消しを維持するために、すべての ACM 発行のパブリック証明書で**CT ログ**を有効にします。\n\nドメインの CT ログを監視し、予期しない発行についてアラートを出します。機密性の高い内部名については、CT を無効にするのではなく、プライベート PKI または非パブリックホスト名を優先し、短い証明書ライフタイムで**多層防御**を適用します。",
+      "Url": "https://hub.prowler.com/check/acm_certificates_transparency_logs_enabled"
+    }
+  },
+  "Categories": [
+    "logging"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

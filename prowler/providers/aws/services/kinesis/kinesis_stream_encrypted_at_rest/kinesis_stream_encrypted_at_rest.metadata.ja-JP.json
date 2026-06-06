@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "kinesis_stream_encrypted_at_rest",
+  "CheckTitle": "Kinesis ストリームは KMS で保存時に暗号化されています",
+  "CheckType": [
+    "ソフトウェアと構成のチェック/AWS セキュリティベストプラクティス",
+    "ソフトウェアと構成のチェック/業界および規制基準/AWS 基礎セキュリティベストプラクティス",
+    "ソフトウェアと構成のチェック/業界および規制基準/NIST 800-53 コントロール"
+  ],
+  "ServiceName": "kinesis",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsKinesisStream",
+  "ResourceGroup": "messaging",
+  "Description": "**Amazon Kinesis Data Streams** の **サーバーサイド暗号化** は、**AWS KMS** を使用して保存時のレコードを保護します。評価では、ストリームが KMS キーで `SSE-KMS` が設定されているかどうかを判断します。KMS ベースの保存時暗号化がないストリームが特定されます。",
+  "Risk": "**SSE-KMS** がない場合、シャード内のレコードは、ストレージ、バックアップ、または分析エクスポートにアクセスされた場合にプレーンテキストで露出する可能性があり、**機密性**が損なわれます。KMS コントロールがないことは、キー ポリシー、ローテーション、および監査証跡を削除することにより、**整合性**と監視を低下させ、秘密裏のデータ流出や内部不正使用を可能にします。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/kinesis-controls.html#kinesis-1",
+    "https://docs.aws.amazon.com/streams/latest/dev/getting-started-with-sse.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/Kinesis/server-side-encryption.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws kinesis start-stream-encryption --stream-name <KINESIS_STREAM_NAME> --encryption-type KMS --key-id alias/aws/kinesis",
+      "NativeIaC": "```yaml\n# CloudFormation: Kinesis ストリームで KMS 暗号化を有効にする\nResources:\n  <example_resource_name>:\n    Type: AWS::Kinesis::Stream\n    Properties:\n      ShardCount: 1\n      StreamEncryption:\n        EncryptionType: KMS  # 重要: 保存時に KMS 暗号化を有効にする\n        KeyId: alias/aws/kinesis  # 重要: AWS 管理の Kinesis KMS キーを使用\n```",
+      "Other": "1. AWS コンソールを開き、Amazon Kinesis > データストリームに移動\n2. ストリームを選択\n3. 詳細タブで、サーバーサイド暗号化の編集をクリック\n4. 有効を選択\n5. (デフォルト) aws/kinesis KMS キーを選択\n6. 保存をクリック",
+      "Terraform": "```hcl\n# Kinesis ストリームで KMS 暗号化を有効にする\nresource \"aws_kinesis_stream\" \"<example_resource_name>\" {\n  name            = \"<example_resource_name>\"\n  shard_count     = 1\n  encryption_type = \"KMS\"            # 重要: 保存時に KMS 暗号化を有効にする\n  kms_key_id      = \"alias/aws/kinesis\" # 重要: AWS 管理の Kinesis KMS キーを使用\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "すべてのストリームで **SSE-KMS** を有効にします。\n- ローテーションと所有権のために **カスタマー管理キー** を使用\n- KMS グラントで **最小特権** を強制し、アカウント間の使用を制限\n- キーの使用を監視し、CI/CD で暗号化を要求",
+      "Url": "https://hub.prowler.com/check/kinesis_stream_encrypted_at_rest"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

@@ -1,0 +1,40 @@
+{
+  "Provider": "aws",
+  "CheckID": "opensearch_service_domains_fault_tolerant_master_nodes",
+  "CheckTitle": "OpenSearch ドメインには少なくとも 3 つの専用マスターノードがあります",
+  "CheckType": [
+    "ソフトウェアと構成のチェック/AWS セキュリティベストプラクティス",
+    "影響/サービス拒否"
+  ],
+  "ServiceName": "opensearch",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsOpenSearchServiceDomain",
+  "ResourceGroup": "database",
+  "Description": "**Amazon OpenSearch ドメイン**には、安定したクラスターの調整と選挙をサポートするために、少なくとも `3` つのマスターノード数で**専用マスターノード**が有効になっています",
+  "Risk": "`3` 未満または無効な**専用マスターノード**の場合、クラスターは**クォーラム**を失い、リーダー選挙がブロックされる可能性があります。\n\n影響には、クラスター状態の更新の停止、読み取り/書き込みの失敗、シャード割り当ての問題、スプリットブレインの可能性が含まれ、**可用性**と**整合性**が低下します。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/opensearch-controls.html#opensearch-11",
+    "https://docs.aws.amazon.com/opensearch-service/latest/developerguide/managedomains-dedicatedmasternodes.html#dedicatedmasternodes-number"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws opensearch update-domain-config --domain-name <name> --cluster-config \"DedicatedMasterEnabled=true,DedicatedMasterType=<instance_type>,DedicatedMasterCount=3\"",
+      "NativeIaC": "```yaml\n# CloudFormation: 少なくとも 3 つの専用マスターノードを設定します\nResources:\n  <example_resource_name>:\n    Type: AWS::OpenSearchService::Domain\n    Properties:\n      ClusterConfig:\n        DedicatedMasterEnabled: true  # 重要: 専用マスターノードを有効にします\n        DedicatedMasterCount: 3       # 重要: 最低 3 つのマスターを確保します\n        DedicatedMasterType: \"<instance_type>\"  # 重要: マスターを有効にする際に必要です\n```",
+      "Other": "1. AWS コンソールにサインインし、Amazon OpenSearch Service を開きます\n2. ドメインを選択し、編集を選択します\n3. クラスター構成で:\n   - 専用マスターノードを有効にする\n   - 専用マスターノード数を 3 に設定する\n   - 専用マスターインスタンスタイプを選択する\n4. 変更を保存を選択します",
+      "Terraform": "```hcl\n# Terraform: 少なくとも 3 つの専用マスターノードを設定します\nresource \"aws_opensearch_domain\" \"<example_resource_name>\" {\n  domain_name = \"<example_resource_name>\"\n\n  cluster_config {\n    dedicated_master_enabled = true  # 重要: 専用マスターを有効にします\n    dedicated_master_count   = 3     # 重要: 最低 3 つのマスターを確保します\n    dedicated_master_type    = \"<instance_type>\"  # 重要: マスターを有効にする際に必要です\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "**専用マスターノード**を有効にし、数を少なくとも `3`（奇数）に設定して**クォーラム**を維持します。*スタンバイ付きマルチ AZ* を使用してマスターをゾーン間で分散します。マスターインスタンスを適切にサイズ設定し、クラスターの健全性を監視して高可用性と回復力を維持します。",
+      "Url": "https://hub.prowler.com/check/opensearch_service_domains_fault_tolerant_master_nodes"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

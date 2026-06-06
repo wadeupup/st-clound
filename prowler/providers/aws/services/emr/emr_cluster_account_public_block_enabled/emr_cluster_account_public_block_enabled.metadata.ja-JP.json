@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "emr_cluster_account_public_block_enabled",
+  "CheckTitle": "EMR アカウントで Block Public Access が有効化されていること",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices/Network Reachability",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices"
+  ],
+  "ServiceName": "emr",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Other",
+  "ResourceGroup": "compute",
+  "Description": "Amazon EMR のアカウントレベル **Block Public Access** 設定をリージョンごとに評価します。`BlockPublicSecurityGroupRules` が有効な場合、許可ポートを除き、公開ソース（`0.0.0.0/0`、`::/0`）からの受信を許可するセキュリティグループをクラスターで使用できません。",
+  "Risk": "公開向け EMR ルールは、クラスター ノードや UI をインターネットから到達可能にし、ブルートフォースやリモート悪用を招きます。\n\n攻撃者はジョブデータの流出、処理改ざん、VPC へのピボットを行えるため、データ窃取・改ざん・サービス中断によって **機密性**、**完全性**、**可用性** が損なわれます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/EMR/block-public-access.html",
+    "https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-block-public-access.html",
+    "https://github.com/cloudmatos/matos/tree/master/remediations/aws/emr/block-emr-public-access"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws emr put-block-public-access-configuration --block-public-access-configuration BlockPublicSecurityGroupRules=true",
+      "NativeIaC": "```yaml\n# CloudFormation: Enable EMR Block Public Access (account/Region level)\nResources:\n  EmrBpaRole:\n    Type: AWS::IAM::Role\n    Properties:\n      AssumeRolePolicyDocument:\n        Version: '2012-10-17'\n        Statement:\n          - Effect: Allow\n            Principal:\n              Service: lambda.amazonaws.com\n            Action: sts:AssumeRole\n      Policies:\n        - PolicyName: EmrBpaPut\n          PolicyDocument:\n            Version: '2012-10-17'\n            Statement:\n              - Effect: Allow\n                Action: elasticmapreduce:PutBlockPublicAccessConfiguration\n                Resource: \"*\"\n\n  EmrBpaFunction:\n    Type: AWS::Lambda::Function\n    Properties:\n      Role: !GetAtt EmrBpaRole.Arn\n      Runtime: python3.12\n      Handler: index.handler\n      Code:\n        ZipFile: |\n          import boto3, json, urllib.request\n          def handler(event, context):\n              try:\n                  boto3.client('emr').put_block_public_access_configuration(\n                      BlockPublicAccessConfiguration={\n                          'BlockPublicSecurityGroupRules': True  # CRITICAL: enables EMR Block Public Access\n                      }\n                  )\n                  status='SUCCESS'\n              except Exception:\n                  status='FAILED'\n              body=json.dumps({\n                  'Status': status,\n                  'PhysicalResourceId': 'EmrBPA',  # respond to CFN\n                  'StackId': event['StackId'],\n                  'RequestId': event['RequestId'],\n                  'LogicalResourceId': event['LogicalResourceId']\n              }).encode()\n              req=urllib.request.Request(event['ResponseURL'], data=body, method='PUT')\n              req.add_header('content-type','')\n              req.add_header('content-length',str(len(body)))\n              urllib.request.urlopen(req)\n\n  EmrBpa:\n    Type: Custom::EmrBpa\n    Properties:\n      ServiceToken: !GetAtt EmrBpaFunction.Arn  # Invokes Lambda to apply the setting\n```",
+      "Other": "1. AWS コンソールで Amazon EMR に移動します\n2. 対象リージョンを選択します（右上）\n3. 左メニューの \"EMR on EC2\" 配下で \"Block public access\" をクリックします\n4. \"Edit\" をクリックし \"Turn on\" を選択します\n5. \"Save\" をクリックします",
+      "Terraform": "```hcl\n# Enable EMR Block Public Access (account/Region level)\nresource \"aws_emr_block_public_access_configuration\" \"example_resource_name\" {\n  block_public_security_group_rules = true  # CRITICAL: enables Block Public Access\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "EMR **Block Public Access** を有効に維持し、例外は最小化してください。必要なポートのみ許可し、送信元を制限します。\n\nsecurity groups には **最小権限** を適用し、クラスターはプライベートサブネットに配置し、bastion host または Session Manager を使用します。**VPC** 制御と監視を組み合わせて **多層防御** を実装してください。",
+      "Url": "https://hub.prowler.com/check/emr_cluster_account_public_block_enabled"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

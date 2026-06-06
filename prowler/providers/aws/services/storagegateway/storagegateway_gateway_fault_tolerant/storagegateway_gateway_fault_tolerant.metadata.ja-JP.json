@@ -1,0 +1,40 @@
+{
+  "Provider": "aws",
+  "CheckID": "storagegateway_gateway_fault_tolerant",
+  "CheckTitle": "AWSストレージゲートウェイゲートウェイはEC 2上でホストされていない",
+  "CheckType": [
+    "ソフトウェアと構成チェック/AWSセキュリティのベストプラクティス",
+    "サービスへの影響/拒否"
+  ],
+  "ServiceName": "storagegateway",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "storage",
+  "Description": "各ゲートウェイのホスティング環境を評価し、＊＊EC 2インスタンス＊＊にホスティングされたAWSストレージゲートウェイをマークすることにより、＊＊EC 2＊単一インスタンスEC 2＊配置をプラットフォームレベルの高可用性を利用できる＊＊非EC 2＊プラットフォームと区別する。",
+  "Risk": "**1つのEC 2ホストゲートウェイ**に障害リスクが集中しています。インスタンスまたはAZの中断、再起動、またはネットワーク障害により、ファイルアクセスが停止し、ダウンタイムと書き込みが停滞する可能性があります。これにより、**の可用性**が低下し、一部の操作やキャッシュの非同期化により**の整合性**に影響を与える可能性があります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/filegateway/latest/files3/resource-vm-setup.html",
+    "https://docs.aws.amazon.com/filegateway/latest/files3/disaster-recovery-resiliency.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "1.AWSコンソールでストレージ・ゲートウェイに移動し、「ゲートウェイの作成」をクリックします\n2.ゲートウェイタイプを選択し、ホストプラットフォームの下でVMware ESXi、Microsoft Hyper-V、Linux KVMまたはハードウェアデバイスを選択します（Amazon EC 2を選択しないでください）\n3.ホストに仮想マシンをダウンロードして配備し、電源を入れ、IPアドレスをメモする\n4.コンソールで、新しいゲートウェイを接続してアクティブにする\n5.新しいゲートウェイ上に等価なリソース（共有/ボリューム/テープ）を再作成し、新しいゲートウェイIP/DNSを使用するためにクライアントを更新する\n6.ストレージゲートウェイ>ゲートウェイで、古いEC 2マネージドゲートウェイを削除する\n7.新しいゲートウェイの詳細がホストプラットフォームがAmazon EC 2と等しくないことを示しているかどうかを確認する",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "**高可用性**のために設計：重要なワークロードの単一インスタンスゲートウェイの使用を回避します。優先的に**EFS**や**FSx**などの管理されたマルチAZサービスを使用するか、クライアントのフェイルオーバと弾力性のある名前の付いた複数のゲートウェイを使用します。**深度防御**を適用し、フェイルオーバを定期的に検証し、中断を防ぐために運転状況を監視します。",
+      "Url": "https://hub.prowler.com/check/storagegateway_gateway_fault_tolerant"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

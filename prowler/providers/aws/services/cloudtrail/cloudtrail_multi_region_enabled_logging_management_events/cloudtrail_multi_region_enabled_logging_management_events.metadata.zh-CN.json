@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "cloudtrail_multi_region_enabled_logging_management_events",
+  "CheckTitle": "CloudTrail 跟踪记录读取和写入操作的管理事件",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/CIS AWS Foundations Benchmark"
+  ],
+  "ServiceName": "cloudtrail",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "low",
+  "ResourceType": "AwsCloudTrailTrail",
+  "ResourceGroup": "monitoring",
+  "Description": "**CloudTrail 跟踪** 在每个 AWS 区域记录 **管理事件**（`read` 和 `write`），并正在积极记录日志，使用多区域跟踪或每个区域的覆盖。",
+  "Risk": "没有区域范围的管理事件日志记录，对身份、网络和审计设置的更改可能无法跟踪。\n\n攻击者可以在被忽视的区域中操作以创建资源、修改权限或禁用日志记录，从而损害 **完整性**、**机密性** 和事件响应。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.prowler.com/checks/aws/logging-policies/logging_14#terraform",
+    "https://docs.prowler.com/checks/aws/logging-policies/logging_14"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation: enable multi-region and log management events (read & write)\nResources:\n  <example_resource_name>:\n    Type: AWS::CloudTrail::Trail\n    Properties:\n      S3BucketName: <example_resource_name>\n      IsMultiRegionTrail: true  # CRITICAL: apply the trail to all regions\n      EventSelectors:\n        - IncludeManagementEvents: true  # CRITICAL: log management events\n          ReadWriteType: All             # CRITICAL: log both read and write\n```",
+      "Other": "1. 在 AWS 控制台中，转到 CloudTrail > 跟踪并选择您的跟踪\n2. 单击编辑\n3. 将跟踪应用到所有区域设置为是\n4. 在管理事件下，将读取/写入事件设置为全部\n5. 单击保存更改\n6. 如果日志记录为关闭，单击开始记录日志",
+      "Terraform": "```hcl\n# Terraform: enable multi-region and log management events (read & write)\nresource \"aws_cloudtrail\" \"<example_resource_name>\" {\n  name           = \"<example_resource_name>\"\n  s3_bucket_name = \"<example_resource_name>\"\n\n  is_multi_region_trail = true  # CRITICAL: apply the trail to all regions\n\n  event_selector {\n    include_management_events = true  # CRITICAL: log management events\n    read_write_type           = \"All\" # CRITICAL: log both read & write\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "启用 **多区域 CloudTrail**，在所有区域记录 `read` 和 `write` 的 **管理事件**。\n\n将日志集中在一个单独的、锁定的账户中；应用 **最小权限原则**、加密、保留和完整性验证；并使用防篡改、拒绝删除的控制措施保护跟踪和存储，以实现 **纵深防御**。",
+      "Url": "https://hub.prowler.com/check/cloudtrail_multi_region_enabled_logging_management_events"
+    }
+  },
+  "Categories": [
+    "logging",
+    "forensics-ready"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

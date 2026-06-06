@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "storage_default_to_entra_authorization_enabled",
+  "CheckTitle": "确保 Azure 存储账户默认启用 Microsoft Entra 授权",
+  "CheckType": [],
+  "ServiceName": "storage",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AzureStorageAccount",
+  "ResourceGroup": "storage",
+  "Description": "确保 Azure 存储账户设置“Default to Microsoft Entra authorization in the Azure portal”已启用，以强制通过 Microsoft Entra ID 访问 Blob、文件、队列和表。",
+  "Risk": "若未启用此设置，Azure 门户可能通过 Shared Key 等较弱方式进行授权，从而增加数据未授权访问风险。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/storage/blobs/authorize-access-azure-active-directory",
+  "Remediation": {
+    "Code": {
+      "CLI": "az storage account update --name <storage-account-name> --resource-group <resource-group-name> --default-to-AzAd-auth true",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity-staging/knowledge-base/azure/StorageAccounts/enable-microsoft-entra-authorization-by-default.html",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "在 Azure 门户中默认启用 Microsoft Entra 授权，以提升安全性并避免依赖 Shared Key 身份验证。",
+      "Url": "https://learn.microsoft.com/en-us/azure/storage/blobs/authorize-access-azure-active-directory"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

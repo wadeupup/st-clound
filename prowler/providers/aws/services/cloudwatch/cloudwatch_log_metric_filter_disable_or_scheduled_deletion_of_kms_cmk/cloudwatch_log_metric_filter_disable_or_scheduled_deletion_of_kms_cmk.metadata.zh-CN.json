@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "cloudwatch_log_metric_filter_disable_or_scheduled_deletion_of_kms_cmk",
+  "CheckTitle": "账户已为禁用或计划删除客户管理 KMS CMK 配置 CloudWatch 日志度量过滤器和告警",
+  "CheckType": [
+    "Software and Configuration Checks/Industry and Regulatory Standards/CIS AWS Foundations Benchmark",
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Effects/Denial of Service"
+  ],
+  "ServiceName": "cloudwatch",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsCloudWatchAlarm",
+  "ResourceGroup": "monitoring",
+  "Description": "传送到 CloudWatch 的 CloudTrail 事件会通过一个**度量过滤器和告警**来评估，以监控 **KMS CMK 状态变更**，特别是来自 `kms.amazonaws.com` 的 `DisableKey` 和 `ScheduleKeyDeletion` 事件。",
+  "Risk": "如果缺少对 **CMK 被禁用或计划删除** 的告警，将削弱对业务 **可用性** 和 **完整性** 的保障：加密数据可能无法再解密，备份不可用，恢复变得不可能。攻击者或内部人员可以在无人察觉的情况下更改密钥状态，从而导致中断和不可逆的数据丢失。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/kms/latest/developerguide/deleting-keys-creating-cloudwatch-alarm.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation：用于监控 KMS 密钥禁用/删除操作的度量过滤器与告警\nResources:\n  MetricFilter:\n    Type: AWS::Logs::MetricFilter\n    Properties:\n      LogGroupName: <example_resource_name>\n      # 关键：侦测来自 CloudTrail 日志的 KMS DisableKey 或 ScheduleKeyDeletion 事件\n      # 此过滤模式是该检查所期望的\n      FilterPattern: '{($.eventSource = kms.amazonaws.com) && (($.eventName=DisableKey)||($.eventName=ScheduleKeyDeletion)) }'\n      MetricTransformations:\n        - MetricValue: \"1\"\n          MetricNamespace: CISBenchmark\n          MetricName: disable_or_delete_cmk_changes_metric\n\n  Alarm:\n    Type: AWS::CloudWatch::Alarm\n    Properties:\n      # 关键：对上面度量所创建的指标进行告警\n      MetricName: disable_or_delete_cmk_changes_metric\n      Namespace: CISBenchmark\n      Statistic: Sum\n      Period: 300\n      EvaluationPeriods: 1\n      Threshold: 1\n      ComparisonOperator: GreaterThanOrEqualToThreshold\n```",
+      "Other": "1. 打开 AWS 控制台，进入 CloudWatch > Log groups（日志组）\n2. 选择接收 CloudTrail 事件的日志组\n3. 点击“Create metric filter”（创建度量过滤器）\n4. 在 Filter pattern 中粘贴：{($.eventSource = kms.amazonaws.com) && (($.eventName=DisableKey)||($.eventName=ScheduleKeyDeletion)) }\n5. 为度量命名（例如：disable_or_delete_cmk_changes_metric），将 Namespace 设为 CISBenchmark，Value 设为 1，然后创建\n6. 在 Metric filters 选项卡中选中新建的过滤器并点击“Create alarm”（创建告警）\n7. 设置 Statistic：Sum，Period：5 minutes，Threshold type：Static，Threshold：1，Comparison：Greater/Equal\n8. 创建告警（通知操作可选，不是通过检查所必需）",
+      "Terraform": "```hcl\n# 用于 KMS DisableKey 或 ScheduleKeyDeletion 的度量过滤器\nresource \"aws_cloudwatch_log_metric_filter\" \"cmk\" {\n  name           = \"<example_resource_name>\"\n  log_group_name = \"<example_resource_name>\" # 关键：CloudTrail 日志组\n  # 关键：侦测 KMS 密钥被禁用或计划删除的事件\n  pattern = \"{($.eventSource = kms.amazonaws.com) && (($.eventName=DisableKey)||($.eventName=ScheduleKeyDeletion)) }\"\n\n  metric_transformation {\n    name      = \"disable_or_delete_cmk_changes_metric\" # 关键：供告警使用的指标\n    namespace = \"CISBenchmark\"\n    value     = \"1\"\n  }\n}\n\n# 针对上述度量创建告警\nresource \"aws_cloudwatch_metric_alarm\" \"cmk\" {\n  alarm_name          = \"<example_resource_name>\"\n  comparison_operator = \"GreaterThanOrEqualToThreshold\"\n  evaluation_periods  = 1\n  metric_name         = \"disable_or_delete_cmk_changes_metric\" # 关键：保持指标名称一致\n  namespace           = \"CISBenchmark\"\n  period              = 300\n  statistic           = \"Sum\"\n  threshold           = 1\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "为 `DisableKey` 和 `ScheduleKeyDeletion` 的 CloudTrail 事件配置 **CloudWatch 度量过滤器和告警**，以便能够快速响应。\n- 对 KMS 管理操作应用**最小权限原则**\n- 强制执行**变更控制**与职责分离\n- 使用删除等待期并监控所有区域",
+      "Url": "https://hub.prowler.com/check/cloudwatch_log_metric_filter_disable_or_scheduled_deletion_of_kms_cmk"
+    }
+  },
+  "Categories": [
+    "logging"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "日志记录与监控"
+}
+
+

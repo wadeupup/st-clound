@@ -1,0 +1,35 @@
+{
+  "Provider": "aws",
+  "CheckID": "iam_root_hardware_mfa_enabled",
+  "CheckTitle": "确保仅为根账户启用硬件 MFA",
+  "CheckType": [
+    "软件和配置检查",
+    "行业和监管标准",
+    "CIS AWS 基础基准"
+  ],
+  "ServiceName": "iam",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "critical",
+  "ResourceType": "AwsIamUser",
+  "ResourceGroup": "IAM",
+  "Description": "确保仅为根账户启用硬件 MFA",
+  "Risk": "根账户是 AWS 账户中权限最高的用户。MFA 在用户名和密码的基础上增加了一层额外的保护。启用 MFA 后，当用户登录 AWS 网站时，他们将被要求输入用户名和密码以及来自 AWS MFA 设备的身份验证代码。对于级别 2，建议仅使用硬件 MFA 保护根账户。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "使用 IAM 控制台导航到仪表板并展开在根账户上激活 MFA。如果使用 AWS Organizations，考虑启用集中式根管理并移除单个根凭证。",
+      "Url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_root-user.html#id_root-user_manage_mfa"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

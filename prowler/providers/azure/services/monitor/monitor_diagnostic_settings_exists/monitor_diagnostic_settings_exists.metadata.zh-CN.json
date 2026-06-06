@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "monitor_diagnostic_settings_exists",
+  "CheckTitle": "确保订阅活动日志存在“诊断设置”",
+  "CheckType": [],
+  "ServiceName": "monitor",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Monitor",
+  "ResourceGroup": "monitoring",
+  "Description": "启用用于导出活动日志的诊断设置。订阅内的每个独立资源都可配置诊断设置。应为你的环境中所有合适的资源配置这些设置。",
+  "Risk": "诊断设置控制诊断日志的导出方式。默认情况下，日志仅保留 90 天。应定义诊断设置，以便导出并长期存储日志，从而分析 Azure 订阅内的安全活动。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/cli/azure/monitor/diagnostic-settings?view=azure-cli-latest",
+  "Remediation": {
+    "Code": {
+      "CLI": "az monitor diagnostic-settings subscription create --subscription <subscription id> --name <diagnostic settings name> --location <location> <[- -event-hub <event hub ID> --event-hub-auth-rule <event hub auth rule ID>] [-- storage-account <storage account ID>] [--workspace <log analytics workspace ID>] --logs '<JSON encoded categories>' (e.g. [{category:Security,enabled:true},{category:Administrative,enabled:true},{cat egory:Alert,enabled:true},{category:Policy,enabled:true}])",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity-staging/knowledge-base/azure/Monitor/subscription-activity-log-diagnostic-settings.html#trendmicro",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "在订阅上启用诊断设置：1. 进入 Monitor。2. 点击 Activity Log。3. 点击 Export Activity Logs。4. 点击 + Add diagnostic setting。5. 输入 Diagnostic setting 名称。6. 为诊断设置选择 Categories。7. 选择合适的 Destination（可为 Log Analytics、Storage Account、Event Hub 或 Partner solution）。8. 点击 Save。在特定资源上启用诊断设置：1. 进入 Monitor。2. 点击 Diagnostic settings。3. 点击 diagnostics 状态为 disabled 的资源。4. 选择 Add Diagnostic Setting。5. 输入 Diagnostic setting 名称。6. 选择合适的日志、指标和目标（可为 Log Analytics、Storage Account、Event Hub 或 Partner solution）。7. 点击 Save。按需对所有资源重复以上步骤。",
+      "Url": "https://docs.microsoft.com/en-us/azure/monitoring-and-diagnostics/monitoring-overview-activity-logs#export-the-activity-log-with-a-log-profile"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "默认情况下未设置诊断设置。"
+}

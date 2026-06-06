@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "autoscaling_group_using_ec2_launch_template",
+  "CheckTitle": "Amazon EC2 Auto Scaling グループが EC2 起動テンプレートを使用しています",
+  "CheckType": [
+    "ソフトウェアと設定チェック/AWS セキュリティベストプラクティス"
+  ],
+  "ServiceName": "autoscaling",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsAutoScalingAutoScalingGroup",
+  "ResourceGroup": "compute",
+  "Description": "**EC2 Auto Scaling グループ**は、**EC2 起動テンプレート**を直接、または `mixed instances policy` を介して使用して、インスタンス設定とバージョン管理された設定を定義します。",
+  "Risk": "起動テンプレートがない場合、インスタンス設定の**バージョン管理された監査可能なベースライン**がなく、設定のドリフトが増加します。一貫性のないメタデータとネットワークオプションは、不正なアクセスまたは不安定なデプロイメントを可能にし、機密性と可用性を低下させます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/AutoScaling/asg-launch-template.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/autoscaling-controls.html#autoscaling-9",
+    "https://docs.aws.amazon.com/autoscaling/ec2/userguide/create-asg-launch-template.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws autoscaling update-auto-scaling-group --auto-scaling-group-name <example_resource_name> --launch-template LaunchTemplateId=<template-id>",
+      "NativeIaC": "```yaml\n# CloudFormation: 起動テンプレートを ASG に添付します\nResources:\n  ASG:\n    Type: AWS::AutoScaling::AutoScalingGroup\n    Properties:\n      MinSize: '0'\n      MaxSize: '1'\n      VPCZoneIdentifier:\n        - <example_subnet_id>\n      LaunchTemplate: # 重要：ASG が EC2 起動テンプレートを使用することを保証します（チェックを修正）\n        LaunchTemplateId: <example_launch_template_id> # EC2 起動テンプレートを参照します\n        Version: $Default\n```",
+      "Other": "1. AWS コンソールで、EC2 > Auto Scaling Groups に移動します\n2. <example_resource_name> を選択し、Edit をクリックします\n3. \"Launch template or configuration\" の下で、Launch template を選択し、テンプレートとバージョン（Default または Latest）を選択します\n4. Update をクリックして保存します",
+      "Terraform": "```hcl\n# Terraform: 起動テンプレートを ASG に添付します\nresource \"aws_autoscaling_group\" \"example\" {\n  min_size            = 0\n  max_size            = 1\n  vpc_zone_identifier = [\"<example_subnet_id>\"]\n\n  launch_template {\n    id      = \"<example_launch_template_id>\" # 重要：ASG が EC2 起動テンプレートを使用することを保証します（チェックを修正）\n    version = \"$Default\"\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "すべての Auto Scaling グループに対して**起動テンプレート**を採用し、それらを任意の `mixed instances policy` に含めます。承認付きのバージョン管理を使用し、強化されたデフォルト（最小権限ロール、`IMDSv2` などのセキュアなメタデータ、暗号化されたストレージ）を強制し、変更管理を適用して一貫性と多層防御を確保します。",
+      "Url": "https://hub.prowler.com/check/autoscaling_group_using_ec2_launch_template"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

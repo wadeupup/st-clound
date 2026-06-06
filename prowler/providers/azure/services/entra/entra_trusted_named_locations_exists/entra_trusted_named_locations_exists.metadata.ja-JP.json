@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "entra_trusted_named_locations_exists",
+  "CheckTitle": "信頼された場所（Trusted Locations）が定義されていることを確認する",
+  "CheckType": [],
+  "ServiceName": "entra",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "#microsoft.graph.ipNamedLocation",
+  "ResourceGroup": "network",
+  "Description": "Microsoft Entra ID の Conditional Access では、組織が Named locations を構成し、それらを信頼済みまたは未信頼として設定できます。これらの設定により、条件付きアクセス ポリシーで使用する地理的ロケーションの指定、または実際の IP アドレス/範囲の定義と、それらが組織にとって信頼済みかどうかの指定が可能になります。",
+  "Risk": "信頼済みの送信元 IP アドレスまたは範囲を定義することで、組織はそれらの信頼済み/未信頼 IP アドレスおよび範囲に基づく Conditional Access ポリシーを作成・適用できます。信頼済み IP アドレス/範囲から認証するユーザーは、未信頼ロケーションまたは未信頼送信元 IP アドレス/範囲から Microsoft Entra ID に認証するユーザーと比較して、アクセス制限またはアクセス要件が緩和される場合があります。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/entra/identity/conditional-access/location-condition",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "1. Microsoft Entra ID Conditional Access ブレードへ移動します 2. Named locations ブレードをクリックします 3. Named locations ブレード内で IP ranges location をクリックします 4. Name テキスト ボックスにこのロケーション設定名を入力します 5. + 記号をクリックします 6. 表示されたテキスト ボックスに CIDR 記法で IP アドレス範囲を追加します 7. Add ボタンをクリックします 8. 追加が必要な各 IP 範囲について手順 5〜7 を繰り返します 9. 入力した情報が信頼済み範囲の場合は Mark as trusted location チェック ボックスを選択します 10. 完了後、Create をクリックします",
+      "Url": "https://learn.microsoft.com/en-us/security/benchmark/azure/mcsb-identity-management#im-7-restrict-resource-access-based-on--conditions"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "Named locations の構成時、組織は地理情報または送信元 IP アドレス/範囲の定義でロケーションを作成できます。Country location を使用する場合、これらを信頼済みとしてマークできず、当該設定に依存する Conditional Access ポリシーでは All trusted locations を使用できません。代わりに Select locations を使用する必要があります。これにより構成時の追加リソース要件が発生する可能性があり、十分な組織内テストが必要です。一般に、Conditional Access ポリシーはユーザーの Microsoft Entra ID 認証を完全に阻止し得るため、徹底したテストが推奨されます。完全ロックアウト回避のため、他の管理者全員が認証できない事態に備え、完全な Global Administrator 権限を持つ「Break Glass」アカウントを推奨します。このアカウントは Conditional Access ポリシーから除外し、可能な限り長いパスフレーズで構成してください。このアカウントは緊急時および管理者完全ロックアウト時のみ使用すべきです。"
+}

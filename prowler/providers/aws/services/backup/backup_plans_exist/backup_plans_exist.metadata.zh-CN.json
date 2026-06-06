@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "backup_plans_exist",
+  "CheckTitle": "至少存在一个 AWS Backup 计划",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices"
+  ],
+  "ServiceName": "backup",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "low",
+  "ResourceType": "AwsBackupBackupPlan",
+  "ResourceGroup": "storage",
+  "Description": "**AWS Backup** 会被评估是否存在至少一个**备份计划**，该计划为选定的资源安排和保留恢复点。\n\n评估会确定是否配置了任何计划；当未找到任何计划时（即使存在备份库），会记录缺少计划的情况。",
+  "Risk": "没有备份计划，资源将缺乏计划的恢复点，削弱了 RPO/RTO。\n- 删除或损坏后无法恢复的数据（完整性）\n- 由于无法恢复而导致长时间中断（可用性）\n- 不一致的备份阻碍调查和受控恢复",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://awscli.amazonaws.com/v2/documentation/api/2.0.33/reference/backup/create-backup-plan.html",
+    "https://docs.aws.amazon.com/aws-backup/latest/devguide/about-backup-plans.html",
+    "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/backup_plan",
+    "https://medium.com/@christopheradamson253/backup-strategies-using-aws-backup-1b17b94a7957"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws backup create-backup-plan --backup-plan \"{\\\"BackupPlanName\\\":\\\"<example_resource_name>\\\",\\\"Rules\\\":[{\\\"RuleName\\\":\\\"<example_resource_name>\\\",\\\"TargetBackupVaultName\\\":\\\"Default\\\"}]}\"",
+      "NativeIaC": "```yaml\n# CloudFormation：创建最小 AWS Backup 计划以通过检查\nResources:\n  <example_resource_name>:\n    Type: AWS::Backup::BackupPlan\n    Properties:\n      BackupPlan:\n        BackupPlanName: <example_resource_name>  # 关键：确保至少存在一个备份计划\n        Rules:\n          - RuleName: <example_resource_name>     # 关键：最小必需规则\n            TargetBackupVault: Default            # 关键：规则所需的库\n```",
+      "Other": "1. 在 AWS 控制台中，转到 AWS Backup\n2. 点击备份计划 > 创建备份计划\n3. 选择构建新计划\n4. 输入计划名称：<example_resource_name>\n5. 在备份规则下，设置规则名称：<example_resource_name> 和目标备份库：Default\n6. 点击创建计划",
+      "Terraform": "```hcl\n# Terraform：满足检查的最小 AWS Backup 计划\nresource \"aws_backup_plan\" \"<example_resource_name>\" {\n  name = \"<example_resource_name>\"  # 关键：创建备份计划以便检查通过\n\n  rule {\n    rule_name         = \"<example_resource_name>\"  # 关键：最小规则\n    target_vault_name = \"Default\"                  # 关键：必需的库\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "为关键工作负载建立并强制执行**备份计划**：\n- 定义计划、保留和生命周期以满足 RPO/RTO\n- 使用标记通过策略包含所有必需的资源\n- 在可行的情况下启用跨区域/账户复制和不可变性\n- 对备份角色应用最小权限\n- 定期测试恢复并查看报告",
+      "Url": "https://hub.prowler.com/check/backup_plans_exist"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

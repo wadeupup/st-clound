@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "cloudfront_distributions_geo_restrictions_enabled",
+  "CheckTitle": "CloudFront 分配已启用地理位置限制",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices/Network Reachability"
+  ],
+  "ServiceName": "cloudfront",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "low",
+  "ResourceType": "AwsCloudFrontDistribution",
+  "ResourceGroup": "network",
+  "Description": "**CloudFront 分配**配置了**地理位置限制**，使用允许列表或阻止列表（`RestrictionType` 不为 `none`）按国家/地区限制访问。",
+  "Risk": "缺少地理位置限制，内容可在全球范围内访问，可能导致：\n- 来自受制裁或未授权区域的访问（机密性/合规性）\n- 更广泛的机器人滥用、抓取和 DDoS 准备（可用性）\n- 针对应用程序的更多凭据填充和欺诈尝试",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://repost.aws/knowledge-center/cloudfront-geo-restriction",
+    "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/georestrictions.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/CloudFront/geo-restriction.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws cloudfront get-distribution-config --id <DISTRIBUTION_ID> --output json > current-config.json && echo 'Manually edit current-config.json to add Restrictions.GeoRestriction with RestrictionType: \"whitelist\" and Locations: [\"US\"], then run:' && echo 'aws cloudfront update-distribution --id <DISTRIBUTION_ID> --distribution-config file://current-config.json --if-match $(aws cloudfront get-distribution-config --id <DISTRIBUTION_ID> --query \"ETag\" --output text)'",
+      "NativeIaC": "```yaml\nResources:\n  <example_resource_name>:\n    Type: AWS::CloudFront::Distribution\n    Properties:\n      DistributionConfig:\n        Enabled: true\n        Origins:\n          - DomainName: \"<example_origin_domain>\"\n            Id: \"<example_origin_id>\"\n        DefaultCacheBehavior:\n          TargetOriginId: \"<example_origin_id>\"\n          ViewerProtocolPolicy: allow-all\n          CachePolicyId: \"<example_cache_policy_id>\"\n        Restrictions:\n          GeoRestriction:\n            RestrictionType: whitelist  # 关键：启用地理位置限制\n            Locations:                  # 关键：至少一个允许的国家/地区\n              - US\n```",
+      "Other": "1. 在 AWS 控制台中，转到 CloudFront > 分配\n2. 选择目标分配\n3. 打开安全选项卡 > 地理位置限制 > 编辑\n4. 选择允许列表（或阻止列表）\n5. 向列表中添加至少一个国家/地区\n6. 保存更改",
+      "Terraform": "```hcl\nresource \"aws_cloudfront_distribution\" \"<example_resource_name>\" {\n  enabled = true\n\n  origins {\n    domain_name = \"<example_origin_domain>\"\n    origin_id   = \"<example_origin_id>\"\n  }\n\n  default_cache_behavior {\n    target_origin_id       = \"<example_origin_id>\"\n    viewer_protocol_policy = \"allow-all\"\n    cache_policy_id        = \"<example_cache_policy_id>\"\n  }\n\n  restrictions {\n    geo_restriction {\n      restriction_type = \"whitelist\" # 关键：启用地理位置限制\n      locations        = [\"US\"]      # 关键：至少一个允许的国家/地区\n    }\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "对分配范围应用**最小权限**：在可行的情况下使用国家/地区**允许列表**启用地理位置限制，或维护与法律、许可和威胁模型一致的精确阻止列表。\n\n分层**纵深防御**：使用 WAF/机器人控制、签名 URL 或 Cookie，以及监控来检测滥用和配置漂移。",
+      "Url": "https://hub.prowler.com/check/cloudfront_distributions_geo_restrictions_enabled"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "Infrastructure Security"
+}
+

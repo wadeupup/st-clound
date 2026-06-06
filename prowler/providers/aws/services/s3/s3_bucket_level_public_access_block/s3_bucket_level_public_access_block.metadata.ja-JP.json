@@ -1,0 +1,37 @@
+{
+  "Provider": "aws",
+  "CheckID": "s3_bucket_level_public_access_block",
+  "CheckTitle": "S3バケットレベルのパブリックアクセスブロックを確認してください。",
+  "CheckType": [
+    "データ保護"
+  ],
+  "ServiceName": "s3",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:s3:::bucket_name",
+  "Severity": "medium",
+  "ResourceType": "AwsS3Bucket",
+  "ResourceGroup": "storage",
+  "Description": "S3バケットレベルのパブリックアクセスブロックを確認してください。",
+  "Risk": "公開アクセス・ポリシーが機密データ・バケットに適用される可能性があります。",
+  "RelatedUrl": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-control-block-public-access.html",
+  "Remediation": {
+    "Code": {
+      "CLI": "aws s3api put-public-access-block --region <REGION_NAME> --public-access-block-configuration BlockPublicAcls=true,IgnorePublicAcls=true,BlockPublicPolicy=true,RestrictPublicBuckets=true --bucket <BUCKET_NAME>",
+      "NativeIaC": "",
+      "Other": "https://github.com/cloudmatos/matos/tree/master/remediations/aws/s3/s3/block-public-access",
+      "Terraform": "https://docs.prowler.com/checks/aws/s3-policies/bc_aws_s3_20#terraform"
+    },
+    "Recommendation": {
+      "Text": "S3に保存されたデータの公開を防ぐために、バケットレベルでPublic Access Blockを有効にできます。",
+      "Url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-control-block-public-access.html"
+    }
+  },
+  "Categories": [],
+  "Tags": {
+    "Tag1Key": "value",
+    "Tag2Key": "value"
+  },
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

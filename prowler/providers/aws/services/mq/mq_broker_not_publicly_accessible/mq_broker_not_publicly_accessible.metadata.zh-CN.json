@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "mq_broker_not_publicly_accessible",
+  "CheckTitle": "Amazon MQ broker 不可公开访问",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践/网络可达性",
+    "软件和配置检查/行业和法规标准/AWS 基础安全最佳实践",
+    "软件和配置检查/行业和监管标准/NIST 800-53 控制",
+    "TTPs/初始访问",
+    "影响/数据暴露"
+  ],
+  "ServiceName": "mq",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsAmazonMQBroker",
+  "ResourceGroup": "messaging",
+  "Description": "**Amazon MQ brokers** 会根据 **public accessibility** 进行评估，以确定 broker 是否通过其 `publicly accessible` 设置暴露公共端点或仅限于 VPC 连接。",
+  "Risk": "**可公开访问的 brokers** 扩大了暴露面：互联网主机可以探测协议和控制台，尝试凭证喷洒，发布/消费消息，并进行连接泛洪。这威胁到 **机密性**（数据泄露）、**完整性**（消息篡改）和 **可用性**（DoS/资源耗尽）。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/amazon-mq/latest/developer-guide/using-amazon-mq-securely.html#prefer-brokers-without-public-accessibility",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/MQ/publicly-accessible.html#"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation：没有公共访问权限的 Amazon MQ broker\nResources:\n  <example_resource_name>:\n    Type: AWS::AmazonMQ::Broker\n    Properties:\n      BrokerName: <example_resource_name>\n      EngineType: ACTIVEMQ\n      EngineVersion: <example_engine_version>\n      HostInstanceType: <example_instance_type>\n      PubliclyAccessible: false  # 关键：禁用公共互联网访问\n      Users:\n        - Username: <example_username>\n          Password: <example_password>\n      SubnetIds:\n        - <example_subnet_id>\n      SecurityGroups:\n        - <example_security_group_id>\n      AutoMinorVersionUpgrade: true\n```",
+      "Other": "1. 打开 AWS 控制台并进入 Amazon MQ\n2. 创建一个新 broker 并将 Public accessibility 设置为 Disabled/No\n3. 将您的客户端指向新 broker 的私有端点\n4. 删除旧的可公开访问的 broker",
+      "Terraform": "```hcl\n# 没有公共访问权限的 Amazon MQ broker\nresource \"aws_mq_broker\" \"<example_resource_name>\" {\n  broker_name         = \"<example_resource_name>\"\n  engine_type         = \"ActiveMQ\"\n  engine_version      = \"<example_engine_version>\"\n  host_instance_type  = \"<example_instance_type>\"\n  publicly_accessible = false # 关键：禁用公共互联网访问\n  security_groups     = [\"<example_security_group_id>\"]\n  subnet_ids          = [\"<example_subnet_id>\"]\n\n  user {\n    username = \"<example_username>\"\n    password = \"<example_password>\"\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "优先选择私有部署：设置 `publicly_accessible=false`，将 brokers 放置在私有子网中，并将安全组限制为受信任的生产者/消费者。使用私有连接（VPC 端点、对等连接、VPN/Direct Connect）。实施强身份验证和授权映射，并仅允许所需的协议端口。应用 **最小特权**。",
+      "Url": "https://hub.prowler.com/check/mq_broker_not_publicly_accessible"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

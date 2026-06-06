@@ -1,0 +1,35 @@
+{
+  "Provider": "aws",
+  "CheckID": "iam_user_no_setup_initial_access_key",
+  "CheckTitle": "コンソールパスワードを持つすべてのIAMユーザーの初期ユーザー設定時にアクセスキーを設定しないでください",
+  "CheckType": [
+    "ソフトウェアと構成のチェック",
+    "業界および規制の標準",
+    "CIS AWS Foundations ベンチマーク"
+  ],
+  "ServiceName": "iam",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "medium",
+  "ResourceType": "AwsIamAccessKey",
+  "ResourceGroup": "IAM",
+  "Description": "コンソールパスワードを持つすべてのIAMユーザーの初期ユーザー設定時にアクセスキーを設定しないでください",
+  "Risk": "AWSコンソールは、アクセスキーを作成するためのチェックボックスをデフォルトで有効にしています。これにより、多くのアクセスキーが不必要に生成されます。不必要な認証情報に加えて、これらのキーの監査やローテーションにおける不必要な管理作業も発生します。プロファイルが作成された後にユーザーが追加の手順を踏むことを要求することで、アクセスキーが(a)彼らの作業に必要であり、(b)アカウントにアクセスキーが設定された場合、そのキーが組織内のどこかで使用されている可能性があることをより強く示すことができます。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "IAMコンソールから: 認証情報レポートを生成し、不要なキーを無効にします。",
+      "Url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_getting-report.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "CAF セキュリティエピック: IAM"
+}

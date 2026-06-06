@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "cloudfront_distributions_using_waf",
+  "CheckTitle": "CloudFront 分配使用 AWS WAF Web ACL",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/PCI-DSS"
+  ],
+  "ServiceName": "cloudfront",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsCloudFrontDistribution",
+  "ResourceGroup": "network",
+  "Description": "**CloudFront 分配**会被评估是否关联了**AWS WAF** Web ACL，该 ACL 在边缘检查和过滤 HTTP/S 请求。\n\n此发现会突出显示没有此 Web ACL 关联的分配。",
+  "Risk": "面向 Internet 的分配缺少**WAF**会使应用程序暴露于第 7 层威胁：SQLi/XSS 和机器人滥用可能导致数据泄露（**机密性**）、未经授权的操作（**完整性**）以及使源过载的请求洪流（**可用性**）。它还可能增加出口和计算成本。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://repost.aws/questions/QUTY5hPVxgS6Caa3eZHX7-nQ/waf-on-alb-or-cloudfront",
+    "https://docs.aws.amazon.com/waf/latest/developerguide/cloudfront-features.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/CloudFront/cloudfront-integrated-with-waf.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation：将 AWS WAFv2 Web ACL 与 CloudFront 分配关联\nResources:\n  <example_distribution>:\n    Type: AWS::CloudFront::Distribution\n    Properties:\n      DistributionConfig:\n        Enabled: true\n        Origins:\n          - Id: origin1\n            DomainName: <example_origin_domain>\n            S3OriginConfig: {}\n        DefaultCacheBehavior:\n          TargetOriginId: origin1\n          ViewerProtocolPolicy: redirect-to-https\n          ForwardedValues:\n            QueryString: false\n        WebACLId: <example_web_acl_arn>  # 关键：将 WAFv2 Web ACL（ARN）关联到此分配\n        # 这通过启用 WAF 保护使分配通过检查\n```",
+      "Other": "1. 在 AWS 控制台中，转到 CloudFront > 分配并选择您的分配\n2. 点击编辑（常规/设置）\n3. 将 AWS WAF Web ACL 设置为您的 Web ACL（范围：Global/CloudFront）\n4. 点击保存/是，编辑并等待部署完成\n5. 如果不存在 Web ACL：转到 WAF & Shield > Web ACLs（范围：CloudFront），创建 Web ACL，然后重复步骤 1-4 以关联它",
+      "Terraform": "```hcl\n# 将此添加到现有的 CloudFront 分配资源\nresource \"aws_cloudfront_distribution\" \"<example_resource_name>\" {\n  web_acl_id = \"<example_web_acl_arn>\"  # 关键：将 WAFv2 Web ACL（ARN）关联到分配以通过检查\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "将每个分配与**AWS WAF Web ACL**关联，并应用纵深防御：\n- 使用托管规则组和速率限制\n- 根据需要添加 IP/地理位置和机器人控制\n- 启用日志记录，在 `count` 模式下测试新规则，并进行调整\n- 监控指标并更新规则\n\n使控制与请求的**最小权限**保持一致。",
+      "Url": "https://hub.prowler.com/check/cloudfront_distributions_using_waf"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

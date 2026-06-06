@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "cloudfront_distributions_using_waf",
+  "CheckTitle": "CloudFrontディストリビューションがAWS WAF Web ACLを使用している",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/PCI-DSS"
+  ],
+  "ServiceName": "cloudfront",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsCloudFrontDistribution",
+  "ResourceGroup": "network",
+  "Description": "**CloudFrontディストリビューション**は、エッジでHTTP/Sリクエストを検査およびフィルタリングする関連する**AWS WAF** Web ACLについて評価されます。\n\nこの検出結果は、このWeb ACL関連付けがないディストリビューションを強調表示します。",
+  "Risk": "インターネット向けディストリビューションに**WAF**がない場合、アプリケーションがレイヤー7の脅威にさらされます：SQLi/XSSとボット悪用により、データ漏洩（**機密性**）、不正な操作（**整合性**）、オリジンを過負荷にするリクエストフラッド（**可用性**）が発生する可能性があります。また、エグレスとコンピューティングコストが増加する可能性があります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://repost.aws/questions/QUTY5hPVxgS6Caa3eZHX7-nQ/waf-on-alb-or-cloudfront",
+    "https://docs.aws.amazon.com/waf/latest/developerguide/cloudfront-features.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/CloudFront/cloudfront-integrated-with-waf.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation：AWS WAFv2 Web ACLをCloudFrontディストリビューションに関連付け\nResources:\n  <example_distribution>:\n    Type: AWS::CloudFront::Distribution\n    Properties:\n      DistributionConfig:\n        Enabled: true\n        Origins:\n          - Id: origin1\n            DomainName: <example_origin_domain>\n            S3OriginConfig: {}\n        DefaultCacheBehavior:\n          TargetOriginId: origin1\n          ViewerProtocolPolicy: redirect-to-https\n          ForwardedValues:\n            QueryString: false\n        WebACLId: <example_web_acl_arn>  # 重要：WAFv2 Web ACL（ARN）をこのディストリビューションに関連付け\n        # これにより、WAF保護を有効にしてディストリビューションがパスします\n```",
+      "Other": "1. AWSコンソールで、CloudFront > ディストリビューションに移動し、ディストリビューションを選択\n2. 編集（一般/設定）をクリック\n3. AWS WAF Web ACLをWeb ACL（スコープ：Global/CloudFront）に設定\n4. 保存/はい、編集をクリックし、デプロイが完了するまで待つ\n5. Web ACLが存在しない場合：WAF & Shield > Web ACLs（スコープ：CloudFront）に移動し、Web ACLを作成し、ステップ1-4を繰り返して関連付けます",
+      "Terraform": "```hcl\n# 既存のCloudFrontディストリビューションリソースにこれを追加\nresource \"aws_cloudfront_distribution\" \"<example_resource_name>\" {\n  web_acl_id = \"<example_web_acl_arn>\"  # 重要：WAFv2 Web ACL（ARN）をディストリビューションに関連付けてチェックをパス\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "各ディストリビューションを**AWS WAF Web ACL**に関連付け、多層防御を適用：\n- マネージドルールグループとレート制限を使用\n- 必要に応じてIP/地理的制御とボット制御を追加\n- ログを有効化し、`count`モードで新しいルールをテストし、調整\n- メトリクスを監視し、ルールを更新\n\nリクエストの**最小権限**とコントロールを一致させます。",
+      "Url": "https://hub.prowler.com/check/cloudfront_distributions_using_waf"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

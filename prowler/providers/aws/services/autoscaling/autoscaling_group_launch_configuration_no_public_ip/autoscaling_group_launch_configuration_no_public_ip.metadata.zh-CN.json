@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "autoscaling_group_launch_configuration_no_public_ip",
+  "CheckTitle": "Auto Scaling 组关联的启动配置不分配公共 IP 地址",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践/网络可达性",
+    "软件和配置检查/行业和监管标准/AWS 基础安全最佳实践",
+    "软件和配置检查/行业和监管标准/CIS AWS 基础基准"
+  ],
+  "ServiceName": "autoscaling",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsAutoScalingAutoScalingGroup",
+  "ResourceGroup": "compute",
+  "Description": "**Amazon EC2 Auto Scaling 组**会进行评估，以确定其关联的**启动配置**是否为实例分配**公共 IP 地址**（例如，`AssociatePublicIpAddress=true`）。",
+  "Risk": "**可公开寻址的实例**可以从互联网访问，使侦察、暴力破解和利用暴露的服务成为可能。\n\n泄露可能导致远程访问、**数据泄露**和**横向移动**，影响**机密性**、**完整性**和**可用性**。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/autoscaling-controls.html#autoscaling-5",
+    "https://docs.aws.amazon.com/autoscaling/ec2/userguide/create-auto-scaling-groups-launch-configuration.html",
+    "https://docs.aws.amazon.com/autoscaling/ec2/userguide/change-launch-config.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation 启动配置，不分配公共 IP\nResources:\n  <example_resource_name>:\n    Type: AWS::AutoScaling::LaunchConfiguration\n    Properties:\n      ImageId: <example_ami_id>\n      InstanceType: <example_instance_type>\n      AssociatePublicIpAddress: false  # 关键：禁用为实例分配公共 IP\n```",
+      "Other": "1. 在 AWS 控制台中，转到 EC2 > Auto Scaling > Launch configurations 并单击 Create launch configuration\n2. 使用与当前组相同的 AMI 和实例类型；在 Advanced details 下，将 IP address type 设置为 Do not assign a public IP address\n3. 创建启动配置\n4. 转到 EC2 > Auto Scaling Groups，选择您的组，单击 Launch configuration 旁边的 Edit，选择新配置，然后单击 Update",
+      "Terraform": "```hcl\n# 不分配公共 IP 的启动配置\nresource \"aws_launch_configuration\" \"<example_resource_name>\" {\n  image_id                    = \"<example_ami_id>\"\n  instance_type               = \"<example_instance_type>\"\n  associate_public_ip_address = false  # 关键：禁用分配公共 IP\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "将实例放置在私有子网中，并禁用公共寻址（`AssociatePublicIpAddress=false`）。通过**负载均衡器**或**私有端点**发布服务，强制执行**最小权限**安全组，并使用**SSM**、VPN 或加固的堡垒主机进行管理访问。优先使用**启动模板**来标准化网络控制。",
+      "Url": "https://hub.prowler.com/check/autoscaling_group_launch_configuration_no_public_ip"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

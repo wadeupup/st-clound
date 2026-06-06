@@ -1,0 +1,40 @@
+{
+  "Provider": "aws",
+  "CheckID": "waf_regional_webacl_with_rules",
+  "CheckTitle": "AWS WAF Classic Regional Web ACL には、少なくとも1つのルールまたはルールグループがあります",
+  "CheckType": [
+    "ソフトウェアと構成チェック/AWSセキュリティのベストプラクティス",
+    "ソフトウェアと設定のチェック/業界および規制基準/AWS 基盤セキュリティのベストプラクティス",
+    "ソフトウェアおよび設定のチェック／業界および規制基準／NIST 800-53 管理策"
+  ],
+  "ServiceName": "waf",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsWafRegionalWebAcl",
+  "ResourceGroup": "security",
+  "Description": "**AWS WAF Classic Regional web ACL** には、HTTP(S) リクエストを検査して対応するための少なくとも 1 つの **rule** または **rule group** が含まれています。エントリのない ACL は空とみなされます。",
+  "Risk": "ルールがない場合、Web ACL は検査を一切実行せず、悪意のあるトラフィックを通過させてしまいます。\n- **機密性**: SQLi/XSS によるデータ漏えい\n- **完全性**: 不正な操作または改ざん\n- **可用性**: 悪用/ボットトラフィックによる性能低下またはサービス拒否",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/waf-controls.html#waf-4",
+    "https://docs.aws.amazon.com/waf/latest/developerguide/classic-web-acl-editing.html",
+    "https://docs.aws.amazon.com/waf/latest/developerguide/waf-rules.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws waf-regional update-web-acl --web-acl-id <your-web-acl-id> --change-token $(aws waf-regional get-change-token --query 'ChangeToken' --output text) --updates '[{\"Action\":\"INSERT\",\"ActivatedRule\":{\"Priority\":1,\"RuleId\":\"<your-rule-id>\",\"Action\":{\"Type\":\"BLOCK\"}}}]'",
+      "NativeIaC": "```yaml\n# CloudFormation: Web ACL に少なくとも 1 つのルールがあることを確認する\nResources:\n  <example_resource_name>:\n    Type: AWS::WAFRegional::WebACL\n    Properties:\n      Name: \"<example_resource_name>\"\n      MetricName: \"<example_resource_name>\"\n      DefaultAction:\n        Type: ALLOW\n      # 重要: Web ACL にルールを追加すると空ではなくなり、チェックに合格します\n      Rules:\n        - Action:\n            Type: BLOCK\n          Priority: 1\n          RuleId: \"<example_resource_id>\"  # Web ACL に挿入するルール\n```",
+      "Other": "1. AWS コンソールを開き、AWS WAF に移動します\n2. 左側のペインで Web ACLs をクリックし、求められた場合は AWS WAF Classic に切り替えます\n3. Regional Web ACL を選択し、Rules タブを開きます\n4. Edit web ACL をクリックします\n5. Rules で既存のルールまたはルールグループを選択し、Add rule to web ACL を選択します\n6. Save changes をクリックします",
+      "Terraform": "```hcl\n# Terraform: Web ACL に少なくとも 1 つのルールがあることを確認する\nresource \"aws_wafregional_web_acl\" \"<example_resource_name>\" {\n  name        = \"<example_resource_name>\"\n  metric_name = \"<example_resource_name>\"\n\n  default_action {\n    type = \"ALLOW\"\n  }\n\n  # 重要: Web ACL が空にならないように、少なくとも 1 つのルールを追加してください\n  rules {\n    priority = 1\n    rule_id  = \"<example_resource_id>\"\n    action {\n      type = \"BLOCK\"\n    }\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "各 web ACL には、リクエストを検査し**最小権限**を適用する少なくとも 1 つの**ルール**または**ルールグループ**を設定してください。マネージドルールとカスタムルールを組み合わせて多層防御を適用し、必要に応じてレート制御を含め、定期的に見直してください。*望ましくないトラフィックはデフォルトでブロックし、必要なパターンのみを許可してください*。",
+      "Url": "https://hub.prowler.com/check/waf_regional_webacl_with_rules"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "lightsail_database_public",
+  "CheckTitle": "Lightsail 数据库公共访问已禁用",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践/网络可达性",
+    "软件和配置检查/行业和法规标准/AWS 基础安全最佳实践",
+    "影响/数据暴露",
+    "TTPs/初始访问"
+  ],
+  "ServiceName": "lightsail",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Other",
+  "ResourceGroup": "compute",
+  "Description": "**Lightsail 托管数据库** 被评估为 **公共可访问性**。当启用 `public mode` 时，数据库通过其端点和端口接受来自互联网的连接；否则，访问仅限于授权的 Lightsail 资源。",
+  "Risk": "**可公开访问的数据库** 将机密数据和凭据暴露给互联网，从而可能导致：\n- **暴力破解** 和凭据填充\n- 通过未经授权的查询进行 **数据泄露**\n- 来自扫描或 DoS 的 **服务中断**\n\n妥协可能导致 **横向移动** 和篡改，影响机密性、完整性和可用性。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/lightsail/latest/userguide/amazon-lightsail-databases.html",
+    "https://docs.aws.amazon.com/lightsail/latest/userguide/amazon-lightsail-configuring-database-public-mode.html",
+    "https://spinupwp.com/doc/external-database-amazon-lightsail/"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws lightsail update-relational-database --relational-database-name <example_resource_name> --no-publicly-accessible",
+      "NativeIaC": "```yaml\n# CloudFormation：在现有 Lightsail 数据库上禁用公共访问\nResources:\n  <example_resource_name>:\n    Type: AWS::Lightsail::Database\n    Properties:\n      RelationalDatabaseName: <example_resource_name>\n      PubliclyAccessible: false  # 关键：关闭公共模式，使数据库不可公开访问\n```",
+      "Other": "1. 在 AWS 控制台中，转到 Lightsail > Databases\n2. 选择 <example_resource_name>\n3. 打开 Networking 选项卡\n4. 在 Public mode 中，切换为 Off\n5. 等待状态返回为 Available",
+      "Terraform": "```hcl\n# 禁用 Lightsail 数据库的公共访问\nresource \"aws_lightsail_database\" \"<example_resource_name>\" {\n  name                 = \"<example_resource_name>\"\n  availability_zone    = \"<availability_zone>\"\n  blueprint_id         = \"<blueprint_id>\"\n  bundle_id            = \"<bundle_id>\"\n  master_database_name = \"<master_database_name>\"\n  master_username      = \"<master_username>\"\n  master_password      = \"<master_password>\"\n\n  publicly_accessible = false  # 关键：确保数据库不可公开访问\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "禁用 **public mode**，仅允许从受信任的私有网络访问数据库。\n\n- 强制执行 **最小权限** 和网络分段\n- 使用堡垒主机、隧道或私有端点进行管理员访问\n- 如果无法避免暴露，请通过 IP 限制、轮换凭据，并监控连接以实现 **深度防御**",
+      "Url": "https://hub.prowler.com/check/lightsail_database_public"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

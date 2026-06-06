@@ -1,0 +1,33 @@
+{
+  "Provider": "aws",
+  "CheckID": "s3_bucket_acl_prohibited",
+  "CheckTitle": "检查 S3 存储桶是否启用了 ACLs",
+  "CheckType": [
+    "日志记录和监控"
+  ],
+  "ServiceName": "s3",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:s3:::bucket_name",
+  "Severity": "medium",
+  "ResourceType": "AwsS3Bucket",
+  "ResourceGroup": "storage",
+  "Description": "检查 S3 存储桶是否启用了 ACLs",
+  "Risk": "S3 ACL 是一种早于 IAM 的旧版访问控制机制。目前首选的方法是 IAM 和存储桶策略。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "aws s3api put-bucket-ownership-controls --bucket <bucket-name> --ownership-controls Rules=[{ObjectOwnership=BucketOwnerEnforced}]",
+      "NativeIaC": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-ownershipcontrols.html",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "确保已禁用 S3 ACL（BucketOwnerEnforced）。使用 IAM 策略和存储桶策略来管理访问。",
+      "Url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/about-object-ownership.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

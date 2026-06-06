@@ -1,0 +1,44 @@
+{
+  "Provider": "aws",
+  "CheckID": "guardduty_is_enabled",
+  "CheckTitle": "GuardDuty detector 已启用且未暂停",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices/Runtime Behavior Analysis",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/CIS AWS Foundations Benchmark"
+  ],
+  "ServiceName": "guardduty",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsGuardDutyDetector",
+  "ResourceGroup": "security",
+  "Description": "会按 Region 评估 **Amazon GuardDuty** detector 的存在性与健康状态。该检查会识别账号未启用 GuardDuty、detector 无状态，或 detector 已配置但处于 `suspended` 的情况。",
+  "Risk": "如果未启用活动状态的 **GuardDuty**，CloudTrail、VPC Flow Logs、DNS、S3、EKS、EBS 和 Lambda 中的威胁可能被忽略。攻击者可进行数据外泄、横向移动和挖矿，削弱机密性、完整性与可用性，尤其是在未监控的 Region 中。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/guardduty/latest/ug/guardduty_settingup.html",
+    "https://aws.plainenglish.io/how-to-protect-your-organizations-aws-account-with-aws-guardduty-a1a635c417aa",
+    "https://medium.com/swlh/aws-cdk-automating-guardduty-event-notifications-in-all-regions-f0bbcec6077d",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/GuardDuty/guardduty-enabled.html",
+    "https://docs.aws.amazon.com/prescriptive-guidance/latest/patterns/use-terraform-to-automatically-enable-amazon-guardduty-for-an-organization.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation: Ensure GuardDuty detector is enabled (not suspended) in the Region\nResources:\n  ExampleGuardDutyDetector:\n    Type: AWS::GuardDuty::Detector\n    Properties:\n      Enable: true  # Critical: enables the detector so GuardDuty is active (not suspended)\n```",
+      "Other": "1. 登录 AWS Console 并打开 Amazon GuardDuty\n2. 切换到目标 AWS Region\n3. 如果出现 Get started，点击 Enable GuardDuty\n4. 如果 GuardDuty 已配置但处于 suspended，进入 Settings 并点击 Enable（或 Resume）以激活 detector\n5. 在每个需要的 Region 重复以上操作",
+      "Terraform": "```hcl\n# Terraform: Ensure GuardDuty detector is enabled (not suspended) in the Region\nresource \"aws_guardduty_detector\" \"example_resource_name\" {\n  enable = true  # Critical: turns GuardDuty on and ensures it is not suspended\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "在委派管理员统一管理下，在所有支持的 Region 和账号中启用并保持 **GuardDuty** 处于活动状态。启用相关防护计划并自动纳管新账号。避免 detector 处于 `suspended`，对管理员实施**最小权限**，并将发现结果接入响应流程以实现**纵深防御**。",
+      "Url": "https://hub.prowler.com/check/guardduty_is_enabled"
+    }
+  },
+  "Categories": [
+    "forensics-ready"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

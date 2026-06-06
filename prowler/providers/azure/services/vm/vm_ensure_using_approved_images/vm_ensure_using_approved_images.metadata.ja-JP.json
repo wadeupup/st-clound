@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "vm_ensure_using_approved_images",
+  "CheckTitle": "Azure VM が承認済みマシンイメージを使用していることを確認する。",
+  "CheckType": [],
+  "ServiceName": "vm",
+  "SubServiceName": "image",
+  "ResourceIdTemplate": "/subscriptions/<subscription-id>/resourceGroups/<resource-group-name>/providers/Microsoft.Compute/images/<virtual-machine-image-id>",
+  "Severity": "medium",
+  "ResourceType": "Microsoft.Compute/images",
+  "ResourceGroup": "compute",
+  "Description": "すべての Azure 仮想マシンインスタンスが、承認済みマシンイメージからのみ起動されていることを確認します。",
+  "Risk": "承認済みマシンイメージとは、事前構成済み OS と、Azure に承認された明確に定義されたサーバーソフトウェアスタックを含み、アプリケーション実行向けに完全構成されたカスタム仮想マシン（VM）イメージです。Azure クラウド環境で新規 VM インスタンスを承認済み（ゴールデン）イメージから起動することで、迅速かつ安定したアプリケーションのデプロイとスケーリング、安全なアプリケーションスタックのアップグレード、バージョン管理などの大きな利点が得られます。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/virtual-machines/windows/create-vm-generalized-managed",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/VirtualMachines/approved-machine-image.html",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "必要な VM インスタンスを、承認済み（ゴールデン）マシンイメージを使用して再作成してください。",
+      "Url": "https://docs.microsoft.com/en-us/azure/virtual-machines/windows/create-vm-generalized-managed"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "このチェックは、VM がカスタムイメージから起動されたかどうかのみを検証します。イメージ内容やセキュリティベースラインは検証しません。"
+}

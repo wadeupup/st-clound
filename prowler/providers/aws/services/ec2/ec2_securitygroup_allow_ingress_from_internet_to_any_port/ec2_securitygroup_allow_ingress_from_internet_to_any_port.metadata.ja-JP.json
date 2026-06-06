@@ -1,0 +1,37 @@
+{
+  "Provider": "aws",
+  "CheckID": "ec2_securitygroup_allow_ingress_from_internet_to_any_port",
+  "CheckTitle": "いかなるセキュリティグループも 0.0.0.0/0 または ::/0 から任意のポートへのインバウンドを許可していないことを確認する",
+  "CheckType": [
+    "Infrastructure Security"
+  ],
+  "ServiceName": "ec2",
+  "SubServiceName": "securitygroup",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "high",
+  "ResourceType": "AwsEc2SecurityGroup",
+  "ResourceGroup": "network",
+  "Description": "いかなるセキュリティグループも、0.0.0.0/0 または ::/0 から任意のポートへのインバウンドトラフィックを許可せず、また許可されていないネットワークインターフェイス種別またはインスタンスオーナーを持つネットワークインターフェイスにアタッチされていないことを確認します。デフォルトで許可されるネットワークインターフェイス種別は \"api_gateway_managed\" と \"vpc_endpoint\" であり、デフォルトで許可されるインスタンスオーナーは \"amazon-elb\" です。これらの値は、変数 \"ec2_allowed_interface_types\" および \"ec2_allowed_instance_owners\" を設定することでカスタマイズできます。",
+  "Risk": "このセキュリティグループはインターネットから任意のポートへの全てのトラフィックを許可しており、攻撃者がインスタンスへアクセスできる可能性があります。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "ゼロトラストアプローチを採用し、インバウンドトラフィックを可能な限り絞り込みます。南北トラフィックだけでなく、東西トラフィックについても制御を検討してください。",
+      "Url": "https://docs.aws.amazon.com/vpc/latest/userguide/VPC_SecurityGroups.html"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+
+

@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "route53_dangling_ip_subdomain_takeover",
+  "CheckTitle": "Route53 A 记录不指向悬空 IP 地址",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践/网络可达性",
+    "TTPs/初始访问",
+    "影响/数据暴露"
+  ],
+  "ServiceName": "route53",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsRoute53HostedZone",
+  "ResourceGroup": "network",
+  "Description": "**Route 53 `A` 记录**（非别名）中使用文字 IP 的记录会针对**当前未分配给账户中资源的公共 AWS 地址**进行评估。与 AWS 范围匹配但缺乏所有权的条目会被识别为潜在的**悬空 IP 目标**。",
+  "Risk": "指向已释放 AWS IP 的悬空 DNS `A` 记录会导致**子域名接管**。之后获得该 IP 的攻击者可以：\n- 重定向或篡改内容（完整性）\n- 窃取凭证/Cookie（机密性）\n- 中断或冒充服务（可用性）",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://support.icompaas.com/support/solutions/articles/62000233461-ensure-route53-records-contains-dangling-ips-",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/Route53/dangling-dns-records.html",
+    "https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/resource-record-sets-deleting.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws route53 change-resource-record-sets --hosted-zone-id <example_resource_id> --change-batch '{\"Changes\":[{\"Action\":\"UPSERT\",\"ResourceRecordSet\":{\"Name\":\"<example_resource_name>\",\"Type\":\"A\",\"AliasTarget\":{\"HostedZoneId\":\"<ALIAS_TARGET_HOSTED_ZONE_ID>\",\"DNSName\":\"<ALIAS_TARGET_DNS_NAME>\",\"EvaluateTargetHealth\":false}}}]}'",
+      "NativeIaC": "```yaml\n# CloudFormation：将 A 记录转换为 Alias，使其不再指向悬空 IP\nResources:\n  <example_resource_name>:\n    Type: AWS::Route53::RecordSet\n    Properties:\n      HostedZoneId: <example_resource_id>\n      Name: <example_resource_name>\n      Type: A\n      AliasTarget:\n        HostedZoneId: <ALIAS_TARGET_HOSTED_ZONE_ID>  # 关键：使用 AWS 资源的别名，而不是 IP\n        DNSName: <ALIAS_TARGET_DNS_NAME>             # 严重：目标 AWS 资源 DNS（例如，ALB/CloudFront）\n        EvaluateTargetHealth: false\n```",
+      "Other": "1. 打开 AWS 控制台 > Route 53 > 托管区域\n2. 选择托管区域并找到失败的非别名 A 记录\n3. 如果不需要：点击删除并确认\n4. 如果需要：选择该记录，点击编辑，启用别名，选择正确的 AWS 资源（例如 ALB/CloudFront），然后保存更改\n5. 等待传播（约 60 秒）并重新运行检查",
+      "Terraform": "```hcl\n# Terraform：将 A 记录转换为 Alias，以避免悬空的公共 IP 地址\nresource \"aws_route53_record\" \"<example_resource_name>\" {\n  zone_id = \"<example_resource_id>\"\n  name    = \"<example_resource_name>\"\n  type    = \"A\"\n\n  alias {                                  # 关键：AWS 资源的别名（无直接 IP）\n    name                   = \"<ALIAS_TARGET_DNS_NAME>\"   # e.g., dualstack.<alb>.amazonaws.com\n    zone_id                = \"<ALIAS_TARGET_HOSTED_ZONE_ID>\"\n    evaluate_target_health = false\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "删除或更新任何指向未分配 IP 的记录。避免在 `A` 记录中硬编码 AWS 公网 IP；使用指向托管端点的**别名/CNAME**。强制执行**资产生命周期**退役、例行的 DNS-资产核对，以及带监控的**变更控制**，以防止并检测漂移。",
+      "Url": "https://hub.prowler.com/check/route53_dangling_ip_subdomain_takeover"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

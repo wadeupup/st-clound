@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "containerregistry_uses_private_link",
+  "CheckTitle": "确保使用私有链接访问 Azure Container Registry",
+  "CheckType": [],
+  "ServiceName": "containerregistry",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "ContainerRegistry",
+  "ResourceGroup": "container",
+  "Description": "确保使用私有链接访问 Azure Container Registry，以增强安全性并限制通过公共互联网访问注册表。",
+  "Risk": "如果未使用私有链接，Azure Container Registry 可能暴露在公共互联网中，增加未授权访问和潜在数据泄露风险。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/private-link/private-link-overview",
+  "Remediation": {
+    "Code": {
+      "CLI": "az network private-endpoint create  --connection-name <ConnectionName> --resource-group <ResourceGroupName> --name <Name> --private-connection-resource-id <RegistryId> --vnet-name <VnetName> --subnet <SubnetName> --group-ids registry",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "通过 Azure 门户为 Azure Container Registry 创建私有链接：1. 导航到你的 Container Registry。2. 在设置中选择“Networking”。3. 选择“Private access”。4. 为该注册表配置专用终结点。",
+      "Url": "https://learn.microsoft.com/en-us/azure/container-registry/container-registry-private-link"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "该功能仅适用于 Premium SKU 注册表。"
+}

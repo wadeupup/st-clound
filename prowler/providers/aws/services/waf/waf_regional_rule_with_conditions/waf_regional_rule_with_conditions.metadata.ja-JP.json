@@ -1,0 +1,39 @@
+{
+  "Provider": "aws",
+  "CheckID": "waf_regional_rule_with_conditions",
+  "CheckTitle": "AWS WAF Classic Regional ルールには少なくとも 1 つの条件があります",
+  "CheckType": [
+    "ソフトウェアと構成チェック/AWSセキュリティのベストプラクティス",
+    "ソフトウェアおよび設定のチェック／業界および規制基準／NIST 800-53 管理策"
+  ],
+  "ServiceName": "waf",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsWafRegionalRule",
+  "ResourceGroup": "security",
+  "Description": "**AWS WAF Classic Regional ルール**には、ルールがどのリクエストを評価するかを定義するために、1 つ以上の **条件（predicate）**（IP、byte/regex、geo、size、SQLi/XSS）が関連付けられています",
+  "Risk": "空のルールは決して一致せず、トラフィックがその制御を回避できてしまいます。これにより多層防御が弱まり、Web ACL の順序とデフォルトアクションによっては、**機密性**（データ流出）、**完全性**（SQLi/XSS）、および **可用性**（レート/サイズ制限の欠如）に影響を及ぼす可能性があります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/waf/latest/developerguide/classic-web-acl-rules-editing.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/waf-controls.html#waf-2",
+    "https://docs.aws.amazon.com/config/latest/developerguide/waf-regional-rule-not-empty.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws waf-regional update-rule --rule-id <example_rule_id> --change-token $(aws waf-regional get-change-token --query ChangeToken --output text) --updates '[{\"Action\":\"INSERT\",\"Predicate\":{\"Negated\":false,\"Type\":\"IPMatch\",\"DataId\":\"<example_ipset_id>\"}}]'",
+      "NativeIaC": "```yaml\n# WAF Classic Regional ルールに少なくとも 1 つの条件を追加する\nResources:\n  <example_resource_name>:\n    Type: AWS::WAFRegional::Rule\n    Properties:\n      Name: <example_resource_name>\n      MetricName: <example_metric_name>\n      Predicates:\n        - Negated: false         # 重大: 述語がそのまま適用されることを保証します\n          Type: IPMatch          # 重大: 述語型\n          DataId: <example_ipset_id>  # 重大: 既存のIPセットを条件としてアタッチします\n```",
+      "Other": "1. AWS コンソールを開いて AWS WAF に移動し、次に「Switch to AWS WAF Classic」を選択します\n2. 左側のペインで「Regional」を選択し、「Rules」をクリックします\n3. 対象のルールを選択し、「Add rule」を選択します\n4. 「Add condition」をクリックし、「When a request to does」を設定して、「IP match」（または別のタイプ）を選択し、既存の条件（例: IP set）を選択します\n5. 「Update」をクリックして、条件付きのルールを保存します",
+      "Terraform": "```hcl\n# 少なくとも1つの条件を持つ WAF Classic Regional ルール\nresource \"aws_wafregional_rule\" \"<example_resource_name>\" {\n  name        = \"<example_resource_name>\"\n  metric_name = \"<example_metric_name>\"\n\n  predicate {                        \n    data_id = \"<example_ipset_id>\"  # 重大: 既存のIPセットを条件としてアタッチします\n    type    = \"IPMatch\"             # 重大: 述語型\n    negated = false                  # 重大: 条件を直接適用してください\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "各ルールに対して正確な**条件**（例：IP、パターン、geo、サイズ）を定義し、プレースホルダールールは避けてください。**最小権限**のフィルタリングを適用し、ルールの順序を見直し、**多層防御**のために層状のコントロールを使用してください。定期的にルールの有効性を検証および監視してください。",
+      "Url": "https://hub.prowler.com/check/waf_regional_rule_with_conditions"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

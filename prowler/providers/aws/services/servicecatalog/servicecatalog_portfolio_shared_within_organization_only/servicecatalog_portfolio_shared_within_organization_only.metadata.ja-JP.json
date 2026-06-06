@@ -1,0 +1,39 @@
+{
+  "Provider": "aws",
+  "CheckID": "servicecatalog_portfolio_shared_within_organization_only",
+  "CheckTitle": "Service Catalog ポートフォリオは AWS Organization 内でのみ共有されます",
+  "CheckType": [
+    "ソフトウェアと構成チェック/AWSセキュリティのベストプラクティス",
+    "TTPs/初期アクセス/不正アクセス"
+  ],
+  "ServiceName": "servicecatalog",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Other",
+  "ResourceGroup": "governance",
+  "Description": "**AWS Service Catalog ポートフォリオ**は、共有が直接の `ACCOUNT` 共有ではなく、**AWS Organizations** の統合を介して行われていることを確認するために評価されます。共有されているポートフォリオを確認し、組織スコープではなく個別のアカウントを対象としているものを特定します。",
+  "Risk": "個別のアカウントとの共有により、受信者は一元化されたガードレールの外で製品をインポートして起動でき、起動ロールを継承します。これにより、不正なプロビジョニング、データ露出、構成ドリフトが発生し、誤用された権限と制御されないコストを通じて機密性、完全性、可用性に影響を及ぼす可能性があります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/servicecatalog/latest/adminguide/catalogs_portfolios_sharing.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws servicecatalog create-portfolio-share --portfolio-id <portfolio-id> --organization-ids <org-id>",
+      "NativeIaC": "```yaml\n# CloudFormation: Service Catalog ポートフォリオを AWS Organization 内でのみ共有する\nResources:\n  <example_resource_name>:\n    Type: AWS::ServiceCatalog::PortfolioShare\n    Properties:\n      PortfolioId: <example_resource_id>\n      OrganizationNode:               # 重大: AWS Organizations 内で共有\n        Type: ORGANIZATION            # 組織全体とポートフォリオを共有します\n        Value: <example_resource_id>  # 例: o-xxxxxxxxxx\n```",
+      "Other": "1. AWS コンソールで、Service Catalog > Portfolios に移動し、対象のポートフォリオを開きます\n2. Shares/Sharing タブを開きます\n3. Type が \"Account\" の共有をすべて削除します（各アカウントとの共有を停止します）\n4. Share をクリックし、\"AWS Organizations\" を選択し、Type を \"Organization\" に設定し、Org ID（o-xxxxxxxxxx）を入力して共有します\n5. Type が \"Account\" の共有が残っていないことを確認します",
+      "Terraform": "```hcl\n# Service CatalogポートフォリオをAWS Organization内でのみ共有する\nresource \"aws_servicecatalog_portfolio_share\" \"<example_resource_name>\" {\n  portfolio_id = \"<example_resource_id>\"\n\n  organization_node {           # 重大: AWS Organizations 内で共有\n    type  = \"ORGANIZATION\"     # 組織全体とポートフォリオを共有します\n    value = \"<example_resource_id>\"  # 例: o-xxxxxxxxxx\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "ポートフォリオの共有には**組織による共有**を優先し、`ACCOUNT`ターゲットは避けてください。ポートフォリオへのアクセス権と起動ロールには**最小権限**を徹底し、共有を定期的に見直してください。**職務の分離**と**多層防御**を適用して、統制されたアカウントのみが製品を利用できるようにし、影響範囲が限定された状態を維持してください。",
+      "Url": "https://hub.prowler.com/check/servicecatalog_portfolio_shared_within_organization_only"
+    }
+  },
+  "Categories": [
+    "trust-boundaries"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

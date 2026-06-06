@@ -1,0 +1,37 @@
+{
+  "Provider": "aws",
+  "CheckID": "iam_no_expired_server_certificates_stored",
+  "CheckTitle": "AWS IAM に保存されている期限切れ SSL/TLS 証明書がすべて削除されていることを確認する。",
+  "CheckType": [
+    "Software and Configuration Checks",
+    "Industry and Regulatory Standards",
+    "CIS AWS Foundations Benchmark"
+  ],
+  "ServiceName": "iam",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "critical",
+  "ResourceType": "Other",
+  "ResourceGroup": "IAM",
+  "Description": "AWS IAM に保存されている期限切れ SSL/TLS 証明書がすべて削除されていることを確認する。",
+  "Risk": "期限切れ SSL/TLS 証明書を削除することで、無効な証明書が AWS Elastic Load Balancer（ELB）などのリソースへ誤ってデプロイされるリスクを排除できます。これは ELB 配下のアプリケーション/Web サイトの信頼性低下を防ぎます。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "aws iam delete-server-certificate --server-certificate-name <CERTIFICATE_NAME",
+      "NativeIaC": "",
+      "Other": "AWS Management Console から期限切れ証明書を削除することは現在サポートされていません。",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "Elastic Load Balancing、CloudFront などで期限切れサーバー証明書を使用している場合、証明書の削除はアプリケーションに影響を与える可能性があります。アプリケーション機能を中断させないよう、各サービスで必要な設定を実施してください。",
+      "Url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_server-certs.html"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "Data Protection"
+}

@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "sagemaker_notebook_instance_vpc_settings_configured",
+  "CheckTitle": "Amazon SageMaker notebook 实例已配置 VPC 设置",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践/网络可达性",
+    "软件和配置检查/行业和监管标准/AWS 基础安全最佳实践"
+  ],
+  "ServiceName": "sagemaker",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsSageMakerNotebookInstance",
+  "ResourceGroup": "ai_ml",
+  "Description": "**SageMaker 笔记本实例**会针对**VPC 附加**进行评估。配置了 VPC（通过 `subnet_id` 和安全组）的实例使用私有网络；而没有 VPC 设置的实例则依赖公有网络。",
+  "Risk": "如果没有 VPC，笔记本将失去**网络隔离**。到 AWS 服务的流量可能会经过公共互联网，从而限制**出口控制**和**私有端点**，使数据外泄和拦截成为可能，并使横向移动更容易——影响**机密性**和**完整性**。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/SageMaker/notebook-instance-in-vpc.html",
+    "https://docs.aws.amazon.com/sagemaker/latest/dg/studio-notebooks-and-internet-access.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation：具有 VPC 设置的 SageMaker Notebook 实例\nResources:\n  <example_resource_name>:\n    Type: AWS::SageMaker::NotebookInstance\n    Properties:\n      InstanceType: ml.t3.medium\n      RoleArn: <example_resource_id>\n      SubnetId: <example_resource_id>  # 关键：将 notebook 放置在 VPC 子网中，以便检查通过\n```",
+      "Other": "1. 在 AWS 控制台中，前往 SageMaker > Notebook 实例\n2. 选择失败的 notebook 实例，选择 Stop，然后选择 Delete\n3. 单击 Create notebook instance 并使用相同的名称\n4. 在 Network 下，选择您的 VPC 和一个子网（选择任何所需的 Security group）\n5. 创建 notebook 实例\n6. 在其变为 InService 后，重新运行检查",
+      "Terraform": "```hcl\nresource \"aws_sagemaker_notebook_instance\" \"<example_resource_name>\" {\n  name          = \"<example_resource_name>\"\n  role_arn      = \"<example_resource_id>\"\n  instance_type = \"ml.t3.medium\"\n  subnet_id     = \"<example_resource_id>\" # 关键：确保笔记本位于 VPC 子网中，以通过检查\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "在**私有 VPC**中运行笔记本，应用**最小权限**安全组和**网络分段**。优先为 AWS 服务使用 **VPC 端点**，并将出站流量限制到批准的目标，以实施**纵深防御**。",
+      "Url": "https://hub.prowler.com/check/sagemaker_notebook_instance_vpc_settings_configured"
+    }
+  },
+  "Categories": [
+    "internet-exposed",
+    "gen-ai"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

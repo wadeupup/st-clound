@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "neptune_cluster_public_snapshot",
+  "CheckTitle": "NeptuneDB クラスター スナップショットは公開されていません",
+  "CheckType": [
+    "ソフトウェアと構成のチェック/AWS セキュリティベストプラクティス/ネットワーク到達可能性",
+    "影響/データの露出",
+    "TTPs/初期アクセス/不正アクセス"
+  ],
+  "ServiceName": "neptune",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "critical",
+  "ResourceType": "AwsRdsDbClusterSnapshot",
+  "ResourceGroup": "database",
+  "Description": "Neptune DB の手動クラスター スナップショットは、その復元属性がすべての AWS アカウント *(public)* にアクセスを許可するかどうかを評価されます。\n\nレポートで失敗のステータスが表示される場合、スナップショットは公開されており、任意の AWS アカウントによってコピーまたは復元される可能性があります。**PASS** は公開されていないことを意味します。",
+  "Risk": "**公開スナップショット** は、保存されたデータとメタデータの機密性を損ないます。\n\n攻撃者や第三者は次のことができます:\n- スナップショットを外部アカウントにコピーまたは復元する。\n- スナップショットに含まれる機密データにアクセスする。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/neptune-controls.html#neptune-3",
+    "https://docs.aws.amazon.com/config/latest/developerguide/neptune-cluster-snapshot-public-prohibited.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws neptune modify-db-cluster-snapshot-attribute --db-cluster-snapshot-identifier <snapshot_id> --attribute-name restore --values-to-remove all",
+      "NativeIaC": "",
+      "Terraform": "",
+      "Other": "1. AWS マネジメントコンソールにサインインし、Amazon RDS コンソールを開きます\n2. 左側のナビゲーションで、スナップショット > DB クラスター スナップショットを選択します\n3. スナップショットを選択し、アクション > スナップショットの権限を管理を選択します\n4. 権限ダイアログでパブリック/すべてのアカウントの権限を削除し、保存をクリックします"
+    },
+    "Recommendation": {
+      "Text": "公開共有を避け、スナップショットアクセスを付与する際には **最小特権** を適用します: 特定の AWS アカウントまたはロールとだけ共有します。\n\n**暗号化**を使用し、自動化されたポリシーと定期的な監査を強制し、**職務分離**とタグ付けを適用してスナップショットアクセスを制御および追跡します。",
+      "Url": "https://hub.prowler.com/check/neptune_cluster_public_snapshot"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

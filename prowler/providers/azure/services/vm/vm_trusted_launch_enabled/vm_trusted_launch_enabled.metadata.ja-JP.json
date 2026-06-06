@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "vm_trusted_launch_enabled",
+  "CheckTitle": "Virtual Machines で Trusted Launch が有効化されていることを確認する",
+  "CheckType": [],
+  "ServiceName": "vm",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Microsoft.Compute/virtualMachines",
+  "ResourceGroup": "compute",
+  "Description": "Secure Boot と vTPM を同時に有効化すると、ブート攻撃から VM を保護する強固な基盤となります。例えば、攻撃者がブートローダーを悪意のあるバージョンに置き換えようとした場合、Secure Boot が VM の起動を防止します。仮に攻撃者が Secure Boot を回避して悪意のあるブートローダーを導入できた場合でも、vTPM を使用して侵入を検出し、アラートを発することができます。",
+  "Risk": "Secure Boot と vTPM は連携して、bootkit、rootkit、ファームウェアルートキットを含むさまざまなブート攻撃から VM を保護します。Azure VM で Trusted Launch を有効化しない場合、rootkit やブートレベルマルウェアへの脆弱性が高まり、起動プロセスへの不正変更を検出・防止する能力が低下し、システム整合性とデータセキュリティが損なわれる可能性があります。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/virtual-machines/trusted-launch-existing-vm?tabs=portal",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "1. Virtual Machines に移動します。2. 各 VM で Settings 配下の左ペインから Configuration をクリックします。3. Security Type で「Trusted Launch Virtual Machines」を選択します。4. Enable Secure Boot と Enable vTPM にチェックが入っていることを確認します。5. Apply をクリックします。",
+      "Url": "https://learn.microsoft.com/en-us/azure/virtual-machines/trusted-launch-existing-vm?tabs=portal#enable-trusted-launch-on-existing-vm"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "Secure Boot と vTPM は現在、Azure Generation 1 VM ではサポートされていません。重要: まだ両方が有効化されていない Generation 2 VM で Secure Boot と vTPM を有効化する前に、修復作業前の VM 復元ポイント作成を強く推奨します。"
+}

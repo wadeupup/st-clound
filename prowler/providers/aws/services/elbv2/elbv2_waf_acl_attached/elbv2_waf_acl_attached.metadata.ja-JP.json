@@ -1,0 +1,38 @@
+{
+  "Provider": "aws",
+  "CheckID": "elbv2_waf_acl_attached",
+  "CheckTitle": "Application Load Balancer に WAF Web ACL が関連付けられていること",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "TTPs/Initial Access"
+  ],
+  "ServiceName": "elbv2",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsElbv2LoadBalancer",
+  "ResourceGroup": "network",
+  "Description": "Application Load Balancer に、HTTP(S) リクエストを制御する **AWS WAF Web ACL** が関連付けられているかを評価します。この評価は Web ACL が未設定の ALB を検出し、**WAFv2** またはリージョナル **WAF Classic** の関連付けを認識します。",
+  "Risk": "**WAF Web ACL** がない場合、ALB はフィルタリングされていない L7 トラフィックを受け入れ、以下を許します：\n- **インジェクション**（SQLi/XSS）による機密性・完全性への影響\n- **クレデンシャルスタッフィング** と **ボット悪用**\n- **リソース枯渇** による可用性低下",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/waf/latest/developerguide/web-acl-associating-aws-resource.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws wafv2 associate-web-acl --web-acl-arn <WEB_ACL_ARN> --resource-arn <ALB_ARN>",
+      "NativeIaC": "```yaml\n# CloudFormation: associate an existing WAFv2 Web ACL to an ALB\nResources:\n  <example_resource_name>:\n    Type: AWS::WAFv2::WebACLAssociation\n    Properties:\n      ResourceArn: <example_resource_id>  # CRITICAL: ALB ARN to protect\n      WebACLArn: <example_resource_id>    # CRITICAL: WAFv2 Web ACL ARN to attach\n```",
+      "Other": "1. AWS コンソールで **WAF & Shield** を開きます\n2. **Web ACLs** に移動し、対象リージョンの Web ACL を選択します\n3. **Associated AWS resources** > **Associate resource** をクリックします\n4. 対象の **Application Load Balancer** を選択し、**Associate** をクリックします",
+      "Terraform": "```hcl\n# Associate WAFv2 Web ACL with an ALB\nresource \"aws_wafv2_web_acl_association\" \"<example_resource_name>\" {\n  resource_arn = \"<example_resource_id>\" # CRITICAL: ALB ARN\n  web_acl_arn  = \"<example_resource_id>\" # CRITICAL: WAFv2 Web ACL ARN\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "各 ALB に **WAF Web ACL** を関連付け、**多層防御** を実装してください。マネージドルールとカスタムルール、IP レピュテーション、レート制限を活用して攻撃を遮断します。ポリシーは継続的に調整しログを監視してください。*最小権限* を適用し、必要なパス・メソッド・送信元のみにルールを絞ります。",
+      "Url": "https://hub.prowler.com/check/elbv2_waf_acl_attached"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

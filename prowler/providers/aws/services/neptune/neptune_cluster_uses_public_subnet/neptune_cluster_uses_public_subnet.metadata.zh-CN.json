@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "neptune_cluster_uses_public_subnet",
+  "CheckTitle": "Neptune 集群未使用公共子网",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践/网络可达性",
+    "TTPs/初始访问/未经授权的访问"
+  ],
+  "ServiceName": "neptune",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsRdsDbCluster",
+  "ResourceGroup": "database",
+  "Description": "Neptune 集群与一个或多个**公共子网**关联。",
+  "Risk": "在**公共子网**中的 Neptune 集群增加了在 CIA 三元组中的暴露：\n\n- **机密性**：直接访问使凭证攻击和数据泄露成为可能\n- **完整性**：攻击者可能会修改或注入图数据\n- **可用性**：公共可达性允许 DDoS 或远程利用，导致停机",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/neptune/latest/userguide/get-started-vpc.html",
+    "https://docs.aws.amazon.com/neptune/latest/userguide/feature-overview-endpoints.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\nResources:\n  NeptuneSubnetGroup:\n    Type: AWS::Neptune::DBSubnetGroup\n    Properties:\n      DBSubnetGroupDescription: \"Private subnets for Neptune\"\n      SubnetIds:  # 仅使用私有子网 ID 以防止公共访问\n        - <PRIVATE_SUBNET_ID_1>\n        - <PRIVATE_SUBNET_ID_2>\n\n  NeptuneDBCluster:\n    Type: AWS::Neptune::DBCluster\n    Properties:\n      DBSubnetGroupName: !Ref NeptuneSubnetGroup  # 将集群与私有子网组关联\n```",
+      "Terraform": "```hcl\nresource \"aws_neptune_subnet_group\" \"neptune\" {\n  name       = \"neptune-private-subnets\"\n  subnet_ids = [\"<PRIVATE_SUBNET_ID_1>\", \"<PRIVATE_SUBNET_ID_2>\"]  # 仅使用私有子网 ID 以防止公共访问\n}\n\nresource \"aws_neptune_cluster\" \"example_cluster\" {\n  neptune_subnet_group_name = aws_neptune_subnet_group.neptune.name  # 将集群与私有子网组关联\n}\n```",
+      "Other": "1. 打开 AWS 控制台并转到 Amazon Neptune > 子网组\n2. 点击创建 DB 子网组\n3. 输入名称和描述，选择 VPC，并仅添加私有子网 ID（至少两个）\n4. 点击创建\n5. 转到 Amazon Neptune > DB 集群 > 选择集群 > 操作 > 修改\n6. 将 DB 子网组设置为新创建的子网组并保存（如有需要立即应用）\n7. 验证集群子网组现在仅列出私有子网"
+    },
+    "Recommendation": {
+      "Text": "将 Neptune 集群放置在**私有子网**中，并移除公共路由能力以减少攻击面。\n\n- 应用**最小权限**和网络分段\n- 使用范围网络控制和最小信任路径限制入站访问\n- 强制执行日志记录、监控和私有连接以进行管理和应用访问",
+      "Url": "https://hub.prowler.com/check/neptune_cluster_uses_public_subnet"
+    }
+  },
+  "Categories": [
+    "internet-exposed",
+    "trust-boundaries"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

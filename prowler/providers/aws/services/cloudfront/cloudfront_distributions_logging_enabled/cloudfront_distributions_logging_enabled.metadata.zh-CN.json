@@ -1,0 +1,44 @@
+{
+  "Provider": "aws",
+  "CheckID": "cloudfront_distributions_logging_enabled",
+  "CheckTitle": "CloudFront 分配已启用日志记录",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices"
+  ],
+  "ServiceName": "cloudfront",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsCloudFrontDistribution",
+  "ResourceGroup": "network",
+  "Description": "**CloudFront 分配**使用**标准访问日志**或附加的**实时日志配置**记录查看器请求。\n\n此发现评估是否配置了日志记录，以便为每个分配捕获请求元数据。",
+  "Risk": "缺少**CloudFront 日志**会阻碍对边缘请求的监控，妨碍检测机器人滥用、凭据填充、源探测和缓存绕过尝试。\n\n这会延迟事件响应并削弱取证证据，影响**机密性**、**完整性**和**可用性**。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/AccessLogs.html",
+    "https://repost.aws/knowledge-center/cloudfront-logging-requests",
+    "https://aws.amazon.com/awstv/watch/e895e7811ac/",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/CloudFront/enable-real-time-logging.html",
+    "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/real-time-logs.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws cloudfront get-distribution-config --id <DISTRIBUTION_ID> --output json > current-config.json && echo 'Manually edit current-config.json to add Logging.Bucket: <example_bucket>.s3.amazonaws.com', then run:' && echo 'aws cloudfront update-distribution --id <DISTRIBUTION_ID> --distribution-config file://current-config.json --if-match $(aws cloudfront get-distribution-config --id <DISTRIBUTION_ID> --query \"ETag\" --output text)'",
+      "NativeIaC": "```yaml\n# CloudFormation：启用 CloudFront 标准访问日志\nResources:\n  <example_resource_name>:\n    Type: AWS::CloudFront::Distribution\n    Properties:\n      DistributionConfig:\n        Enabled: true\n        Origins:\n          - Id: origin1\n            DomainName: <example_origin_domain>\n            S3OriginConfig: {}\n        DefaultCacheBehavior:\n          TargetOriginId: origin1\n          ViewerProtocolPolicy: allow-all\n        Logging:\n          Bucket: <example_bucket>.s3.amazonaws.com  # 关键：为此分配启用到 S3 的标准访问日志\n          # 存在带有 Bucket 的 Logging 会启用访问日志\n```",
+      "Other": "1. 在 AWS 控制台中，转到 CloudFront 并选择您的分配\n2. 打开常规选项卡并点击编辑\n3. 在标准日志记录中，设置为开启\n4. 选择接收日志的 S3 存储桶\n5. 确保 S3 存储桶的对象所有权设置为启用 ACL（存储桶所有者首选/对象写入者）\n6. 保存更改",
+      "Terraform": "```hcl\n# 将此块添加到您现有的 CloudFront 分配以启用访问日志\nresource \"aws_cloudfront_distribution\" \"<example_resource_name>\" {\n  # ... 现有必需配置 ...\n  logging_config {\n    bucket = \"<example_bucket>.s3.amazonaws.com\"  # 关键：启用到 S3 的标准访问日志\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "为所有分配启用**标准访问日志**或**实时日志**。\n\n对日志存储应用**最小权限**，强制执行保留和不可变性，并使用警报集中摄取。\n\n使用**纵深防御**：与 WAF 指标关联，在需要时采样实时日志，并审计新分配以进行日志记录。",
+      "Url": "https://hub.prowler.com/check/cloudfront_distributions_logging_enabled"
+    }
+  },
+  "Categories": [
+    "logging"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "Logging and Monitoring"
+}
+

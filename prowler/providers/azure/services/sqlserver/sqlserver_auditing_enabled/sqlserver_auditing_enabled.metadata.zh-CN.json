@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "sqlserver_auditing_enabled",
+  "CheckTitle": "确保 SQL 服务器已配置审计策略",
+  "CheckType": [],
+  "ServiceName": "sqlserver",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "SQLServer",
+  "ResourceGroup": "database",
+  "Description": "确保已配置审计策略",
+  "Risk": "审计策略用于存储与 SQL 服务器相关的日志（例如成功/失败的登录尝试）。这些日志可用于检测异常，或在发现安全事件时进行调查。",
+  "RelatedUrl": "https://docs.microsoft.com/en-us/azure/sql-database/sql-database-auditing",
+  "Remediation": {
+    "Code": {
+      "CLI": "Set-AzureRmSqlServerAuditingPolicy -ResourceGroupName <RESOURCE_GROUP_NAME> -ServerName <SERVER_NAME> -AuditType <AUDIT_TYPE> -StorageAccountName <STORAGE_ACCOUNT_NAME>",
+      "NativeIaC": "",
+      "Other": "https://docs.prowler.com/checks/azure/azure-logging-policies/bc_azr_logging_2",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-logging-policies/bc_azr_logging_2#terraform"
+    },
+    "Recommendation": {
+      "Text": "为 SQL 服务器创建审计策略",
+      "Url": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/Sql/auditing.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

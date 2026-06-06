@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "cloudfront_distributions_custom_ssl_certificate",
+  "CheckTitle": "CloudFront 分配使用自定义 SSL/TLS 证书",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices"
+  ],
+  "ServiceName": "cloudfront",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsCloudFrontDistribution",
+  "ResourceGroup": "network",
+  "Description": "CloudFront 分配配置了**自定义 SSL/TLS 证书**，而不是用于查看器连接的默认 `*.cloudfront.net` 证书。",
+  "Risk": "使用默认证书会阻止在您自己的主机名上使用 HTTPS，破坏主机名验证。客户端可能面临错误或避免使用 TLS，影响**身份验证**和**可用性**。对 TLS 配置和域绑定安全标头的控制减少，削弱**机密性**和用户信任。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://trendmicro.com/cloudoneconformity/knowledge-base/aws/CloudFront/cloudfront-distro-custom-tls.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/cloudfront-controls.html#cloudfront-7",
+    "https://support.icompaas.com/support/solutions/articles/62000233491-ensure-cloudfront-distributions-use-custom-ssl-tls-certificates",
+    "https://reintech.io/blog/configure-https-ssl-certificates-cloudfront-distributions"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws cloudfront get-distribution-config --id <DISTRIBUTION_ID> --output json > current-config.json && echo 'Manually edit current-config.json to add Aliases and ViewerCertificate fields, then run:' && echo 'aws cloudfront update-distribution --id <DISTRIBUTION_ID> --distribution-config file://current-config.json --if-match $(aws cloudfront get-distribution-config --id <DISTRIBUTION_ID> --query \"ETag\" --output text)'",
+      "NativeIaC": "```yaml\nResources:\n  <example_resource_name>:\n    Type: AWS::CloudFront::Distribution\n    Properties:\n      DistributionConfig:\n        Enabled: true\n        Origins:\n          - Id: origin1\n            DomainName: <example_origin_domain>\n            S3OriginConfig: {}\n        DefaultCacheBehavior:\n          TargetOriginId: origin1\n          ViewerProtocolPolicy: redirect-to-https\n          ForwardedValues:\n            QueryString: false\n        Aliases:\n          - <example_domain>  # 关键：添加证书覆盖的备用域名（CNAME）\n        ViewerCertificate:\n          AcmCertificateArn: <example_certificate_arn>  # 关键：附加自定义 ACM 证书（必须在 us-east-1 中）\n          SslSupportMethod: sni-only  # 关键：使用 ACM 证书时必需\n```",
+      "Other": "1. 打开 CloudFront 控制台并选择您的分配\n2. 转到设置/常规选项卡并点击编辑\n3. 在备用域名（CNAME）中，添加 <example_domain>\n4. 在 SSL 证书中，选择自定义 SSL 证书并选择您的 ACM 证书（在 us-east-1 中颁发并覆盖 <example_domain>）\n5. 点击保存/是，编辑并等待分配部署",
+      "Terraform": "```hcl\nresource \"aws_cloudfront_distribution\" \"<example_resource_name>\" {\n  enabled = true\n\n  origin {\n    domain_name = \"<example_origin_domain>\"\n    origin_id   = \"origin1\"\n    s3_origin_config {}\n  }\n\n  default_cache_behavior {\n    target_origin_id       = \"origin1\"\n    viewer_protocol_policy = \"redirect-to-https\"\n    forwarded_values { query_string = false }\n  }\n\n  aliases = [\"<example_domain>\"]  # 关键：添加证书覆盖的 CNAME\n\n  viewer_certificate {\n    acm_certificate_arn = \"<example_certificate_arn>\"  # 关键：自定义 ACM 证书（在 us-east-1 中）\n    ssl_support_method  = \"sni-only\"                    # 关键：使用 ACM 证书时必需\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "- 使用覆盖您域名的**自定义 SSL/TLS 证书**并配置别名。\n- 强制执行现代 TLS 策略、**SNI**和**HSTS**；禁用旧版协议。\n- 对证书生命周期应用**最小权限**并轮换/监控密钥。",
+      "Url": "https://hub.prowler.com/check/cloudfront_distributions_custom_ssl_certificate"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

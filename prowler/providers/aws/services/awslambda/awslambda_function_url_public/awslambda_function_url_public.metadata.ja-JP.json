@@ -1,0 +1,44 @@
+{
+  "Provider": "aws",
+  "CheckID": "awslambda_function_url_public",
+  "CheckTitle": "Lambda関数URLがパブリックにアクセス可能でない",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices/Network Reachability",
+    "Effects/Data Exposure"
+  ],
+  "ServiceName": "awslambda",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsLambdaFunction",
+  "ResourceGroup": "serverless",
+  "Description": "**AWS Lambda関数URL**は、`AuthType`が**AWS IAM認証**を強制するか、**パブリック呼び出し**を許可するかを判断するために評価されます。\n\n関数URLを持つ関数に適用され、リクエストがIAMプリンシパルによって認証および承認される必要がある場合に強調表示されます。",
+  "Risk": "認証されていない関数URLにより、誰でもコードを呼び出すことができます：\n- 機密性：データ漏洩\n- 整合性：過剰な権限を持つロジックによる意図しない変更\n- 可用性：高リクエストレートによるDoS/ウォレット枯渇\n\n攻撃者はスクリプト呼び出し、データ漏洩、関数の権限を使用した横方向の移動を行うことができます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/Lambda/iam-auth-function-url.html",
+    "https://www.roastdev.com/post/aws-lambda-url-invocations-with-iam-authentication-and-throttling-limits",
+    "https://docs.aws.amazon.com/secretsmanager/latest/userguide/lambda-functions.html",
+    "https://dev.to/aws-builders/hands-on-aws-lambda-function-url-with-aws-iam-authentication-type-180g",
+    "https://www.rahulpnath.com/blog/how-to-secure-and-authenticate-lambda-function-urls/"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws lambda update-function-url-config --function-name <FUNCTION_NAME> --auth-type AWS_IAM",
+      "NativeIaC": "```yaml\n# CloudFormation：Lambda関数URLをIAM認証を要求するように設定\nResources:\n  FunctionUrl:\n    Type: AWS::Lambda::Url\n    Properties:\n      TargetFunctionArn: arn:aws:lambda:<region>:<account-id>:function/<example_resource_name>\n      AuthType: AWS_IAM  # 重要：IAM認証を要求し、パブリックアクセスを防止\n```",
+      "Other": "1. AWSコンソールで、Lambda > 関数に移動し、<example_resource_name>を開く\n2. 設定 > 関数URL > 編集を選択\n3. 認証タイプをAWS_IAMに設定\n4. 保存をクリック",
+      "Terraform": "```hcl\n# Lambda関数URLをIAM認証を要求するように設定\nresource \"aws_lambda_function_url\" \"example\" {\n  function_name      = \"<example_resource_name>\"\n  authorization_type = \"AWS_IAM\"  # 重要：IAM認証を要求することでパブリックアクセスをブロック\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "関数URLで`AWS_IAM`を強制し、**最小権限**を適用：\n- `lambda:InvokeFunctionUrl`を必要なプリンシパルのみに付与\n- `*`プリンシパルや広範な条件を避ける\n- CORSを信頼できるオリジンとメソッドに制限\n- 悪用を抑制するために予約済み同時実行数を設定\n\nインターネット使用の場合は、**多層防御**（WAF/CDNまたはプライベートアクセス）を検討してください。",
+      "Url": "https://hub.prowler.com/check/awslambda_function_url_public"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

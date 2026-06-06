@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "sagemaker_notebook_instance_encryption_enabled",
+  "CheckTitle": "SageMaker ノートブックインスタンスは KMS キーで暗号化されています",
+  "CheckType": [
+    "ソフトウェアと構成チェック/AWSセキュリティのベストプラクティス",
+    "ソフトウェアと設定のチェック/業界および規制基準/AWS 基盤セキュリティのベストプラクティス",
+    "影響／データ露出"
+  ],
+  "ServiceName": "sagemaker",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsSageMakerNotebookInstance",
+  "ResourceGroup": "ai_ml",
+  "Description": "**Amazon SageMaker ノートブックインスタンス** は、AWS KMS キーを使用した **保存時の暗号化** について評価されます。この検出結果は、ノートブックの ML ボリューム暗号化に対して `KmsKeyId` が設定されているかどうかを反映します。",
+  "Risk": "顧客管理のKMSキーを使用した**保存時暗号化**がなければ、ノートブックのEBSボリュームおよびスナップショット上のデータは、ストレージへのアクセス、コピーされたバックアップ、またはホストの侵害を通じて露出する可能性があり、**機密性**が低下し、**キーのローテーション**および**失効**の制御が制限されます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/sagemaker/latest/dg/key-management.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/SageMaker/notebook-data-encrypted.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation: KMS暗号化付きSageMakerノートブック\nResources:\n  <example_resource_name>:\n    Type: AWS::SageMaker::NotebookInstance\n    Properties:\n      InstanceType: ml.t3.medium\n      RoleArn: <example_resource_arn>\n      KmsKeyId: <example_resource_id>  # 重要: 指定されたKMSキーでノートブックのEBSボリュームを暗号化します\n```",
+      "Other": "1. AWS コンソール > Amazon SageMaker > ノートブックインスタンス を開く\n2. 問題のあるノートブックインスタンスを選択し、[停止] をクリックする\n3. [ノートブックインスタンスの作成] をクリックする\n4. 名前を入力し、インスタンスタイプと IAM ロールを選択する\n5. [暗号化キー] で、KMS キーを選択する\n6. インスタンスを作成し、起動することを確認する\n7. 必要に応じてノートブック/データを移行する（例: S3 経由）\n8. 古い暗号化されていないノートブックインスタンスを削除する",
+      "Terraform": "```hcl\n# KMS暗号化付きSageMakerノートブック\nresource \"aws_sagemaker_notebook_instance\" \"<example_resource_name>\" {\n  name          = \"<example_resource_name>\"\n  role_arn      = \"<example_resource_arn>\"\n  instance_type = \"ml.t3.medium\"\n  kms_key_id    = \"<example_resource_id>\"  # 重要: このKMSキーを使用したEBS暗号化を有効にする\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "ノートブックMLボリュームには、`KmsKeyId` を設定して **顧客管理 KMS キー** を使用し、関連する S3 の入力/出力にも KMS を適用してください。キーの使用には **最小権限** を徹底し、**ローテーション** を有効にし、保存データを保護するためにキーアクセスを **多層防御** に沿って整合させてください。",
+      "Url": "https://hub.prowler.com/check/sagemaker_notebook_instance_encryption_enabled"
+    }
+  },
+  "Categories": [
+    "encryption",
+    "gen-ai"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

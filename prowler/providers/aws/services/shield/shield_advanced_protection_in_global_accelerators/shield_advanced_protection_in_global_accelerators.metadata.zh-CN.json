@@ -1,0 +1,40 @@
+{
+  "Provider": "aws",
+  "CheckID": "shield_advanced_protection_in_global_accelerators",
+  "CheckTitle": "Global Accelerator 加速器受 AWS Shield Advanced 保护",
+  "CheckType": [
+    "软件和配置检查/AWS安全最佳实践",
+    "影响/拒绝服务"
+  ],
+  "ServiceName": "shield",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "security",
+  "Description": "**AWS Global Accelerator** 加速器会被评估是否已作为 `protected resources` 注册到 **Shield Advanced** 中，这表明是否已为每个加速器配置增强的 DDoS 防护。",
+  "Risk": "如果没有 **Shield Advanced**，Global Accelerators 更容易受到流量型和协议型 **DDoS** 攻击，这些攻击会耗尽容量，导致 **可用性** 丧失、**延迟** 增加以及故障转移中断。有限的可见性和缺乏 SRT 支持会延长事件持续时间，并可能因恶意流量引发意外的 **成本** 激增。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/waf/latest/developerguide/what-is-aws-waf.html",
+    "https://docs.aws.amazon.com/waf/latest/developerguide/configure-new-protection.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws shield create-protection --name <example_resource_name> --resource-arn <example_resource_id>",
+      "NativeIaC": "```yaml\n# CloudFormation：为 Global Accelerator 加速器添加 Shield Advanced 保护\nResources:\n  ShieldProtection:\n    Type: AWS::Shield::Protection\n    Properties:\n      Name: <example_resource_name>\n      ResourceArn: <example_resource_id>  # 关键：要保护的 Global Accelerator 加速器的 ARN\n```",
+      "Other": "1. 在 AWS 控制台中，打开 AWS WAF & Shield\n2. 在 AWS Shield 下，选择 Protected resources\n3. 点击 Add resources to protect\n4. 将 Scope 设置为 Global，并选择 Global Accelerator 资源类型\n5. 选择目标加速器，然后点击 Protect with Shield Advanced",
+      "Terraform": "```hcl\n# 为 Global Accelerator 加速器启用 Shield Advanced 保护\nresource \"aws_shield_protection\" \"protection\" {\n  name         = \"<example_resource_name>\"\n  resource_arn = \"<example_resource_id>\"  # 关键：要保护的 Global Accelerator 加速器的 ARN\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "将每个 Global Accelerator 添加为 **Shield Advanced** 中的 `protected resource`。在适用情况下，结合 AWS WAF 实施**纵深防御**，启用主动监控和告警，并使用 **Firewall Manager** 在各个账户中强制执行防护覆盖。遵循**最小权限**原则，限制可修改防护措施的人员。",
+      "Url": "https://hub.prowler.com/check/shield_advanced_protection_in_global_accelerators"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

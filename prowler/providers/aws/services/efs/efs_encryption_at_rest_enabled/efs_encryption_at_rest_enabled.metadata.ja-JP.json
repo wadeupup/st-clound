@@ -1,0 +1,48 @@
+{
+  "Provider": "aws",
+  "CheckID": "efs_encryption_at_rest_enabled",
+  "CheckTitle": "EFS ファイルシステムで保存時の暗号化が有効になっている",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/NIST 800-53 Controls (USA)",
+    "Software and Configuration Checks/Industry and Regulatory Standards/NIST CSF Controls (USA)",
+    "Software and Configuration Checks/Industry and Regulatory Standards/PCI-DSS",
+    "Software and Configuration Checks/Industry and Regulatory Standards/HIPAA Controls (USA)",
+    "Software and Configuration Checks/Industry and Regulatory Standards/ISO 27001 Controls",
+    "Effects/Data Exposure"
+  ],
+  "ServiceName": "efs",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsEfsFileSystem",
+  "ResourceGroup": "storage",
+  "Description": "**Amazon EFS ファイルシステム** は、AWS KMS を使用してサービスに保存されているファイルデータとメタデータを保護するために **保存時の暗号化** が有効になっています",
+  "Risk": "保存時の暗号化がないと、EFS の内容をストレージメディア、バックアップ、または侵害されたホストから読み取ることができ、**機密性** を損ない、オフラインでの窃取を可能にします。特権の侵害により、秘密のデータ収集や操作も可能になり、ファイルの **整合性** が脅かされます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://repost.aws/knowledge-center/efs-turn-on-encryption-at-rest",
+    "https://docs.aws.amazon.com/efs/latest/ug/EFSKMS.html",
+    "https://docs.aws.amazon.com/efs/latest/ug/encryption-at-rest.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation: Create an EFS file system with encryption at rest enabled\nResources:\n  <example_resource_name>:\n    Type: AWS::EFS::FileSystem\n    Properties:\n      Encrypted: true  # Critical: enables encryption at rest so the check passes\n```",
+      "Other": "1. AWS コンソールで、Amazon EFS に移動します\n2. ファイルシステムを作成をクリックします\n3. 暗号化を有効にするをチェックします（デフォルトキーを残すか、必要に応じて KMS キーを選択します）\n4. 作成をクリックします\n5. データを暗号化されていないファイルシステムから新しい暗号化されたファイルシステムに移行します\n6. 失敗している検出をクリアするために暗号化されていないファイルシステムを削除します",
+      "Terraform": "```hcl\n# Terraform: Create an EFS file system with encryption at rest enabled\nresource \"aws_efs_file_system\" \"<example_resource_name>\" {\n  encrypted = true  # Critical: enables encryption at rest so the check passes\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "すべての EFS ファイルシステムに対して **保存時の暗号化** を有効にし、制御、ローテーション、監査のために **顧客管理の KMS キー** を優先します。キーポリシーに **最小権限** を適用し、キー管理の職務を分離します。*既存の暗号化されていないデータについては*、新しい暗号化されたファイルシステムに移行します。作成ポリシー（IAM/SCP）を強制して、暗号化されていないデプロイメントを防ぎます。",
+      "Url": "https://hub.prowler.com/check/efs_encryption_at_rest_enabled"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

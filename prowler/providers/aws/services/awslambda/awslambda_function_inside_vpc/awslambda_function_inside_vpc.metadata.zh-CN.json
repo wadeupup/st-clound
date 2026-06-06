@@ -1,0 +1,45 @@
+{
+  "Provider": "aws",
+  "CheckID": "awslambda_function_inside_vpc",
+  "CheckTitle": "Lambda 函数部署在 VPC 内",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices/Network Reachability",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices"
+  ],
+  "ServiceName": "awslambda",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "low",
+  "ResourceType": "AwsLambdaFunction",
+  "ResourceGroup": "serverless",
+  "Description": "**AWS Lambda 函数**使用**VPC 网络**，配置了指定的子网和安全组，而不是默认的 Lambda 托管网络。\n\n存在 VPC 关联（`vpc_id`）表示与 VPC 资源的私有连接。",
+  "Risk": "如果没有 VPC 连接，函数将缺乏网络隔离和细粒度的出口控制，削弱**机密性**和**完整性**。\n\n流量必须使用公共端点，增加了通过无限制出站进行数据泄露和 SSRF 的风险。如果需要私有数据库，缺少 VPC 访问可能会影响**可用性**。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/lambda/latest/dg/configuration-vpc.html",
+    "https://repost.aws/pt/knowledge-center/lambda-dedicated-vpc",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/Lambda/function-in-vpc.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/lambda-controls.html#lambda-3",
+    "https://stackoverflow.com/questions/55074793/how-can-we-force-aws-lamda-to-run-securely-in-a-vpc",
+    "https://www.techtarget.com/searchCloudComputing/answer/How-do-I-configure-AWS-Lambda-functions-in-a-VPC/"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws lambda update-function-configuration --function-name <example_resource_name> --vpc-config SubnetIds=<example_subnet_id>,SecurityGroupIds=<example_security_group_id>",
+      "NativeIaC": "```yaml\nAWSTemplateFormatVersion: '2010-09-09'\nResources:\n  LambdaFunction:\n    Type: AWS::Lambda::Function\n    Properties:\n      FunctionName: <example_resource_name>\n      Role: <example_role_arn>\n      Handler: index.handler\n      Runtime: python3.12\n      Code:\n        S3Bucket: <example_code_bucket>\n        S3Key: <example_code_key>\n      # 关键：通过指定至少一个子网和一个安全组将函数附加到 VPC\n      # 这将设置 VpcConfig，为函数提供 VPC ID 并使检查通过\n      VpcConfig:\n        SubnetIds:\n          - <example_subnet_id>\n        SecurityGroupIds:\n          - <example_security_group_id>\n```",
+      "Other": "1. 在 AWS Lambda 控制台中，打开您的函数\n2. 转到配置 > VPC 并点击编辑\n3. 选择目标 VPC\n4. 选择至少一个子网和一个安全组\n5. 点击保存",
+      "Terraform": "```hcl\nresource \"aws_lambda_function\" \"example\" {\n  function_name = \"<example_resource_name>\"\n  role          = \"<example_role_arn>\"\n  handler       = \"index.handler\"\n  runtime       = \"python3.12\"\n  filename      = \"<example_package.zip>\"\n\n  # 关键：VPC 配置将函数附加到 VPC，提供 VPC ID 以便检查通过\n  vpc_config {\n    subnet_ids         = [\"<example_subnet_id>\"]      # 至少一个子网\n    security_group_ids = [\"<example_security_group_id>\"]\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "将函数附加到具有私有子网和限制性安全组的 VPC，以强制执行**最小权限**和出口控制。\n- 优先使用**VPC 端点**访问 AWS 服务\n- 仅在必要时使用 NAT\n- 跨可用区分布子网以提高弹性\n- 使用需要 `VpcIds`、`SubnetIds` 和 `SecurityGroupIds` 的 IAM 条件进行治理。",
+      "Url": "https://hub.prowler.com/check/awslambda_function_inside_vpc"
+    }
+  },
+  "Categories": [
+    "trust-boundaries"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

@@ -1,0 +1,45 @@
+{
+  "Provider": "aws",
+  "CheckID": "vpc_flow_logs_enabled",
+  "CheckTitle": "VPC フローログは有効化されています",
+  "CheckType": [
+    "ソフトウェアと構成チェック/AWSセキュリティのベストプラクティス",
+    "ソフトウェアと設定のチェック/業界および規制基準/AWS 基盤セキュリティのベストプラクティス",
+    "ソフトウェアおよび設定チェック/業界および規制の標準/CIS AWS Foundations Benchmark",
+    "ソフトウェアおよび設定チェック／業界および規制基準／PCI-DSS",
+    "ソフトウェアおよび構成チェック/業界および規制基準/NIST 800-53 管理策（米国）",
+    "ソフトウェアおよび構成のチェック/業界および規制基準/NIST CSF コントロール（米国）"
+  ],
+  "ServiceName": "vpc",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsEc2Vpc",
+  "ResourceGroup": "network",
+  "Description": "**AWS VPC** には、ネットワークインターフェイスの IP トラフィックを記録し、そのレコードをログの送信先に配信するための **Flow Logs** が設定されています。\n\n有効なフローログ設定がない VPC は強調表示されます。",
+  "Risk": "フローログがないと、ネットワーク活動は不透明になり、悪意のあるトラフィックの検知と調査が妨げられます。攻撃者は気付かれずに探索、情報持ち出し、または横方向に移動でき、**機密性** と **完全性** に影響を及ぼします。さらに、障害や設定ミスの診断が難しくなり、**可用性** が低下します。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/flow-logs.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/VPC/vpc-flow-logs-enabled.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws ec2 create-flow-logs --resource-type VPC --resource-ids <VPC_ID> --traffic-type ALL --log-destination-type s3 --log-destination arn:aws:s3:::<S3_BUCKET_NAME>",
+      "NativeIaC": "```yaml\n# CloudFormation: 既存のVPCに対してVPCフローログをS3に有効化する\nResources:\n  FlowLog:\n    Type: AWS::EC2::FlowLog\n    Properties:\n      ResourceId: <example_resource_id>         # 重大: VPC ID を対象にする\n      ResourceType: VPC                         # 重要: VPC レベルでフローログを有効にする\n      TrafficType: ALL                          # 重大: すべてのトラフィックをログに記録する\n      LogDestinationType: s3                    # 重要: ログをS3に送信します（IAMロールは不要）\n      LogDestination: arn:aws:s3:::<example_resource_name>  # 重大: S3 バケット ARN\n```",
+      "Other": "1. AWS コンソールで、VPC > Your VPCs に移動します\n2. 対象の VPC を選択します\n3. Flow logs タブを開き、Create flow log をクリックします\n4. Traffic type を All に設定します\n5. Destination を S3 に設定し、Bucket ARN: arn:aws:s3:::<example_resource_name> を入力します\n6. Create flow log をクリックします",
+      "Terraform": "```hcl\n# 既存のVPCに対してVPCフローログをS3に有効化する\nresource \"aws_flow_log\" \"vpc\" {\n  vpc_id               = \"<example_resource_id>\"                 # 重要: フローログを有効にするためにVPCを対象にしてください\n  traffic_type         = \"ALL\"                                   # 重大: すべてのトラフィックをログに記録する\n  log_destination_type = \"s3\"                                    # 重要: ログをS3に送信します（IAMロールは不要）\n  log_destination      = \"arn:aws:s3:::<example_resource_name>\"  # 重大: S3 バケット ARN\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "すべてのVPCで**VPC Flow Logs**を有効にして、ベースラインのテレメトリを提供します。\n少なくとも`REJECT`を記録し、機密性の高いネットワークでは`ALL`を優先して記録します。ログは、保持期間を設定した一元化されアクセス制御された宛先に送信します。書き込み/読み取り権限には**最小権限**を適用し、**多層防御**のために監視と統合します。",
+      "Url": "https://hub.prowler.com/check/vpc_flow_logs_enabled"
+    }
+  },
+  "Categories": [
+    "logging",
+    "forensics-ready"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

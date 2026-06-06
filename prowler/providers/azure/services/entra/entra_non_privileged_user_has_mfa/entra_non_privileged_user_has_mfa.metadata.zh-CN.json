@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "entra_non_privileged_user_has_mfa",
+  "CheckTitle": "确保所有非特权用户的“多重身份验证状态”为“已启用”",
+  "CheckType": [],
+  "ServiceName": "entra",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "#microsoft.graph.users",
+  "ResourceGroup": "IAM",
+  "Description": "为所有非特权用户启用多重身份验证。",
+  "Risk": "多重身份验证要求个人在获得访问权限前至少提供两种不同形式的身份验证。多重身份验证可进一步确保尝试访问的个人确为其声称身份。使用多重身份验证后，攻击者需要至少攻破两种不同认证机制，从而提高攻击难度并降低风险。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/entra/identity/authentication/concept-mfa-howitworks",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/ActiveDirectory/multi-factor-authentication-for-all-non-privileged-users.html#",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "为 Microsoft Entra ID 中的用户启用可用的多重身份验证方法之一。",
+      "Url": "https://learn.microsoft.com/en-us/entra/identity/authentication/tutorial-enable-azure-mfa"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "用户在获得任何访问权限前需要两种身份验证形式。同时，这也会增加双重认证管理方面的运维开销。"
+}

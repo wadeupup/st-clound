@@ -1,0 +1,33 @@
+{
+  "Provider": "aws",
+  "CheckID": "s3_bucket_acl_prohibited",
+  "CheckTitle": "S3 バケットで ACL が有効になっているか確認する",
+  "CheckType": [
+    "ログ記録と監視"
+  ],
+  "ServiceName": "s3",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:s3:::bucket_name",
+  "Severity": "medium",
+  "ResourceType": "AwsS3Bucket",
+  "ResourceGroup": "storage",
+  "Description": "S3 バケットで ACL が有効になっているか確認する",
+  "Risk": "S3 ACL は、IAM より前から存在する従来のアクセス制御メカニズムです。現在は、IAM とバケットポリシーが推奨される方法です。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "aws s3api put-bucket-ownership-controls --bucket <bucket-name> --ownership-controls Rules=[{ObjectOwnership=BucketOwnerEnforced}]",
+      "NativeIaC": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-ownershipcontrols.html",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "S3 ACLが無効化されていること（BucketOwnerEnforced）を確認してください。アクセス管理にはIAMポリシーとバケットポリシーを使用してください。",
+      "Url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/about-object-ownership.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

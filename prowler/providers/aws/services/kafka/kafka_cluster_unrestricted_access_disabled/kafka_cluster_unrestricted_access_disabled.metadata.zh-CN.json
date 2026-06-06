@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "kafka_cluster_unrestricted_access_disabled",
+  "CheckTitle": "Kafka 集群需要身份验证",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践",
+    "软件和配置检查/行业和法规标准/AWS 基础安全最佳实践",
+    "TTPs/初始访问/未经授权的访问",
+    "影响/数据暴露"
+  ],
+  "ServiceName": "kafka",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "critical",
+  "ResourceType": "AwsMskCluster",
+  "ResourceGroup": "messaging",
+  "Description": "Amazon MSK 集群会被评估是否允许**未经身份验证的客户端访问**。无服务器集群本质上需要身份验证；配置集群会被检查是否允许**不受限制的连接**而不是经过身份验证的客户端。",
+  "Risk": "允许**未经身份验证的访问**会让任何人连接并：\n- 读取敏感主题（机密性）\n- 发布或更改数据（完整性）\n- 过载代理和消费者（可用性）\n\n这会导致消息泄露、流污染和可信数据管道的滥用。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/msk/latest/developerguide/msk-configure-security.html",
+    "https://docs.aws.amazon.com/msk/latest/developerguide/security.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/MSK/unrestricted-access-to-brokers.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws kafka update-security --cluster-arn <example_resource_arn> --current-version <example_current_version> --client-authentication 'Unauthenticated={Enabled=false}'",
+      "NativeIaC": "```yaml\n# CloudFormation：禁用 MSK 的未经身份验证的客户端访问\nResources:\n  <example_resource_name>:\n    Type: AWS::MSK::Cluster\n    Properties:\n      ClusterName: <example_resource_name>\n      KafkaVersion: <example_kafka_version>\n      NumberOfBrokerNodes: 2\n      BrokerNodeGroupInfo:\n        InstanceType: <example_instance_type>\n        ClientSubnets:\n          - <subnet_id_1>\n          - <subnet_id_2>\n        StorageInfo:\n          EbsStorageInfo:\n            VolumeSize: 1000\n      ClientAuthentication:\n        Unauthenticated:\n          Enabled: false  # 关键：禁用未经身份验证的客户端访问\n```",
+      "Other": "1. 打开 AWS 控制台并进入 Amazon MSK\n2. 选择您的集群并打开安全选项卡\n3. 点击客户端身份验证下的编辑\n4. 关闭/清除未经身份验证的访问\n5. 保存更改以应用更新",
+      "Terraform": "```hcl\n# Terraform：禁用 MSK 的未经身份验证的客户端访问\nresource \"aws_msk_cluster\" \"<example_resource_name>\" {\n  cluster_name           = \"<example_resource_name>\"\n  kafka_version          = \"<example_kafka_version>\"\n  number_of_broker_nodes = 2\n\n  broker_node_group_info {\n    instance_type   = \"<example_instance_type>\"\n    client_subnets  = [\"<subnet_id_1>\", \"<subnet_id_2>\"]\n    ebs_volume_size = 1000\n  }\n\n  client_authentication {\n    unauthenticated = false  # 关键：禁用未经身份验证的客户端访问\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "禁用**未经身份验证的访问**并要求**强客户端身份验证**（mTLS 或 IAM/SASL）。\n- 使用范围 ACL 强制执行**最小权限**\n- 通过私有连接和严格的安全组限制网络路径\n- 在传输中加密，监控访问，并定期轮换凭证",
+      "Url": "https://hub.prowler.com/check/kafka_cluster_unrestricted_access_disabled"
+    }
+  },
+  "Categories": [
+    "identity-access"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

@@ -1,0 +1,32 @@
+{
+  "Provider": "aws",
+  "CheckID": "ec2_client_vpn_endpoint_connection_logging_enabled",
+  "CheckTitle": "EC2 Client VPN 端点应启用客户端连接日志记录",
+  "CheckType": [],
+  "ServiceName": "ec2",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "low",
+  "ResourceType": "AwsEc2ClientVpnEndpoint",
+  "ResourceGroup": "network",
+  "Description": "此控制检查 AWS Client VPN 端点是否启用了客户端连接日志记录。如果端点未启用客户端连接日志记录，则控制失败。",
+  "Risk": "Client VPN 端点允许远程客户端安全地连接到 AWS 中的虚拟私有云 (VPC) 中的资源。连接日志允许您跟踪 VPN 端点上的用户活动并提供可见性。",
+  "RelatedUrl": "https://docs.aws.amazon.com/vpn/latest/clientvpn-admin/what-is.html",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://docs.aws.amazon.com/securityhub/latest/userguide/ec2-controls.html#ec2-51",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "要启用连接日志记录，请参阅 AWS Client VPN 管理员指南中的为现有 Client VPN 端点启用连接日志记录。",
+      "Url": "https://docs.aws.amazon.com/config/latest/developerguide/ec2-client-vpn-connection-log-enabled.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "vm_ensure_using_managed_disks",
+  "CheckTitle": "Virtual Machines で Managed Disks が利用されていることを確認する",
+  "CheckType": [],
+  "ServiceName": "vm",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Microsoft.Compute/virtualMachines",
+  "ResourceGroup": "compute",
+  "Description": "Virtual Machines 上の Blob ベース VHD を Managed Disks に移行し、この構成の既定機能を活用します。機能には次が含まれます: 1. 既定のディスク暗号化 2. 基盤ハードウェア障害時に Microsoft がディスクストレージを管理して移動することによる耐障害性 3. ストレージアカウントに比べたコスト削減",
+  "Risk": "Managed Disks は既定で基盤ハードウェア上で暗号化されるため、基本保護のために追加暗号化は不要です（必要に応じて追加暗号化も可能）。Managed Disks は設計上、ストレージアカウントより高い耐障害性があります。ARM でデプロイされた Virtual Machines については、Azure Advisor が将来的にセキュリティとコスト管理の両面から VHD を Managed Disks に移行することを推奨する場合があります。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/virtual-machines/unmanaged-disks-deprecation",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/VirtualMachines/managed-disks-in-use.html",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-general-policies/ensure-virtual-machines-are-utilizing-managed-disks#terraform"
+    },
+    "Recommendation": {
+      "Text": "1. 検索機能で Virtual Machines に移動します。2. 変換したい仮想マシンを選択します。3. VM のメニューで Disks を選択します。4. 画面上部で Migrate to managed disks を選択します。5. 画面の案内に従って変換し、最後に Migrate を選択して処理を開始します。",
+      "Url": "https://docs.microsoft.com/en-us/security/benchmark/azure/security-controls-v3-data-protection#dp-4-enable-data-at-rest-encryption-by-default"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "Managed Disks には割り当てたディスク容量に応じた追加コストが発生します。Managed Disks への変換時、VM は一度停止してから再起動されます。"
+}

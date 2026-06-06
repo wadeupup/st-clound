@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "vm_sufficient_daily_backup_retention_period",
+  "CheckTitle": "确保为 Azure 虚拟机配置了足够的每日备份保留期。",
+  "CheckType": [],
+  "ServiceName": "vm",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Microsoft.Compute/virtualMachines",
+  "ResourceGroup": "compute",
+  "Description": "确保为 Azure 虚拟机配置了足够的每日备份保留期。",
+  "Risk": "为 Azure 虚拟机设置合理的每日备份保留期，可确保备份策略遵循组织推动的合规法规中规定的最佳实践。将 VM 备份保留更长时间，可在发生故障时更高效地执行数据恢复流程。",
+  "RelatedUrl": "https://docs.microsoft.com/en-us/azure/backup/backup-azure-vms-introduction",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/VirtualMachines/sufficient-backup-retention-period.html",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "将每台 VM 备份策略的每日备份保留期设置为满足或超过组织的最低要求。",
+      "Url": "https://docs.microsoft.com/en-us/azure/backup/backup-azure-vms-introduction"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

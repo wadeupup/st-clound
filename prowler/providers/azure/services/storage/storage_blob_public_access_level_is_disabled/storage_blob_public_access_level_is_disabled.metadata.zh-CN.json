@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "storage_blob_public_access_level_is_disabled",
+  "CheckTitle": "确保存储账户中所有 Blob 容器的“Public access level”设置为“Private (no anonymous access)”",
+  "CheckType": [],
+  "ServiceName": "storage",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AzureStorageAccount",
+  "ResourceGroup": "storage",
+  "Description": "确保存储账户中所有 Blob 容器的“Public access level”配置设置为“Private (no anonymous access)”，以阻止对这些 Microsoft Azure 资源的匿名访问。",
+  "Risk": "匿名访问 Blob 容器的用户可以使用不需要凭据的构造方式（如共享访问签名）。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/StorageAccounts/disable-blob-anonymous-access-for-storage-accounts.html",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-networking-policies/ensure-that-storage-accounts-disallow-public-access#terraform"
+    },
+    "Recommendation": {
+      "Text": "将“Public access level”配置设置为“Private (no anonymous access)”",
+      "Url": ""
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

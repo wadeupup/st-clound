@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "containerregistry_not_publicly_accessible",
+  "CheckTitle": "Container Registry へのパブリック ネットワーク アクセスを制限する",
+  "CheckType": [],
+  "ServiceName": "containerregistry",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "ContainerRegistry",
+  "ResourceGroup": "container",
+  "Description": "Azure Container Registry へのパブリック ネットワーク アクセスが制限されていることを確認します。",
+  "Risk": "パブリックにアクセス可能な状態は、Container Registry を潜在的な攻撃、不正利用、データ漏えいのリスクにさらします。アクセスを制限することで攻撃対象領域を最小化し、認可されたネットワークのみがレジストリにアクセスできるようにします。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/container-registry/container-registry-access-selected-networks",
+  "Remediation": {
+    "Code": {
+      "CLI": "az acr update --name <registry-name> --default-action Deny",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "パブリック アクセスを制限した後も必要なサービスからアクセスできるよう、必要な仮想ネットワーク構成または IP ルールが設定されていることを確認してください。安全な環境を維持するため、ネットワーク アクセス設定を定期的に見直してください。Azure Container Registry のパブリック ネットワーク アクセスを制限するには: 1. Azure Portal で対象の Container Registry に移動します。2. 「Settings」->「Networking」で「Public network access」を「Disabled」に設定します。3. 必要に応じて、仮想ネットワーク サービス エンドポイントまたはプライベート エンドポイントを設定して安全なアクセスを実現します。4. 必要に応じて IP アクセス ルールを見直し、調整します。",
+      "Url": "https://learn.microsoft.com/en-us/azure/container-registry/container-registry-access-selected-networks"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "この機能は Premium SKU レジストリでのみ利用できます。"
+}

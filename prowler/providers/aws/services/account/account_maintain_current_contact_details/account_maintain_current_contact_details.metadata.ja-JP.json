@@ -1,0 +1,46 @@
+{
+  "Provider": "aws",
+  "CheckID": "account_maintain_current_contact_details",
+  "CheckTitle": "AWS アカウントの連絡先情報が最新です",
+  "CheckType": [
+    "ソフトウェアと設定チェック/業界および規制基準/AWS 基礎セキュリティベストプラクティス"
+  ],
+  "ServiceName": "account",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "governance",
+  "Description": "**AWS アカウントの連絡先情報**は、`security`、`billing`、`operations` の**主要連絡先**および**代替連絡先**について最新であり、正確なメールアドレスと電話番号が含まれています。",
+  "Risk": "古い連絡先または単一の連絡先は、**セキュリティ通知**を遅らせ、**インシデント対応**を遅くし、**アカウント回復**を複雑にします。\n\nAWS は、悪用の緩和中にサービスをスロットルし、**可用性**を低下させる可能性があります。見逃したアラートは継続的な悪用を可能にし、**データ流出**と不正な変更（**整合性**）のリスクがあります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.prowler.com/checks/aws/iam-policies/iam_18-maintain-contact-details#aws-console",
+    "https://repost.aws/knowledge-center/update-phone-number",
+    "https://support.stax.io/docs/accounts/update-aws-account-contact-details",
+    "https://maartenbruntink.nl/blog/2022/09/26/aws-account-hygiene-101-mass-updating-alternate-account-contacts/",
+    "https://docs.aws.amazon.com/security-ir/latest/userguide/update-account-contact-info.html",
+    "https://docs.aws.amazon.com/accounts/latest/reference/manage-acct-update-contact-primary.html",
+    "https://repost.aws/knowledge-center/add-update-billing-contact",
+    "https://aws.amazon.com/blogs/security/update-the-alternate-security-contact-across-your-aws-accounts-for-timely-security-notifications/",
+    "https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_accounts_update_contacts.html",
+    "https://docs.aws.amazon.com/accounts/latest/reference/manage-acct-update-contact-alternate.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws account put-alternate-contact --alternate-contact-type=SECURITY --email-address=<SECURITY_EMAIL> --name=\"<SECURITY_CONTACT_NAME>\" --phone-number=\"<SECURITY_PHONE>\" --title=\"Security\"",
+      "NativeIaC": "",
+      "Other": "1. AWS マネジメントコンソールにサインインします\n2. Billing and Cost Management を開き、アカウント名 > Account をクリックします\n3. Contact information の下で、Edit をクリックし、詳細を更新してから、Update をクリックします\n4. Alternate contacts の下で、Edit をクリックします\n5. Security 連絡先の名前、メール、電話（チームエイリアスを使用）を入力し、Update をクリックします\n6. 必要に応じて、Billing と Operations についても繰り返します",
+      "Terraform": "```hcl\n# AWS アカウントの Security 代替連絡先を設定します\nresource \"aws_account_alternate_contact\" \"<example_resource_name>\" {\n  alternate_contact_type = \"SECURITY\"  # 重要：AWS がセキュリティチームに連絡できることを保証します\n  email_address          = \"<SECURITY_EMAIL>\"  # 重要：連絡先の宛先\n  name                   = \"<SECURITY_CONTACT_NAME>\"\n  phone_number           = \"<SECURITY_PHONE>\"\n  title                  = \"Security\"\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "採用：\n- `security`、`billing`、`operations` の**主要連絡先**および**代替連絡先**\n- 共有され、監視されたエイリアスと SMS 対応の電話番号（個人以外）\n- 定期的なレビューを伴うアカウント間の集中管理\n- 連絡先データを変更できる人に対する**最小権限**\n- 定期的な到達可能性テストと文書化された所有権",
+      "Url": "https://hub.prowler.com/check/account_maintain_current_contact_details"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "dynamodb_table_protected_by_backup_plan",
+  "CheckTitle": "DynamoDB テーブルがバックアッププランで保護されているか",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices"
+  ],
+  "ServiceName": "dynamodb",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsDynamoDbTable",
+  "ResourceGroup": "database",
+  "Description": "**DynamoDB テーブル**について、リソース割り当て（明示的なテーブル、リソースタイプのワイルドカード、または全リソースカバレッジを含む）を通じて**AWS Backup バックアッププラン**に含まれているかが評価されます。\n\n結果は、テーブルがプランで定義されたスケジュールバックアップと保持ポリシーによって管理されているかを示します。",
+  "Risk": "バックアッププランがない場合、テーブルデータには管理されたコピーがなく、**可用性**と**整合性**が損なわれます。偶発的な削除、破損した書き込み、または悪意のあるアクションが回復不可能になる可能性があり、RPO/RTO が悪化します。また、クロスリージョン/アカウントコピーと不変性機能も失われ、ダウンタイムとデータ損失が増加します。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/aws-backup/latest/devguide/assigning-resources.html",
+    "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/CreateBackupAWS.html",
+    "https://aws.amazon.com/blogs/database/set-up-scheduled-backups-for-amazon-dynamodb-using-aws-backup/"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation: Add DynamoDB tables to an AWS Backup plan\nResources:\n  BackupPlan:\n    Type: AWS::Backup::BackupPlan\n    Properties:\n      BackupPlan:\n        BackupPlanName: <example_resource_name>\n        BackupPlanRule:\n          - RuleName: r\n            TargetBackupVault: Default\n\n  BackupSelection:\n    Type: AWS::Backup::BackupSelection\n    Properties:\n      BackupPlanId: !Ref BackupPlan\n      BackupSelection:\n        SelectionName: <example_resource_name>\n        IamRoleArn: <example_role_arn>\n        Resources:\n          - arn:aws:dynamodb:*:*:table/*  # CRITICAL: adds all DynamoDB tables to the backup plan, making them protected\n```",
+      "Other": "1. AWS Backup コンソールで、Settings > Configure resources に移動し、DynamoDB を有効化して確認します\n2. Backup plans > Create backup plan > Build a new plan に移動します\n3. プラン名を入力し、Rule name を任意の値に設定し、Backup vault を Default に設定してプランを作成します\n4. プランページで、Assign resources を選択します\n5. リソース割り当て名を入力し、IAM role を Default role に設定し、DynamoDB テーブルを選択して Assign resources を選択します",
+      "Terraform": "```hcl\n# Terraform: Add DynamoDB tables to an AWS Backup plan\nresource \"aws_backup_plan\" \"<example_resource_name>\" {\n  name = \"<example_resource_name>\"\n  rule {\n    rule_name         = \"r\"\n    target_vault_name = \"Default\"\n  }\n}\n\ndata \"aws_iam_role\" \"<example_resource_name>\" {\n  name = \"AWSServiceRoleForBackup\"\n}\n\nresource \"aws_backup_selection\" \"<example_resource_name>\" {\n  name         = \"<example_resource_name>\"\n  plan_id      = aws_backup_plan.<example_resource_name>.id\n  iam_role_arn = data.aws_iam_role.<example_resource_name>.arn\n  resources    = [\n    \"arn:aws:dynamodb:*:*:table/*\" # CRITICAL: adds all DynamoDB tables to the backup plan, making them protected\n  ]\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "すべての重要なテーブルを**AWS Backup バックアッププラン**の下に配置し、**多層防御**と**最小権限**に従います：\n- 大規模なカバレッジにはタグベースの割り当てを使用する\n- スケジュール、保持、クロスリージョン/アカウントコピーを定義する\n- 不変性のために**Vault Lock**を有効化する\n- 定期的に復元をテストし、バックアップの削除を制限する",
+      "Url": "https://hub.prowler.com/check/dynamodb_table_protected_by_backup_plan"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

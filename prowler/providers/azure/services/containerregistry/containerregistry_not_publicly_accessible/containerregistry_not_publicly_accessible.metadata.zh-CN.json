@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "containerregistry_not_publicly_accessible",
+  "CheckTitle": "限制对 Container Registry 的公共网络访问",
+  "CheckType": [],
+  "ServiceName": "containerregistry",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "ContainerRegistry",
+  "ResourceGroup": "container",
+  "Description": "确保已限制对 Azure Container Registry 的公共网络访问。",
+  "Risk": "公共可访问性会使 Container Registry 暴露于潜在攻击、未授权使用和数据泄露风险。限制访问可最小化攻击面，并确保只有授权网络可以访问注册表。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/container-registry/container-registry-access-selected-networks",
+  "Remediation": {
+    "Code": {
+      "CLI": "az acr update --name <registry-name> --default-action Deny",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "请确保在限制公共访问后，已配置必要的虚拟网络设置或 IP 规则，以允许所需服务访问。请定期审查网络访问设置以维持安全环境。限制 Azure Container Registry 公共网络访问的方法：1. 在 Azure 门户中导航到你的 Container Registry。2. 在“Settings”->“Networking”下，将“Public network access”设置为“Disabled”。3. 按需设置虚拟网络服务终结点或专用终结点以实现安全访问。4. 视需要审查并调整 IP 访问规则。",
+      "Url": "https://learn.microsoft.com/en-us/azure/container-registry/container-registry-access-selected-networks"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "该功能仅适用于 Premium SKU 注册表。"
+}

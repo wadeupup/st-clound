@@ -1,0 +1,45 @@
+{
+  "Provider": "aws",
+  "CheckID": "awslambda_function_inside_vpc",
+  "CheckTitle": "Lambda関数がVPC内にデプロイされている",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices/Network Reachability",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices"
+  ],
+  "ServiceName": "awslambda",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "low",
+  "ResourceType": "AwsLambdaFunction",
+  "ResourceGroup": "serverless",
+  "Description": "**AWS Lambda関数**は、デフォルトのLambda管理ネットワークではなく、指定されたサブネットとセキュリティグループを使用して**VPCネットワーク**を使用します。\n\nVPC関連付け（`vpc_id`）の存在は、VPCリソースへのプライベート接続を示します。",
+  "Risk": "VPC接続がない場合、関数はネットワーク分離と細かいエグレス制御を欠き、**機密性**と**整合性**を弱めます。\n\nトラフィックはパブリックエンドポイントを使用する必要があり、無制限のアウトバウンドによるデータ漏洩とSSRFのリスクが高まります。プライベートデータベースが必要な場合、VPCアクセスの欠如は**可用性**に影響を与える可能性があります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/lambda/latest/dg/configuration-vpc.html",
+    "https://repost.aws/pt/knowledge-center/lambda-dedicated-vpc",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/Lambda/function-in-vpc.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/lambda-controls.html#lambda-3",
+    "https://stackoverflow.com/questions/55074793/how-can-we-force-aws-lamda-to-run-securely-in-a-vpc",
+    "https://www.techtarget.com/searchCloudComputing/answer/How-do-I-configure-AWS-Lambda-functions-in-a-VPC/"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws lambda update-function-configuration --function-name <example_resource_name> --vpc-config SubnetIds=<example_subnet_id>,SecurityGroupIds=<example_security_group_id>",
+      "NativeIaC": "```yaml\nAWSTemplateFormatVersion: '2010-09-09'\nResources:\n  LambdaFunction:\n    Type: AWS::Lambda::Function\n    Properties:\n      FunctionName: <example_resource_name>\n      Role: <example_role_arn>\n      Handler: index.handler\n      Runtime: python3.12\n      Code:\n        S3Bucket: <example_code_bucket>\n        S3Key: <example_code_key>\n      # 重要：少なくとも1つのサブネットと1つのセキュリティグループを指定して関数をVPCにアタッチ\n      # これによりVpcConfigが設定され、関数にVPC IDが提供され、チェックがPASSになります\n      VpcConfig:\n        SubnetIds:\n          - <example_subnet_id>\n        SecurityGroupIds:\n          - <example_security_group_id>\n```",
+      "Other": "1. AWS Lambdaコンソールで関数を開く\n2. 設定 > VPCに移動し、編集をクリック\n3. ターゲットVPCを選択\n4. 少なくとも1つのサブネットと1つのセキュリティグループを選択\n5. 保存をクリック",
+      "Terraform": "```hcl\nresource \"aws_lambda_function\" \"example\" {\n  function_name = \"<example_resource_name>\"\n  role          = \"<example_role_arn>\"\n  handler       = \"index.handler\"\n  runtime       = \"python3.12\"\n  filename      = \"<example_package.zip>\"\n\n  # 重要：VPC設定により関数がVPCにアタッチされ、VPC IDが提供されてチェックがパスします\n  vpc_config {\n    subnet_ids         = [\"<example_subnet_id>\"]      # 少なくとも1つのサブネット\n    security_group_ids = [\"<example_security_group_id>\"]\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "プライベートサブネットと制限的なセキュリティグループを持つVPCに関数をアタッチして、**最小権限**とエグレス制御を強制します。\n- AWSサービスには**VPCエンドポイント**を優先する\n- 必要な場合のみNATを使用する\n- 回復力のためにAZ全体にサブネットを分散する\n- `VpcIds`、`SubnetIds`、`SecurityGroupIds`を要求するIAM条件で管理する。",
+      "Url": "https://hub.prowler.com/check/awslambda_function_inside_vpc"
+    }
+  },
+  "Categories": [
+    "trust-boundaries"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

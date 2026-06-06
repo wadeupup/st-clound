@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "acm_certificates_expiration_check",
+  "CheckTitle": "ACM 証明書が設定された閾値日数以内に期限切れになります",
+  "CheckType": [
+    "ソフトウェアと設定チェック/AWS セキュリティベストプラクティス",
+    "ソフトウェアと設定チェック/業界および規制基準/AWS 基礎セキュリティベストプラクティス",
+    "影響/サービス拒否"
+  ],
+  "ServiceName": "acm",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsCertificateManagerCertificate",
+  "ResourceGroup": "security",
+  "Description": "**ACM 証明書**は、設定可能な閾値に対して**有効期限までの時間**が評価されます。有効期限が近い、または既に期限切れの証明書が表示され、サービスに接続されている証明書、および*範囲内の場合*、未使用の証明書が含まれます。",
+  "Risk": "期限切れまたは期限が近い **TLS 証明書**は、ハンドシェイクを中断し、**サービス中断**と API 呼び出しの失敗（**可用性**）を引き起こす可能性があります。緊急の修正は設定ミスのリスクを高め、無効化された検証や弱い暗号を有効にし、**MITM** とデータ露出（**機密性**/**整合性**）を可能にします。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/ACM/certificate-expires-in-45-days.html",
+    "https://repost.aws/es/knowledge-center/acm-notification-certificate-renewal",
+    "https://docs.aws.amazon.com/config/latest/developerguide/acm-certificate-expiration-check.html",
+    "https://repost.aws/questions/QU3sMaeZPMRo2kLcsfJsfuVA/acm-notifications-for-expiring-certificates"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "1. AWS コンソールで、Certificate Manager (ACM) を開きます\n2. 期限切れが近い証明書が ACM 発行の場合：選択し、検証を完了/復元します（Route 53 にレコードを作成するか、表示された CNAME を追加）して、更新を続行できるようにします\n3. 期限切れが近い証明書がインポートされた場合：Import a certificate をクリックし、新しい証明書と秘密鍵をアップロードしてから保存します\n4. サービスを更新して、新しい/更新された証明書を使用します：\n   - ALB/NLB：EC2 > Load Balancers > Listeners > Edit > Change certificate を新しい ACM 証明書に変更\n   - CloudFront：Distributions > Edit > Viewer certificate > 新しい ACM 証明書を選択\n   - API Gateway：Custom domain names > Edit > 新しい ACM 証明書を選択\n5. 古い証明書が使用されていないことを確認します；不要な場合は削除します",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "**自動証明書ライフサイクル管理**を採用します：**自動更新付きの ACM 発行証明書**を優先するか、インポートを自動更新/ローテーションパイプラインと統合します。アラートで有効期限を追跡し、証明書操作に**最小権限**を強制し、未使用の証明書を削除し、ダウンタイムを避けるためにロールオーバーをテストします。",
+      "Url": "https://hub.prowler.com/check/acm_certificates_expiration_check"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

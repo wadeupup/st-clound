@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "dms_endpoint_neptune_iam_authorization_enabled",
+  "CheckTitle": "Neptune 用 DMS エンドポイントで IAM 認可が有効になっていることを確認する",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Effects/Data Exposure"
+  ],
+  "ServiceName": "dms",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsDmsEndpoint",
+  "ResourceGroup": "database",
+  "Description": "**DMS Neptune エンドポイント** では、エンドポイント設定 `IamAuthEnabled` により **IAM 認可** が有効化されている必要があります。",
+  "Risk": "**IAM 認可** が有効化されていない場合、移行コンポーネントは広範な信頼関係のもとで Neptune とやり取りできてしまい、未承認のデータロード、読み取り、変更を許す可能性があります。\n\nこれによりデータの **機密性** と **完全性** が低下し、権限乱用やデータ流出のリスクが高まります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/dms/latest/userguide/CHAP_Target.Neptune.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/dms-controls.html#dms-10"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws dms modify-endpoint --endpoint-arn <endpoint-arn> --neptune-settings '{\"IamAuthEnabled\":true}'",
+      "NativeIaC": "```yaml\n# CloudFormation: DMS Neptune エンドポイントで IAM 認可を有効化する\nResources:\n  <example_resource_name>:\n    Type: AWS::DMS::Endpoint\n    Properties:\n      EndpointType: target\n      EngineName: neptune\n      NeptuneSettings:\n        ServiceAccessRoleArn: <example_resource_arn>\n        S3BucketName: <example_resource_name>\n        S3BucketFolder: <example_resource_name>\n        IamAuthEnabled: true  # 重要: Neptune エンドポイントの IAM 認可を有効化\n```",
+      "Other": "1. AWS コンソールで Database Migration Service > Endpoints に移動します\n2. Neptune エンドポイントを選択し、「Modify」をクリックします\n3. Endpoint settings（Neptune settings）を展開し、IAM authorization を Enabled に設定します\n4. Service access role ARN が設定されていることを確認し、「Save」をクリックします",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "Neptune エンドポイントで **IAM 認可**（`IamAuthEnabled=true`）を有効化し、Neptune と S3 に対する最小限の権限のみを持つ **最小特権** のサービスロールを使用してください。\n\nあわせて **多層防御（Defense in Depth）** を実施し、ネットワーク経路の制限、移行ロールの職務分離、ログおよびアラートによるアクセス監視を行ってください。",
+      "Url": "https://hub.prowler.com/check/dms_endpoint_neptune_iam_authorization_enabled"
+    }
+  },
+  "Categories": [
+    "identity-access"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+
+

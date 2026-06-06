@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "sqlserver_tde_encryption_enabled",
+  "CheckTitle": "SQL サーバーの Transparent Data Encryption（TDE）プロテクターが暗号化されていることを確認する",
+  "CheckType": [],
+  "ServiceName": "sqlserver",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "SQLServer",
+  "ResourceGroup": "database",
+  "Description": "すべての SQL サーバーで Transparent Data Encryption を有効化します。",
+  "Risk": "Azure SQL Database の Transparent Data Encryption は、アプリケーション変更なしで、保存時のデータベース、関連バックアップ、トランザクション ログ ファイルをリアルタイムに暗号化/復号化し、悪意ある活動の脅威から保護するのに役立ちます。",
+  "RelatedUrl": "https://docs.microsoft.com/en-us/sql/relational-databases/security/encryption/transparent-data-encryption-with-azure-sql-database",
+  "Remediation": {
+    "Code": {
+      "CLI": "az sql db tde set --resource-group resourceGroup --server dbServerName --database dbName --status Enabled",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity-staging/knowledge-base/azure/Sql/data-encryption.html#",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "1. SQL databases に移動します。2. 各 DB インスタンスで。3. Transparent data encryption をクリックします。4. Data encryption を On に設定します。",
+      "Url": "https://learn.microsoft.com/en-us/azure/azure-sql/database/transparent-data-encryption-byok-overview?view=azuresql"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

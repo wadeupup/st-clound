@@ -1,0 +1,35 @@
+{
+  "Provider": "aws",
+  "CheckID": "s3_bucket_secure_transport_policy",
+  "CheckTitle": "检查 S3 存储桶是否具有安全传输策略。",
+  "CheckType": [
+    "数据保护"
+  ],
+  "ServiceName": "s3",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:s3:::bucket_name",
+  "Severity": "medium",
+  "ResourceType": "AwsS3Bucket",
+  "ResourceGroup": "storage",
+  "Description": "检查 S3 存储桶是否具有安全传输策略。",
+  "Risk": "如果存储桶策略未强制执行 HTTPS，客户端与 S3 存储桶之间的通信可能会使用未加密的 HTTP。因此，敏感信息可能会以明文形式通过网络或互联网传输。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://docs.prowler.com/checks/aws/s3-policies/s3_15-secure-data-transport#aws-console",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "确保 S3 存储桶已启用传输中加密。",
+      "Url": "https://aws.amazon.com/premiumsupport/knowledge-center/s3-bucket-policy-for-config-rule/"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

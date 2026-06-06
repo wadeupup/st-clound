@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "mq_broker_auto_minor_version_upgrades",
+  "CheckTitle": "Amazon MQ ブローカーは自動マイナーバージョンアップグレードが有効になっています",
+  "CheckType": [
+    "ソフトウェアと構成のチェック/パッチ管理",
+    "ソフトウェアと構成のチェック/業界および規制基準/NIST 800-53 コントロール"
+  ],
+  "ServiceName": "mq",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "low",
+  "ResourceType": "AwsAmazonMQBroker",
+  "ResourceGroup": "messaging",
+  "Description": "**Amazon MQ ブローカー**は、`autoMinorVersionUpgrade` が有効になっており、スケジュールされたメンテナンスウィンドウ中にサポートされているマイナーおよびパッチエンジンの更新を自動的に適用します。",
+  "Risk": "自動マイナーアップグレードがない場合、ブローカーは**既知の脆弱なエンジンバージョン**を実行する可能性があり、以下の影響を与えるエクスプロイトを可能にします:\n- **機密性**: メッセージの漏洩\n- **完全性**: 改ざんまたはリプレイ\n- **可用性**: クラッシュ/DoSおよび不安定性\n\nパッチの遅延は、運用リスクとドリフトも増加させます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/MQ/auto-minor-version-upgrade.html",
+    "https://docs.aws.amazon.com/amazon-mq/latest/developer-guide/upgrading-brokers.html#upgrading-brokers-automatic-upgrades",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/mq-controls.html#mq-3",
+    "https://docs.aws.amazon.com/amazon-mq/latest/developer-guide/upgrading-brokers.html#upgrading-brokers-automatic-upgrades.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws mq update-broker --broker-id <example_resource_id> --auto-minor-version-upgrade",
+      "NativeIaC": "```yaml\n# CloudFormation: MQ ブローカーで自動マイナーバージョンアップグレードを有効にする\nResources:\n  <example_resource_name>:\n    Type: AWS::AmazonMQ::Broker\n    Properties:\n      BrokerName: <example_resource_name>\n      AutoMinorVersionUpgrade: true  # 重要: 自動マイナーバージョンアップグレードを有効にします\n      DeploymentMode: SINGLE_INSTANCE\n      EngineType: ACTIVEMQ\n      EngineVersion: <ENGINE_VERSION>\n      HostInstanceType: mq.t3.micro\n      PubliclyAccessible: true\n      Users:\n        - Username: <USERNAME>\n          Password: <PASSWORD>\n```",
+      "Other": "1. Amazon MQ コンソールを開く\n2. ブローカーに移動し、対象のブローカーを選択\n3. 編集をクリック\n4. メンテナンスの下で、自動マイナーバージョンアップグレードを有効にするを確認\n5. 保存をクリック",
+      "Terraform": "```hcl\n# Terraform: MQ ブローカーで自動マイナーバージョンアップグレードを有効にする\nresource \"aws_mq_broker\" \"<example_resource_name>\" {\n  broker_name                = \"<example_resource_name>\"\n  engine_type                = \"ActiveMQ\"\n  engine_version             = \"<ENGINE_VERSION>\"\n  host_instance_type         = \"mq.t3.micro\"\n  publicly_accessible        = true\n  auto_minor_version_upgrade = true  # 重要: 自動マイナーバージョンアップグレードを有効にします\n\n  user {\n    username = \"<USERNAME>\"\n    password = \"<PASSWORD>\"\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "すべてのブローカーで `autoMinorVersionUpgrade` を有効にして、パッチの遅延を減らします。\n\n- 定義されたメンテナンスウィンドウにアップグレードを合わせる\n- 本番環境の前にステージングで変更を検証する\n- 更新後にブローカーの健康状態とログを監視する\n- ロールバックのために HA とテスト済みバックアップを維持する（*多層防御*）",
+      "Url": "https://hub.prowler.com/check/mq_broker_auto_minor_version_upgrades"
+    }
+  },
+  "Categories": [
+    "vulnerabilities"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

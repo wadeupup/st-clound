@@ -1,0 +1,44 @@
+{
+  "Provider": "aws",
+  "CheckID": "elasticache_redis_replication_group_auth_enabled",
+  "CheckTitle": "引擎版本 < 6.0 的 ElastiCache Redis 复制组已启用 Redis OSS AUTH",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/NIST 800-53 Controls",
+    "TTPs/Initial Access/Unauthorized Access",
+    "Effects/Data Exposure"
+  ],
+  "ServiceName": "elasticache",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "database",
+  "Description": "运行版本低于 `6.0` 的 Amazon ElastiCache Redis 复制组会被评估是否使用了 **AUTH 令牌**。对于 `6.0+` 版本，该发现表明应审查 **ACL/RBAC** 配置，而不是基于令牌的 AUTH。",
+  "Risk": "在 `6.0` 之前的集群上如果没有 **AUTH**，客户端可以运行未经验证的命令，从而允许数据读取/写入、密钥删除和缓存投毒。这威胁到 **机密性** 和 **完整性**，并可能通过窃取或注入的会话数据来促进横向移动。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/elasticache-controls.html#elasticache-6",
+    "https://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/auth.html#auth-modifyng-token",
+    "https://docs.aws.amazon.com/AmazonElastiCache/latest/dg/auth.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws elasticache modify-replication-group --replication-group-id <example_resource_id> --auth-token <AUTH_TOKEN> --auth-token-update-strategy SET --apply-immediately",
+      "NativeIaC": "```yaml\n# CloudFormation: enable Redis AUTH on an existing replication group\nResources:\n  <example_resource_name>:\n    Type: AWS::ElastiCache::ReplicationGroup\n    Properties:\n      ReplicationGroupId: <example_resource_id>\n      ReplicationGroupDescription: enable-auth\n      TransitEncryptionEnabled: true   # CRITICAL: required to use AUTH\n      AuthToken: <AUTH_TOKEN>          # CRITICAL: enables Redis AUTH\n      AuthTokenUpdateStrategy: SET  # CRITICAL: adds token; enables AUTH\n```",
+      "Other": "1. 在 AWS 控制台中，转到 ElastiCache > Redis 复制组\n2. 选择复制组 <example_resource_id> 并点击修改\n3. 在访问控制下，选择 Redis OSS AUTH 并输入 <AUTH_TOKEN>\n4. 勾选立即应用并点击修改\n5. 等待状态返回可用；AUTH 现已启用",
+      "Terraform": "```hcl\n# Terraform: enable Redis AUTH on an existing replication group\nresource \"aws_elasticache_replication_group\" \"<example_resource_name>\" {\n  replication_group_id       = \"<example_resource_id>\"\n  description                = \"enable-auth\"\n  transit_encryption_enabled = true            # CRITICAL: required to use AUTH\n  auth_token                 = \"<AUTH_TOKEN>\" # CRITICAL: enables Redis AUTH\n  auth_token_update_strategy = \"SET\"       # CRITICAL: adds token; enables AUTH\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "应用深度防御：\n- 对于版本 < `6.0`，启用 **AUTH**，使用强且轮换的令牌，并要求传输中加密。\n- 对于 `6.0+` 版本，优先使用具有最小权限、默认拒绝角色的 **RBAC/ACL**。\n- 将网络访问限制为受信任的源，并定期审计访问。",
+      "Url": "https://hub.prowler.com/check/elasticache_redis_replication_group_auth_enabled"
+    }
+  },
+  "Categories": [
+    "identity-access"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

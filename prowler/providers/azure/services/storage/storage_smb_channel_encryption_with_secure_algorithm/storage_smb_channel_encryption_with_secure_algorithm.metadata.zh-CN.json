@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "storage_smb_channel_encryption_with_secure_algorithm",
+  "CheckTitle": "确保 SMB 文件共享的 SMB 通道加密使用安全算法",
+  "CheckType": [],
+  "ServiceName": "storage",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "/subscriptions/{subscription_id}/resourceGroups/{resource_group}/providers/Microsoft.Storage/storageAccounts/{storageAccountName}/fileServices/default",
+  "Severity": "medium",
+  "ResourceType": "AzureStorageAccount",
+  "ResourceGroup": "storage",
+  "Description": "为 SMB 文件共享实施使用安全算法的 SMB 通道加密，以确保传输中数据的机密性和完整性。",
+  "Risk": "未使用推荐的 SMB 通道加密可能会使通过 SMB 通道传输的数据暴露于未授权拦截和篡改风险。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/well-architected/service-guides/azure-files#recommendations-for-smb-file-shares",
+  "Remediation": {
+    "Code": {
+      "CLI": "az storage account file-service-properties update --resource-group <resource-group> --account-name <storage-account> --channel-encryption AES-256-GCM",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "使用门户、CLI 或 PowerShell 将 SMB 通道加密设置为安全算法。",
+      "Url": "https://learn.microsoft.com/en-us/azure/storage/files/files-smb-protocol?tabs=azure-portal#smb-security-settings"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "当 SMB 通道加密设置为安全算法时，此检查通过。"
+}

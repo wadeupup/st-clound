@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "vm_scaleset_associated_with_load_balancer",
+  "CheckTitle": "VM Scale Set が Load Balancer に関連付けられていることを確認する",
+  "CheckType": [],
+  "ServiceName": "vm",
+  "SubServiceName": "scaleset",
+  "ResourceIdTemplate": "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachineScaleSets/{vmScaleSetName}",
+  "Severity": "medium",
+  "ResourceType": "Microsoft.Compute/virtualMachineScaleSets",
+  "ResourceGroup": "compute",
+  "Description": "Azure 仮想マシンスケールセットが、トラフィック分散のためにロードバランサーを使用していることを確認します。",
+  "Risk": "ロードバランサー連携がない場合、Azure 仮想マシンスケールセットはトラフィックスパイクやインスタンス障害時に可用性が低下し、サービス中断が発生する可能性があります。その結果、ユーザー体験の低下やビジネスへの影響が生じるおそれがあります。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/virtual-network/network-overview",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/VirtualMachines/associated-load-balancers.html",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "高可用性と最適なトラフィック分散を確保するため、Azure 仮想マシンスケールセットにロードバランサーを関連付けてください。",
+      "Url": "https://docs.microsoft.com/en-us/azure/load-balancer/load-balancer-overview"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

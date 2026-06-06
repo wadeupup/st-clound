@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "keyvault_recoverable",
+  "CheckTitle": "Key Vault が復旧可能であることを確認する",
+  "CheckType": [],
+  "ServiceName": "keyvault",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "KeyVault",
+  "ResourceGroup": "security",
+  "Description": "Key Vault にはオブジェクト キー、シークレット、証明書が含まれます。Key Vault が偶発的に利用不能になると、即時のデータ損失や、Key Vault オブジェクトが提供するセキュリティ機能（認証、検証、真正性確認、否認防止など）の喪失につながる可能性があります。'Do Not Purge' と 'Soft Delete' を有効化して Key Vault を復旧可能にすることが推奨されます。これは、ストレージ アカウント、SQL データベース、および Key Vault オブジェクト（キー、シークレット、証明書）が提供する依存サービスなど、暗号化データの損失を防ぐためです。ユーザーの誤削除や悪意あるユーザーによる破壊的操作で発生し得ます。警告: Azure 全サービスに共通するソフト削除機能の現在の制限として、Key Vault を削除するとロール割り当てが消失します。復旧後にすべてのロール割り当てを再作成する必要があります。",
+  "Risk": "ユーザーが誤って Key Vault に対して delete/purge コマンドを実行したり、攻撃者/悪意あるユーザーが意図的に実行して障害を引き起こすシナリオが考えられます。Key Vault を削除またはパージすると、データを暗号化するキーやアクセス/サービスを可能にするシークレット/証明書にアクセスできなくなるため、即時のデータ損失につながります。Key Vault の恒久的な利用不能に関係するプロパティは 2 つあります。1. enableSoftDelete: このパラメータを 'true' に設定すると、Key Vault が削除されても Key Vault 本体またはそのオブジェクトは次の 90 日間復旧可能です。この 90 日間に復旧またはパージ（恒久削除）が可能です。何もしない場合、Key Vault とそのオブジェクトはその後パージされます。2. enablePurgeProtection: enableSoftDelete は Key Vault が恒久削除されないことを保証し、削除日から 90 日間復旧可能にします。しかし、Key Vault および/またはそのオブジェクトが誤ってパージされると復旧できないケースがあります。enablePurgeProtection を 'true' に設定すると、Key Vault とそのオブジェクトをパージできなくなります。Key Vault で両方のパラメータを有効にすることで、Key Vault とそのオブジェクトが恒久的に削除/パージされることを防止できます。",
+  "RelatedUrl": "https://docs.microsoft.com/en-us/azure/key-vault/key-vault-soft-delete-cli",
+  "Remediation": {
+    "Code": {
+      "CLI": "az resource update --id /subscriptions/xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/<resourceGroupName>/providers/Microsoft.KeyVault/vaults/<keyVaultName> --set properties.enablePurgeProtection=trueproperties.enableSoftDelete=true",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/KeyVault/enable-key-vault-recoverability.html#",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-general-policies/ensure-the-key-vault-is-recoverable#terraform"
+    },
+    "Recommendation": {
+      "Text": "Key Vault で 'Do Not Purge' と 'Soft Delete' を有効にするには: Azure Portal から 1. Key Vaults に移動 2. 各 Key Vault で 3. Properties をクリック 4. soft-delete の状態が \"Soft delete has been enabled on this key vault.\" と表示されることを確認 5. ページ下部の 'Enable Purge Protection' をクリック（注: 一度有効化すると無効化できません）。Azure CLI から az resource update --id /subscriptions/xxxxxx-xxxx-xxxx-xxxx- xxxxxxxxxxxx/resourceGroups/<resourceGroupName>/providers/Microsoft.KeyVault /vaults/<keyVaultName> --set properties.enablePurgeProtection=true properties.enableSoftDelete=true。PowerShell から Update-AzKeyVault -VaultName <vaultName -ResourceGroupName <resourceGroupName -EnablePurgeProtection",
+      "Url": "https://blogs.technet.microsoft.com/kv/2017/05/10/azure-key-vault-recovery-options/"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "Key Vault で purge-protection と soft-delete を有効化すると、その操作は元に戻せません。"
+}

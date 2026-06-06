@@ -1,0 +1,37 @@
+{
+  "Provider": "aws",
+  "CheckID": "appstream_fleet_maximum_session_duration",
+  "CheckTitle": "AppStream フリートの最大ユーザーセッション時間が 10 時間未満です",
+  "CheckType": [
+    "ソフトウェアと設定チェック/AWS セキュリティベストプラクティス"
+  ],
+  "ServiceName": "appstream",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "compute",
+  "Description": "**AppStream フリート**は**最大ユーザーセッション時間**を強制します。この調査結果は、各フリートの設定された制限を閾値（デフォルト `10 時間`（`36000` 秒））に対して評価し、セッション時間がその制限を超えるフリートを識別します。",
+  "Risk": "長時間のセッションは、エンドポイントまたはトークンが侵害された場合、**セッションハイジャック**、**横方向の移動**、**データ流出**の時間窓を広げます。再認証の減少は**機密性**と**整合性**を弱め、アクセス時間の延長は**コスト**とリソースの競合を増加させる可能性があります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/appstream2/latest/developerguide/set-up-stacks-fleets.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws appstream update-fleet --name <example_resource_name> --max-user-duration-in-seconds 3600",
+      "NativeIaC": "```yaml\n# CloudFormation: AppStream フリートのセッション時間を 10 時間未満に設定します\nResources:\n  AppStreamFleet:\n    Type: AWS::AppStream::Fleet\n    Properties:\n      Name: \"<example_resource_name>\"\n      MaxUserDurationInSeconds: 3600  # 重要：最大セッション時間が < 10 時間であることを保証してチェックを通過します\n```",
+      "Other": "1. AWS コンソールを開き、Amazon AppStream 2.0 に移動します\n2. Fleets をクリックし、<example_resource_name> を選択します\n3. Edit をクリックします\n4. Maximum session duration を 10 時間未満の値（例：3600 秒）に設定します\n5. 変更を保存します",
+      "Terraform": "```hcl\n# Terraform: AppStream フリートのセッション時間を 10 時間未満に設定します\nresource \"aws_appstream_fleet\" \"<example_resource_name>\" {\n  name                         = \"<example_resource_name>\"\n  max_user_duration_in_seconds = 3600 # 重要：最大セッション時間が < 10 時間であることを保証してチェックを通過します\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "データの機密性に基づいて、**最大セッション時間**を `<= 10 時間`（例：`600` 分）以下に設定します。短い制限を優先し、更新時に**再認証**を強制し、**最小権限**を適用し、**アイドルタイムアウト**を有効にします。**多層防御**の一部としてセッションアクティビティを監視します。",
+      "Url": "https://hub.prowler.com/check/appstream_fleet_maximum_session_duration"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "Infrastructure Security"
+}
+

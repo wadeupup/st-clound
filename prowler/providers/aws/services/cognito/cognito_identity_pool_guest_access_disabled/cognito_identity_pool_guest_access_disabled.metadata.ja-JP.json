@@ -1,0 +1,32 @@
+{
+  "Provider": "aws",
+  "CheckID": "cognito_identity_pool_guest_access_disabled",
+  "CheckTitle": "Cognito アイデンティティプールでゲストアクセスが無効になっていることを確認する",
+  "CheckType": [],
+  "ServiceName": "cognito",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:aws:cognito-idp:region:account:identitypool/identitypool-id",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "IAM",
+  "Description": "ゲストアクセスにより、認証されていないユーザーがアイデンティティプールにアクセスできるようになります。これは、ユーザーがソーシャルアイデンティティプロバイダーでサインインできるパブリック Web サイトに役立ちますが、セキュリティリスクになる可能性もあります。ゲストアクセスが必要ない場合は、無効にする必要があります。",
+  "Risk": "ゲストアクセスが有効になっている場合、認証されていないユーザーがアイデンティティプールにアクセスできます。ゲストアクセスが必要ない場合、これはセキュリティリスクになる可能性があります。",
+  "RelatedUrl": "https://docs.aws.amazon.com/location/latest/developerguide/authenticating-using-cognito.html",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "Cognito アイデンティティプールではゲストアクセスを無効にする必要があります。ゲストアクセスを無効にするには、Amazon Cognito のドキュメントの手順に従ってください。",
+      "Url": "https://docs.aws.amazon.com/location/latest/developerguide/authenticating-using-cognito.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "opensearch_service_domains_not_publicly_accessible",
+  "CheckTitle": "Amazon OpenSearch Service ドメインは公開アクセスできません",
+  "CheckType": [
+    "ソフトウェアと構成のチェック/AWS セキュリティベストプラクティス/ネットワーク到達可能性",
+    "ソフトウェアと構成のチェック/業界および規制基準/AWS 基礎セキュリティベストプラクティス",
+    "影響/データの露出",
+    "TTPs/初期アクセス"
+  ],
+  "ServiceName": "opensearch",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "critical",
+  "ResourceType": "AwsOpenSearchServiceDomain",
+  "ResourceGroup": "database",
+  "Description": "**Amazon OpenSearch ドメイン**は、リソースベースのアクセスポリシーを通じて**公開露出**が評価されます。VPC 内のドメインは**プライベートに到達可能**と見なされ、広範な未認証アクセスを許可する過度に許可されたポリシーを持つドメインは**公開アクセス可能**と識別されます。",
+  "Risk": "公開露出により、誰でもデータをクエリ、インデックス、または削除でき、**機密性**（記録の開示）、**完全性**（不正な書き込み、インデックスの改ざん）、および**可用性**（中断、削除）に影響を与えます。攻撃者は機密ログ/PIIを収集し、分析を変更したり、インデックスを消去したりして、横方向の移動や運用停止を可能にします。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-vpc.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/Elasticsearch/domain-exposed.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws opensearch update-domain-config --domain-name <DOMAIN_NAME> --access-policies '{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::<ACCOUNT_ID>:root\"},\"Action\":\"es:*\",\"Resource\":\"arn:aws:es:<REGION>:<ACCOUNT_ID>:domain/<DOMAIN_NAME>/*\"}]}'",
+      "NativeIaC": "```yaml\n# CloudFormation: OpenSearch アクセスポリシーをあなたのアカウントのみに制限します\nResources:\n  <example_resource_name>:\n    Type: AWS::OpenSearchService::Domain\n    Properties:\n      DomainName: <example_resource_name>\n      AccessPolicies:  # 重要: あなたのアカウントのみにアクセスを制限し、公開アクセスを削除します\n        Version: '2012-10-17'\n        Statement:\n          - Effect: Allow\n            Principal:\n              AWS: arn:aws:iam::<ACCOUNT_ID>:root  # 重要: このアカウントのみがアクセス可能です\n            Action: es:*\n            Resource: arn:aws:es:<REGION>:<ACCOUNT_ID>:domain/<example_resource_name>/*\n```",
+      "Other": "1. AWS コンソールで Amazon OpenSearch Service を開き、ドメインを選択します\n2. セキュリティ構成 > 編集に移動します\n3. アクセスポリシー > JSON を選択します\n4. 以下のポリシーに置き換え（あなたの値を使用）て、変更を保存します:\n```json\n{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Effect\": \"Allow\",\n      \"Principal\": {\"AWS\": \"arn:aws:iam::<ACCOUNT_ID>:root\"},\n      \"Action\": \"es:*\",\n      \"Resource\": \"arn:aws:es:<REGION>:<ACCOUNT_ID>:domain/<DOMAIN_NAME>/*\"\n    }\n  ]\n}\n```\n5. ドメインエンドポイントがあなたのアカウントの IAM プリンシパル以外には公開アクセスできないことを確認します",
+      "Terraform": "```hcl\n# OpenSearch アクセスポリシーをあなたのアカウントのみに制限します\nresource \"aws_opensearch_domain\" \"<example_resource_name>\" {\n  domain_name = \"<example_resource_name>\"\n\n  # 重要: アクセスを所有アカウントのみに制限し、公開アクセスを削除します\n  access_policies = jsonencode({\n    Version = \"2012-10-17\"\n    Statement = [{\n      Effect    = \"Allow\"\n      Principal = { AWS = \"arn:aws:iam::<ACCOUNT_ID>:root\" }\n      Action    = \"es:*\"\n      Resource  = \"arn:aws:es:<REGION>:<ACCOUNT_ID>:domain/<example_resource_name>/*\"\n    }]\n  })\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "**最小特権**と**多層防御**を適用します:\n- ドメインを**VPC**に配置し、セキュリティグループで到達可能性を制限します\n- 狭いリソースポリシーを使用します; `Principal:\"*\"`を避けます\n- 認証されたアクセスを要求します（詳細な制御）; *避けられない場合*、IP とロールで公開エンドポイントを制限します\n- ログとアラートでアクセスを監視します",
+      "Url": "https://hub.prowler.com/check/opensearch_service_domains_not_publicly_accessible"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

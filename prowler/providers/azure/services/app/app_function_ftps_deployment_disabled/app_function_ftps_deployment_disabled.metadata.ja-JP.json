@@ -1,0 +1,32 @@
+{
+  "Provider": "azure",
+  "CheckID": "app_function_ftps_deployment_disabled",
+  "CheckTitle": "不正アクセスとデータ漏えいを防ぐため、Azure Functions で FTP および FTPS デプロイが無効化されていることを確認する。",
+  "CheckType": [],
+  "ServiceName": "app",
+  "SubServiceName": "function",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Microsoft.Web/sites",
+  "ResourceGroup": "serverless",
+  "Description": "Azure の FTP デプロイ エンドポイントは暗号化されておらず公開されているため、攻撃に対して脆弱です。FTP および FTPS デプロイを無効化することで、ログイン資格情報や機密コードベースへの不正アクセスを防ぎ、セキュリティを強化できます。",
+  "Risk": "有効のままにすると、攻撃者がネットワーク トラフィックを傍受してアプリやサービスを完全に制御できる可能性があり、データ漏えいや不正な改ざんにつながるおそれがあります。",
+  "RelatedUrl": "https://docs.microsoft.com/en-us/azure/app-service/deploy-ftp",
+  "Remediation": {
+    "Code": {
+      "CLI": "az webapp config set --resource-group <resource-group> --name <app-name> --ftps-state Disabled",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": "",
+      "Arm": ""
+    },
+    "Recommendation": {
+      "Text": "セキュリティ リスクを軽減するため、Azure Functions の FTP および FTPS デプロイを無効化することを推奨します。代わりに、Docker コンテナーなどのより安全なデプロイ方法、または GitHub Actions による継続的デプロイの有効化を検討してください。",
+      "Url": "https://learn.microsoft.com/en-us/azure/azure-functions/functions-deployment-technologies?tabs=windows#trigger-syncing"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "このチェックは Azure Functions が安全にデプロイされていることを確認し、攻撃対象領域を減らして機密情報を保護します。"
+}

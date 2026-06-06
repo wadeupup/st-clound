@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "app_function_identity_without_admin_privileges",
+  "CheckTitle": "Azure Functions が管理者権限を持つ ID で構成されていないことを確認する",
+  "CheckType": [],
+  "ServiceName": "app",
+  "SubServiceName": "function",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Microsoft.Web/sites",
+  "ResourceGroup": "serverless",
+  "Description": "最小権限の原則を維持し、攻撃対象領域を減らすために、Azure Functions が管理者権限で構成されていないことを確認することは重要です。Azure Functions の権限を制限することで、潜在的なセキュリティ リスクやデータ漏えいを軽減できます。",
+  "Risk": "Azure Functions が管理者権限で構成されている場合、不正アクセス、権限昇格、データ漏えいのリスクが高まります。攻撃者はこれらの権限を悪用して機密データへアクセスし、システム全体を侵害する可能性があります。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/entra/identity/managed-identities-azure-resources/overview",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/Functions/azure-function-admin-permissions.html",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "この問題を修正するには、Azure Functions が管理者権限を持つ ID で構成されていないことを確認してください。代わりに最小権限の原則に従い、Azure Functions には必要最小限の権限のみを付与してください。詳細は公式ドキュメントの「最小権限の原則を使用する」を参照してください。",
+      "Url": "https://docs.microsoft.com/en-us/azure/architecture/framework/security/design-identity-authorization#use-the-principle-of-least-privilege"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "このチェックは権限昇格攻撃の防止に役立ち、Azure Functions が必要な権限で動作していることを保証することで、潜在的なセキュリティ侵害の影響を低減します。"
+}

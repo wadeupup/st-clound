@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "elasticache_cluster_uses_public_subnet",
+  "CheckTitle": "ElastiCache 集群未使用公共子网",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices/Network Reachability",
+    "Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Effects/Data Exposure"
+  ],
+  "ServiceName": "elasticache",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "database",
+  "Description": "评估 **ElastiCache 资源**（Redis 节点和 Memcached 集群）是否放置在 **公共子网**中。\n\n该检查结果会识别包含配置了互联网路由的子网（而非仅私有子网）的缓存子网组。",
+  "Risk": "在 **公共子网**中托管缓存可能允许直接或配置错误的互联网访问，影响 CIA：\n- 机密性：未经授权的读取和密钥转储\n- 完整性：缓存中毒或密钥篡改\n- 可用性：扫描和 DDoS\n\n攻击者可能从缓存转向 VPC 内的 **横向移动**。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/AmazonElastiCache/latest/dg/SubnetGroups.html",
+    "https://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/VPCs.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws elasticache modify-cache-cluster --cache-cluster-id <example_resource_id> --cache-subnet-group-name <example_resource_name> --apply-immediately",
+      "NativeIaC": "```yaml\n# CloudFormation: move ElastiCache into private subnets via a private subnet group\nResources:\n  PrivateCacheSubnetGroup:\n    Type: AWS::ElastiCache::SubnetGroup\n    Properties:\n      Description: Private subnets only\n      SubnetIds:\n        - <example_resource_id>  # private subnet\n        - <example_resource_id>  # private subnet\n\n  CacheCluster:\n    Type: AWS::ElastiCache::CacheCluster\n    Properties:\n      CacheClusterId: <example_resource_id>\n      Engine: redis\n      CacheNodeType: cache.t3.micro\n      NumCacheNodes: 1\n      CacheSubnetGroupName: !Ref PrivateCacheSubnetGroup  # CRITICAL: forces the cluster to use only private subnets\n```",
+      "Other": "1. 在 AWS 控制台中，转到 ElastiCache > 子网组\n2. 点击创建缓存子网组，并仅选择私有子网（无到互联网网关的路由）\n3. 转到 ElastiCache > Redis 或 Memcached，选择您的集群\n4. 点击修改，将子网组设置为私有子网组\n5. 勾选立即应用并点击修改以保存",
+      "Terraform": "```hcl\n# Terraform: ensure the cluster uses a subnet group with only private subnets\nresource \"aws_elasticache_subnet_group\" \"private\" {\n  name       = \"<example_resource_name>\"\n  subnet_ids = [\"<example_resource_id>\", \"<example_resource_id>\"] # private subnets only\n}\n\nresource \"aws_elasticache_cluster\" \"cache\" {\n  cluster_id      = \"<example_resource_id>\"\n  engine          = \"redis\"\n  node_type       = \"cache.t3.micro\"\n  num_cache_nodes = 1\n  subnet_group_name = aws_elasticache_subnet_group.private.name  # CRITICAL: restricts cluster to private subnets\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "仅将缓存放置在 **私有子网**中，并确保路由表缺少互联网出口。使用严格的 **安全组**（限制为所需端口和受信任源）应用 **最小权限**。\n\n对于外部访问，使用 **VPC 对等连接**、**VPN** 或 **PrivateLink**。启用传输中加密和 Redis `AUTH` 以实现分层控制。",
+      "Url": "https://hub.prowler.com/check/elasticache_cluster_uses_public_subnet"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

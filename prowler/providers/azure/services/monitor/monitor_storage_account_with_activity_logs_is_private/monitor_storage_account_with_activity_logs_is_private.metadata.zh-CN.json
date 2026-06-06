@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "monitor_storage_account_with_activity_logs_is_private",
+  "CheckTitle": "确保存储活动日志的存储容器不可被公开访问",
+  "CheckType": [],
+  "ServiceName": "monitor",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Monitor",
+  "ResourceGroup": "monitoring",
+  "Description": "包含活动日志导出的存储账户容器不应可被公开访问。",
+  "Risk": "允许公开访问活动日志内容，可能帮助攻击者识别受影响账户在使用或配置上的弱点。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/azure-monitor/essentials/diagnostic-settings",
+  "Remediation": {
+    "Code": {
+      "CLI": "az storage container set-permission --name insights-activity-logs --account-name <Storage Account Name> --public-access off",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity-staging/knowledge-base/azure/Monitor/check-for-publicly-accessible-activity-log-storage-container.html",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-logging-policies/ensure-the-storage-container-storing-the-activity-logs-is-not-publicly-accessible#terraform"
+    },
+    "Recommendation": {
+      "Text": "1. 在 Azure Home 中选择 Portal Menu。2. 搜索 Storage Accounts 进入存储账户页面。3. 点击目标存储账户名称。4. 在 settings 下点击 Configuration。5. 在“Allow Blob public access”下选择 Enabled。",
+      "Url": "https://docs.microsoft.com/en-us/security/benchmark/azure/security-controls-v3-network-security#ns-2-secure-cloud-services-with-network-controls"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "将容器访问策略配置为 private 后，除存储账户所有者外其他所有人都将无法访问该容器。若需要允许其他指定用户访问，必须显式设置访问策略。"
+}

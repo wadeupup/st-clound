@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "kms_cmk_not_deleted_unintentionally",
+  "CheckTitle": "AWS KMS 客户管理密钥未计划删除",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践",
+    "软件和配置检查/行业和法规标准/AWS 基础安全最佳实践",
+    "影响/数据销毁"
+  ],
+  "ServiceName": "kms",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "critical",
+  "ResourceType": "AwsKmsKey",
+  "ResourceGroup": "security",
+  "Description": "**客户管理的 KMS 密钥** 会被评估为 `PendingDeletion` 状态，表示在强制等待期内计划删除。",
+  "Risk": "计划删除的密钥可能导致**解密能力的永久丧失**，降低数据和工作负载的**可用性**和**完整性**。意外或恶意的计划删除会启用**加密擦除**，在等待窗口期间和之后导致中断、恢复失败和集成中断。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/kms/latest/developerguide/deleting-keys-scheduling-key-deletion.html",
+    "https://docs.aws.amazon.com/kms/latest/developerguide/deleting-keys-scheduling-key-deletion.html#deleting-keys-scheduling-key-deletion-console"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws kms cancel-key-deletion --key-id <KEY_ID>",
+      "NativeIaC": "",
+      "Other": "1. 登录 AWS 管理控制台并打开 AWS KMS\n2. 转到客户管理密钥并选择状态为“Pending deletion”的密钥\n3. 点击密钥操作 > 取消密钥删除\n4. 确认取消；密钥状态将从待删除更改",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "防止意外删除：\n- 对密钥管理员实施**最小权限**和**职责分离**\n- 要求更改批准并对删除事件发出警报\n- 优先**禁用**未使用的密钥而不是删除\n- 设置足够的等待期并审查 `PendingDeletion` 状态的密钥以验证授权",
+      "Url": "https://hub.prowler.com/check/kms_cmk_not_deleted_unintentionally"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

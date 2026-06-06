@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "ses_identity_not_publicly_accessible",
+  "CheckTitle": "SES 身份资源策略不允许公共访问",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践/网络可达性",
+    "TTPs/初始访问",
+    "影响/数据暴露"
+  ],
+  "ServiceName": "ses",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsIamPolicy",
+  "ResourceGroup": "messaging",
+  "Description": "**Amazon SES 身份**会被评估是否存在**可公开访问的资源策略**——例如，带有 `Principal:\"*\"` 的语句或被广泛信任的主体，这些策略允许对该身份执行操作。",
+  "Risk": "公共 SES 身份策略允许未经授权的电子邮件发送或配置更改。\n- 完整性：伪造电子邮件和品牌冒充\n- 机密性：身份详细信息暴露\n- 可用性：声誉受损导致限流或暂停",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/ses/latest/dg/policy-anatomy.html",
+    "https://docs.aws.amazon.com/ses/latest/dg/identity-authorization-policies.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws sesv2 delete-email-identity-policy --email-identity <IDENTITY-NAME> --policy-name <POLICY-NAME>",
+      "NativeIaC": "",
+      "Other": "1. 在 AWS 控制台中，前往 Simple Email Service (SES)\n2. 打开 Verified identities 并选择受影响的身份\n3. 点击 Resource policies\n4. 删除公共策略，或编辑它以移除任何 Principal 为 \"*\" 的项，并将其限制为特定的 AWS 账户\n5. 保存更改",
+      "Terraform": "```hcl\nresource \"aws_ses_identity_policy\" \"<example_resource_name>\" {\n  identity = \"<example_resource_name>\"\n  name     = \"<example_resource_name>\"\n\n  policy = jsonencode({\n    Version   = \"2012-10-17\"\n    Statement = [{\n      Effect    = \"Allow\"\n      Principal = { AWS = [\"<account_id>\"] } # 关键：限制到特定的 AWS 账户，而不是“*”\n      Action    = [\"ses:SendEmail\"]\n      Resource  = \"arn:aws:ses:<region>:<account_id>:identity/<example_resource_name>\"\n    }]\n  })\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "将 SES 身份策略限制为已知主体和操作，并遵循**最小权限**原则。优先使用显式账户 ARN 进行发送授权，并添加诸如 `aws:SourceIp` 和 `aws:SecureTransport` 之类的条件。定期审查授权，并移除未使用的访问权限，作为**纵深防御**的一部分。",
+      "Url": "https://hub.prowler.com/check/ses_identity_not_publicly_accessible"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

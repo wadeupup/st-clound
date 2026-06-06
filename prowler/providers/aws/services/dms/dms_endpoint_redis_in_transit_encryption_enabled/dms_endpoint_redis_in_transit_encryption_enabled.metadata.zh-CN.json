@@ -1,0 +1,45 @@
+{
+  "Provider": "aws",
+  "CheckID": "dms_endpoint_redis_in_transit_encryption_enabled",
+  "CheckTitle": "Redis OSS 的 DMS 端点已启用传输中加密",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices/Encryption in Transit",
+    "Software and Configuration Checks/Industry and Regulatory Standards/NIST 800-53 Controls (USA)",
+    "Software and Configuration Checks/Industry and Regulatory Standards/PCI-DSS",
+    "Software and Configuration Checks/Industry and Regulatory Standards/ISO 27001 Controls"
+  ],
+  "ServiceName": "dms",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsDmsEndpoint",
+  "ResourceGroup": "database",
+  "Description": "**DMS Redis OSS 端点** 会检查其端点设置中是否存在 **TLS**（例如 `ssl-encryption`），以确认 DMS 复制实例与 Redis 之间的连接已启用传输中加密。",
+  "Risk": "如果未启用 **TLS**，DMS 与 Redis 之间的流量可能被拦截或篡改，从而危及数据的 **机密性** 和 **完整性**。\n\n攻击者可以发起 **中间人攻击**，窃取认证令牌，并注入或破坏迁移中的数据。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/dms-controls.html#dms-12",
+    "https://docs.aws.amazon.com/dms/latest/userguide/CHAP_Target.Redis.html#CHAP_Target.Redis.EndpointSettings",
+    "https://support.icompaas.com/support/solutions/articles/62000233450-ensure-encryption-in-transit-for-dms-endpoints-for-redis-oss"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation：为 Redis OSS DMS 端点启用 TLS\nResources:\n  <example_resource_name>:\n    Type: AWS::DMS::Endpoint\n    Properties:\n      EndpointIdentifier: <example_resource_name>\n      EndpointType: target\n      EngineName: redis\n      RedisSettings:\n        ServerName: <example_resource_name>\n        Port: 6379\n        AuthType: none\n        SslSecurityProtocol: ssl-encryption  # 关键：为传输中加密启用 TLS\n```",
+      "Other": "1. 在 AWS 控制台中，前往 Database Migration Service > Endpoints\n2. 选择 Redis OSS 端点并单击“Modify”\n3. 将 SSL security protocol（Encryption in transit）设置为 \"SSL encryption\"\n4. 保存更改",
+      "Terraform": "```hcl\n# 为 Redis OSS DMS 端点启用 TLS\nresource \"aws_dms_endpoint\" \"<example_resource_name>\" {\n  endpoint_id   = \"<example_resource_id>\"\n  endpoint_type = \"target\"\n  engine_name   = \"redis\"\n\n  redis_settings {\n    server_name           = \"<example_resource_name>\"\n    port                  = 6379\n    auth_type             = \"none\"\n    ssl_security_protocol = \"ssl-encryption\" # 关键：为传输中加密启用 TLS\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "在 Redis OSS 端点上启用 **TLS**（例如 `ssl-encryption`），并要求进行服务器证书校验。禁止明文连接，优先使用私有网络，并为 DMS 角色实施 **最小权限**，以增强整体的 **纵深防御** 能力。",
+      "Url": "https://hub.prowler.com/check/dms_endpoint_redis_in_transit_encryption_enabled"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+
+

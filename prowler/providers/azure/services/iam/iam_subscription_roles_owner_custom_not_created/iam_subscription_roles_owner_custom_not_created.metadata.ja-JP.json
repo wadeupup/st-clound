@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "iam_subscription_roles_owner_custom_not_created",
+  "CheckTitle": "カスタムのサブスクリプション所有者ロールが作成されていないことを確認する",
+  "CheckType": [],
+  "ServiceName": "iam",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AzureRole",
+  "ResourceGroup": "IAM",
+  "Description": "カスタムのサブスクリプション所有者ロールが作成されていないことを確認する",
+  "Risk": "サブスクリプション所有者には、カスタム所有者ロールを作成する権限を含めるべきではありません。最小権限の原則に従い、完全な管理アクセスを許可する代わりに、必要な権限のみを割り当てるべきです。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/role-based-access-control/custom-roles",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity-staging/knowledge-base/azure/AccessControl/remove-custom-owner-roles.html",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "カスタムのサブスクリプション所有者ロールは作成すべきではありません。これは、最小権限の原則に従い、完全な管理アクセスではなく必要な権限のみを割り当てるべきためです",
+      "Url": "https://www.trendmicro.com/cloudoneconformity-staging/knowledge-base/azure/AccessControl/remove-custom-owner-roles.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

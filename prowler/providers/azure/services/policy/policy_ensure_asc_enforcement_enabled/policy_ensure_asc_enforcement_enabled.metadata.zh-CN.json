@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "policy_ensure_asc_enforcement_enabled",
+  "CheckTitle": "确保 ASC 默认策略设置未被设为“Disabled”",
+  "CheckType": [],
+  "ServiceName": "policy",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Microsoft.Authorization/policyAssignments",
+  "ResourceGroup": "governance",
+  "Description": "ASC 默认策略提供的各项设置均不应将 effect 设为 Disabled。",
+  "Risk": "安全策略定义了工作负载的目标配置，并有助于确保符合企业或监管安全要求。ASC 默认策略默认关联到每个订阅。ASC 默认策略分配是一组基于最佳实践的安全建议。启用 ASC 默认策略中的建议可确保 Azure Security Center 能监控所有受支持建议，并可选择对其中部分建议启用自动化操作。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/defender-for-cloud/security-policy-concept",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "1. 在 Azure Home 中选择 Portal Menu。2. 选择 Policy。3. 对每个订阅选择 ASC Default。4. 点击“view Assignment”。5. 点击“Edit assignment”。6. 确保 Policy Enforcement 为 Enabled。7. 点击“Review + Save”。",
+      "Url": "https://learn.microsoft.com/en-us/azure/defender-for-cloud/implement-security-recommendations"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

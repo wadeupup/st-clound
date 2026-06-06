@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "app_ensure_http_is_redirected_to_https",
+  "CheckTitle": "确保 Azure App Service 中的 Web 应用将所有 HTTP 流量重定向到 HTTPS",
+  "CheckType": [],
+  "ServiceName": "app",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Microsoft.Web/sites/config",
+  "ResourceGroup": "serverless",
+  "Description": "默认情况下，Azure Web Apps 允许站点同时在 HTTP 和 HTTPS 下运行。默认情况下，任何人都可以通过非安全的 HTTP 链接访问 Web 应用。可以限制不安全的 HTTP 请求，并将所有 HTTP 请求重定向到安全的 HTTPS 端口。建议强制仅允许 HTTPS 流量。",
+  "Risk": "启用仅 HTTPS 流量会将所有非安全 HTTP 请求重定向到 HTTPS 端口。HTTPS 使用 TLS/SSL 协议提供加密且经过身份验证的安全连接。因此，为获得安全收益，支持 HTTPS 非常重要。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/app-service/configure-ssl-bindings#enforce-https",
+  "Remediation": {
+    "Code": {
+      "CLI": "az webapp update --resource-group <RESOURCE_GROUP_NAME> --name <APP_NAME> --set httpsOnly=true",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/AppService/enable-https-only-traffic.html#",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-networking-policies/bc_azr_networking_5#terraform"
+    },
+    "Recommendation": {
+      "Text": "1. 使用 https://portal.azure.com 登录 Azure 门户 2. 进入 App Services 3. 点击每个应用 4. 在 Setting 部分点击 Configuration 5. 在 General Settings 中将 HTTPS Only 设置为 On 6. 点击 Save",
+      "Url": "https://learn.microsoft.com/en-us/security/benchmark/azure/security-controls-v3-data-protection#dp-3-encrypt-sensitive-data-in-transit"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "启用后，每个传入的 HTTP 请求都会被重定向到 HTTPS 端口。这意味着对应用发起的 HTTP 请求将增加一层额外安全防护。"
+}

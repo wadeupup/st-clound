@@ -1,0 +1,36 @@
+{
+  "Provider": "aws",
+  "CheckID": "ec2_elastic_ip_shodan",
+  "CheckTitle": "检查是否有任何弹性 IP 或公共 IP 出现在 Shodan 中（需要 Shodan API 密钥）",
+  "CheckType": [
+    "Infrastructure Security"
+  ],
+  "ServiceName": "ec2",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "high",
+  "ResourceType": "AwsEc2Eip",
+  "ResourceGroup": "network",
+  "Description": "检查是否有任何弹性 IP 或公共 IP 出现在 Shodan 中（需要 Shodan API 密钥）",
+  "Risk": "像 Shodan 这样的网站会索引暴露的系统，并进一步将它们暴露给更广泛的受众，作为快速查找可利用系统的方式。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "检查已识别的 IP，考虑将它们更改为私有 IP 并从 Shodan 中删除它们。",
+      "Url": "https://www.shodan.io/"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

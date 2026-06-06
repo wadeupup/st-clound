@@ -1,0 +1,39 @@
+{
+  "Provider": "aws",
+  "CheckID": "guardduty_eks_runtime_monitoring_enabled",
+  "CheckTitle": "GuardDuty detector で EKS ランタイムモニタリングが有効化されていること",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices/Runtime Behavior Analysis",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices"
+  ],
+  "ServiceName": "guardduty",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsGuardDutyDetector",
+  "ResourceGroup": "security",
+  "Description": "GuardDuty detector で Amazon EKS 向け **EKS ランタイムモニタリング**が有効かを評価します。この設定は detector レベルで管理され、EKS ノードおよびコンテナ上の*プロセス・ファイル・ネットワーク*活動の可視性に関係します。",
+  "Risk": "**EKS ランタイムモニタリング**がない場合、クラスター内アクティビティは検知の盲点になります。攻撃者はマルウェアやクリプトマイナーの実行、Pod 経由での機密情報流出、ワークロード改ざん、他サービスへの横展開を行う可能性があり、機密性・完全性を低下させ、リソース枯渇（可用性）を引き起こします。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/guardduty/latest/ug/runtime-monitoring-configuration.html",
+    "https://docs.aws.amazon.com/config/latest/developerguide/guardduty-eks-protection-runtime-enabled.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/guardduty-controls.html#guardduty-7"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws guardduty update-detector --detector-id <detector-id> --features name=EKS_RUNTIME_MONITORING,status=ENABLED",
+      "NativeIaC": "```yaml\nResources:\n  <example_resource_name>:\n    Type: AWS::GuardDuty::Detector\n    Properties:\n      Enable: true\n      Features:\n        - Name: EKS_RUNTIME_MONITORING   # Critical: selects EKS Runtime Monitoring feature\n          Status: ENABLED                # Critical: enables the feature to pass the check\n```",
+      "Other": "1. AWS Console を開き Amazon GuardDuty に移動します\n2. 左ペインで Settings > Runtime monitoring を選択します\n3. EKS Runtime Monitoring のステータスを Enabled に切り替えます\n4. Save changes をクリックします",
+      "Terraform": "```hcl\nresource \"aws_guardduty_detector\" \"<example_resource_name>\" {\n  enable = true\n\n  features {\n    name   = \"EKS_RUNTIME_MONITORING\"  # Critical: selects EKS Runtime Monitoring feature\n    status = \"ENABLED\"                 # Critical: enables the feature to pass the check\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "- すべてのアカウントとクラスターで自動エージェント管理付き **EKS ランタイムモニタリング**を有効化する\n- エージェントには**最小権限**を適用し、クラスターアクセスを分離する\n- 検出結果を対応ワークフローに連携し、ランタイムカバレッジを定期的に検証する",
+      "Url": "https://hub.prowler.com/check/guardduty_eks_runtime_monitoring_enabled"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

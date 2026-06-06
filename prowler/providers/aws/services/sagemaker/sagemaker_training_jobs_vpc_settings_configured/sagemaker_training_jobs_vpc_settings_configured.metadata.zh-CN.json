@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "sagemaker_training_jobs_vpc_settings_configured",
+  "CheckTitle": "Amazon SageMaker 训练作业已启用 VPC 配置",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践/网络可达性",
+    "软件和配置检查/行业和监管标准/AWS 基础安全最佳实践",
+    "影响/数据暴露"
+  ],
+  "ServiceName": "sagemaker",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Other",
+  "ResourceGroup": "ai_ml",
+  "Description": "**SageMaker 训练作业**会通过检测作业设置中定义的 `subnets` 来评估其**VPC 配置**。启用 VPC 设置后，ENI 会将作业置于您的 VPC 中，因此训练卷和输出的流量会使用私有网络。",
+  "Risk": "如果没有 VPC 设置，训练容器将依赖公共网络和宽泛的出站访问。这会削弱**机密性**和**完整性**，使数据集或模型工件的数据外泄、恶意软件下载，以及绕过细粒度安全组控制和基于 VPC 的监控成为可能。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/sagemaker/latest/dg/interface-vpc-endpoint.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation：启用了 VPC 的 SageMaker TrainingJob\nResources:\n  <example_resource_name>:\n    Type: AWS::SageMaker::TrainingJob\n    Properties:\n      TrainingJobName: <example_resource_name>\n      RoleArn: <example_resource_id>\n      AlgorithmSpecification:\n        TrainingImage: <example_resource_id>\n        TrainingInputMode: File\n      OutputDataConfig:\n        S3OutputPath: s3://<example_resource_name>/\n      ResourceConfig:\n        InstanceType: ml.m5.large\n        InstanceCount: 1\n        VolumeSizeInGB: 10\n      StoppingCondition:\n        MaxRuntimeInSeconds: 3600\n      VpcConfig:\n        Subnets:\n          - <example_resource_id>  # 关键：添加 VPC 子网，使作业具有 VPC 配置\n        SecurityGroupIds:\n          - <example_resource_id>  # 使用 VPC 时 SageMaker 要求提供\n```",
+      "Other": "1. 在 AWS 控制台中，前往 SageMaker > Training > Training jobs\n2. 点击 Create training job（或选择一个作业并选择 Create copy）\n3. 在 Networking 中，选择一个 VPC，然后至少选择一个 Subnet 和一个 Security group\n4. 完成必填字段并创建该作业\n5. 验证新的训练作业在其详细信息中显示 VPC 子网",
+      "Terraform": "```hcl\n# 带有 VPC 配置的 SageMaker 训练作业\nresource \"aws_sagemaker_training_job\" \"<example_resource_name>\" {\n  name     = \"<example_resource_name>\"\n  role_arn = \"<example_resource_id>\"\n\n  algorithm_specification {\n    training_image     = \"<example_resource_id>\"\n    training_input_mode = \"File\"\n  }\n\n  output_data_config {\n    s3_output_path = \"s3://<example_resource_name>/\"\n  }\n\n  resource_config {\n    instance_type  = \"ml.m5.large\"\n    instance_count = 1\n    volume_size_gb = 10\n  }\n\n  stopping_condition {\n    max_runtime_in_seconds = 3600\n  }\n\n  vpc_config {\n    subnets            = [\"<example_resource_id>\"]     # 关键：在训练作业上启用 VPC\n    security_group_ids = [\"<example_resource_id>\"]     # VPC 必需\n\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "在 VPC 中使用特定的 `subnets` 和严格限定范围的 `security groups` 运行训练。\n- 为 S3、ECR 和 SageMaker 使用 `VPC endpoints` 以保持流量私有\n- 默认阻止出站互联网访问，并仅允许所需的目标\n- 实施网络分段，并在可行时启用 `network isolation`",
+      "Url": "https://hub.prowler.com/check/sagemaker_training_jobs_vpc_settings_configured"
+    }
+  },
+  "Categories": [
+    "trust-boundaries",
+    "gen-ai"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

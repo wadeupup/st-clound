@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "elbv2_deletion_protection",
+  "CheckTitle": "ELBv2 ロードバランサーで削除保護が有効化されていること",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Effects/Denial of Service"
+  ],
+  "ServiceName": "elbv2",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsElbv2LoadBalancer",
+  "ResourceGroup": "network",
+  "Description": "**削除保護**（`deletion_protection.enabled`）が有効な **ELBv2 ロードバランサー** は、標準 API を通じた削除に対して耐性があります。\n\nこの評価では、各ロードバランサーで当該属性が有効かを判定します。",
+  "Risk": "**削除保護** がない場合、ユーザーや自動処理によりロードバランサーが削除され、サービスエンドポイント断やルーティング破綻が発生し、**可用性** が損なわれます。\n\n悪意ある、または誤った削除は **DoS** を招き、ブルー/グリーンロールバックを妨げ、インシデント復旧時間を増加させます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/elasticloadbalancing/latest/application/application-load-balancers.html#deletion-protection",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/ELBv2/deletion-protection.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws elbv2 modify-load-balancer-attributes --load-balancer-arn <lb_arn> --attributes Key=deletion_protection.enabled,Value=true",
+      "NativeIaC": "```yaml\nResources:\n  <example_resource_name>:\n    Type: AWS::ElasticLoadBalancingV2::LoadBalancer\n    Properties:\n      Subnets:\n        - <example_subnet_id_1>\n        - <example_subnet_id_2>\n      LoadBalancerAttributes:\n        - Key: deletion_protection.enabled  # Critical: enable deletion protection\n          Value: \"true\"                   # Ensures the LB cannot be deleted accidentally\n```",
+      "Other": "1. AWS コンソールで EC2 > Load Balancers（Load Balancing 配下）に移動します\n2. 対象ロードバランサーを選択します\n3. Attributes タブを開いて Edit attributes をクリックします\n4. Deletion protection を有効化します\n5. Save changes をクリックします",
+      "Terraform": "```hcl\nresource \"aws_lb\" \"<example_resource_name>\" {\n  subnets = [\"<example_subnet_id_1>\", \"<example_subnet_id_2>\"]\n\n  enable_deletion_protection = true # Critical: enables deletion protection to pass the check\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "本番および重要なロードバランサーで **削除保護** を有効化してください。\n\n削除操作を制限する **最小権限** を徹底し、保護対象資産に対してガバナンス（タグとポリシーガードレール）を適用し、承認付きの **変更管理** を必須化します。*パイプラインでは*、保護対象リソースの削除をブロックするチェックを追加してください。",
+      "Url": "https://hub.prowler.com/check/elbv2_deletion_protection"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

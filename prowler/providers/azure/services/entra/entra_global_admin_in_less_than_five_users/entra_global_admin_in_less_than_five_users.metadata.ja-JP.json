@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "entra_global_admin_in_less_than_five_users",
+  "CheckTitle": "グローバル管理者の割り当てユーザー数が 5 未満であることを確認する",
+  "CheckType": [],
+  "ServiceName": "entra",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "#microsoft.graph.directoryRole",
+  "ResourceGroup": "IAM",
+  "Description": "この推奨事項は、Microsoft Entra ID におけるグローバル管理者ロールの割り当てを最小 2 ユーザー、最大 4 ユーザーとすることで、セキュリティと運用効率のバランスを維持することを目的としています。少なくとも 2 名のグローバル管理者がいれば冗長性を確保でき、4 名以下に制限することで過剰な特権アクセスのリスクを低減できます。",
+  "Risk": "グローバル管理者ロールは Microsoft Entra ID の全サービスに対して広範な権限を持ちます。グローバル管理者ロールは日常業務で使用すべきではなく、管理者は日常業務用の通常アカウントと、管理業務用の別アカウントを持つべきです。グローバル管理者の人数を制限することで、不正アクセスのリスク低減、人為的ミスの影響最小化、最小権限の原則への準拠による Azure テナントの攻撃対象領域削減に寄与します。一方で、少なくとも 2 名のグローバル管理者がいれば、1 名が不在でも管理機能を継続できます。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/entra/identity/role-based-access-control/best-practices#5-limit-the-number-of-global-administrators-to-less-than-5",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "1. Azure Home から Portal Menu を選択します 2. Microsoft Entra ID を選択します 3. Roles and Administrators を選択します 4. Global Administrator を選択します 5. このロールがアクティブに割り当てられているユーザーが 5 名未満であることを確認します 6. このロールがアクティブに割り当てられているユーザーが少なくとも 2 名であることを確認します。",
+      "Url": "https://learn.microsoft.com/en-us/microsoft-365/admin/add-users/about-admin-roles?view=o365-worldwide#security-guidelines-for-assigning-roles"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "この推奨事項の実装には、管理ワークフローの変更や役割・責任の再配分が必要になる場合があります。すべてのグローバル管理者に対して十分なトレーニングと周知を実施してください。"
+}

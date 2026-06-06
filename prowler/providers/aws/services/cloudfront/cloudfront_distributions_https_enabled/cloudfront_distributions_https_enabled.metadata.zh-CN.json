@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "cloudfront_distributions_https_enabled",
+  "CheckTitle": "CloudFront 分配的查看器协议策略设置为仅 HTTPS 或重定向到 HTTPS",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices/Network Reachability",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Effects/Data Exposure"
+  ],
+  "ServiceName": "cloudfront",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsCloudFrontDistribution",
+  "ResourceGroup": "network",
+  "Description": "当默认缓存行为的 `viewer_protocol_policy` 为 `https-only` 或 `redirect-to-https` 时，CloudFront 分配要求查看器连接通过**HTTPS**。使用 `allow-all` 的配置允许 HTTP。",
+  "Risk": "允许 HTTP 会使流量暴露于**中间人**拦截和**会话劫持**，可能导致 Cookie、令牌或 PII 被盗。攻击者可以**篡改**响应、注入恶意软件或执行**降级/剥离**攻击，削弱机密性和完整性。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/CloudFront/security-policy.html",
+    "https://docs.aws.amazon.com/IAM/latest/UserGuide/what-is-access-analyzer.html",
+    "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/using-https.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws cloudfront get-distribution-config --id <DISTRIBUTION_ID> --output json > current-config.json && echo 'Manually edit current-config.json to change DefaultCacheBehavior.ViewerProtocolPolicy to \"redirect-to-https\" or \"https-only\", then run:' && echo 'aws cloudfront update-distribution --id <DISTRIBUTION_ID> --distribution-config file://current-config.json --if-match $(aws cloudfront get-distribution-config --id <DISTRIBUTION_ID> --query \"ETag\" --output text)'",
+      "NativeIaC": "```yaml\n# CloudFormation：将 ViewerProtocolPolicy 设置为要求 HTTPS\nResources:\n  <example_resource_name>:\n    Type: AWS::CloudFront::Distribution\n    Properties:\n      DistributionConfig:\n        DefaultCacheBehavior:\n          ViewerProtocolPolicy: https-only  # 关键：要求查看器使用 HTTPS\n```",
+      "Other": "1. 在 AWS 控制台中，转到 CloudFront > 分配\n2. 选择目标分配并打开行为选项卡\n3. 选择默认 (*) 行为并点击编辑\n4. 将查看器协议策略设置为将 HTTP 重定向到 HTTPS（或仅 HTTPS）\n5. 保存更改并部署",
+      "Terraform": "```hcl\n# Terraform：将 viewer_protocol_policy 设置为强制 HTTPS\nresource \"aws_cloudfront_distribution\" \"<example_resource_name>\" {\n  default_cache_behavior {\n    target_origin_id       = \"<example_origin_id>\"\n    viewer_protocol_policy = \"redirect-to-https\" # 关键：强制 HTTP 重定向到 HTTPS\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "通过将 `viewer_protocol_policy` 设置为 `https-only` 或 `redirect-to-https` 来强制查看器**仅使用 HTTPS**访问；避免使用 `allow-all`。将加密扩展到端到端的源，启用**HSTS**，优先使用现代 TLS 和密码，并将 Cookie 标记为 `Secure`。这支持**纵深防御**并防止降级。",
+      "Url": "https://hub.prowler.com/check/cloudfront_distributions_https_enabled"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

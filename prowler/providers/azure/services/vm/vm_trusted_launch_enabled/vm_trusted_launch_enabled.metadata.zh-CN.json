@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "vm_trusted_launch_enabled",
+  "CheckTitle": "确保在虚拟机上启用 Trusted Launch",
+  "CheckType": [],
+  "ServiceName": "vm",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Microsoft.Compute/virtualMachines",
+  "ResourceGroup": "compute",
+  "Description": "当 Secure Boot 与 vTPM 同时启用时，它们可为虚拟机提供强有力的启动攻击防护基础。例如，如果攻击者尝试将引导加载程序替换为恶意版本，Secure Boot 会阻止虚拟机启动。若攻击者绕过 Secure Boot 并安装恶意引导加载程序，vTPM 可用于检测入侵并向你发出告警。",
+  "Risk": "Secure Boot 与 vTPM 协同工作，可保护虚拟机免受多种启动攻击，包括 bootkit、rootkit 和固件 rootkit。若未在 Azure VM 中启用 Trusted Launch，可能导致对 rootkit 和启动层恶意软件的脆弱性增加，降低对启动流程未授权更改的检测与防护能力，并可能危及系统完整性与数据安全。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/virtual-machines/trusted-launch-existing-vm?tabs=portal",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "1. 进入 Virtual Machines。2. 对每台 VM，在 Settings 下点击左侧 Configuration。3. 在 Security Type 下选择“Trusted Launch Virtual Machines”。4. 确保勾选 Enable Secure Boot 与 Enable vTPM。5. 点击 Apply。",
+      "Url": "https://learn.microsoft.com/en-us/azure/virtual-machines/trusted-launch-existing-vm?tabs=portal#enable-trusted-launch-on-existing-vm"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "Secure Boot 和 vTPM 当前不支持 Azure 第一代（Generation 1）VM。重要提示：对于尚未同时启用 Secure Boot 和 vTPM 的第二代（Generation 2）VM，在执行修复前强烈建议先创建 VM 还原点。"
+}

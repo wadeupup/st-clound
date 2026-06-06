@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "keyvault_recoverable",
+  "CheckTitle": "确保 Key Vault 可恢复",
+  "CheckType": [],
+  "ServiceName": "keyvault",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "KeyVault",
+  "ResourceGroup": "security",
+  "Description": "Key Vault 包含对象密钥、机密和证书。Key Vault 的意外不可用可能立即导致数据丢失，或导致由 Key Vault 对象支持的安全功能（身份验证、校验、验证、不可抵赖性等）失效。建议通过启用“Do Not Purge”和“Soft Delete”功能来使 Key Vault 可恢复。这是为了防止加密数据（包括存储账户、SQL 数据库以及由 Key Vault 对象（密钥、机密、证书）提供的依赖服务等）丢失。该问题可能发生在用户误删或恶意用户破坏性操作的情况下。警告：当前 Azure 各服务的软删除功能有一项限制：删除 Key Vault 时角色分配会消失。恢复后需要重新创建所有角色分配。",
+  "Risk": "可能存在以下场景：用户误执行 Key Vault 的 delete/purge 命令，或攻击者/恶意用户故意执行这些操作以造成中断。删除或清除（purge）Key Vault 会立即导致数据丢失，因为用于加密数据的密钥以及用于访问/服务的机密和证书将无法访问。影响 Key Vault 永久不可用有 2 个属性：1. enableSoftDelete：将其设置为“true”可确保即使 Key Vault 被删除，Key Vault 本身及其对象在接下来的 90 天内仍可恢复。在这 90 天内可执行恢复或清除（永久删除）；若不采取操作，Key Vault 及其对象随后将被清除。2. enablePurgeProtection：enableSoftDelete 仅确保 Key Vault 不会被立即永久删除并在删除后 90 天内可恢复；但某些场景下 Key Vault 及/或其对象仍可能被误清除，从而无法恢复。将 enablePurgeProtection 设置为“true”可确保 Key Vault 及其对象无法被清除。在 Key Vault 上同时启用这两个参数，可确保 Key Vault 及其对象不会被永久删除/清除。",
+  "RelatedUrl": "https://docs.microsoft.com/en-us/azure/key-vault/key-vault-soft-delete-cli",
+  "Remediation": {
+    "Code": {
+      "CLI": "az resource update --id /subscriptions/xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/<resourceGroupName>/providers/Microsoft.KeyVault/vaults/<keyVaultName> --set properties.enablePurgeProtection=trueproperties.enableSoftDelete=true",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/KeyVault/enable-key-vault-recoverability.html#",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-general-policies/ensure-the-key-vault-is-recoverable#terraform"
+    },
+    "Recommendation": {
+      "Text": "为 Key Vault 启用“Do Not Purge”和“Soft Delete”：在 Azure 门户中：1. 转到 Key Vaults。2. 对每个 Key Vault。3. 点击 Properties。4. 确保 soft-delete 状态显示“Soft delete has been enabled on this key vault.”。5. 在页面底部点击“Enable Purge Protection”。注意：启用后无法禁用。在 Azure CLI 中：az resource update --id /subscriptions/xxxxxx-xxxx-xxxx-xxxx- xxxxxxxxxxxx/resourceGroups/<resourceGroupName>/providers/Microsoft.KeyVault /vaults/<keyVaultName> --set properties.enablePurgeProtection=true properties.enableSoftDelete=true。在 PowerShell 中：Update-AzKeyVault -VaultName <vaultName -ResourceGroupName <resourceGroupName -EnablePurgeProtection",
+      "Url": "https://blogs.technet.microsoft.com/kv/2017/05/10/azure-key-vault-recovery-options/"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "一旦为 Key Vault 启用了 purge-protection 和 soft-delete，该操作不可逆。"
+}

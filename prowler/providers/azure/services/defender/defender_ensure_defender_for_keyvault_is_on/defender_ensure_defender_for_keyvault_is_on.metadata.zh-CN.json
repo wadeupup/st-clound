@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "defender_ensure_defender_for_keyvault_is_on",
+  "CheckTitle": "确保 Microsoft Defender for KeyVault 设置为“开启”",
+  "CheckType": [],
+  "ServiceName": "defender",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AzureDefenderPlan",
+  "ResourceGroup": "security",
+  "Description": "确保 Microsoft Defender for KeyVault 设置为“开启”",
+  "Risk": "默认情况下，Microsoft Defender for Cloud 对 Azure Key Vault 处于禁用状态。Defender for Cloud 可检测对 Azure Key Vault 数据的异常和潜在恶意访问或利用尝试。这层防护可让你在无需成为安全专家、且无需使用和管理第三方安全监控工具或服务的情况下应对威胁。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/SecurityCenter/defender-key-vault.html",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-general-policies/ensure-that-azure-defender-is-set-to-on-for-key-vault#terraform"
+    },
+    "Recommendation": {
+      "Text": "确保为 Azure Key Vault 启用 Microsoft Defender for Cloud。Key Vault 是 Azure 云服务，用于保护加密密钥和机密信息，例如证书、基于连接的字符串和密码。",
+      "Url": ""
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "elbv2_ssl_listeners",
+  "CheckTitle": "ELBv2 Application Load Balancer リスナーが HTTPS を使用するか、HTTP を HTTPS にリダイレクトしていること",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Effects/Data Exposure"
+  ],
+  "ServiceName": "elbv2",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsElbv2LoadBalancer",
+  "ResourceGroup": "network",
+  "Description": "**Application Load Balancer リスナー**の **暗号化された受信** を評価します。`HTTPS` リスナーのみであるか、`HTTP` リスナーがある場合は `HTTPS` へリダイレクトされる必要があります。",
+  "Risk": "公開された `HTTP` パスはトラフィックを平文で通過させ、盗聴、認証情報窃取、セッションハイジャック、レスポンス改ざんを可能にします。これにより機密性と完全性が弱まり、公開または共有ネットワーク上での **MITM** 攻撃が成立しやすくなります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/elb-controls.html#elb-1",
+    "https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws elbv2 modify-listener --listener-arn <listener_arn> --default-actions '[{\"Type\":\"redirect\",\"RedirectConfig\":{\"Protocol\":\"HTTPS\",\"Port\":\"443\",\"StatusCode\":\"HTTP_301\"}}]'",
+      "NativeIaC": "```yaml\n# CloudFormation: Redirect HTTP listener to HTTPS\nResources:\n  <example_resource_name>:\n    Type: AWS::ElasticLoadBalancingV2::Listener\n    Properties:\n      LoadBalancerArn: <example_resource_id>\n      Protocol: HTTP\n      Port: 80\n      DefaultActions:\n        - Type: redirect\n          RedirectConfig:\n            Protocol: HTTPS  # Critical: redirect HTTP to HTTPS\n            Port: '443'      # Critical: target HTTPS port\n            StatusCode: HTTP_301  # Critical: enforce redirect\n```",
+      "Other": "1. EC2 コンソールを開き、Load Balancers に移動します\n2. Application Load Balancer を選択して Listeners タブを開きます\n3. HTTP:80 リスナーを選択し、Edit（または View/edit rules）をクリックします\n4. デフォルトアクションを Redirect to にし、Protocol: HTTPS、Port: 443、Status code: HTTP_301 を設定します\n5. 変更を保存します",
+      "Terraform": "```hcl\n# Terraform: Redirect HTTP listener to HTTPS\nresource \"aws_lb_listener\" \"<example_resource_name>\" {\n  load_balancer_arn = \"<example_resource_id>\"\n  protocol          = \"HTTP\"\n  port              = 80\n\n  default_action {\n    type = \"redirect\"\n    redirect {\n      protocol   = \"HTTPS\"   # Critical: redirect to HTTPS\n      port       = \"443\"     # Critical: target HTTPS port\n      status_code = \"HTTP_301\" # Critical: enforce redirect\n    }\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "**TLS を全面適用**してください：`HTTPS` リスナーを使用し、すべての `HTTP` リスナーは `HTTPS` のみへリダイレクトします。平文転送は行わないでください。強力な TLS ポリシーと管理証明書で **多層防御** を実装し、必要に応じて `HSTS` を使って `http` 到達を防止します。",
+      "Url": "https://hub.prowler.com/check/elbv2_ssl_listeners"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

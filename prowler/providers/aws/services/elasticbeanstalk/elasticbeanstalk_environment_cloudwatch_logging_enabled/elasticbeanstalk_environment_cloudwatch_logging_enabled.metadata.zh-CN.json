@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "elasticbeanstalk_environment_cloudwatch_logging_enabled",
+  "CheckTitle": "Elastic Beanstalk 环境将日志流式传输到 CloudWatch Logs",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices/Runtime Behavior Analysis",
+    "TTPs/Defense Evasion"
+  ],
+  "ServiceName": "elasticbeanstalk",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsElasticBeanstalkEnvironment",
+  "ResourceGroup": "compute",
+  "Description": "**Elastic Beanstalk 环境**通过 `StreamLogs` 设置，配置为将实例与代理日志流式传输到 **Amazon CloudWatch Logs**",
+  "Risk": "若未将日志**集中化**到 CloudWatch，日志可能在轮转或实例终止时丢失，从而延迟检测与响应。攻击者可删除本地日志以规避审计，隐藏 Web 攻击或配置篡改证据，并破坏**机密性**、**完整性**与**可用性**。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/AWSHowTo.cloudwatchlogs.html",
+    "https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/environments-cfg-logging.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/elasticbeanstalk-controls.html#elasticbeanstalk-3"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws elasticbeanstalk update-environment --environment-name <example_resource_name> --option-settings Namespace=aws:elasticbeanstalk:cloudwatch:logs,OptionName=StreamLogs,Value=true",
+      "NativeIaC": "```yaml\nResources:\n  <example_resource_name>:\n    Type: AWS::ElasticBeanstalk::Environment\n    Properties:\n      ApplicationName: \"<example_resource_name>\"\n      PlatformArn: \"<platform_arn>\"\n      OptionSettings:\n        - Namespace: aws:elasticbeanstalk:cloudwatch:logs\n          OptionName: StreamLogs\n          Value: \"true\"  # Critical: Enables instance log streaming to CloudWatch Logs\n```",
+      "Other": "1. 打开 AWS Elastic Beanstalk 控制台并选择你的环境\n2. 进入 Configuration > Updates, monitoring, and logging > Edit\n3. 在“Instance log streaming to CloudWatch Logs”下，将 Log streaming 设置为 Activated\n4. 点击 Apply 保存",
+      "Terraform": "```hcl\nresource \"aws_elastic_beanstalk_environment\" \"<example_resource_name>\" {\n  name         = \"<example_resource_name>\"\n  application  = \"<example_resource_name>\"\n  platform_arn = \"<platform_arn>\"\n\n  # Critical: Enables instance log streaming to CloudWatch Logs\n  setting {\n    namespace = \"aws:elasticbeanstalk:cloudwatch:logs\"\n    name      = \"StreamLogs\"\n    value     = \"true\"\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "启用流式传输到 **CloudWatch Logs**。设置合理的保留期，避免在终止时删除日志，并使用最小权限 IAM 限制访问。添加指标过滤器和告警以实现早期检测，并保留归档以支持**取证**、**可追责性**和**纵深防御**。",
+      "Url": "https://hub.prowler.com/check/elasticbeanstalk_environment_cloudwatch_logging_enabled"
+    }
+  },
+  "Categories": [
+    "logging"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

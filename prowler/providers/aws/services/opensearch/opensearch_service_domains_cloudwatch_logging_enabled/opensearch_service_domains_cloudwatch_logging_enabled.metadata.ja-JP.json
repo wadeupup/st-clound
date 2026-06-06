@@ -1,0 +1,47 @@
+{
+  "Provider": "aws",
+  "CheckID": "opensearch_service_domains_cloudwatch_logging_enabled",
+  "CheckTitle": "Amazon OpenSearch Service ドメインは、検索およびインデックスのスローログを CloudWatch Logs に公開します",
+  "CheckType": [
+    "ソフトウェアと構成のチェック/AWS セキュリティベストプラクティス/ランタイム動作分析",
+    "ソフトウェアと構成のチェック/業界および規制基準/AWS 基礎セキュリティベストプラクティス"
+  ],
+  "ServiceName": "opensearch",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "low",
+  "ResourceType": "AwsOpenSearchServiceDomain",
+  "ResourceGroup": "database",
+  "Description": "**Amazon OpenSearch Service** ドメインは、CloudWatch Logs に対して **検索** および **インデックス** 操作の **スローログ公開** が有効になっています (`SEARCH_SLOW_LOGS` および `INDEX_SLOW_LOGS`)。",
+  "Risk": "これらのログがないと、**高コストの検索** や **遅いインデックス** への可視性が失われ、ホットスポットや不正使用が隠されます。\n- 可用性: タイムアウト、スロットリング、ノード圧力\n- 整合性: インデックスの見落としや遅延\n- 運用: インシデント対応の遅れやキャパシティプランニングの遅れ",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-createdomain-configure-slow-logs.html",
+    "https://support.icompaas.com/support/solutions/articles/62000129471-ensure-amazon-elasticsearch-service-es-domains-have-logging-enabled",
+    "https://docs.prowler.com/checks/aws/elasticsearch-policies/elasticsearch_7",
+    "https://docs.prowler.com/checks/aws/elasticsearch-policies/elasticsearch_7#terraform",
+    "https://bigdataboutique.com/blog/inspecting-search-slow-logs-on-elasticsearch-and-opensearch-b05d87",
+    "https://repost.aws/knowledge-center/opensearch-troubleshoot-slow-logs",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/Elasticsearch/slow-logs.html",
+    "https://medium.com/heyjobs-tech/how-to-create-an-opensearch-cluster-using-terraform-926b4a62b489",
+    "https://docs.aws.amazon.com/opensearch-service/latest/developerguide/createdomain-configure-slow-logs.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws opensearch update-domain-config --domain-name <DOMAIN_NAME> --log-publishing-options \"SEARCH_SLOW_LOGS={CloudWatchLogsLogGroupArn=<LOG_GROUP_ARN>,Enabled=true},INDEX_SLOW_LOGS={CloudWatchLogsLogGroupArn=<LOG_GROUP_ARN>,Enabled=true}\"",
+      "NativeIaC": "```yaml\n# CloudFormation: OpenSearch の検索およびインデックススローログを CloudWatch に有効化\nResources:\n  <example_resource_name>:\n    Type: AWS::OpenSearchService::Domain\n    Properties:\n      DomainName: <example_resource_name>\n      LogPublishingOptions:\n        SEARCH_SLOW_LOGS:\n          CloudWatchLogsLogGroupArn: <LOG_GROUP_ARN>\n          Enabled: true  # 重要: SEARCH_SLOW_LOGS の公開を有効にします\n        INDEX_SLOW_LOGS:\n          CloudWatchLogsLogGroupArn: <LOG_GROUP_ARN>\n          Enabled: true  # 重要: INDEX_SLOW_LOGS の公開を有効にします\n```",
+      "Other": "1. AWS コンソールで Amazon OpenSearch Service を開き、ドメインを選択します\n2. [ログ] タブに移動します\n3. 検索スローログについては、[有効にする] をクリックし、CloudWatch ロググループを選択または作成し、提案されたリソースポリシーを承認/アタッチしてから保存します\n4. インデックススローログについては、[有効にする] をクリックし、CloudWatch ロググループを選択または作成し、提案されたリソースポリシーを承認/アタッチしてから保存します\n5. ドメインのステータスがアクティブに戻るのを待ちます",
+      "Terraform": "```hcl\n# OpenSearch の検索およびインデックススローログを CloudWatch に有効化\nresource \"aws_opensearch_domain\" \"<example_resource_name>\" {\n  domain_name = \"<example_resource_name>\"\n\n  # 重要: SEARCH_SLOW_LOGS の公開を有効にします\n  log_publishing_options {\n    log_type                 = \"SEARCH_SLOW_LOGS\"\n    cloudwatch_log_group_arn = \"<LOG_GROUP_ARN>\"\n    enabled                  = true\n  }\n\n  # 重要: INDEX_SLOW_LOGS の公開を有効にします\n  log_publishing_options {\n    log_type                 = \"INDEX_SLOW_LOGS\"\n    cloudwatch_log_group_arn = \"<LOG_GROUP_ARN>\"\n    enabled                  = true\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "すべてのドメインで `SEARCH_SLOW_LOGS` と `INDEX_SLOW_LOGS` の両方を有効にし、CloudWatch に公開します。意味のあるしきい値と保持期間を設定し、ロググループを分け、異常に対してアラートを設定します。ログアクセスには **最小特権** を適用し、補完的なエラーおよび監査ログと共に **多層防御** を使用します。",
+      "Url": "https://hub.prowler.com/check/opensearch_service_domains_cloudwatch_logging_enabled"
+    }
+  },
+  "Categories": [
+    "logging"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

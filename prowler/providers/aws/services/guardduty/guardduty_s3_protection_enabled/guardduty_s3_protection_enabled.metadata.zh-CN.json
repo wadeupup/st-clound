@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "guardduty_s3_protection_enabled",
+  "CheckTitle": "GuardDuty detector 已启用 S3 Protection",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices/Runtime Behavior Analysis",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Effects/Data Exfiltration"
+  ],
+  "ServiceName": "guardduty",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsGuardDutyDetector",
+  "ResourceGroup": "security",
+  "Description": "会评估 Amazon GuardDuty detector 是否启用了 **S3 Protection**。该能力通过分析 CloudTrail S3 数据事件，监控账号与 Region 内 S3 存储桶的**对象级 API 活动**（`GetObject`、`PutObject`、`DeleteObject`）。",
+  "Risk": "若未启用 S3 Protection，**对象级 S3 活动**将不被分析，从而可能导致：\n- 通过批量读取/复制进行**数据外泄**\n- **破坏性删除**\n- **策略/ACL 篡改**\n\n这些未被发现的行为会削弱数据机密性、完整性和可用性。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.amazonaws.cn/en_us/guardduty/latest/ug/guardduty_finding-types-s3.html",
+    "https://docs.aws.amazon.com/guardduty/latest/ug/s3_detection.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/GuardDuty/enable-s3-protection.html",
+    "https://docs.aws.amazon.com/guardduty/latest/ug/s3-protection.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/guardduty-controls.html#guardduty-10"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws guardduty update-detector --detector-id <detector-id> --data-sources S3Logs={Enable=true}",
+      "NativeIaC": "```yaml\n# CloudFormation: Enable S3 Protection on a GuardDuty detector\nResources:\n  <example_resource_name>:\n    Type: AWS::GuardDuty::Detector\n    Properties:\n      Enable: true\n      DataSources:\n        S3Logs:\n          Enable: true  # Critical: Enables GuardDuty S3 Protection\n```",
+      "Other": "1. 打开 AWS Management Console 并进入 GuardDuty\n2. 在左侧菜单选择 Settings\n3. 找到 S3 Protection 部分并点击 Enable（或切换为 On）\n4. 点击 Save",
+      "Terraform": "```hcl\n# Enable S3 Protection on a GuardDuty detector\nresource \"aws_guardduty_detector\" \"<example_resource_name>\" {\n  enable = true\n\n  datasources {\n    s3_logs {\n      enable = true  # Critical: Enables GuardDuty S3 Protection\n    }\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "在所有账号和 Region 启用 **S3 Protection**，为 S3 增加**纵深防御**。对 IAM 和存储桶策略实施**最小权限**，持续强制 **Block Public Access**，将发现结果接入告警系统，并定期审查异常以防止数据丢失与篡改。",
+      "Url": "https://hub.prowler.com/check/guardduty_s3_protection_enabled"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

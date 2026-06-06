@@ -1,0 +1,44 @@
+{
+  "Provider": "aws",
+  "CheckID": "cloudwatch_changes_to_network_acls_alarm_configured",
+  "CheckTitle": "ネットワーク ACL (NACL) 変更イベント用の CloudWatch ログメトリクスフィルターとアラームが存在する",
+  "CheckType": [
+    "Software and Configuration Checks/Industry and Regulatory Standards/CIS AWS Foundations Benchmark",
+    "Software and Configuration Checks/AWS Security Best Practices/Runtime Behavior Analysis"
+  ],
+  "ServiceName": "cloudwatch",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsCloudWatchAlarm",
+  "ResourceGroup": "monitoring",
+  "Description": "CloudTrail で記録された **ネットワーク ACL の変更** は、CloudWatch Logs メトリクスフィルターによって一致し、`CreateNetworkAcl`、`CreateNetworkAclEntry`、`DeleteNetworkAcl`、`DeleteNetworkAclEntry`、`ReplaceNetworkAclEntry`、`ReplaceNetworkAclAssociation` などのイベントに対して関連するアラームが設定されます。",
+  "Risk": "**NACL 変更** の監視がないと、ポリシーの改ざんの検出が低下し、**機密性** の損失（入口/出口の開放）、ネットワーク **整合性** の低下（横方向の移動、セグメンテーションの回避）、**可用性** の低下（トラフィックのブラックホールまたはロックアウト）のリスクがあります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudwatch-alarms-for-cloudtrail.html",
+    "https://www.clouddefense.ai/compliance-rules/cis-v130/monitoring/cis-v130-4-11",
+    "https://support.icompaas.com/support/solutions/articles/62000084031-ensure-a-log-metric-filter-and-alarm-exist-for-changes-to-network-access-control-lists-nacl-",
+    "https://trendmicro.com/cloudoneconformity/knowledge-base/aws/CloudWatchLogs/network-acl-changes-alarm.html",
+    "https://support.icompaas.com/support/solutions/articles/62000233134-4-11-ensure-network-access-control-list-nacl-changes-are-monitored-manual-"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation to alert on NACL changes\nResources:\n  MetricFilter:\n    Type: AWS::Logs::MetricFilter\n    Properties:\n      LogGroupName: \"<example_resource_name>\"  # CRITICAL: CloudTrail log group to monitor\n      FilterPattern: '{ ($.eventName = CreateNetworkAcl) || ($.eventName = CreateNetworkAclEntry) || ($.eventName = DeleteNetworkAcl) || ($.eventName = DeleteNetworkAclEntry) || ($.eventName = ReplaceNetworkAclEntry) || ($.eventName = ReplaceNetworkAclAssociation) }'  # CRITICAL: detects NACL changes\n      MetricTransformations:\n        - MetricValue: \"1\"\n          MetricNamespace: \"CISBenchmark\"\n          MetricName: \"nacl_changes\"\n\n  NaclChangesAlarm:\n    Type: AWS::CloudWatch::Alarm\n    Properties:\n      AlarmName: \"nacl_changes\"\n      ComparisonOperator: GreaterThanOrEqualToThreshold\n      EvaluationPeriods: 1\n      MetricName: \"nacl_changes\"   # CRITICAL: alarm targets the metric from the filter\n      Namespace: \"CISBenchmark\"\n      Period: 300\n      Statistic: Sum\n      Threshold: 1\n```",
+      "Other": "1. AWS コンソールで、CloudWatch > ロググループに移動し、CloudTrail ロググループを開きます\n2. メトリクスフィルタータブ > メトリクスフィルターの作成\n3. フィルターパターンを次のように設定します：\n   { ($.eventName = CreateNetworkAcl) || ($.eventName = CreateNetworkAclEntry) || ($.eventName = DeleteNetworkAcl) || ($.eventName = DeleteNetworkAclEntry) || ($.eventName = ReplaceNetworkAclEntry) || ($.eventName = ReplaceNetworkAclAssociation) }\n4. 次へ > フィルター名：nacl_changes；メトリクス名前空間：CISBenchmark；メトリクス名：nacl_changes；メトリクス値：1 > メトリクスフィルターの作成\n5. 新しいメトリクスフィルターを選択 > アラームの作成\n6. 統計：合計、期間：5 分、しきい値タイプ：静的、条件：以上、しきい値：1 を設定します\n7. アクション（オプション）を次へ > 名前：nacl_changes > アラームの作成",
+      "Terraform": "```hcl\n# CloudWatch metric filter and alarm for NACL changes\nresource \"aws_cloudwatch_log_metric_filter\" \"nacl\" {\n  name           = \"nacl_changes\"\n  log_group_name = \"<example_resource_name>\"  # CloudTrail log group\n  pattern        = \"{ ($.eventName = CreateNetworkAcl) || ($.eventName = CreateNetworkAclEntry) || ($.eventName = DeleteNetworkAcl) || ($.eventName = DeleteNetworkAclEntry) || ($.eventName = ReplaceNetworkAclEntry) || ($.eventName = ReplaceNetworkAclAssociation) }\"  # CRITICAL: detects NACL changes\n\n  metric_transformation {\n    name      = \"nacl_changes\"\n    namespace = \"CISBenchmark\"\n    value     = \"1\"\n  }\n}\n\nresource \"aws_cloudwatch_metric_alarm\" \"nacl\" {\n  alarm_name          = \"nacl_changes\"\n  comparison_operator = \"GreaterThanOrEqualToThreshold\"\n  evaluation_periods  = 1\n  metric_name         = \"nacl_changes\"   # CRITICAL: alarm targets the metric from the filter\n  namespace           = \"CISBenchmark\"\n  period              = 300\n  statistic           = \"Sum\"\n  threshold           = 1\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "CloudTrail からの NACL 変更イベント用の CloudWatch Logs メトリクスフィルターとアラームを実装し、アラートを応答者にルーティングします。NACL 管理に **最小権限の原則** を適用し、**変更管理** を要求し、設定監視とフローログを使用した **多層防御** を使用してネットワークの状態を検証および監視します。",
+      "Url": "https://hub.prowler.com/check/cloudwatch_changes_to_network_acls_alarm_configured"
+    }
+  },
+  "Categories": [
+    "logging"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "Logging and Monitoring"
+}
+

@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "storage_cross_tenant_replication_disabled",
+  "CheckTitle": "クロステナント レプリケーションが無効化されていることを確認する",
+  "CheckType": [],
+  "ServiceName": "storage",
+  "SubServiceName": "account",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AzureStorageAccount",
+  "ResourceGroup": "storage",
+  "Description": "Azure Storage Accounts でクロステナント レプリケーションが有効になっていないことを確認し、テナント境界を越えた意図しないデータ複製を防止します。",
+  "Risk": "クロステナント レプリケーションが有効な場合、機密データが意図せず他テナントへ複製され、データ漏えい・不正アクセス・データ ガバナンス/プライバシー ポリシー違反のリスクが高まる可能性があります。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/storage/blobs/object-replication-prevent-cross-tenant-policies?tabs=portal",
+  "Remediation": {
+    "Code": {
+      "CLI": "az storage account update --name <storage-account-name> --resource-group <resource-group> --default-to-oauth-authentication true --allow-cross-tenant-replication false",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity-staging/knowledge-base/azure/StorageAccounts/disable-cross-tenant-replication.html",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "storage accounts で Cross Tenant Replication を無効化し、明示的に共有しない限りデータがテナント境界内に留まるようにして、データ漏えいおよび不正アクセスのリスクを低減します。",
+      "Url": "https://learn.microsoft.com/en-us/azure/storage/blobs/object-replication-prevent-cross-tenant-policies?tabs=portal"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

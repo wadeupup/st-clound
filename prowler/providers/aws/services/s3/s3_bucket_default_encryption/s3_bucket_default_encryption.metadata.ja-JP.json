@@ -1,0 +1,35 @@
+{
+  "Provider": "aws",
+  "CheckID": "s3_bucket_default_encryption",
+  "CheckTitle": "S3 バケットでデフォルト暗号化（SSE）が有効になっているか、またはそれを強制するバケットポリシーが使用されているかを確認してください。",
+  "CheckType": [
+    "データ保護"
+  ],
+  "ServiceName": "s3",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:s3:::bucket_name",
+  "Severity": "medium",
+  "ResourceType": "AwsS3Bucket",
+  "ResourceGroup": "storage",
+  "Description": "S3 バケットでデフォルト暗号化（SSE）が有効になっているか、またはそれを強制するバケットポリシーが使用されているかを確認してください。",
+  "Risk": "Amazon S3 のデフォルト暗号化は、S3 バケットのデフォルトの暗号化動作を設定する方法を提供します。これにより、保存データが暗号化されることが保証されます。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "aws s3api put-bucket-encryption --bucket <bucket_name> --server-side-encryption-configuration '{'Rules': [{'ApplyServerSideEncryptionByDefault': {'SSEAlgorithm': 'AES256'}}]}'",
+      "NativeIaC": "https://docs.prowler.com/checks/aws/s3-policies/s3_14-data-encrypted-at-rest#cloudformation",
+      "Other": "",
+      "Terraform": "https://docs.prowler.com/checks/aws/s3-policies/s3_14-data-encrypted-at-rest#terraform"
+    },
+    "Recommendation": {
+      "Text": "S3 バケットで保存時の暗号化が有効になっていることを確認してください。",
+      "Url": "https://aws.amazon.com/blogs/security/how-to-prevent-uploads-of-unencrypted-objects-to-amazon-s3/"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

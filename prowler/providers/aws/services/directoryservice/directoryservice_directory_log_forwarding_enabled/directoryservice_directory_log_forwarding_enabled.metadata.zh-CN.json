@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "directoryservice_directory_log_forwarding_enabled",
+  "CheckTitle": "Directory Service 目录已启用日志转发到 CloudWatch Logs",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices"
+  ],
+  "ServiceName": "directoryservice",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "IAM",
+  "Description": "**AWS Directory Service 目录**配置为使用日志订阅将域控制器安全事件日志转发到 **CloudWatch Logs**。\n\n评估识别已配置或未配置此转发的目录。",
+  "Risk": "如果没有转发，将失去对 AD 安全事件的可见性，延迟检测可疑身份验证、策略更改或权限授予。攻击者可以在不被注意的情况下升级和持久化，存在未授权访问（机密性）和身份/策略操作（完整性）的风险，同时阻碍取证和响应。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.amazonaws.cn/en_us/directoryservice/latest/admin-guide/ms_ad_enable_log_forwarding.html",
+    "https://docs.aws.amazon.com/directoryservice/latest/admin-guide/incident-response.html",
+    "https://docs.aws.amazon.com/directoryservice/latest/admin-guide/ms_ad_enable_log_forwarding.html",
+    "https://support.icompaas.com/support/solutions/articles/62000233528--ensure-directory-service-monitoring-with-cloudwatch-logs"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation：启用 Directory Service 日志转发到 CloudWatch Logs\nResources:\n  LogGroup:\n    Type: AWS::Logs::LogGroup\n    Properties:\n      LogGroupName: /aws/directoryservice/<example_resource_id>\n\n  LogsResourcePolicy:\n    Type: AWS::Logs::ResourcePolicy\n    Properties:\n      PolicyName: DSLogSubscription\n      PolicyDocument: |\n        {\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"ds.amazonaws.com\"},\"Action\":[\"logs:CreateLogStream\",\"logs:PutLogEvents\",\"logs:DescribeLogStreams\"],\"Resource\":\"arn:aws:logs:*:*:log-group:/aws/directoryservice/*\"}]}\n\n  DirectoryLogSubscription:\n    Type: AWS::DirectoryService::LogSubscription\n    Properties:\n      DirectoryId: <example_resource_id>          # 关键：目标 Directory Service ID 以启用日志转发\n      LogGroupName: /aws/directoryservice/<example_resource_id>  # 关键：CloudWatch Logs 目标\n```",
+      "Other": "1. 在 AWS 控制台中，转到 Directory Service > Directories 并打开您的目录\n2. 在 Directory details 页面上，选择 Networking & security 选项卡\n3. 在 Log forwarding 中，点击 Enable\n4. 选择 Create a new CloudWatch log group（或选择现有的）\n5. 点击 Enable 开始转发日志",
+      "Terraform": "```hcl\n# 启用 Directory Service 日志转发到 CloudWatch Logs\nresource \"aws_cloudwatch_log_group\" \"ds\" {\n  name = \"/aws/directoryservice/<example_resource_id>\"\n}\n\nresource \"aws_cloudwatch_log_resource_policy\" \"ds\" {\n  policy_name     = \"DSLogSubscription\"\n  policy_document = jsonencode({\n    Version   = \"2012-10-17\",\n    Statement = [{\n      Effect    = \"Allow\",\n      Principal = { Service = \"ds.amazonaws.com\" },\n      Action    = [\"logs:CreateLogStream\", \"logs:PutLogEvents\", \"logs:DescribeLogStreams\"],\n      Resource  = \"arn:aws:logs:*:*:log-group:/aws/directoryservice/*\"\n    }]\n  })\n}\n\nresource \"aws_directory_service_log_subscription\" \"enable\" {\n  directory_id  = \"<example_resource_id>\"                 # 关键：为此目录启用日志转发\n  log_group_name = aws_cloudwatch_log_group.ds.name        # 关键：CloudWatch Logs 目标\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "启用并维护到 CloudWatch Logs 的**日志转发**。\n\n- 在具有严格访问和保留策略的受保护组中集中日志\n- 对交付角色和读者应用最小权限；防止篡改（不可变性）\n- 对高风险事件发出告警，并在跨区域/账户聚合以实现纵深防御",
+      "Url": "https://hub.prowler.com/check/directoryservice_directory_log_forwarding_enabled"
+    }
+  },
+  "Categories": [
+    "logging"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

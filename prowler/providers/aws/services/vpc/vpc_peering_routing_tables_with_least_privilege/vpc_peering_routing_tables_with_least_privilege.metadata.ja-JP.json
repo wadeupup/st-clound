@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "vpc_peering_routing_tables_with_least_privilege",
+  "CheckTitle": "VPC ピアリング接続のルートテーブルには、0.0.0.0/0 またはリクエスター/アクセプター VPC CIDR 全体のルートは含まれません",
+  "CheckType": [
+    "ソフトウェアおよび設定のチェック/AWS セキュリティのベストプラクティス/ネットワーク到達可能性",
+    "ソフトウェアと設定のチェック/業界および規制基準/AWS 基盤セキュリティのベストプラクティス",
+    "TTPs/ラテラルムーブメント",
+    "影響／データ露出"
+  ],
+  "ServiceName": "vpc",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsEc2VpcPeeringConnection",
+  "ResourceGroup": "network",
+  "Description": "**AWS VPC ピアリング**のルートテーブルは、**最小権限ルーティング**の観点で評価されます。`0.0.0.0/0` またはピア VPC の CIDR 全体を対象とするルートは広すぎると見なされ、ピアリング接続を通じてアドバタイズされるべきなのは、特定のサブネットまたはより狭いプレフィックスのみです。",
+  "Risk": "広範なピアリングルートはVPC間の到達性を拡大し、横方向の移動や不正な探索を可能にして、**機密性** と **完全性** を損ないます。`0.0.0.0/0` やフルCIDRパスを使用すると、重複する範囲での誤経路指定も増加し、ネットワークの **可用性** を低下させます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://www.trendmicro.com/cloudoneconformity-staging/knowledge-base/aws/VPC/vpc-peering-access.html#",
+    "https://docs.aws.amazon.com/vpc/latest/peering/peering-configurations-partial-access.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation: VPC ピアリングルートを特定のサブネットに制限する（最小権限）\nResources:\n  PeeringSpecificRoute:\n    Type: AWS::EC2::Route\n    Properties:\n      RouteTableId: <example_resource_id>\n      DestinationCidrBlock: 10.0.1.0/24  # 重大: 0.0.0.0/0 や VPC CIDR 全体ではなく、特定のサブネットを使用してください\n      VpcPeeringConnectionId: <example_resource_id>\n```",
+      "Other": "1. AWS Console で、VPC > Route tables に移動します\n2. ピア接続された VPC に到達するために使用されている route table を選択し、Routes > Edit routes をクリックします\n3. VPC peering connection をターゲットとしている 0.0.0.0/0 へのルート、または requester/accepter VPC CIDR 全体へのルートを削除します\n4. 同じ VPC peering connection をターゲットとして、peer VPC 内で必要な subnet CIDR のみに対するルートを追加します\n5. 変更を保存し、peer VPC の route table でも繰り返します",
+      "Terraform": "```hcl\n# VPC ピアリングのルートを特定のサブネットに制限する（最小権限）\nresource \"aws_route\" \"peering_specific\" {\n  route_table_id             = \"<example_resource_id>\"\n  destination_cidr_block     = \"10.0.1.0/24\"  # 重大: 0.0.0.0/0 や VPC 全体の CIDR ではなく、特定のサブネット\n  vpc_peering_connection_id  = \"<example_resource_id>\"\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "ピアリングでは**最小権限**を徹底します。必要なサブネットまたはより具体的なプレフィックスのみを広報し、`0.0.0.0/0` や VPC 全体の範囲は避けてください。両側でルートを対称に保ち、セキュリティグループと NACL による**多層防御**を重ねてください。*広範な接続性が必要な場合*は、セグメント化された設計またはトランジットゲートウェイを優先してください。",
+      "Url": "https://hub.prowler.com/check/vpc_peering_routing_tables_with_least_privilege"
+    }
+  },
+  "Categories": [
+    "trust-boundaries"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

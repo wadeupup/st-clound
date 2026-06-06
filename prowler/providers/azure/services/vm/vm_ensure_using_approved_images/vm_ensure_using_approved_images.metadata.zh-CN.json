@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "vm_ensure_using_approved_images",
+  "CheckTitle": "确保 Azure 虚拟机使用已批准的机器映像。",
+  "CheckType": [],
+  "ServiceName": "vm",
+  "SubServiceName": "image",
+  "ResourceIdTemplate": "/subscriptions/<subscription-id>/resourceGroups/<resource-group-name>/providers/Microsoft.Compute/images/<virtual-machine-image-id>",
+  "Severity": "medium",
+  "ResourceType": "Microsoft.Compute/images",
+  "ResourceGroup": "compute",
+  "Description": "确保所有 Azure 虚拟机实例仅从已批准的机器映像启动。",
+  "Risk": "已批准的机器映像是一种自定义虚拟机（VM）映像，其中包含预配置的操作系统和由 Azure 批准、定义明确的服务器软件栈，并已完整配置用于运行你的应用程序。在 Azure 云环境中使用已批准（黄金）机器映像来启动新的 VM 实例，可带来显著收益，例如更快且更稳定的应用部署与扩缩容、更安全的应用栈升级以及版本管理。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/virtual-machines/windows/create-vm-generalized-managed",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/VirtualMachines/approved-machine-image.html",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "使用已批准（黄金）机器映像重新创建所需的 VM 实例。",
+      "Url": "https://docs.microsoft.com/en-us/azure/virtual-machines/windows/create-vm-generalized-managed"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "此检查仅验证 VM 是否从自定义映像启动，不验证映像内容或安全基线。"
+}

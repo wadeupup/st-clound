@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "app_http_logs_enabled",
+  "CheckTitle": "确保 Azure AppService 的“HTTP 日志”已启用",
+  "CheckType": [],
+  "ServiceName": "app",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "low",
+  "ResourceType": "Microsoft.Web/sites/config",
+  "ResourceGroup": "serverless",
+  "Description": "为 Azure App Service 实例启用 AppServiceHTTPLogs 诊断日志类别，以确保所有 HTTP 请求均被捕获并集中记录。",
+  "Risk": "捕获 Web 请求对于执行监控和事件响应活动的安全分析人员来说是重要的支撑信息。启用日志后，这些日志可以被摄取到 SIEM 或组织内其他集中聚合平台。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/security/benchmark/azure/mcsb-logging-threat-detection#lt-3-enable-logging-for-security-investigation",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-logging-policies/ensure-that-app-service-enables-http-logging#terraform"
+    },
+    "Recommendation": {
+      "Text": "1. 进入 App Services；对每个 App Service：2. 进入 Diagnostic Settings 3. 点击 Add Diagnostic Setting 4. 勾选“HTTP logs”旁的复选框 5. 根据你的日志消费能力配置目标（例如流式传输到 Event Hub，再通过 SIEM 集成消费 Event Hub 日志）。",
+      "Url": "https://docs.microsoft.com/en-us/azure/app-service/troubleshoot-diagnostic-logs"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "日志消费与处理会产生额外成本。"
+}

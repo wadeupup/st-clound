@@ -1,0 +1,44 @@
+{
+  "Provider": "aws",
+  "CheckID": "networkfirewall_policy_rule_group_associated",
+  "CheckTitle": "Network Firewall 策略至少关联一个规则组",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践/网络可达性",
+    "软件和配置检查/行业和法规标准/AWS 基础安全最佳实践",
+    "软件和配置检查/行业和监管标准/NIST 800-53 控制（美国）"
+  ],
+  "ServiceName": "networkfirewall",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsNetworkFirewallFirewall",
+  "ResourceGroup": "network",
+  "Description": "Network Firewall 策略关联一个或多个 **有状态** 或 **无状态规则组** 以定义数据包检查和处理。\n\n识别没有规则组的策略。",
+  "Risk": "没有规则组，流量不会被有效检查，允许未经授权的流量跨 VPC 边界流动。\n\n影响：\n- 机密性：数据泄露\n- 完整性：通过暴露的服务进行未经授权的更改\n- 可用性：C2、扫描或 DoS 流量通过；启用横向移动",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/network-firewall/latest/developerguide/rule-groups.html",
+    "https://docs.aws.amazon.com/network-firewall/latest/developerguide/firewall-policy-updating.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/networkfirewall-controls.html#networkfirewall-3",
+    "https://medium.com/slalom-blog/secure-internet-access-egress-filtering-with-aws-network-firewall-ddf52ae121f9",
+    "https://docs.aws.amazon.com/de_de/network-firewall/latest/developerguide/nwfw-using-managed-rule-groups-add-to-policy.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation：将至少一个规则组附加到 Network Firewall 策略\nResources:\n  FirewallPolicy:\n    Type: AWS::NetworkFirewall::FirewallPolicy\n    Properties:\n      FirewallPolicyName: <example_resource_name>\n      FirewallPolicy:\n        StatelessDefaultActions:\n          - aws:forward_to_sfe\n        StatelessFragmentDefaultActions:\n          - aws:forward_to_sfe\n        # 关键：将至少一个规则组与策略关联以通过检查\n        StatefulRuleGroupReferences:\n          - ResourceArn: <example_resource_arn>  # 关键行：引用现有规则组 ARN\n```",
+      "Other": "1. 打开 AWS 控制台并转到 VPC > Network Firewall > Firewall policies\n2. 选择目标防火墙策略\n3. 在有状态规则组（或无状态规则组）中，选择添加规则组（或添加托管的有状态/无状态规则组）\n4. 选择至少一个现有规则组并选择添加到策略\n5. 点击保存",
+      "Terraform": "```hcl\n# 将至少一个规则组附加到 Network Firewall 策略\nresource \"aws_networkfirewall_firewall_policy\" \"<example_resource_name>\" {\n  name = \"<example_resource_name>\"\n\n  firewall_policy {\n    stateless_default_actions          = [\"aws:forward_to_sfe\"]\n    stateless_fragment_default_actions = [\"aws:forward_to_sfe\"]\n\n    # 关键：将至少一个规则组与策略关联以通过检查\n    stateful_rule_group_reference {\n      resource_arn = \"<example_resource_arn>\"  # 关键行：引用现有规则组 ARN\n    }\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "为每个策略关联适当的 **有状态** 和 **无状态规则组**。\n- 强制执行 **默认拒绝** 的姿态（最小特权）\n- 使用经过审核的托管规则组作为基线，然后根据工作负载进行定制\n- 定期审查和测试；版本化规则，监控日志，并要求变更控制",
+      "Url": "https://hub.prowler.com/check/networkfirewall_policy_rule_group_associated"
+    }
+  },
+  "Categories": [
+    "trust-boundaries"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

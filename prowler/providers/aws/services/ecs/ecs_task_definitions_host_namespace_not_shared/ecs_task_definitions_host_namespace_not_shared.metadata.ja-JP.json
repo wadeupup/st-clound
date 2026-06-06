@@ -1,0 +1,44 @@
+{
+  "Provider": "aws",
+  "CheckID": "ecs_task_definitions_host_namespace_not_shared",
+  "CheckTitle": "ECS タスク定義がホストのプロセス名前空間をコンテナと共有していない",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/CIS Host Hardening Benchmarks",
+    "TTPs/Privilege Escalation",
+    "TTPs/Discovery"
+  ],
+  "ServiceName": "ecs",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsEcsTaskDefinition",
+  "ResourceGroup": "container",
+  "Description": "`pidMode` が `host` である **ECS タスク定義** は、分離されたタスクまたはプライベート名前空間を使用するのではなく、コンテナとホストの **プロセス名前空間** を共有するように設定されています。",
+  "Risk": "**ホスト PID 共有** により、コンテナがホストプロセスを表示および操作でき、分離が損なわれます。\n- 機密性：プロセス列挙とメタデータ漏洩\n- 整合性/可用性：シグナルまたは `ptrace` の改ざん、サービスの終了\n\n侵害されたコンテナからの横方向の移動と権限昇格を可能にします。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/ecs-controls.html#ecs-3",
+    "https://docs.aws.amazon.com/config/latest/developerguide/ecs-task-definition-pid-mode-check.html",
+    "https://docs.aws.amazon.com/AmazonECS/latest/userguide/task_definition_parameters.html#container_definition_pid_mode"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws ecs register-task-definition --family <example_resource_name> --pid-mode task --container-definitions '[{\"name\":\"<container-name>\",\"image\":\"<image>\"}]'",
+      "NativeIaC": "```yaml\n# CloudFormation: ECS Task Definition without host PID namespace\nResources:\n  <example_resource_name>:\n    Type: AWS::ECS::TaskDefinition\n    Properties:\n      Family: <example_resource_name>\n      ContainerDefinitions:\n        - Name: <container-name>\n          Image: <image>\n      PidMode: task  # Critical: ensures containers use task PID namespace, not host\n```",
+      "Other": "1. AWS コンソールで、Amazon ECS > タスク定義に移動します\n2. タスク定義を選択し、新しいリビジョンを作成をクリックします\n3. プロセス名前空間共有（PID モード）をタスク（ホストではない）に設定します\n4. 新しいリビジョンを保存します\n5. （以前の Host PID リビジョンがまだアクティブな場合）そのリビジョンを選択し、登録解除をクリックします",
+      "Terraform": "```hcl\n# ECS Task Definition without host PID namespace\nresource \"aws_ecs_task_definition\" \"example\" {\n  family                = \"<example_resource_name>\"\n  container_definitions = jsonencode([{ name = \"<container-name>\", image = \"<image>\" }])\n  pid_mode              = \"task\"  # Critical: prevents sharing the host's process namespace\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "**分離された PID 名前空間** を優先します：`pidMode=task` を設定するか、デフォルトのコンテナごとの名前空間を使用します。厳密に制御された診断を除き、`host` PID 共有を避けます。\n\n**最小権限** を適用します：非 root ユーザー、最小限の機能、読み取り専用ファイルシステム；およびネットワークとランタイム制御による **多層防御**。",
+      "Url": "https://hub.prowler.com/check/ecs_task_definitions_host_namespace_not_shared"
+    }
+  },
+  "Categories": [
+    "container-security"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

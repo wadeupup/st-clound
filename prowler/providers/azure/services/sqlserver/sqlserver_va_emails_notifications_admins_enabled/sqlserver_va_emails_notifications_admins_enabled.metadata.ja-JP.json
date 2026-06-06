@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "sqlserver_va_emails_notifications_admins_enabled",
+  "CheckTitle": "各 SQL Server で Vulnerability Assessment（VA）設定 'Also send email notifications to admins and subscription owners' が設定されていることを確認する",
+  "CheckType": [],
+  "ServiceName": "sqlserver",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "SQLServer",
+  "ResourceGroup": "database",
+  "Description": "Vulnerability Assessment（VA）設定 'Also send email notifications to admins and subscription owners' を有効化します。",
+  "Risk": "設定 'Also send email notifications to admins and subscription owners' を有効化すると、VA スキャン レポートとアラートが管理者およびサブスクリプション所有者に送信されます。これにより、リスク特定と是正対応に要する時間を短縮できる可能性があります。",
+  "RelatedUrl": "https://docs.microsoft.com/en-us/azure/sql-database/sql-vulnerability-assessment",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-general-policies/ensure-that-va-setting-also-send-email-notifications-to-admins-and-subscription-owners-is-set-for-an-sql-server#terraform"
+    },
+    "Recommendation": {
+      "Text": "1. SQL servers に移動します。2. サーバー インスタンスを選択します。3. Security Center をクリックします。4. サブスクリプション レベルで Enabled の横にある Configure を選択します。5. Vulnerability Assessment Settings セクションで、未設定の場合は Storage Accounts を構成します。6. 'Also send email notifications to admins and subscription owners' をチェック/有効化します。7. Save をクリックします。",
+      "Url": "https://learn.microsoft.com/en-us/azure/defender-for-cloud/sql-azure-vulnerability-assessment-enable"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "Microsoft Defender for SQL 機能を有効化すると、各 SQL サーバーに対して追加コストが発生します。"
+}

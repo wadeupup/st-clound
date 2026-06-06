@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "dynamodb_accelerator_cluster_in_transit_encryption_enabled",
+  "CheckTitle": "DynamoDB Accelerator (DAX) 集群已启用传输加密",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Effects/Data Exposure"
+  ],
+  "ServiceName": "dynamodb",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "database",
+  "Description": "**DAX 集群**的端点加密设置为 `TLS`，强制对客户端到集群的连接进行**传输加密**",
+  "Risk": "缺少 **TLS** 会导致 DAX 流量可能被拦截和篡改，影响：\n- 机密性：查询、数据或凭据的暴露\n- 完整性：被篡改的请求/响应和缓存投毒\n- 可用性：会话劫持或重放导致服务中断",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/dynamodb-controls.html#dynamodb-7",
+    "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DAXEncryptionInTransit.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws dax create-cluster --cluster-name <cluster-name> --node-type <node-type> --replication-factor <replication-factor> --cluster-endpoint-encryption-type TLS",
+      "NativeIaC": "```yaml\n# CloudFormation: Create DAX cluster with TLS (encryption in transit)\nResources:\n  <example_resource_name>:\n    Type: AWS::DAX::Cluster\n    Properties:\n      ClusterName: <example_resource_name>\n      IAMRoleARN: <example_resource_id>\n      NodeType: <example_node_type>\n      ReplicationFactor: 1\n      ClusterEndpointEncryptionType: TLS  # Critical: Enables TLS for in-transit encryption\n```",
+      "Other": "1. 在 AWS 控制台中，前往 DynamoDB > DAX\n2. 点击 Create cluster\n3. 设置 Cluster name、Node type、Replication factor 和 IAM role\n4. 启用 Encryption in transit (TLS)\n5. 创建集群并等待直到状态为 ACTIVE\n6. 更新应用程序以使用新的 DAX 集群端点\n7. 删除旧的未启用 TLS 的 DAX 集群",
+      "Terraform": "```hcl\n# DAX cluster with encryption in transit enabled\nresource \"aws_dax_cluster\" \"<example_resource_name>\" {\n  cluster_name                      = \"<example_resource_name>\"\n  node_type                         = \"<example_node_type>\"\n  replication_factor                = 1\n  iam_role_arn                      = \"<example_resource_id>\"\n  cluster_endpoint_encryption_type  = \"TLS\"  # Critical: Enables TLS for in-transit encryption\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "为所有 DAX 端点和客户端强制执行 **TLS**（传输加密）。如果现有集群缺少此功能，请创建新的启用 TLS 的集群并进行迁移。\n\n应用**纵深防御**策略：限制网络路径，保持访问私有化，并使用**最小权限**IAM 来减少影响范围。",
+      "Url": "https://hub.prowler.com/check/dynamodb_accelerator_cluster_in_transit_encryption_enabled"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

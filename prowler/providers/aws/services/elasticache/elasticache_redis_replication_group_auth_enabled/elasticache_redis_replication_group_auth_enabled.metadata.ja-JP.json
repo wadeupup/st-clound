@@ -1,0 +1,44 @@
+{
+  "Provider": "aws",
+  "CheckID": "elasticache_redis_replication_group_auth_enabled",
+  "CheckTitle": "エンジンバージョン < 6.0 の ElastiCache Redis レプリケーショングループで Redis OSS AUTH が有効になっている",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/NIST 800-53 Controls",
+    "TTPs/Initial Access/Unauthorized Access",
+    "Effects/Data Exposure"
+  ],
+  "ServiceName": "elasticache",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "database",
+  "Description": "`6.0` より前のバージョンを実行している Amazon ElastiCache Redis レプリケーショングループは、**AUTH トークン**の使用について評価されます。`6.0+` の場合、検出結果は、トークンベースの AUTH ではなく、**ACL/RBAC** 構成を確認する必要があることを示しています。",
+  "Risk": "`6.0` より前のクラスターで **AUTH** がない場合、クライアントは認証されていないコマンドを実行でき、データの読み取り/書き込み、キーの削除、キャッシュの汚染が可能になります。これは **機密性** と **整合性** を脅かし、盗まれたまたは注入されたセッションデータを通じて横方向の移動を促進する可能性があります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/elasticache-controls.html#elasticache-6",
+    "https://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/auth.html#auth-modifyng-token",
+    "https://docs.aws.amazon.com/AmazonElastiCache/latest/dg/auth.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws elasticache modify-replication-group --replication-group-id <example_resource_id> --auth-token <AUTH_TOKEN> --auth-token-update-strategy SET --apply-immediately",
+      "NativeIaC": "```yaml\n# CloudFormation: enable Redis AUTH on an existing replication group\nResources:\n  <example_resource_name>:\n    Type: AWS::ElastiCache::ReplicationGroup\n    Properties:\n      ReplicationGroupId: <example_resource_id>\n      ReplicationGroupDescription: enable-auth\n      TransitEncryptionEnabled: true   # CRITICAL: required to use AUTH\n      AuthToken: <AUTH_TOKEN>          # CRITICAL: enables Redis AUTH\n      AuthTokenUpdateStrategy: SET  # CRITICAL: adds token; enables AUTH\n```",
+      "Other": "1. AWS コンソールで、ElastiCache > Redis レプリケーショングループに移動します\n2. レプリケーショングループ <example_resource_id> を選択し、変更をクリックします\n3. アクセス制御で、Redis OSS AUTH を選択し、<AUTH_TOKEN> を入力します\n4. すぐに適用にチェックを入れ、変更をクリックします\n5. ステータスが利用可能に戻るまで待ちます。AUTH が有効になりました",
+      "Terraform": "```hcl\n# Terraform: enable Redis AUTH on an existing replication group\nresource \"aws_elasticache_replication_group\" \"<example_resource_name>\" {\n  replication_group_id       = \"<example_resource_id>\"\n  description                = \"enable-auth\"\n  transit_encryption_enabled = true            # CRITICAL: required to use AUTH\n  auth_token                 = \"<AUTH_TOKEN>\" # CRITICAL: enables Redis AUTH\n  auth_token_update_strategy = \"SET\"       # CRITICAL: adds token; enables AUTH\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "多層防御を適用します：\n- バージョン < `6.0` の場合、強力でローテーションされたトークンで **AUTH** を有効にし、転送中の暗号化を要求します。\n- `6.0+` の場合、最小権限、デフォルトで拒否するロールを持つ **RBAC/ACL** を優先します。\n- ネットワークアクセスを信頼できるソースに制限し、定期的にアクセスを監査します。",
+      "Url": "https://hub.prowler.com/check/elasticache_redis_replication_group_auth_enabled"
+    }
+  },
+  "Categories": [
+    "identity-access"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

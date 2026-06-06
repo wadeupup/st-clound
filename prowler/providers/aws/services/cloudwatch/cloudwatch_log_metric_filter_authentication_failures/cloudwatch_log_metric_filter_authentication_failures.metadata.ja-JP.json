@@ -1,0 +1,46 @@
+{
+  "Provider": "aws",
+  "CheckID": "cloudwatch_log_metric_filter_authentication_failures",
+  "CheckTitle": "アカウントに AWS 管理コンソール認証失敗用の CloudWatch Logs メトリクスフィルターとアラームが存在する",
+  "CheckType": [
+    "Software and Configuration Checks/Industry and Regulatory Standards/CIS AWS Foundations Benchmark",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Software and Configuration Checks/AWS Security Best Practices/Runtime Behavior Analysis",
+    "TTPs/Initial Access",
+    "TTPs/Credential Access"
+  ],
+  "ServiceName": "cloudwatch",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsCloudWatchAlarm",
+  "ResourceGroup": "monitoring",
+  "Description": "**AWS 管理コンソール認証失敗** 用の CloudWatch Logs メトリクスフィルターとアラーム。CloudTrail から取得（`eventName=ConsoleLogin`、`errorMessage=\"Failed authentication\"`）。\n\nこれらの失敗がメトリクスに変換され、アラームによって積極的に監視されているかどうかを識別します。",
+  "Risk": "失敗したコンソールログインの可視性がないと、検出されない **ブルートフォース** や **認証情報スタッフィング** の試行が可能になり、攻撃者の滞在時間が延びます。\n\n成功した推測によりコンソールアクセスが許可され、破壊的な変更を通じてデータの機密性、設定の整合性、可用性が危険にさらされます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudwatch-alarms-for-cloudtrail.html",
+    "https://www.intelligentdiscovery.io/controls/cloudwatch/cloudwatch-alarm-signin-failures",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/CloudWatchLogs/console-sign-in-failures-alarm.html",
+    "https://newsletter.simpleaws.dev/p/cloudtrail-cloudwatch-logs-login-detection-alert"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation: Metric filter and alarm for console authentication failures\nResources:\n  MetricFilter:\n    Type: AWS::Logs::MetricFilter\n    Properties:\n      LogGroupName: \"<example_resource_name>\"\n      FilterPattern: '{ ($.eventName = ConsoleLogin) && ($.errorMessage = \"Failed authentication\") }'  # Critical: matches failed console login events\n      MetricTransformations:\n        - MetricValue: \"1\"\n          MetricNamespace: \"<example_resource_name>\"  # Critical: creates metric namespace\n          MetricName: \"<example_resource_name>\"       # Critical: creates metric name\n\n  Alarm:\n    Type: AWS::CloudWatch::Alarm\n    Properties:\n      MetricName: \"<example_resource_name>\"   # Critical: alarm targets metric from filter\n      Namespace: \"<example_resource_name>\"    # Critical: must match metric's namespace\n      ComparisonOperator: GreaterThanOrEqualToThreshold\n      EvaluationPeriods: 1\n      Period: 300\n      Statistic: Sum\n      Threshold: 1\n```",
+      "Other": "1. AWS コンソールで CloudWatch を開きます\n2. Logs > Log groups に移動し、イベントを受信する CloudTrail ロググループを選択します\n3. Metric filters タブを開く > Create metric filter\n   - フィルターパターン：{ ($.eventName = ConsoleLogin) && ($.errorMessage = \"Failed authentication\") }\n   - 任意のメトリクス名と名前空間を割り当て、値 1、その後作成\n4. 作成したメトリクスフィルターで、それを選択し、Create alarm を選択します\n   - 統計：Sum、期間：5 分、しきい値タイプ：Static、しきい値：>= 1\n   - アラームを作成",
+      "Terraform": "```hcl\n# Metric filter and alarm for console authentication failures\nresource \"aws_cloudwatch_log_metric_filter\" \"metric\" {\n  name           = \"<example_resource_name>\"\n  log_group_name = \"<example_resource_name>\"\n  pattern        = \"{($.eventName = ConsoleLogin) && ($.errorMessage = \\\"Failed authentication\\\") }\" # Critical: detects failed console logins\n\n  metric_transformation {\n    name      = \"<example_resource_name>\"   # Critical: metric created by filter\n    namespace = \"<example_resource_name>\"   # Critical: metric namespace\n    value     = \"1\"\n  }\n}\n\nresource \"aws_cloudwatch_metric_alarm\" \"alarm\" {\n  metric_name          = aws_cloudwatch_log_metric_filter.metric.metric_transformation[0].name   # Critical: alarm references the filter's metric\n  namespace            = aws_cloudwatch_log_metric_filter.metric.metric_transformation[0].namespace # Critical: must match\n  comparison_operator  = \"GreaterThanOrEqualToThreshold\"\n  evaluation_periods   = 1\n  period               = 300\n  statistic            = \"Sum\"\n  threshold            = 1\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "`ConsoleLogin` 失敗用のログメトリクスフィルターを実装し、実行可能な通知を持つ **CloudWatch アラーム** を添付します。ノイズを減らすためにしきい値を調整し、アラートをインシデント対応にルーティングします。\n\n影響を制限するために **最小権限** を適用し、**MFA** を強制し、アラートを送信元 IP とユーザーコンテキストと関連付けます。",
+      "Url": "https://hub.prowler.com/check/cloudwatch_log_metric_filter_authentication_failures"
+    }
+  },
+  "Categories": [
+    "logging"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "Logging and Monitoring"
+}
+

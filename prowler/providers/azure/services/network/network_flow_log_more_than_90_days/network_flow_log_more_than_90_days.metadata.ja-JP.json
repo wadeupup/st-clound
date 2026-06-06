@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "network_flow_log_more_than_90_days",
+  "CheckTitle": "Network Security Group Flow Log の保持期間が 0、90 日以上であることを確認する",
+  "CheckType": [],
+  "ServiceName": "network",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Network",
+  "ResourceGroup": "network",
+  "Description": "Network Security Group Flow Logs を有効化し、保持期間を 90 日以上に設定する必要があります。",
+  "Risk": "Flow logs を有効化すると、ネットワーク セキュリティ グループに出入りする IP トラフィック情報を取得できます。ログは異常検知や、侵害が疑われる事象の分析に役立ちます。",
+  "RelatedUrl": " https://docs.microsoft.com/en-us/azure/network-watcher/network-watcher-nsg-flow-logging-overview",
+  "Remediation": {
+    "Code": {
+      "CLI": "az network watcher flow-log configure --nsg <NameorID of the Network Security Group> --enabled true --resource-group <resourceGroupName> --retention 91 -- storage-account <NameorID of the storage account to save flow logs>",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity-staging/knowledge-base/azure/Network/sufficient-nsg-flow-log-retention-period.html",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-logging-policies/bc_azr_logging_1#terraform"
+    },
+    "Recommendation": {
+      "Text": "Azure Portal から 1. Network Watcher に移動 2. Logs セクションの NSG flow logs ブレードを選択 3. リストから各 Network Security Group を選択 4. Status が On であることを確認 5. Retention (days) が 90 日より大きいことを確認 6. Storage account フィールドでストレージ アカウントを選択 7. Save を選択。Azure CLI から NSG flow logs を有効化し、Retention (days) を 90 日以上に設定します。az network watcher flow-log configure --nsg <NameorID of the Network Security Group> --enabled true --resource-group <resourceGroupName> --retention 91 --storage-account <NameorID of the storage account to save flow logs>",
+      "Url": "https://docs.microsoft.com/en-us/cli/azure/network/watcher/flow-log?view=azure-cli-latest"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "これにより IP トラフィック ログを 90 日超保持できます。レベル 2 管理策として、まずデータ保持要件を確認し、そのうえで設定を適用してください。保存期間が長くなるため、データ使用量に応じて月次ストレージ コストが増加します。"
+}

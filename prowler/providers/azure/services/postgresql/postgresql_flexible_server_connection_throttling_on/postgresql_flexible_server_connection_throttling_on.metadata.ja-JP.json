@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "postgresql_flexible_server_connection_throttling_on",
+  "CheckTitle": "PostgreSQL Database Server のサーバー パラメーター 'connection_throttling' が 'ON' に設定されていることを確認する",
+  "CheckType": [],
+  "ServiceName": "postgresql",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "PostgreSQL",
+  "ResourceGroup": "database",
+  "Description": "PostgreSQL サーバーで connection_throttling を有効化します。",
+  "Risk": "connection_throttling を有効化すると、PostgreSQL Database のログ メッセージ詳細度設定に役立ちます。これにより同時接続に関するクエリ/エラー ログが生成され、接続リソース枯渇による Denial of Service（DoS）攻撃成功につながるリスクの把握に役立ちます。システムは正当なユーザー過多でも障害や性能低下を起こす可能性があります。クエリ/エラー ログは、構成エラーや最適でない性能の特定、トラブルシュート、修復に利用できます。",
+  "RelatedUrl": " https://docs.microsoft.com/en-us/rest/api/postgresql/configurations/listbyserver",
+  "Remediation": {
+    "Code": {
+      "CLI": "az postgres server configuration set --resource-group <resourceGroupName> --server-name <serverName> --name connection_throttling --value on",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity-staging/knowledge-base/azure/PostgreSQL/connection-throttling.html",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-networking-policies/bc_azr_networking_13#terraform"
+    },
+    "Recommendation": {
+      "Text": "Azure Portal から 1. https://portal.azure.com で Azure Portal にログインします。2. Azure Database for PostgreSQL servers に移動します。3. 各データベースで Server parameters をクリックします。4. connection_throttling を検索します。5. ON をクリックして保存します。Azure CLI から connection_throttling 設定を更新するには次のコマンドを使用します。az postgres server configuration set --resource-group <resourceGroupName> -- server-name <serverName> --name connection_throttling --value on。PowerShell から connection_throttling 設定を更新するには次のコマンドを使用します。Update-AzPostgreSqlConfiguration -ResourceGroupName <ResourceGroupName> - ServerName <ServerName> -Name connection_throttling -Value on",
+      "Url": "https://learn.microsoft.com/en-us/azure/postgresql/single-server/how-to-configure-server-parameters-using-portal"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

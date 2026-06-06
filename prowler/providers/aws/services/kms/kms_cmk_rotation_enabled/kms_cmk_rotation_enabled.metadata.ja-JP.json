@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "kms_cmk_rotation_enabled",
+  "CheckTitle": "KMS カスタマー管理の対称 CMK は自動ローテーションが有効になっています",
+  "CheckType": [
+    "ソフトウェアと構成のチェック/AWS セキュリティベストプラクティス",
+    "ソフトウェアと構成のチェック/業界および規制基準/AWS 基礎セキュリティベストプラクティス",
+    "ソフトウェアと構成のチェック/業界および規制基準/CIS AWS Foundations Benchmark"
+  ],
+  "ServiceName": "kms",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsKmsKey",
+  "ResourceGroup": "security",
+  "Description": "`Enabled` 状態の **カスタマー管理の KMS 対称キー** は、キー素材の `自動ローテーション` が設定されていることを確認するために評価されます",
+  "Risk": "**自動ローテーション**がない場合、長期間使用されるキー素材は機密性と整合性のリスクを増大させます。KMS キーが漏洩した場合、攻撃者はデータキーをアンラップし、キーが変更されるまで保存されたデータを復号化することができます。また、暗号の柔軟性を低下させ、義務付けられたローテーションポリシーと矛盾する可能性があります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/kms/latest/developerguide/rotate-keys.html",
+    "https://aws.amazon.com/blogs/security/how-to-get-ready-for-certificate-transparency/"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws kms enable-key-rotation --key-id <KEY_ID>",
+      "NativeIaC": "```yaml\n# CloudFormation: 自動ローテーションが有効な KMS キー\nResources:\n  <example_resource_name>:\n    Type: AWS::KMS::Key\n    Properties:\n      EnableKeyRotation: true  # 重要: 自動ローテーションを有効にしてキーがチェックを通過するようにします\n      KeyPolicy:\n        Version: \"2012-10-17\"\n        Statement:\n          - Effect: Allow\n            Principal:\n              AWS: !Sub arn:aws:iam::${AWS::AccountId}:root\n            Action: \"kms:*\"\n            Resource: \"*\"\n```",
+      "Other": "1. AWS コンソールで Key Management Service (KMS) に移動\n2. カスタマー管理キーを開き、有効な対称キーを選択\n3. キーローテーションセクションに移動\n4. 自動キーのローテーションを有効にするを確認\n5. 変更を保存",
+      "Terraform": "```hcl\n# 自動ローテーションが有効な KMS キー\nresource \"aws_kms_key\" \"<example_resource_name>\" {\n  enable_key_rotation = true  # 重要: 自動ローテーションを有効にしてキーがチェックを通過するようにします\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "カスタマー管理の対称 KMS キーに **自動ローテーション** を有効にし、ポリシーに合ったローテーション期間を選択します。キー管理と使用のために **最小特権** と **職務分離** を強制します。キーのライフサイクルイベントを監視し、侵害が疑われる場合はオンデマンドローテーションを使用します。",
+      "Url": "https://hub.prowler.com/check/kms_cmk_rotation_enabled"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

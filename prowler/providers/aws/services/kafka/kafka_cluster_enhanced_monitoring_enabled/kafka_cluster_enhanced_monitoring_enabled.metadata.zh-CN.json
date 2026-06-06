@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "kafka_cluster_enhanced_monitoring_enabled",
+  "CheckTitle": "Amazon MSK 集群已启用增强监控",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践",
+    "软件和配置检查/行业和法规标准/AWS 基础安全最佳实践"
+  ],
+  "ServiceName": "kafka",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsMskCluster",
+  "ResourceGroup": "messaging",
+  "Description": "**Amazon MSK 集群**被评估为**增强监控**级别高于`DEFAULT`（例如，`PER_BROKER`，`PER_TOPIC_PER_BROKER`，`PER_TOPIC_PER_PARTITION`）。\n\n*无服务器集群*设计上包含增强监控；配置集群根据其配置的监控级别进行评估。",
+  "Risk": "指标不足限制了对**代理健康状况**、**复制状态**和**消费者滞后**的可见性，延迟了对事件的响应。\n\n这增加了**可用性丧失**（饱和、限制）的风险，并可能掩盖**完整性问题**，如复制不足的分区，在故障期间提高数据丢失的影响。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/msk/latest/developerguide/metrics-details.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/MSK/enable-enhanced-monitoring-for-apache-kafka-brokers.html#",
+    "https://docs.aws.amazon.com/msk/latest/developerguide/monitoring.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws kafka update-monitoring --cluster-arn <CLUSTER_ARN> --current-version <CURRENT_VERSION> --enhanced-monitoring PER_BROKER",
+      "NativeIaC": "```yaml\n# CloudFormation：在 MSK 集群上启用增强监控\nResources:\n  <example_resource_name>:\n    Type: AWS::MSK::Cluster\n    Properties:\n      ClusterName: <example_resource_name>\n      KafkaVersion: <example_kafka_version>\n      NumberOfBrokerNodes: 2\n      BrokerNodeGroupInfo:\n        ClientSubnets:\n          - <example_subnet_id_1>\n          - <example_subnet_id_2>\n        InstanceType: kafka.t3.small\n      EnhancedMonitoring: PER_BROKER  # 关键：将增强监控设置为高于 DEFAULT 以通过检查\n```",
+      "Other": "1. 打开 AWS 控制台并进入 Amazon MSK\n2. 选择您的配置集群\n3. 点击编辑\n4. 在监控下，将增强监控设置为 PER_BROKER（或更高）\n5. 保存更改并等待更新完成",
+      "Terraform": "```hcl\n# Terraform：在 MSK 集群上启用增强监控\nresource \"aws_msk_cluster\" \"<example_resource_name>\" {\n  cluster_name           = \"<example_resource_name>\"\n  kafka_version          = \"<example_kafka_version>\"\n  number_of_broker_nodes = 2\n\n  broker_node_group_info {\n    instance_type  = \"kafka.t3.small\"\n    client_subnets = [\"<example_subnet_id_1>\", \"<example_subnet_id_2>\"]\n  }\n\n  enhanced_monitoring = \"PER_BROKER\" # 关键：将监控设置为高于 DEFAULT 以通过检查\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "选择一个增强级别（例如，`PER_BROKER`或更精细）并建立**可观测性**：优先考虑代理资源、复制健康状况和消费者滞后的遥测。配置与 SLO 对齐的警报和仪表板，以实现主动扩展和快速事件遏制。*在细粒度和成本之间取得平衡*。",
+      "Url": "https://hub.prowler.com/check/kafka_cluster_enhanced_monitoring_enabled"
+    }
+  },
+  "Categories": [
+    "logging"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

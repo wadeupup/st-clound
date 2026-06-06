@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "defender_ensure_system_updates_are_applied",
+  "CheckTitle": "「システム更新の適用」に関する Microsoft Defender の推奨状態が「Completed」であることを確認する",
+  "CheckType": [],
+  "ServiceName": "defender",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AzureDefenderRecommendation",
+  "ResourceGroup": "security",
+  "Description": "すべての仮想マシンに最新の OS パッチが適用されていることを確認します。",
+  "Risk": "Azure Security Center は、Windows VM に構成されているサービスに応じて、Windows Update または Windows Server Update Services（WSUS）から利用可能なセキュリティ更新および重要更新の一覧を取得します。Security Center は Linux システムの最新更新も確認します。VM にシステム更新が不足している場合、Security Center はシステム更新の適用を推奨します。",
+  "RelatedUrl": "https://docs.microsoft.com/en-us/security/benchmark/azure/security-controls-v3-posture-vulnerability-management#pv-7-rapidly-and-automatically-remediate-software-vulnerabilities",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/VirtualMachines/apply-latest-os-patches.html",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "Microsoft Azure のドキュメントに従い、Security Center からセキュリティ パッチを適用してください。代替として、独自のパッチ評価・管理ツールを使用し、OS に必要なセキュリティ パッチを定期的に評価、報告、インストールすることもできます。",
+      "Url": "https://learn.microsoft.com/en-us/azure/virtual-machines/updates-maintenance-overview"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "Microsoft Defender for Cloud の実行には、監視対象リソースごとに追加料金が発生します。正確な時間単価は添付の参照情報を確認してください。"
+}

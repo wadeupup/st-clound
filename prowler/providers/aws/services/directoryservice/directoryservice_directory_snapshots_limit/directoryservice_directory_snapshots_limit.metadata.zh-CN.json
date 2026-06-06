@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "directoryservice_directory_snapshots_limit",
+  "CheckTitle": "Directory Service 目录具有足够的剩余手动快照配额",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Effects/Resource Consumption"
+  ],
+  "ServiceName": "directoryservice",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "low",
+  "ResourceType": "Other",
+  "ResourceGroup": "IAM",
+  "Description": "**AWS Directory Service** 目录的**手动快照容量**已完全消耗或接近耗尽，基于当前快照数量相对于目录允许的最大值。",
+  "Risk": "如果没有剩余的快照容量，您无法创建新的恢复点：\n- 在中断或勒索软件攻击期间可用性降低\n- 由于计划备份失败导致更高的 RPO\n- 没有安全回滚的情况下，变更风险更大（架构/操作系统更新）",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://support.icompaas.com/support/solutions/articles/62000233531--ensure-directory-service-manual-snapshots-limit-reached",
+    "https://docs.aws.amazon.com/directoryservice/latest/admin-guide/ms_ad_limits.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "1. 在 AWS 控制台中，转到 Directory Service > Directories 并打开 <example_resource_id>\n2. 点击 Snapshots\n3. 选择 Type = Manual 的较旧快照，点击 Delete snapshot，确认\n4. 重复操作，直到手动快照数量小于（手动限制 - 2）。对于默认限制 5，最多保留 2 个手动快照\n5. 在 Snapshots 页面上验证 Remaining manual snapshots > 2",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "采用**快照生命周期策略**：在验证恢复后轮换/过期旧的手动快照，并在剩余容量低时发出告警。优先使用**自动备份**以保持节奏和保留。对快照创建强制执行**最小权限**。在*每个目录的硬性上限*内设计操作，以防止容量耗尽。",
+      "Url": "https://hub.prowler.com/check/directoryservice_directory_snapshots_limit"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

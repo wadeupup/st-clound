@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "sqlserver_tde_encrypted_with_cmk",
+  "CheckTitle": "SQL サーバーの Transparent Data Encryption（TDE）プロテクターが Customer-managed key で暗号化されていることを確認する",
+  "CheckType": [],
+  "ServiceName": "sqlserver",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "SQLServer",
+  "ResourceGroup": "database",
+  "Description": "Customer-managed key を使用した Transparent Data Encryption（TDE）サポートにより、TDE Protector の可視性と制御性が向上し、HSM に裏打ちされた外部サービスでセキュリティが強化され、職務分離が促進されます。",
+  "Risk": "Transparent Data Encryption（TDE）の Customer-managed key サポートにより、ユーザーは TDE 暗号化キーを制御し、誰がいつアクセスできるかを制限できます。Azure クラウドベースの外部キー管理システムである Azure Key Vault は、TDE が Customer-managed keys を統合サポートする最初のキー管理サービスです。Customer-managed key サポートでは、データベース暗号化キーは Key Vault に保存された非対称キーで保護されます。この非対称キーはサーバー レベルで設定され、そのサーバー配下のすべてのデータベースに継承されます。",
+  "RelatedUrl": "https://docs.microsoft.com/en-us/sql/relational-databases/security/encryption/transparent-data-encryption-byok-azure-sql",
+  "Remediation": {
+    "Code": {
+      "CLI": "az sql server tde-key set --resource-group resourceName --server dbServerName --server-key-type {AzureKeyVault} --kid keyIdentifier",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity-staging/knowledge-base/azure/Sql/use-byok-for-transparent-data-encryption.html#",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "1. SQL servers に移動します。対象のサーバー インスタンスで 2. Transparent data encryption をクリックします。3. Transparent data encryption を Customer-managed key に設定します。4. key vault を参照し、既存キーを選択するか Azure Key Vault で新しいキーを作成します。5. Make selected key the default TDE protector をチェックします。",
+      "Url": "https://learn.microsoft.com/en-us/azure/azure-sql/database/transparent-data-encryption-byok-overview?view=azuresql"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "TDE protector を Customer-managed key で暗号化すると、該当キー管理の責任はすべて利用者側に移ります。対応する SQL サーバーとホストされたデータベースのデータ可用性を維持するため、当該キーに対する操作は慎重に実施してください。Customer Managed Keys を導入する際は、キー管理用の自動化ツールセット（検出とキー ローテーションを含む）も合わせて導入し、キーは HSM または Azure Key Vault などのハードウェア バックド キーストアに保存することが推奨されます。ツールセットについては暗号鍵プロバイダーに確認してください。追加サービスとして提供される場合があります。"
+}

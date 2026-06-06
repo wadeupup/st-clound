@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "opensearch_service_domains_updated_to_the_latest_service_software_version",
+  "CheckTitle": "Amazon OpenSearch Service ドメインが最新のサービスソフトウェアバージョンに更新されました",
+  "CheckType": [
+    "ソフトウェアと構成のチェック/パッチ管理",
+    "ソフトウェアと構成のチェック/AWS セキュリティベストプラクティス"
+  ],
+  "ServiceName": "opensearch",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsOpenSearchServiceDomain",
+  "ResourceGroup": "database",
+  "Description": "**OpenSearch Service ドメイン**は、保留中の**サービスソフトウェアの更新**について評価されます。これは、エンジンバージョンのアップグレードとは異なる内部プラットフォームの更新に焦点を当てています。",
+  "Risk": "**サービスソフトウェアの更新が欠落している**と、既知の欠陥が未修正のままとなり、データの機密性やインデックスの整合性が脅かされる可能性があります。\n\n必要な更新が欠落すると、AWSがドメインを隔離し、**停止**を引き起こし、長引くと**永久削除**される可能性があります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/opensearch-service/latest/developerguide/service-software.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/Elasticsearch/version.html",
+    "https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-service-software.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws opensearch start-service-software-update --domain-name <DOMAIN_NAME>",
+      "NativeIaC": "",
+      "Other": "1. AWS コンソールにサインインし、Amazon OpenSearch Service を開く\n2. 対象のドメインを選択\n3. アクション > 更新をクリック\n4. 今すぐ更新を適用を選択\n5. 確認をクリックしてサービスソフトウェアの更新を開始",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "最新の**サービスソフトウェアの更新**を迅速に適用します。ドメインの**オフピークウィンドウ**中に更新をスケジュールするか、自動更新を有効にします。コンソールまたは**EventBridge**通知を監視し、ステージングで変更をテストして、**多層防御**をサポートしながらダウンタイムを最小限に抑えます。",
+      "Url": "https://hub.prowler.com/check/opensearch_service_domains_updated_to_the_latest_service_software_version"
+    }
+  },
+  "Categories": [
+    "vulnerabilities"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

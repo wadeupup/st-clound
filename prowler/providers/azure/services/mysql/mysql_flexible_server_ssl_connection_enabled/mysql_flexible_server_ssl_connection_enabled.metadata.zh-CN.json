@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "mysql_flexible_server_ssl_connection_enabled",
+  "CheckTitle": "确保标准 MySQL 数据库服务器的“Enforce SSL connection”设置为“Enabled”",
+  "CheckType": [],
+  "ServiceName": "mysql",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Microsoft.DBforMySQL/flexibleServers",
+  "ResourceGroup": "database",
+  "Description": "在 MYSQL 服务器上启用 SSL 连接。",
+  "Risk": "SSL 连接通过使用安全套接层（SSL）将数据库服务器与客户端应用连接起来，提供新的安全层。通过加密服务器与应用之间的数据流，强制数据库服务器与客户端应用使用 SSL 连接，有助于防御“中间人”攻击。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/mysql/single-server/concepts-ssl-connection-security",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.tenable.com/policies/[type]/AC_AZURE_0131",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "1. 使用 https://portal.azure.com 登录 Azure Portal。2. 进入 Azure Database for MySQL servers。3. 对每个数据库，点击 Connection security。4. 在 SSL settings 中，点击 ENABLED 以强制 SSL 连接。",
+      "Url": "https://docs.microsoft.com/en-us/azure/mysql/single-server/how-to-configure-ssl"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

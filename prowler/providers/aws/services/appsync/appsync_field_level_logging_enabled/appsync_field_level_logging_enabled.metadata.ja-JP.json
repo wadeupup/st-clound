@@ -1,0 +1,45 @@
+{
+  "Provider": "aws",
+  "CheckID": "appsync_field_level_logging_enabled",
+  "CheckTitle": "AWS AppSync API のフィールドレベルログが ALL または ERROR に設定されています",
+  "CheckType": [
+    "ソフトウェアと設定チェック/AWS セキュリティベストプラクティス",
+    "ソフトウェアと設定チェック/業界および規制基準/AWS 基礎セキュリティベストプラクティス"
+  ],
+  "ServiceName": "appsync",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsAppSyncGraphQLApi",
+  "ResourceGroup": "api_gateway",
+  "Description": "**AWS AppSync GraphQL API** は、リゾルバーレベルで**フィールドレベルログ**が設定されています。このチェックは、フィールド解決イベントが記録されていることを確認するために、`ERROR` または `ALL` のログレベルを探します。",
+  "Risk": "**フィールドレベルログ**がない場合、リゾルバーアクセスとミューテーションには**監査可能性**が欠如し、データ流出と改ざん（**機密性と整合性**）の検出が低下します。限られたトレースは、インシデント対応と根本原因分析を妨げ、回復時間を増加させます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://theburningmonk.com/2020/09/how-to-sample-appsync-resolver-logs/",
+    "https://lumigo.io/blog/how-to-monitor-and-debug-appsync-apis/",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/appsync-controls.html#appsync-2",
+    "https://docs.aws.amazon.com/appsync/latest/APIReference/API_LogConfig.html",
+    "https://blog.graphbolt.dev/debugging-aws-appsync-apis-with-cloudwatch",
+    "https://support.icompaas.com/support/solutions/articles/62000233678-ensure-aws-appsync-should-have-field-level-logging-enabled"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws appsync update-graphql-api --api-id <example_resource_id> --name <api-name> --authentication-type AWS_IAM --log-config fieldLogLevel=ERROR,cloudWatchLogsRoleArn=<cloudwatch_logs_role_arn>",
+      "NativeIaC": "```yaml\n# CloudFormation - AppSync API のフィールドレベルログを有効にします\nResources:\n  <example_resource_name>:\n    Type: AWS::AppSync::GraphQLApi\n    Properties:\n      Name: <example_resource_name>\n      AuthenticationType: AWS_IAM\n      LogConfig:\n        CloudWatchLogsRoleArn: arn:aws:iam::<account-id>:role/<example_resource_name>  # 重要：AppSync がログを書き込むことを許可します\n        FieldLogLevel: ERROR  # 重要：フィールドレベルログを準拠レベルに設定します\n```",
+      "Other": "1. AWS コンソールで、AppSync に移動し、GraphQL API を開きます\n2. Settings > Logging に移動します\n3. Enable logs をオンにします\n4. Field resolver log level を ERROR（または ALL）に設定します\n5. AppSync が CloudWatch Logs に書き込むことを許可する IAM ロールを選択します\n6. Save をクリックします",
+      "Terraform": "```hcl\n# Terraform - AppSync API のフィールドレベルログを有効にします\nresource \"aws_appsync_graphql_api\" \"<example_resource_name>\" {\n  name                = \"<example_resource_name>\"\n  authentication_type = \"AWS_IAM\"\n\n  log_config {\n    cloudwatch_logs_role_arn = \"<cloudwatch_logs_role_arn>\" # 重要：CloudWatch へのログ記録を許可します\n    field_log_level          = \"ERROR\"                        # 重要：準拠したフィールドレベルログ\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "- 少なくとも `ERROR` レベルのフィールドレベルログを有効にします；トラブルシューティングの場合のみ `INFO`/`DEBUG`/`ALL` に上げます。\n- ログ記録ロールに**最小権限**を強制します。\n- ログに機密データを含めないようにします；詳細なコンテンツを制限します。\n- 保持を設定し、可視性とコストのバランスを取るためにログ**サンプリング**を検討します。",
+      "Url": "https://hub.prowler.com/check/appsync_field_level_logging_enabled"
+    }
+  },
+  "Categories": [
+    "logging"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

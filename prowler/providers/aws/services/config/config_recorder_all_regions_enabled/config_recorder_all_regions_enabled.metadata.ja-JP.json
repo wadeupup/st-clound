@@ -1,0 +1,44 @@
+{
+  "Provider": "aws",
+  "CheckID": "config_recorder_all_regions_enabled",
+  "CheckTitle": "AWS Config レコーダーが有効で、障害状態または無効になっていない",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/CIS AWS Foundations Benchmark"
+  ],
+  "ServiceName": "config",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "monitoring",
+  "Description": "**AWS アカウント**には、各リージョンで**AWS Config レコーダー**がアクティブで正常な状態になっています。レコーダーがない、レコーダーが無効になっている、またはレコーダーが障害状態にあるリージョンを識別します。",
+  "Risk": "**Config 記録の空白**は**盲点**を作成します。監視されていないリージョンでの変更がキャプチャされないため、**整合性**と**監査可能性**が弱まります。攻撃者は気づかれることなくリソースを変更したり、資産を配置したりでき、設定ミスを引き起こし、**インシデント対応**を遅らせます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://repost.aws/es/questions/QUGcgeerhcTamRkwgdwh_tLQ/enable-aws-config",
+    "https://www.tenable.com/audits/items/CIS_Amazon_Web_Services_Foundations_v1.5.0_L2.audit:6a5136528bd329139e5969f8f1e5ffbc",
+    "https://aws.amazon.com/blogs/mt/aws-config-best-practices/"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\nResources:\n  example_resource_recorder:\n    Type: AWS::Config::ConfigurationRecorder\n    Properties:\n      Name: example_resource\n      RoleARN: !Sub arn:aws:iam::${AWS::AccountId}:role/aws-service-role/config.amazonaws.com/AWSServiceRoleForConfig\n\n  example_resource_channel:\n    Type: AWS::Config::DeliveryChannel\n    Properties:\n      S3BucketName: example_resource\n\n  example_resource_status:\n    Type: AWS::Config::ConfigurationRecorderStatus\n    Properties:\n      Name: example_resource\n      Recording: true  # この行がセキュリティ問題を修正します\n    DependsOn:\n      - example_resource_channel\n```",
+      "Other": "1. AWS コンソールで、Config に移動します\n2. AWS Config の設定（または設定）をクリックします\n3. リソース記録オプション（任意）を選択し、配信用の既存の S3 バケットを選択します\n4. デフォルトの AWSServiceRoleForConfig ロールを保持します\n5. 確認/有効化をクリックして記録を開始します\n6. 設定ページで、ステータスが Failure（障害）ではなく Recording（記録中）と表示されていることを確認します",
+      "Terraform": "```hcl\nresource \"aws_iam_service_linked_role\" \"example_resource\" {\n  aws_service_name = \"config.amazonaws.com\"\n}\n\nresource \"aws_config_configuration_recorder\" \"example_resource\" {\n  name     = \"example_resource\"\n  role_arn = aws_iam_service_linked_role.example_resource.arn\n}\n\nresource \"aws_config_delivery_channel\" \"example_resource\" {\n  s3_bucket_name = \"example_resource\"\n}\n\nresource \"aws_config_configuration_recorder_status\" \"example_resource\" {\n  name         = aws_config_configuration_recorder.example_resource.name\n  is_recording = true  # この行がセキュリティ問題を修正します\n  depends_on   = [aws_config_delivery_channel.example_resource]\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "すべてのリージョンで**AWS Config**を有効にし、継続的な記録を維持し、健全なレコーダーステータスを維持してください。",
+      "Url": "https://hub.prowler.com/check/config_recorder_all_regions_enabled"
+    }
+  },
+  "Categories": [
+    "logging",
+    "forensics-ready"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

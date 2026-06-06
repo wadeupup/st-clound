@@ -1,0 +1,35 @@
+{
+  "Provider": "aws",
+  "CheckID": "iam_policy_no_full_access_to_cloudtrail",
+  "CheckTitle": "确保未创建允许完整 \"cloudtrail:*\" 权限的 IAM 策略",
+  "CheckType": [
+    "软件和配置检查",
+    "行业和监管标准",
+    "CIS AWS 基础基准"
+  ],
+  "ServiceName": "iam",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "medium",
+  "ResourceType": "AwsIamPolicy",
+  "ResourceGroup": "IAM",
+  "Description": "确保未创建允许完整 \"cloudtrail:*\" 权限的 IAM 策略",
+  "Risk": "CloudTrail 是一项关键服务，IAM 策略应特别为此服务遵循最小权限模型",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "从最小权限集开始并根据需要授予额外权限，比从过于宽松的权限开始然后尝试收紧更安全。列出策略并分析权限是否是进行业务活动所需的最小权限。",
+      "Url": "http://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

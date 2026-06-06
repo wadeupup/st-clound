@@ -1,0 +1,40 @@
+{
+  "Provider": "aws",
+  "CheckID": "redshift_cluster_audit_logging",
+  "CheckTitle": "Redshift クラスターに監査ログが有効になっています",
+  "CheckType": [
+    "ソフトウェアと構成のチェック/AWS セキュリティベストプラクティス",
+    "ソフトウェアと構成のチェック/業界および規制基準/AWS 基礎セキュリティベストプラクティス"
+  ],
+  "ServiceName": "redshift",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsRedshiftCluster",
+  "ResourceGroup": "analytics",
+  "Description": "Amazon Redshift クラスターは、接続、ユーザー、およびユーザー活動イベントを Amazon S3 または CloudWatch にエクスポートする**データベース監査ログ**について評価されます。",
+  "Risk": "監査ログがないと、悪意のあるログインやクエリが検出を逃れ、**機密性**（データの流出）、**完全性**（不正なユーザー/ロールの変更）、およびフォレンジックやインシデント対応のための証拠が欠如することによる調査の**可用性**に影響を与える可能性があります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/redshift/latest/mgmt/db-auditing.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws redshift enable-logging --cluster-identifier <example_resource_id> --bucket-name <S3_BUCKET_NAME>",
+      "NativeIaC": "```yaml\nResources:\n  <example_resource_name>:\n    Type: AWS::Redshift::Cluster\n    Properties:\n      ClusterType: single-node\n      NodeType: dc2.large\n      DBName: mydb\n      MasterUsername: masteruser\n      MasterUserPassword: <PASSWORD>\n      # 重要: Redshift 監査ログを S3 に有効にします\n      LoggingProperties:\n        BucketName: <S3_BUCKET_NAME>  # 重要: ログをオンにする必要があります\n```",
+      "Other": "1. Amazon Redshift コンソールを開き、クラスターに移動します\n2. 対象のクラスターを選択し、プロパティタブを開きます\n3. データベース監査ログで、編集をクリックします\n4. ログを有効にし、S3 バケットを選択します\n5. 変更を保存をクリックします",
+      "Terraform": "```hcl\nresource \"aws_redshift_cluster\" \"<example_resource_name>\" {\n  cluster_identifier = \"<example_resource_id>\"\n  node_type          = \"dc2.large\"\n  master_username    = \"masteruser\"\n  master_password    = \"SuperSecretPassw0rd!\"\n  cluster_type       = \"single-node\"\n\n  logging {\n    enable      = true                 # 重要: 監査ログをオンにします\n    bucket_name = \"<S3_BUCKET_NAME>\"  # 重要: S3 宛先が必要です\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "包括的な**Redshift 監査ログ**を有効にし、ユーザー活動イベントを含めます。ログを保護された宛先に集中化し、**最小特権**アクセス、保持、および不変性を強制します。**多層防御**の一環として異常な接続やクエリに対する**アラート**を実装します。",
+      "Url": "https://hub.prowler.com/check/redshift_cluster_audit_logging"
+    }
+  },
+  "Categories": [
+    "logging",
+    "forensics-ready"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

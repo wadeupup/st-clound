@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "ecs_task_definitions_logging_block_mode",
+  "CheckTitle": "ECS タスク定義が非ブロッキングモードでコンテナロギングを行っている",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices/Runtime Behavior Analysis",
+    "Effects/Denial of Service"
+  ],
+  "ServiceName": "ecs",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "low",
+  "ResourceType": "AwsEcsTaskDefinition",
+  "ResourceGroup": "container",
+  "Description": "**ECS タスク定義コンテナ** は、最新のアクティブリビジョンで `logConfiguration.mode` オプションを通じて **非ブロッキングロギングモード** を使用します。",
+  "Risk": "**ブロッキングログモード** は stdout/stderr への書き込みを停止させ、コンテナを応答不能にし、ヘルスチェックを失敗させ、ロググループ/ストリームを作成できない場合にタスクの再起動や起動失敗を引き起こす可能性があります。これにより **可用性** が低下し、依存サービスの連鎖的な不安定性を引き起こす可能性があります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/config/latest/developerguide/ecs-task-definition-log-configuration.html",
+    "https://www.amazonaws.cn/en/blog-selection/preventing-log-loss-with-non-blocking-mode-in-the-awslogs-container-log-driver/",
+    "https://docs.aws.amazon.com/AmazonECS/latest/developerguide/using_awslogs.html#specify-log-config"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws ecs register-task-definition --family <task-family> --container-definitions '[{\"name\":\"<container-name>\",\"image\":\"<image>\",\"logConfiguration\":{\"logDriver\":\"awslogs\",\"options\":{\"awslogs-group\":\"<log-group>\",\"awslogs-region\":\"<region>\",\"awslogs-stream-prefix\":\"ecs\",\"mode\":\"non-blocking\"}}}]'",
+      "NativeIaC": "```yaml\n# CloudFormation: ECS Task Definition with non-blocking container logging\nResources:\n  <example_resource_name>:\n    Type: AWS::ECS::TaskDefinition\n    Properties:\n      Family: <example_resource_name>\n      ContainerDefinitions:\n        - Name: <example_resource_name>\n          Image: <image>\n          LogConfiguration:\n            LogDriver: awslogs\n            Options:\n              awslogs-group: <log-group>\n              awslogs-region: <region>\n              awslogs-stream-prefix: ecs\n              mode: non-blocking  # CRITICAL: sets logging to non-blocking to pass the check\n```",
+      "Other": "1. AWS コンソールを開き、ECS > タスク定義に移動します\n2. 失敗しているタスク定義を選択し、新しいリビジョンを作成を選択します\n3. 影響を受けるコンテナ > ログ設定を編集します\n4. ログドライバーを awslogs に設定し、オプションを追加します：mode = non-blocking\n5. awslogs-group、awslogs-region、および（必要に応じて）awslogs-stream-prefix が設定されていることを確認します\n6. 保存して作成します；新しいリビジョンには非ブロッキングロギングが含まれます",
+      "Terraform": "```hcl\n# ECS Task Definition with container logging set to non-blocking\nresource \"aws_ecs_task_definition\" \"<example_resource_name>\" {\n  family = \"<example_resource_name>\"\n\n  # CRITICAL: \"mode\": \"non-blocking\" in logConfiguration options enforces non-blocking logging\n  container_definitions = jsonencode([\n    {\n      name  = \"<example_resource_name>\"\n      image = \"<image>\"\n      logConfiguration = {\n        logDriver = \"awslogs\"\n        options = {\n          awslogs-group         = \"<log-group>\"\n          awslogs-region        = \"<region>\"\n          awslogs-stream-prefix = \"ecs\"\n          mode                  = \"non-blocking\" # CRITICAL: required to pass the check\n        }\n      }\n    }\n  ])\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "すべてのコンテナに対して `logConfiguration.mode` を `non-blocking` に設定し、`max-buffer-size` を調整してバーストを処理します。ログの宛先をリージョン内に保持してレイテンシを低下させます。**多層防御** を適用します：アプリケーションの実行をロギングから分離し、ログスループットを監視し、ロギングがランタイムをブロックしないようにバックプレッシャーを設計します。",
+      "Url": "https://hub.prowler.com/check/ecs_task_definitions_logging_block_mode"
+    }
+  },
+  "Categories": [
+    "logging",
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

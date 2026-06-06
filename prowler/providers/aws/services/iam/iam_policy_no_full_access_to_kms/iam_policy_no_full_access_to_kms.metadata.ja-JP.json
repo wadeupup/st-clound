@@ -1,0 +1,35 @@
+{
+  "Provider": "aws",
+  "CheckID": "iam_policy_no_full_access_to_kms",
+  "CheckTitle": "IAM ポリシーで完全な \"kms:*\" 権限を許可するものが作成されないようにする",
+  "CheckType": [
+    "ソフトウェアと構成のチェック",
+    "業界および規制の標準",
+    "CIS AWS Foundations ベンチマーク"
+  ],
+  "ServiceName": "iam",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "medium",
+  "ResourceType": "AwsIamPolicy",
+  "ResourceGroup": "IAM",
+  "Description": "IAM ポリシーで完全な \"kms:*\" 権限を許可するものが作成されないようにする",
+  "Risk": "KMSは重要なサービスであり、特にこのサービスに対しては最小権限モデルに従うべきです",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "最小限の権限から始め、必要に応じて追加の権限を付与する方が、最初から権限が緩すぎる状態で始めて後でそれを引き締めようとするよりも安全です。ポリシーを一覧表示し、ビジネス活動を行うために必要な最小限の権限であるかどうかを分析します。",
+      "Url": "http://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

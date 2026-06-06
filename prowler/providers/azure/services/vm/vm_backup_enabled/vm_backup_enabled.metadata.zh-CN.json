@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "vm_backup_enabled",
+  "CheckTitle": "确保已为 Azure 虚拟机启用备份",
+  "CheckType": [],
+  "ServiceName": "vm",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Microsoft.Compute/virtualMachines",
+  "ResourceGroup": "compute",
+  "Description": "确保为 Azure 虚拟机（VM）使用 Microsoft Azure Backup 服务，以防止意外删除或损坏。",
+  "Risk": "若未启用 Azure Backup，虚拟机将面临因误删除、损坏或其他故障导致的数据丢失风险，且恢复选项有限。",
+  "RelatedUrl": "https://docs.microsoft.com/en-us/azure/backup/backup-overview",
+  "Remediation": {
+    "Code": {
+      "CLI": "az backup protection enable-for-vm --resource-group <resource-group> --vm <vm-name> --vault-name <vault-name> --policy-name DefaultPolicy",
+      "NativeIaC": "",
+      "Other": "https://learn.microsoft.com/en-us/azure/backup/quick-backup-vm-portal",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "通过将每台虚拟机关联到 Recovery Services 保管库和备份策略，为每台 VM 启用 Azure Backup。",
+      "Url": "https://docs.microsoft.com/en-us/azure/backup/quick-backup-vm-portal"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "ecs_task_definitions_logging_block_mode",
+  "CheckTitle": "ECS 任务定义在非阻塞模式下进行容器日志记录",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices/Runtime Behavior Analysis",
+    "Effects/Denial of Service"
+  ],
+  "ServiceName": "ecs",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "low",
+  "ResourceType": "AwsEcsTaskDefinition",
+  "ResourceGroup": "container",
+  "Description": "**ECS 任务定义容器** 在最新活动修订版上通过 `logConfiguration.mode` 选项使用 **非阻塞日志记录模式**。",
+  "Risk": "**阻塞日志模式** 可能会阻塞对 stdout/stderr 的写入，使容器无响应、健康检查失败，如果无法创建日志组/流，则可能导致任务重启或启动失败。这会降低 **可用性**，并可能触发依赖服务的级联不稳定。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/config/latest/developerguide/ecs-task-definition-log-configuration.html",
+    "https://www.amazonaws.cn/en/blog-selection/preventing-log-loss-with-non-blocking-mode-in-the-awslogs-container-log-driver/",
+    "https://docs.aws.amazon.com/AmazonECS/latest/developerguide/using_awslogs.html#specify-log-config"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws ecs register-task-definition --family <task-family> --container-definitions '[{\"name\":\"<container-name>\",\"image\":\"<image>\",\"logConfiguration\":{\"logDriver\":\"awslogs\",\"options\":{\"awslogs-group\":\"<log-group>\",\"awslogs-region\":\"<region>\",\"awslogs-stream-prefix\":\"ecs\",\"mode\":\"non-blocking\"}}}]'",
+      "NativeIaC": "```yaml\n# CloudFormation: ECS Task Definition with non-blocking container logging\nResources:\n  <example_resource_name>:\n    Type: AWS::ECS::TaskDefinition\n    Properties:\n      Family: <example_resource_name>\n      ContainerDefinitions:\n        - Name: <example_resource_name>\n          Image: <image>\n          LogConfiguration:\n            LogDriver: awslogs\n            Options:\n              awslogs-group: <log-group>\n              awslogs-region: <region>\n              awslogs-stream-prefix: ecs\n              mode: non-blocking  # CRITICAL: sets logging to non-blocking to pass the check\n```",
+      "Other": "1. 打开 AWS 控制台并转到 ECS > 任务定义\n2. 选择失败的任务定义并选择创建新修订版\n3. 编辑受影响的容器 > 日志配置\n4. 将日志驱动程序设置为 awslogs 并添加选项：mode = non-blocking\n5. 确保设置了 awslogs-group、awslogs-region 和（如需要）awslogs-stream-prefix\n6. 保存并创建；新修订版将具有非阻塞日志记录",
+      "Terraform": "```hcl\n# ECS Task Definition with container logging set to non-blocking\nresource \"aws_ecs_task_definition\" \"<example_resource_name>\" {\n  family = \"<example_resource_name>\"\n\n  # CRITICAL: \"mode\": \"non-blocking\" in logConfiguration options enforces non-blocking logging\n  container_definitions = jsonencode([\n    {\n      name  = \"<example_resource_name>\"\n      image = \"<image>\"\n      logConfiguration = {\n        logDriver = \"awslogs\"\n        options = {\n          awslogs-group         = \"<log-group>\"\n          awslogs-region        = \"<region>\"\n          awslogs-stream-prefix = \"ecs\"\n          mode                  = \"non-blocking\" # CRITICAL: required to pass the check\n        }\n      }\n    }\n  ])\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "为所有容器将 `logConfiguration.mode` 设置为 `non-blocking`，并调整 `max-buffer-size` 以处理突发流量。将日志目标保持在区域内以降低延迟。应用 **纵深防御**：将应用程序执行与日志记录解耦，监控日志吞吐量，并设计背压机制，使日志记录永远不会阻塞运行时。",
+      "Url": "https://hub.prowler.com/check/ecs_task_definitions_logging_block_mode"
+    }
+  },
+  "Categories": [
+    "logging",
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

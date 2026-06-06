@@ -1,0 +1,44 @@
+{
+  "Provider": "aws",
+  "CheckID": "mq_broker_cluster_deployment_mode",
+  "CheckTitle": "MQ RabbitMQ ブローカーはクラスタ (マルチAZ) デプロイメントモードを持っています",
+  "CheckType": [
+    "ソフトウェアと構成のチェック/AWS セキュリティベストプラクティス",
+    "ソフトウェアと構成のチェック/業界および規制基準/NIST 800-53 コントロール",
+    "影響/サービス拒否"
+  ],
+  "ServiceName": "mq",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsAmazonMQBroker",
+  "ResourceGroup": "messaging",
+  "Description": "**Amazon MQ RabbitMQ ブローカー**は、複数のAZにわたってノードが分散され、共有状態を持つ**クラスタデプロイメントモード** (`CLUSTER_MULTI_AZ`) に対して評価されます。\n\nそれ以外の設定のブローカーは識別されます。",
+  "Risk": "**クラスタ化された RabbitMQ** がない場合、ブローカーは**単一障害点**となります。インスタンスまたはAZの障害がキューを停止させ、メッセージの損失や重複を引き起こし、順序を壊し、ブローカーに依存するワークロードの**可用性**と**整合性**を低下させます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/amazon-mq/latest/developer-guide/rabbitmq-basic-elements.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/mq-controls.html#mq-6",
+    "https://docs.aws.amazon.com/amazon-mq/latest/developer-guide/rabbitmq-broker-architecture.html#rabbitmq-broker-architecture-cluster",
+    "https://docs.amazonaws.cn/en_us/AWSCloudFormation/latest/TemplateReference/aws-resource-amazonmq-broker.html",
+    "https://docs.aws.amazon.com/controltower/latest/controlreference/mq-rules.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws mq create-broker --broker-name <example_resource_name> --engine-type RABBITMQ --deployment-mode CLUSTER_MULTI_AZ --host-instance-type mq.m5.large --publicly-accessible --auto-minor-version-upgrade --users '[{\"Username\":\"<example_username>\",\"Password\":\"<example_password>\"}]'",
+      "NativeIaC": "```yaml\n# CloudFormation: クラスタ (マルチAZ) モードで RabbitMQ ブローカーを作成します\nResources:\n  ExampleBroker:\n    Type: AWS::AmazonMQ::Broker\n    Properties:\n      BrokerName: \"<example_resource_name>\"\n      EngineType: RABBITMQ            # 重要: ブローカーが RabbitMQ であることを確認します\n      DeploymentMode: CLUSTER_MULTI_AZ # 重要: クラスタ (マルチAZ) を設定してチェックを通過します\n      HostInstanceType: mq.m5.large\n      PubliclyAccessible: true\n      Users:\n        - Username: \"<example_username>\"\n          Password: \"<example_password>\"\n```",
+      "Other": "1. AWS コンソールを開き、Amazon MQ に移動します\n2. ブローカー > ブローカーの作成 をクリックします\n3. エンジンとして RabbitMQ を選択します\n4. デプロイメントモードをクラスタ (マルチAZ) に設定します\n5. ブローカー名を入力し、インスタンスタイプを選択し、必要に応じてパブリックアクセスを設定し、1人の管理ユーザーを作成します\n6. ブローカーの作成をクリックします\n7. アプリケーションを新しいブローカーエンドポイントに移行し、古い単一インスタンスブローカーを削除します\n\n注意: 既存のブローカーのデプロイメントモードは変更できません。新しいクラスタブローカーを作成する必要があります。",
+      "Terraform": "```hcl\n# Terraform: クラスタ (マルチAZ) モードで RabbitMQ ブローカーを作成します\nresource \"aws_mq_broker\" \"example\" {\n  broker_name         = \"<example_resource_name>\"\n  engine_type         = \"RabbitMQ\"         # 重要: RabbitMQ エンジン\n  deployment_mode     = \"CLUSTER_MULTI_AZ\" # 重要: チェックを通過するためのクラスタ (マルチAZ)\n  host_instance_type  = \"mq.m5.large\"\n  publicly_accessible = true\n\n  user {\n    username = \"<example_username>\"\n    password = \"<example_password>\"\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "RabbitMQ の**クラスタデプロイメント** (`CLUSTER_MULTI_AZ`) を使用して、単一インスタンスのリスクを排除します。\n\n**設計による回復力**を適用します: クライアントの自動再接続、バックオフ付きのリトライ、冪等処理; フェイルオーバーをテストし、ノード損失に備えてサイズを調整し、監視による**最小特権**を強制して深層防御を行います。",
+      "Url": "https://hub.prowler.com/check/mq_broker_cluster_deployment_mode"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

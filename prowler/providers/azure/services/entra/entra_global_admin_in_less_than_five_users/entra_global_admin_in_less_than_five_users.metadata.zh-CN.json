@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "entra_global_admin_in_less_than_five_users",
+  "CheckTitle": "确保全局管理员分配用户少于 5 个",
+  "CheckType": [],
+  "ServiceName": "entra",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "#microsoft.graph.directoryRole",
+  "ResourceGroup": "IAM",
+  "Description": "此建议旨在通过确保 Microsoft Entra ID 中全局管理员角色分配最少 2 人、最多 4 人，在安全性与运营效率之间保持平衡。至少两名全局管理员可确保冗余，最多四名可降低过度特权访问风险。",
+  "Risk": "全局管理员角色在 Microsoft Entra ID 的所有服务中拥有广泛权限。全局管理员角色不应在日常活动中使用；管理员应拥有一个用于日常活动的普通用户账户，以及一个用于管理职责的独立账户。限制全局管理员数量有助于降低未授权访问风险、减少人为错误的潜在影响，并符合最小权限原则以缩小 Azure 租户攻击面。相反，至少两名全局管理员可确保在单个管理员不可用时管理功能不中断。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/entra/identity/role-based-access-control/best-practices#5-limit-the-number-of-global-administrators-to-less-than-5",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "1. 在 Azure Home 中选择 Portal Menu 2. 选择 Microsoft Entra ID 3. 选择 Roles and Administrators 4. 选择 Global Administrator 5. 确保主动分配该角色的用户少于 5 人 6. 确保主动分配该角色的用户至少有 2 人。",
+      "Url": "https://learn.microsoft.com/en-us/microsoft-365/admin/add-users/about-admin-roles?view=o365-worldwide#security-guidelines-for-assigning-roles"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "实施此建议可能需要调整管理工作流或重新分配角色与职责。应为所有全局管理员提供充分培训与认知宣导。"
+}

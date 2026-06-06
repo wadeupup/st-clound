@@ -1,0 +1,32 @@
+{
+  "Provider": "aws",
+  "CheckID": "cognito_user_pool_waf_acl_attached",
+  "CheckTitle": "确保 Amazon Cognito 用户池关联了 WAF Web ACL",
+  "CheckType": [],
+  "ServiceName": "cognito",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:aws:cognito-idp:region:account:userpool/userpool-id",
+  "Severity": "medium",
+  "ResourceType": "AwsCognitoUserPool",
+  "ResourceGroup": "IAM",
+  "Description": "Web ACL 用于控制对您内容的访问。您可以使用 Web ACL 来控制谁可以访问您的内容。您还可以使用 Web ACL 根据 IP 地址、HTTP 标头、HTTP 正文、URI 或 URI 查询字符串参数来阻止请求。您可以将 Web ACL 与 Cognito 用户池关联，以控制对您内容的访问。",
+  "Risk": "如果 Web ACL 未与 Cognito 用户池关联，则内容不受 Web ACL 保护。这可能导致对您内容的未授权访问。",
+  "RelatedUrl": "https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-waf.html",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "Web ACL 应与 Cognito 用户池关联。要将 Web ACL 与 Cognito 用户池关联，请使用 AWS 管理控制台。",
+      "Url": "https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-waf.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

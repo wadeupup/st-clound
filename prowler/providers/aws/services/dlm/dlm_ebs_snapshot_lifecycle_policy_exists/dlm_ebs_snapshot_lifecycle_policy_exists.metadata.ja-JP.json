@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "dlm_ebs_snapshot_lifecycle_policy_exists",
+  "CheckTitle": "EBS スナップショットがあるリージョンに少なくとも1つの EBS スナップショットライフサイクルポリシーが定義されている",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices"
+  ],
+  "ServiceName": "dlm",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "storage",
+  "Description": "**EBS スナップショット**は、スナップショットが存在する各リージョンで**データライフサイクルマネージャー (DLM) ポリシー**によって管理されることが期待されます。\n\n評価では、これらのスナップショットのスナップショット作成、保持、クリーンアップを自動化するライフサイクルポリシーを検索します。",
+  "Risk": "**自動化されたライフサイクルポリシー**がない場合、バックアップは一貫性がなく、エラーが発生しやすくなり、可用性が低下し、回復目標が弱まります。保持ルールがないと、早期削除またはスナップショットの蔓延が発生し、コストが増加し、古いデータが公開されます。リージョン間/アカウント間のコピーがないと、リージョン障害や悪意のある削除に対する回復力が制限されます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/DLM/ebs-snapshot-automation.html",
+    "https://repost.aws/articles/ARmYgZmA8MRQi89pWd9D7eFw/how-to-create-a-automate-backup-aws-data-lifecycle-management-using-snapshots",
+    "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/snapshot-lifecycle.html#dlm-elements"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws dlm create-lifecycle-policy --region <region> --execution-role-arn <execution-role-arn> --description \"<description>\" --state ENABLED --policy-details '{\"PolicyType\":\"EBS_SNAPSHOT_MANAGEMENT\",\"ResourceTypes\":[\"VOLUME\"],\"TargetTags\":[{\"Key\":\"<tag_key>\",\"Value\":\"<tag_value>\"}],\"Schedules\":[{\"CreateRule\":{\"Interval\":24,\"IntervalUnit\":\"HOURS\"},\"RetainRule\":{\"Count\":1}}]}'",
+      "NativeIaC": "```yaml\n# CloudFormation：最小 EBS スナップショットライフサイクルポリシー\nResources:\n  <example_resource_name>:\n    Type: AWS::DLM::LifecyclePolicy\n    Properties:\n      Description: \"<description>\"\n      ExecutionRoleArn: \"<example_resource_arn>\"\n      State: ENABLED  # 重要：ポリシーを有効にしてチェックでカウントされるようにする\n      PolicyDetails:\n        PolicyType: EBS_SNAPSHOT_MANAGEMENT  # 重要：EBS スナップショットライフサイクルポリシーを作成\n        ResourceTypes: [VOLUME]\n        TargetTags:\n          - Key: \"<tag_key>\"  # 重要：タグでターゲットボリュームを選択\n            Value: \"<tag_value>\"\n        Schedules:\n          - CreateRule:\n              Interval: 24\n              IntervalUnit: HOURS\n            RetainRule:\n              Count: 1\n```",
+      "Other": "1. AWS コンソールで、EBS スナップショットがあるリージョンに切り替えます\n2. EC2 > Lifecycle Manager (DLM) > Create lifecycle policy を開きます\n3. EBS snapshot policy を選択します。Target resource: Volumes\n4. Target tags を追加します：Key = <tag_key>、Value = <tag_value>\n5. Schedule を設定します：24 時間ごとに作成。1 つのスナップショットを保持\n6. State が Enabled であることを確認し、Create policy をクリックします",
+      "Terraform": "```hcl\n# Terraform：最小 EBS スナップショットライフサイクルポリシー\nresource \"aws_dlm_lifecycle_policy\" \"<example_resource_name>\" {\n  description        = \"<description>\"\n  execution_role_arn = \"<example_resource_arn>\"\n  state              = \"ENABLED\" # 重要：ポリシーを有効にしてチェックでカウントされるようにする\n\n  policy_details {\n    policy_type    = \"EBS_SNAPSHOT_MANAGEMENT\" # 重要：EBS スナップショットライフサイクルポリシーを作成\n    resource_types = [\"VOLUME\"]\n    target_tags = {\n      \"<tag_key>\" = \"<tag_value>\" # 重要：タグでターゲットボリュームを選択\n    }\n    schedule {\n      create_rule {\n        interval      = 24\n        interval_unit = \"HOURS\"\n      }\n      retain_rule {\n        count = 1\n      }\n    }\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "バックアップが必要なすべてのボリュームに対して**DLM ライフサイクルポリシー**を実装します。\n\n- RPO/RTO を満たすために作成をスケジュールします\n- 蔓延を防ぎ、最小データ公開を強制するために保持を定義します\n- **最小権限**ロールと職務の分離を使用します\n- **多層防御**のためにスナップショットを別のリージョン/アカウントにコピーします\n- タグでポリシーの健全性とカバレッジを監視します",
+      "Url": "https://hub.prowler.com/check/dlm_ebs_snapshot_lifecycle_policy_exists"
+    }
+  },
+  "Categories": [
+    "forensics-ready"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

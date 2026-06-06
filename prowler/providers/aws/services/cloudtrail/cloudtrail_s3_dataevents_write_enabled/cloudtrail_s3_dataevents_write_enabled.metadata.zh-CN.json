@@ -1,0 +1,46 @@
+{
+  "Provider": "aws",
+  "CheckID": "cloudtrail_s3_dataevents_write_enabled",
+  "CheckTitle": "CloudTrail 跟踪记录所有存储桶的所有 S3 对象级 API 操作",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/CIS AWS Foundations Benchmark"
+  ],
+  "ServiceName": "cloudtrail",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "low",
+  "ResourceType": "AwsCloudTrailTrail",
+  "ResourceGroup": "monitoring",
+  "Description": "**CloudTrail 跟踪** 包括 **所有当前和未来存储桶** 的 **写入（或全部）操作** 的 **S3 对象级数据事件**，通过经典或高级选择器。这会在对象级别记录 `PutObject`、`DeleteObject` 和多部分上传等操作。",
+  "Risk": "没有对象级写入日志记录，未经授权或意外的更改和删除可能无法被观察到，从而损害数据 **完整性** 和 **可用性**。取证失去了对谁修改或删除对象的可见性，阻碍了对勒索软件、恶意自动化或内部篡改的检测。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/logging-data-events-with-cloudtrail.html",
+    "https://docs.aws.amazon.com/AmazonS3/latest/userguide/enable-cloudtrail-logging-for-s3.html",
+    "https://www.go2share.net/article/s3-bucket-logging",
+    "https://docs.amazonaws.cn/en_us/AmazonS3/latest/userguide/cloudtrail-logging-s3-info.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/s3-controls.html#s3-22"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws cloudtrail put-event-selectors --trail-name <example_resource_name> --event-selectors '[{\"ReadWriteType\":\"WriteOnly\",\"DataResources\":[{\"Type\":\"AWS::S3::Object\",\"Values\":[\"arn:aws:s3\"]}]}]'",
+      "NativeIaC": "```yaml\nResources:\n  <example_resource_name>:\n    Type: AWS::CloudTrail::Trail\n    Properties:\n      TrailName: <example_resource_name>\n      S3BucketName: <example_resource_name>\n      EventSelectors:\n        - ReadWriteType: WriteOnly\n          DataResources:\n            - Type: AWS::S3::Object\n              Values:\n                - arn:aws:s3  # Critical: enables S3 object-level write data events for all buckets, fixing the check\n```",
+      "Other": "1. 在 AWS 控制台中，打开 CloudTrail 并转到跟踪\n2. 选择 <your trail> 并在数据事件下单击编辑\n3. 对于数据事件源，选择 S3\n4. 选择所有当前和未来的 S3 存储桶\n5. 勾选写入事件（或所有事件）\n6. 单击保存更改",
+      "Terraform": "```hcl\nresource \"aws_cloudtrail\" \"<example_resource_name>\" {\n  name           = \"<example_resource_name>\"\n  s3_bucket_name = \"<example_resource_name>\"\n\n  event_selector {\n    read_write_type = \"WriteOnly\"\n    data_resource {\n      type   = \"AWS::S3::Object\"\n      values = [\"arn:aws:s3\"]  # Critical: logs S3 object-level write events for all buckets to pass the check\n    }\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "在多区域跟踪上为所有存储桶启用对象级 **写入**（以及*可选*读取）的 **CloudTrail S3 数据事件**。对日志存储应用 **最小权限原则**，设置 **生命周期** 保留，并集成警报。使用 **高级选择器** 针对敏感存储桶/操作进行成本控制和 **纵深防御**。",
+      "Url": "https://hub.prowler.com/check/cloudtrail_s3_dataevents_write_enabled"
+    }
+  },
+  "Categories": [
+    "logging",
+    "forensics-ready"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "iam_subscription_roles_owner_custom_not_created",
+  "CheckTitle": "确保未创建自定义订阅所有者角色",
+  "CheckType": [],
+  "ServiceName": "iam",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AzureRole",
+  "ResourceGroup": "IAM",
+  "Description": "确保未创建自定义订阅所有者角色",
+  "Risk": "订阅所有权不应包含创建自定义所有者角色的权限。应遵循最小权限原则，仅分配必要权限，而不是授予完全管理访问权限。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/role-based-access-control/custom-roles",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity-staging/knowledge-base/azure/AccessControl/remove-custom-owner-roles.html",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "不应创建自定义订阅所有者角色。原因是应遵循最小权限原则，仅分配必要权限，而不是授予完全管理访问权限",
+      "Url": "https://www.trendmicro.com/cloudoneconformity-staging/knowledge-base/azure/AccessControl/remove-custom-owner-roles.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

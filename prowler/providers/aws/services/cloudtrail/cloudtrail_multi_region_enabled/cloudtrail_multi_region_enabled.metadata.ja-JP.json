@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "cloudtrail_multi_region_enabled",
+  "CheckTitle": "リージョンに少なくとも 1 つの CloudTrail トレイルがログ記録している",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/CIS AWS Foundations Benchmark"
+  ],
+  "ServiceName": "cloudtrail",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsCloudTrailTrail",
+  "ResourceGroup": "monitoring",
+  "Description": "**AWS CloudTrail** は、すべてのリージョンで `logging` が有効な少なくとも 1 つのトレイルを持っています。**マルチリージョントレイル** またはリージョントレイルは、そのリージョンのカバレッジとしてカウントされます。",
+  "Risk": "いずれのリージョンでもカバレッジが欠如していると、**可視性のギャップ** が生じます。\n\n攻撃者は監視が少ないリージョンを使用して API アクションを実行し、**不正な変更** を隠し、監査証跡なしでデータを窃取でき、**検出制御** を弱め、**フォレンジック** を妨げ、応答を遅らせます（機密性と整合性）。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrailconcepts.html#cloudtrail-concepts-management-events"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation: Create a multi-region CloudTrail and start logging\nResources:\n  <example_resource_name>:\n    Type: AWS::CloudTrail::Trail\n    Properties:\n      TrailName: <example_resource_name>\n      S3BucketName: <example_resource_name>\n      IsMultiRegionTrail: true  # Critical: applies the trail to all regions\n      IsLogging: true           # Critical: ensures the trail is logging\n```",
+      "Other": "1. AWS コンソールで、CloudTrail > トレイルに移動します\n2. トレイルが存在しない場合：トレイルの作成をクリックし、名前を入力し、S3 バケットを選択し、すべてのリージョンにトレイルを適用 = はいに設定し、作成をクリックします（ログ記録が開始されます）\n3. トレイルが存在する場合：選択し、編集をクリックし、すべてのリージョンにトレイルを適用 = はいに設定し、保存します\n4. ステータスがログ記録なしと表示されている場合、ログ記録を開始をクリックします",
+      "Terraform": "```hcl\n# Terraform: Multi-region CloudTrail with logging enabled\nresource \"aws_cloudtrail\" \"<example_resource_name>\" {\n  name           = \"<example_resource_name>\"\n  s3_bucket_name = \"<example_resource_name>\"\n\n  is_multi_region_trail = true  # Critical: applies the trail to all regions\n  enable_logging        = true  # Critical: ensures the trail is logging\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "**マルチリージョン CloudTrail トレイル** またはリージョンごとのトレイルを使用して、すべてのリージョン（未使用のリージョンを含む）で `logging` がアクティブになるようにします。\n\nログを集中化し、ログストアに **最小権限の原則** を適用し、暗号化、整合性検証、保持による **多層防御** を追加します。トレイルの健全性を継続的に監視して、ギャップを発見します。",
+      "Url": "https://hub.prowler.com/check/cloudtrail_multi_region_enabled"
+    }
+  },
+  "Categories": [
+    "logging",
+    "forensics-ready"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

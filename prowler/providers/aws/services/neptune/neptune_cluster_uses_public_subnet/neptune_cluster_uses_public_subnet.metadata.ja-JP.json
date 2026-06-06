@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "neptune_cluster_uses_public_subnet",
+  "CheckTitle": "Neptune クラスターはパブリックサブネットを使用していません",
+  "CheckType": [
+    "ソフトウェアと構成のチェック/AWS セキュリティベストプラクティス/ネットワーク到達可能性",
+    "TTPs/初期アクセス/不正アクセス"
+  ],
+  "ServiceName": "neptune",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsRdsDbCluster",
+  "ResourceGroup": "database",
+  "Description": "Neptune クラスターは1つ以上の**パブリックサブネット**に関連付けられています。",
+  "Risk": "**パブリックサブネット**内の Neptune クラスターは、CIA トライアド全体での露出を増加させます:\n\n- **機密性**: 直接アクセスにより、資格情報攻撃やデータの流出が可能になります\n- **完全性**: 攻撃者がグラフデータを変更または注入する可能性があります\n- **可用性**: パブリック到達性により、DDoS やリモートエクスプロイトが可能になり、ダウンタイムを引き起こす可能性があります",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/neptune/latest/userguide/get-started-vpc.html",
+    "https://docs.aws.amazon.com/neptune/latest/userguide/feature-overview-endpoints.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\nResources:\n  NeptuneSubnetGroup:\n    Type: AWS::Neptune::DBSubnetGroup\n    Properties:\n      DBSubnetGroupDescription: \"Private subnets for Neptune\"\n      SubnetIds:  # パブリックアクセスを防ぐためにプライベートサブネット ID のみを使用します\n        - <PRIVATE_SUBNET_ID_1>\n        - <PRIVATE_SUBNET_ID_2>\n\n  NeptuneDBCluster:\n    Type: AWS::Neptune::DBCluster\n    Properties:\n      DBSubnetGroupName: !Ref NeptuneSubnetGroup  # クラスターをプライベートサブネットグループに関連付けます\n```",
+      "Terraform": "```hcl\nresource \"aws_neptune_subnet_group\" \"neptune\" {\n  name       = \"neptune-private-subnets\"\n  subnet_ids = [\"<PRIVATE_SUBNET_ID_1>\", \"<PRIVATE_SUBNET_ID_2>\"]  # パブリックアクセスを防ぐためにプライベートサブネット ID のみを使用します\n}\n\nresource \"aws_neptune_cluster\" \"example_cluster\" {\n  neptune_subnet_group_name = aws_neptune_subnet_group.neptune.name  # クラスターをプライベートサブネットグループに関連付けます\n}\n```",
+      "Other": "1. AWS コンソールを開き、Amazon Neptune > サブネットグループに移動します\n2. DB サブネットグループの作成をクリックします\n3. 名前と説明を入力し、VPC を選択し、プライベートサブネット ID のみを追加します（少なくとも2つ）\n4. 作成をクリックします\n5. Amazon Neptune > DB クラスター > クラスターを選択 > アクション > 修正に移動します\n6. DB サブネットグループを新しく作成したサブネットグループに設定し、保存します（必要に応じて即時適用）\n7. クラスターサブネットグループがプライベートサブネットのみをリストしていることを確認します"
+    },
+    "Recommendation": {
+      "Text": "Neptune クラスターを**プライベートサブネット**に配置し、攻撃面を減らすためにパブリックルータビリティを削除します。\n\n- **最小特権**とネットワークセグメンテーションを適用します\n- スコープされたネットワーク制御と最小限の信頼されたパスでインバウンドアクセスを制限します\n- 管理およびアプリケーションアクセスのためにログ記録、監視、およびプライベート接続を強制します",
+      "Url": "https://hub.prowler.com/check/neptune_cluster_uses_public_subnet"
+    }
+  },
+  "Categories": [
+    "internet-exposed",
+    "trust-boundaries"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

@@ -1,0 +1,46 @@
+{
+  "Provider": "aws",
+  "CheckID": "eventbridge_global_endpoint_event_replication_enabled",
+  "CheckTitle": "EventBridge 全局端点已启用事件复制",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices"
+  ],
+  "ServiceName": "eventbridge",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsEventsEndpoint",
+  "ResourceGroup": "messaging",
+  "Description": "**EventBridge 全局端点**已将**事件复制**配置为 `ENABLED`（非 `DISABLED`），从而将自定义事件复制到主区域和次区域。",
+  "Risk": "**未启用事件复制**会降低**可用性**，并在区域故障期间增加**恢复点目标（RPO）**。\n- 当主区域故障时，事件可能丢失或延迟\n- 可能无法自动恢复到主区域，导致故障切换时间拉长\n- 跨区域不一致会影响数据完整性",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/eventbridge-controls.html#eventbridge-4",
+    "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-global-endpoints.html",
+    "https://docs.aws.amazon.com/eventbridge/latest/APIReference/API_Endpoint.html",
+    "https://docs.aws.amazon.com/config/latest/developerguide/global-endpoint-event-replication-enabled.html",
+    "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-ge-create-endpoint.html",
+    "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-ge-best-practices.html",
+    "https://docs.aws.amazon.com/eventbridge/latest/APIReference/API_CreateEndpoint.html",
+    "https://aws.amazon.com/blogs/compute/introducing-global-endpoints-for-amazon-eventbridge/"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws events update-endpoint --name <endpoint-name> --replication-config State=ENABLED --role-arn <role-arn>",
+      "NativeIaC": "```yaml\n# CloudFormation: Enable event replication on an EventBridge global endpoint\nResources:\n  Endpoint:\n    Type: AWS::Events::Endpoint\n    Properties:\n      Name: <example_resource_name>\n      EventBuses:\n        - EventBusArn: arn:aws:events:us-east-1:<example_resource_id>:event-bus/<example_resource_name>\n        - EventBusArn: arn:aws:events:us-west-2:<example_resource_id>:event-bus/<example_resource_name>\n      RoutingConfig:\n        FailoverConfig:\n          Primary:\n            HealthCheck: arn:aws:route53:::healthcheck/<example_resource_id>\n          Secondary:\n            Route: us-west-2\n      ReplicationConfig:\n        State: ENABLED  # Critical: enables event replication\n      RoleArn: arn:aws:iam::<example_resource_id>:role/<example_resource_name>  # Critical: role used by replication\n```",
+      "Other": "1. 在 AWS 控制台打开 Amazon EventBridge 并进入 Global endpoints\n2. 选择目标端点并点击 Edit\n3. 在 Event replication 下勾选 Event replication enabled\n4. 在 Execution role 中选择现有角色或创建新角色\n5. 保存更改",
+      "Terraform": "```hcl\n# Terraform (awscc): Enable event replication on an EventBridge global endpoint\nresource \"awscc_events_endpoint\" \"example\" {\n  name = \"<example_resource_name>\"\n\n  event_buses = [\n    { event_bus_arn = \"arn:aws:events:us-east-1:<example_resource_id>:event-bus/<example_resource_name>\" },\n    { event_bus_arn = \"arn:aws:events:us-west-2:<example_resource_id>:event-bus/<example_resource_name>\" }\n  ]\n\n  routing_config = {\n    failover_config = {\n      primary   = { health_check = \"arn:aws:route53:::healthcheck/<example_resource_id>\" }\n      secondary = { route        = \"us-west-2\" }\n    }\n  }\n\n  replication_config = { state = \"ENABLED\" }  # Critical: enables event replication\n  role_arn           = \"arn:aws:iam::<example_resource_id>:role/<example_resource_name>\"  # Critical: role used by replication\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "为全局端点启用**事件复制**以确保区域级弹性。保持跨区域事件总线、规则和目标配置一致。为复制使用遵循**最小权限**的专用 IAM 角色。消费者应按唯一 ID 设计为**幂等**处理。将定期故障切换演练与健康监控纳入**纵深防御**。",
+      "Url": "https://hub.prowler.com/check/eventbridge_global_endpoint_event_replication_enabled"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

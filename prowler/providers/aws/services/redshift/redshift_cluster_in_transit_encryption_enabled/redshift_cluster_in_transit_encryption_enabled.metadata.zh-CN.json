@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "redshift_cluster_in_transit_encryption_enabled",
+  "CheckTitle": "Redshift 集群在传输中加密",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践",
+    "软件和配置检查/行业和法规标准/AWS 基础安全最佳实践",
+    "影响/数据暴露"
+  ],
+  "ServiceName": "redshift",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsRedshiftCluster",
+  "ResourceGroup": "analytics",
+  "Description": "**Amazon Redshift 集群**通过在启用`require_ssl`时要求客户端连接使用**TLS**来强制**传输加密**。\n\n此评估识别未强制连接使用 TLS 的集群。",
+  "Risk": "允许明文或可选 TLS 会使 SQL 会话暴露于以下风险：\n- **机密性**丧失：凭证、查询和结果可能被拦截。\n- **完整性**受损：语句或数据可能在传输中被修改。\n- **可用性**影响：会话劫持可能会中断工作负载。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/redshift/latest/mgmt/security-encryption-in-transit.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/redshift-controls.html#redshift-2",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/Redshift/redshift-parameter-groups-require-ssl.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws redshift modify-cluster-parameter-group --parameter-group-name <example_resource_name> --parameters ParameterName=require_ssl,ParameterValue=true",
+      "NativeIaC": "```yaml\n# CloudFormation：在使用的 Redshift 参数组中将 require_ssl 设置为 true\nResources:\n  <example_resource_name>:\n    Type: AWS::Redshift::ClusterParameterGroup\n    Properties:\n      Description: Require SSL for Redshift connections\n      ParameterGroupFamily: redshift-1.0\n      Parameters:\n        - ParameterName: require_ssl   # 关键：强制客户端连接使用 TLS\n          ParameterValue: true         # 关键：启用 SSL 要求\n```",
+      "Other": "1. 在 AWS 控制台中，转到 Amazon Redshift > 参数组\n2. 打开集群使用的参数组\n3. 点击编辑参数，将 require_ssl 设置为 true，并保存\n4. 重启集群以应用静态参数更改",
+      "Terraform": "```hcl\n# 在集群使用的 Redshift 参数组中将 require_ssl 设置为 true\nresource \"aws_redshift_parameter_group\" \"<example_resource_name>\" {\n  name   = \"<example_resource_name>\"\n  family = \"redshift-1.0\"\n\n  parameter {\n    name  = \"require_ssl\"   # 关键：强制客户端连接使用 TLS\n    value = \"true\"          # 关键：启用 SSL 要求\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "通过设置 `require_ssl=true` 并禁止明文来要求所有 Redshift 连接使用 **TLS**。\n\n配置客户端以验证证书并优先选择私有网络路径。保持驱动程序/TLS 策略的最新。应用**最小特权**和**深度防御**以限制在传输安全失败时的暴露。",
+      "Url": "https://hub.prowler.com/check/redshift_cluster_in_transit_encryption_enabled"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

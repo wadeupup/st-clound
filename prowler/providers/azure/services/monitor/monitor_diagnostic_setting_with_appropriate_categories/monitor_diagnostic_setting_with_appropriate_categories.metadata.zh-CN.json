@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "monitor_diagnostic_setting_with_appropriate_categories",
+  "CheckTitle": "确保诊断设置捕获了适当的类别",
+  "CheckType": [],
+  "ServiceName": "monitor",
+  "SubServiceName": "配置诊断设置",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Monitor",
+  "ResourceGroup": "monitoring",
+  "Description": "前提条件：必须存在诊断设置。如果不存在诊断设置，本建议中的导航与选项将不可用。请先查看本小节开头题为“确保存在‘诊断设置’”的建议。诊断设置应配置为记录来自控制/管理平面的适当活动。",
+  "Risk": "诊断设置控制诊断日志的导出方式。为适当的控制/管理平面活动捕获诊断设置类别，有助于实现正确告警。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/azure-monitor/essentials/diagnostic-settings",
+  "Remediation": {
+    "Code": {
+      "CLI": "az monitor diagnostic-settings subscription create --subscription <subscription id> --name <diagnostic settings name> --location <location> <[- -event-hub <event hub ID> --event-hub-auth-rule <event hub auth rule ID>] [-- storage-account <storage account ID>] [--workspace <log analytics workspace ID>] --logs '[{category:Security,enabled:true},{category:Administrative,enabled:true},{ca tegory:Alert,enabled:true},{category:Policy,enabled:true}]'>",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/Monitor/diagnostic-setting-categories.html",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "1. 进入 Azure Monitor。2. 点击 Activity log。3. 点击 Export Activity Logs。4. 在下拉菜单中选择订阅。5. 点击 Add diagnostic setting。6. 为新的 Diagnostic Setting 输入名称。7. 勾选以下类别：Administrative、Alert、Policy、Security。8. 根据组织需求选择目标位置配置。",
+      "Url": "https://learn.microsoft.com/en-us/azure/storage/common/manage-storage-analytics-logs?toc=%2Fazure%2Fstorage%2Fblobs%2Ftoc.json&bc=%2Fazure%2Fstorage%2Fblobs%2Fbreadcrumb%2Ftoc.json&tabs=azure-portal"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "通过 Azure Portal 创建诊断设置时，默认不会勾选任何类别。"
+}

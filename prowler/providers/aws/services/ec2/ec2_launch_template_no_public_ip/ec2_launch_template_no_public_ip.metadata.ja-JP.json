@@ -1,0 +1,32 @@
+{
+  "Provider": "aws",
+  "CheckID": "ec2_launch_template_no_public_ip",
+  "CheckTitle": "Amazon EC2 起動テンプレートはネットワークインターフェースにパブリック IP を割り当てるべきではない",
+  "CheckType": [],
+  "ServiceName": "ec2",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "high",
+  "ResourceType": "AwsEc2LaunchTemplate",
+  "ResourceGroup": "compute",
+  "Description": "このコントロールは、Amazon EC2 起動テンプレートが起動時にネットワークインターフェースにパブリック IP アドレスを割り当てるように設定されているかをチェックします。EC2 起動テンプレートがネットワークインターフェースにパブリック IP アドレスを割り当てるように設定されている場合、または少なくとも 1 つのネットワークインターフェースにパブリック IP アドレスがある場合、コントロールは失敗します。",
+  "Risk": "パブリック IP アドレスはインターネットからアクセス可能であり、関連するリソースがインターネットからアクセス可能になる可能性があります。EC2 リソースは、ワークロードへの意図しないアクセスを避けるために、パブリックにアクセス可能であるべきではありません。",
+  "RelatedUrl": "https://docs.aws.amazon.com/config/latest/developerguide/ec2-launch-template-public-ip-disabled.html",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://docs.aws.amazon.com/securityhub/latest/userguide/ec2-controls.html#ec2-25",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "EC2 起動テンプレートを更新するには、Amazon EC2 Auto Scaling ユーザーガイドのデフォルトネットワークインターフェース設定の変更を参照してください。",
+      "Url": "https://docs.aws.amazon.com/autoscaling/ec2/userguide/create-launch-template.html#change-network-interface"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

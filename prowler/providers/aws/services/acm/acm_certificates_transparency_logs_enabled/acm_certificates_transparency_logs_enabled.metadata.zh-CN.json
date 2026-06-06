@@ -1,0 +1,40 @@
+{
+  "Provider": "aws",
+  "CheckID": "acm_certificates_transparency_logs_enabled",
+  "CheckTitle": "ACM 证书已导入或已启用证书透明度日志记录",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践"
+  ],
+  "ServiceName": "acm",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsCertificateManagerCertificate",
+  "ResourceGroup": "security",
+  "Description": "检查**ACM 颁发的证书**是否启用了**证书透明度（CT）日志记录**。类型为 `IMPORTED` 的证书不在评估范围内。",
+  "Risk": "禁用**CT 日志记录**会降低对**错误颁发或恶意证书**的可见性，削弱机密性和完整性。攻击者可以**冒充网站**或运行**TLS 中间人攻击**而不会被及时检测到。未记录日志的公共证书可能被浏览器不信任，影响可用性和用户信任。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://aws.amazon.com/blogs/security/how-to-get-ready-for-certificate-transparency/",
+    "https://support.icompaas.com/support/solutions/articles/62000129491-ensure-acm-certificates-have-certificate-transparency-logging-enabled"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws acm update-certificate-options --certificate-arn <CERTIFICATE_ARN> --options CertificateTransparencyLoggingPreference=ENABLED",
+      "NativeIaC": "```yaml\n# CloudFormation: 在 ACM 证书上启用证书透明度日志记录\nResources:\n  <example_resource_name>:\n    Type: AWS::CertificateManager::Certificate\n    Properties:\n      DomainName: <example_domain_name>\n      CertificateTransparencyLoggingPreference: ENABLED  # 关键：启用 CT 日志记录以通过检查\n```",
+      "Other": "1. 打开 AWS Certificate Manager (ACM) 控制台\n2. 选择透明度日志记录已禁用的证书\n3. 单击 Actions > Edit transparency logging\n4. 选择 Enable transparency logging\n5. 单击 Save",
+      "Terraform": "```hcl\n# 在 ACM 证书上启用证书透明度日志记录\nresource \"aws_acm_certificate\" \"<example_resource_name>\" {\n  domain_name = \"<example_domain_name>\"\n  options {\n    certificate_transparency_logging_preference = \"ENABLED\"  # 关键：启用 CT 日志记录以通过检查\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "在所有 ACM 颁发的公共证书上启用**CT 日志记录**，以保持透明度和快速撤销。\n\n监控您域名的 CT 日志，并对意外颁发发出警报。对于敏感的内部名称，优先使用私有 PKI 或非公共主机名，而不是禁用 CT，并通过短证书生命周期应用**纵深防御**。",
+      "Url": "https://hub.prowler.com/check/acm_certificates_transparency_logs_enabled"
+    }
+  },
+  "Categories": [
+    "logging"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

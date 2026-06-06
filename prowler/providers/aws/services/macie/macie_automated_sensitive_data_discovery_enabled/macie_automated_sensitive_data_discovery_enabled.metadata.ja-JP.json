@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "macie_automated_sensitive_data_discovery_enabled",
+  "CheckTitle": "Macieの自動機密データ検出が有効になっています",
+  "CheckType": [
+    "ソフトウェアと構成のチェック/AWS セキュリティベストプラクティス",
+    "ソフトウェアと構成のチェック/業界および規制基準/AWS 基礎セキュリティベストプラクティス"
+  ],
+  "ServiceName": "macie",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Other",
+  "ResourceGroup": "security",
+  "Description": "**Amazon Macie**管理者アカウントには、S3データに対して**自動機密データ検出**が有効になっています。評価は、各リージョンでのアカウントの機能のステータスを確認します。",
+  "Risk": "継続的な検出がないと、機密性のあるS3オブジェクトは分類されず、見過ごされ、**機密性**が弱まります。過度に許可されたアクセスや公開アクセスは検出されずに持続し、**データ流出**を可能にし、封じ込めと**フォレンジック**対応を遅らせます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/config/latest/developerguide/macie-auto-sensitive-data-discovery-check.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/macie-controls.html#macie-2",
+    "https://docs.aws.amazon.com/macie/latest/user/discovery-asdd-account-enable.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws macie2 update-automated-discovery-configuration --status ENABLED --region <REGION>",
+      "NativeIaC": "",
+      "Other": "1. AWSコンソールでAmazon Macieを開く\n2. リージョンセレクターから正しいリージョンを選択\n3. 設定 > 自動機密データ検出に移動\n4. ステータスの下で有効化をクリック（プロンプトが表示された場合はマイアカウントを選択）\n5. 必要に応じて、Macieが有効になっている他のリージョンでも繰り返す",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "必要なリージョン全体でMacie管理者のために`自動機密データ検出`を有効にし、維持します。関連するバケットを含め、識別子と許可リストを調整してノイズを減らし、検出結果を監視にルーティングします。S3での**最小特権**とデータ保護のための**多層防御**を補完します。",
+      "Url": "https://hub.prowler.com/check/macie_automated_sensitive_data_discovery_enabled"
+    }
+  },
+  "Categories": [
+    "secrets"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

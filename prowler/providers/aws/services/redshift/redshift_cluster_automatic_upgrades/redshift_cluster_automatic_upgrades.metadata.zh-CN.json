@@ -1,0 +1,40 @@
+{
+  "Provider": "aws",
+  "CheckID": "redshift_cluster_automatic_upgrades",
+  "CheckTitle": "Redshift 集群已启用自动版本升级",
+  "CheckType": [
+    "软件和配置检查/补丁管理",
+    "软件和配置检查/AWS 安全最佳实践"
+  ],
+  "ServiceName": "redshift",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsRedshiftCluster",
+  "ResourceGroup": "analytics",
+  "Description": "**Amazon Redshift 集群**通过 `AllowVersionUpgrade` 允许自动主要引擎升级，因此更新会在维护窗口期间应用。",
+  "Risk": "如果没有自动升级，集群可能运行**易受攻击的引擎版本**，从而利用已知漏洞。\n\n攻击者可能会读取或篡改数据（**机密性/完整性**），未解决的错误可能导致停机（**可用性**）。延迟打补丁会增加暴露窗口和操作风险。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/systems-manager-automation-runbooks/latest/userguide/automation-aws-modify-redshift-maintenance.html",
+    "https://docs.aws.amazon.com/redshift/latest/mgmt/managing-cluster-operations.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws redshift modify-cluster --cluster-identifier <cluster_id> --allow-version-upgrade",
+      "NativeIaC": "```yaml\n# CloudFormation 确保 Redshift 允许主要版本升级\nResources:\n  <example_resource_name>:\n    Type: AWS::Redshift::Cluster\n    Properties:\n      ClusterType: single-node\n      DBName: <db_name>\n      MasterUsername: <master_username>\n      MasterUserPassword: <master_user_password>\n      NodeType: <node_type>\n      AllowVersionUpgrade: true  # 关键：在维护窗口期间启用自动主要版本升级\n```",
+      "Other": "1. 打开 Amazon Redshift 控制台\n2. 转到集群并选择您的集群\n3. 点击编辑（或编辑维护设置）\n4. 启用“主要版本升级”（允许版本升级）\n5. 点击保存更改",
+      "Terraform": "```hcl\n# Redshift 集群允许自动主要版本升级\nresource \"aws_redshift_cluster\" \"<example_resource_name>\" {\n  cluster_identifier = \"<example_resource_id>\"\n  node_type          = \"<node_type>\"\n  master_username    = \"<master_username>\"\n  master_password    = \"<master_user_password>\"\n\n  allow_version_upgrade = true  # 关键：启用自动主要版本升级\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "启用 `AllowVersionUpgrade` 以保持集群打补丁。使用受控的维护窗口和适当的维护轨道；在生产环境之前在暂存环境中验证升级。\n\n与**默认安全**和**深度防御**保持一致；保留经过测试的备份和回滚计划。*记录合理的例外情况并定期审查*。",
+      "Url": "https://hub.prowler.com/check/redshift_cluster_automatic_upgrades"
+    }
+  },
+  "Categories": [
+    "vulnerabilities"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

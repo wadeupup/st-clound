@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "kms_cmk_rotation_enabled",
+  "CheckTitle": "KMS 客户管理对称 CMK 已启用自动轮换",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践",
+    "软件和配置检查/行业和法规标准/AWS 基础安全最佳实践",
+    "软件和配置检查/行业和监管标准/CIS AWS 基础基准"
+  ],
+  "ServiceName": "kms",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsKmsKey",
+  "ResourceGroup": "security",
+  "Description": "处于 `Enabled` 状态的 **客户管理 KMS 对称密钥** 被评估以确认已配置密钥材料的 `自动轮换`",
+  "Risk": "没有 **自动轮换**，长期存在的密钥材料会增加机密性和完整性风险。如果 KMS 密钥被暴露，攻击者可以解包数据密钥并解密存储的数据，直到密钥更改。这也降低了加密灵活性，并可能与强制轮换策略冲突。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/kms/latest/developerguide/rotate-keys.html",
+    "https://aws.amazon.com/blogs/security/how-to-get-ready-for-certificate-transparency/"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws kms enable-key-rotation --key-id <KEY_ID>",
+      "NativeIaC": "```yaml\n# CloudFormation：启用自动轮换的 KMS 密钥\nResources:\n  <example_resource_name>:\n    Type: AWS::KMS::Key\n    Properties:\n      EnableKeyRotation: true  # 关键：启用自动轮换以便密钥通过检查\n      KeyPolicy:\n        Version: \"2012-10-17\"\n        Statement:\n          - Effect: Allow\n            Principal:\n              AWS: !Sub arn:aws:iam::${AWS::AccountId}:root\n            Action: \"kms:*\"\n            Resource: \"*\"\n```",
+      "Other": "1. 在 AWS 控制台中，转到密钥管理服务 (KMS)\n2. 打开客户管理密钥并选择启用的对称密钥\n3. 转到密钥轮换部分\n4. 检查启用自动密钥轮换\n5. 保存更改",
+      "Terraform": "```hcl\n# 启用自动轮换的 KMS 密钥\nresource \"aws_kms_key\" \"<example_resource_name>\" {\n  enable_key_rotation = true  # 关键：启用自动轮换以便密钥通过检查\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "在客户管理的对称 KMS 密钥上启用 **自动轮换**，并选择符合策略的轮换周期。对密钥管理与使用实施 **最小特权** 和 **职责分离**。监控密钥生命周期事件，并在怀疑泄露时使用按需轮换。",
+      "Url": "https://hub.prowler.com/check/kms_cmk_rotation_enabled"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

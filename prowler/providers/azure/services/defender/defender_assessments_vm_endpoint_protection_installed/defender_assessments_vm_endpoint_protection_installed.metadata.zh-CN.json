@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "defender_assessments_vm_endpoint_protection_installed",
+  "CheckTitle": "确保所有虚拟机均已安装终端防护",
+  "CheckType": [],
+  "ServiceName": "defender",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Microsoft.Security/assessments",
+  "ResourceGroup": "security",
+  "Description": "为所有虚拟机安装终端防护。",
+  "Risk": "安装终端防护系统（如适用于 Azure 的反恶意软件）可提供实时防护能力，帮助识别并清除病毒、间谍软件及其他恶意软件。同时，当已知恶意或不需要的软件尝试在 Azure 系统中安装或运行时，这些系统也可提供可配置告警。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/security/fundamentals/antimalware",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/VirtualMachines/install-endpoint-protection.html#",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "请按照 Microsoft Azure 文档从安全中心安装终端防护。或者，你也可以为操作系统使用自有的终端防护工具。",
+      "Url": ""
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "终端防护会产生额外费用。"
+}

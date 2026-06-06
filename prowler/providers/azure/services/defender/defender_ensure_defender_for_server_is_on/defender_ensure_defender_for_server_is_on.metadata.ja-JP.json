@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "defender_ensure_defender_for_server_is_on",
+  "CheckTitle": "Microsoft Defender for Servers が「オン」に設定されていることを確認する",
+  "CheckType": [],
+  "ServiceName": "defender",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AzureDefenderPlan",
+  "ResourceGroup": "security",
+  "Description": "Microsoft Defender for Servers が「オン」に設定されていることを確認する",
+  "Risk": "Microsoft Defender for Servers を有効化すると、サーバー向けの脅威検知が有効になり、Microsoft Defender for Cloud において脅威インテリジェンス、異常検知、振る舞い分析を提供します。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/SecurityCenter/microsoft-defender-vm-server.html",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-general-policies/ensure-that-azure-defender-is-set-to-on-for-servers#terraform"
+    },
+    "Recommendation": {
+      "Text": "Microsoft Defender for Cloud の標準価格レベルを有効化することで、Microsoft Security Response Center (MSRC) が提供する脅威検知、高度なセキュリティ ポリシー、適応型アプリケーション制御、ネットワーク脅威検知、規制コンプライアンス管理を活用し、より優れたセキュリティ評価が可能になります。",
+      "Url": ""
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "app_minimum_tls_version_12",
+  "CheckTitle": "Web アプリが最新バージョンの TLS 暗号化を使用していることを確認する",
+  "CheckType": [],
+  "ServiceName": "app",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Microsoft.Web/sites/config",
+  "ResourceGroup": "serverless",
+  "Description": "TLS（Transport Layer Security）プロトコルは、標準的な暗号化技術を用いてインターネット上のデータ送信を保護します。暗号化は最新の TLS バージョンに設定すべきです。App Service では既定で TLS 1.2 が利用可能で、PCI DSS などの業界標準でも推奨される TLS レベルです。",
+  "Risk": "App Service は現在、Web アプリで TLS 1.0、1.1、1.2 を設定できます。Web アプリの安全な接続には、最新の TLS 1.2 を使用することを強く推奨します。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/app-service/configure-ssl-bindings#enforce-tls-versions",
+  "Remediation": {
+    "Code": {
+      "CLI": "az webapp config set --resource-group <RESOURCE_GROUP_NAME> --name <APP_NAME> --min-tls-version 1.2",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/AppService/latest-version-of-tls-encryption-in-use.html",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-networking-policies/bc_azr_networking_6#terraform"
+    },
+    "Recommendation": {
+      "Text": "1. https://portal.azure.com で Azure Portal にログインします 2. App Services に移動します 3. 各アプリをクリックします 4. Setting セクションで TLS/SSL settings をクリックします 5. Bindings ペインの Protocol Settings で、Minimum TLS Version が 1.2 に設定されていることを確認します",
+      "Url": "https://docs.microsoft.com/en-us/security/benchmark/azure/security-controls-v3-data-protection#dp-3-encrypt-sensitive-data-in-transit"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "既定では、コマンドライン ツールまたは Azure Portal コンソールで新しいアプリを作成すると、TLS Version 機能は 1.2 に設定されます。"
+}

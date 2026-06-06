@@ -1,0 +1,40 @@
+{
+  "Provider": "aws",
+  "CheckID": "shield_advanced_protection_in_global_accelerators",
+  "CheckTitle": "Global Accelerator accelerator は AWS Shield Advanced によって保護されています",
+  "CheckType": [
+    "ソフトウェアと構成チェック/AWSセキュリティのベストプラクティス",
+    "サービスへの影響/拒否"
+  ],
+  "ServiceName": "shield",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "security",
+  "Description": "**AWS Global Accelerator** アクセラレータは、各アクセラレータに対して強化された DDoS 保護が設定されているかどうかを示す `protected resources` として、**Shield Advanced** への登録対象として評価されます。",
+  "Risk": "**Shield Advanced** がない場合、Global Accelerators は、容量を使い果たす可能性のある大規模攻撃やプロトコル **DDoS** に対してより脆弱になり、**可用性** の低下、**レイテンシ** の上昇、フェイルオーバーの中断を引き起こす可能性があります。可視性が限定され、SRT サポートもないため、インシデントが長引き、悪意のあるトラフィックによって予期しない **コスト** の急増が発生する可能性があります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/waf/latest/developerguide/what-is-aws-waf.html",
+    "https://docs.aws.amazon.com/waf/latest/developerguide/configure-new-protection.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws shield create-protection --name <example_resource_name> --resource-arn <example_resource_id>",
+      "NativeIaC": "```yaml\n# CloudFormation: Global Accelerator のアクセラレータに Shield Advanced 保護を追加する\nResources:\n  ShieldProtection:\n    Type: AWS::Shield::Protection\n    Properties:\n      Name: <example_resource_name>\n      ResourceArn: <example_resource_id>  # 重要: 保護する Global Accelerator アクセラレータの ARN\n```",
+      "Other": "1. AWS コンソールで、AWS WAF & Shield を開きます\n2. AWS Shield の下で、Protected resources を選択します\n3. Add resources to protect をクリックします\n4. Scope を Global に設定し、Global Accelerator のリソースタイプを選択します\n5. 対象の accelerator を選択し、Protect with Shield Advanced をクリックします",
+      "Terraform": "```hcl\n# Global Accelerator アクセラレータの Shield Advanced 保護を有効にする\nresource \"aws_shield_protection\" \"protection\" {\n  name         = \"<example_resource_name>\"\n  resource_arn = \"<example_resource_id>\"  # 重要: 保護する Global Accelerator アクセラレータの ARN\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "各 Global Accelerator を**Shield Advanced** の `protected resource` として追加してください。該当する場合は AWS WAF を使用して**多層防御**を適用し、プロアクティブな監視とアラートを有効にし、**Firewall Manager** を使用してアカウント全体での保護適用を強制してください。保護を変更できるユーザーを制限するために、**最小権限**の原則に従ってください。",
+      "Url": "https://hub.prowler.com/check/shield_advanced_protection_in_global_accelerators"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

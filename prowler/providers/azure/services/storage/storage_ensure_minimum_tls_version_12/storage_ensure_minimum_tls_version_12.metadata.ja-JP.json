@@ -1,0 +1,33 @@
+{
+  "Provider": "azure",
+  "CheckID": "storage_ensure_minimum_tls_version_12",
+  "CheckTitle": "storage accounts の 'Minimum TLS version' が 'Version 1.2' に設定されていることを確認する",
+  "CheckType": [],
+  "ServiceName": "storage",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AzureStorageAccount",
+  "ResourceGroup": "storage",
+  "Description": "storage accounts の 'Minimum TLS version' が 'Version 1.2' に設定されていることを確認します",
+  "Risk": "TLS バージョン 1.0 および 1.1 は、POODLE や BEAST などの攻撃を含む特定の Common Vulnerabilities and Exposures（CVE）に対して脆弱であることが知られています。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://docs.prowler.com/checks/azure/azure-storage-policies/bc_azr_storage_2",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-storage-policies/bc_azr_storage_2#terraform"
+    },
+    "Recommendation": {
+      "Text": "すべての Microsoft Azure Storage accounts が、TLS プロトコルの最新利用可能バージョンを使用していることを確認してください。",
+      "Url": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/StorageAccounts/minimum-tls-version.html"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

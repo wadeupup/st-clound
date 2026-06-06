@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "cloudtrail_multi_region_enabled",
+  "CheckTitle": "区域至少有一个 CloudTrail 跟踪正在记录日志",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/CIS AWS Foundations Benchmark"
+  ],
+  "ServiceName": "cloudtrail",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsCloudTrailTrail",
+  "ResourceGroup": "monitoring",
+  "Description": "**AWS CloudTrail** 在每个区域至少有一个启用了 `logging` 的跟踪。**多区域跟踪** 或区域跟踪在该区域中计入覆盖范围。",
+  "Risk": "任何区域缺少覆盖都会造成 **可见性差距**。\n\n攻击者可以使用监控较少的区域来运行 API 操作，隐藏 **未经授权的更改**，并在没有审计跟踪的情况下窃取数据，从而削弱 **检测控制**，阻碍 **取证**，并延迟响应（机密性和完整性）。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrailconcepts.html#cloudtrail-concepts-management-events"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation: Create a multi-region CloudTrail and start logging\nResources:\n  <example_resource_name>:\n    Type: AWS::CloudTrail::Trail\n    Properties:\n      TrailName: <example_resource_name>\n      S3BucketName: <example_resource_name>\n      IsMultiRegionTrail: true  # Critical: applies the trail to all regions\n      IsLogging: true           # Critical: ensures the trail is logging\n```",
+      "Other": "1. 在 AWS 控制台中，转到 CloudTrail > 跟踪\n2. 如果不存在跟踪：单击创建跟踪，输入名称，选择 S3 存储桶，设置将跟踪应用到所有区域 = 是，然后创建（开始记录日志）\n3. 如果存在跟踪：选择它，单击编辑，设置将跟踪应用到所有区域 = 是，保存\n4. 如果状态显示未记录日志，单击开始记录日志",
+      "Terraform": "```hcl\n# Terraform: Multi-region CloudTrail with logging enabled\nresource \"aws_cloudtrail\" \"<example_resource_name>\" {\n  name           = \"<example_resource_name>\"\n  s3_bucket_name = \"<example_resource_name>\"\n\n  is_multi_region_trail = true  # Critical: applies the trail to all regions\n  enable_logging        = true  # Critical: ensures the trail is logging\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "使用 **多区域 CloudTrail 跟踪** 或每个区域的跟踪，以便在每个区域（包括未使用的区域）中 `logging` 处于活动状态。\n\n集中日志，对日志存储强制执行 **最小权限原则**，并通过加密、完整性验证和保留添加 **纵深防御**。持续监控跟踪运行状况以发现差距。",
+      "Url": "https://hub.prowler.com/check/cloudtrail_multi_region_enabled"
+    }
+  },
+  "Categories": [
+    "logging",
+    "forensics-ready"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "defender_ensure_defender_for_storage_is_on",
+  "CheckTitle": "Microsoft Defender for Storage が「オン」に設定されていることを確認する",
+  "CheckType": [],
+  "ServiceName": "defender",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AzureDefenderPlan",
+  "ResourceGroup": "security",
+  "Description": "Microsoft Defender for Storage が「オン」に設定されていることを確認する",
+  "Risk": "Microsoft Azure ストレージ アカウントに対して Microsoft Defender for Cloud が有効化されていることを確認してください。Defender for storage accounts は Azure ネイティブのセキュリティ インテリジェンス層であり、Azure クラウド ストレージ アカウントへの異常かつ潜在的に有害なアクセスまたは悪用の試みを検出します。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/SecurityCenter/defender-storage.html",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-general-policies/ensure-that-azure-defender-is-set-to-on-for-storage#terraform"
+    },
+    "Recommendation": {
+      "Text": "既定では、Microsoft Defender for Cloud はストレージ アカウントで無効化されています。Azure ストレージ アカウント向けに Defender セキュリティ サービスを有効化することで、Microsoft Security Response Center (MSRC) が提供する脅威検知機能を利用した高度なセキュリティ防御が可能になります。MSRC は、Azure クラウド サービスを含む Microsoft 製品およびサービスに影響するすべてのセキュリティ脆弱性報告を調査します。",
+      "Url": ""
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

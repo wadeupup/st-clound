@@ -1,0 +1,37 @@
+{
+  "Provider": "aws",
+  "CheckID": "ec2_securitygroup_allow_ingress_from_internet_to_high_risk_tcp_ports",
+  "CheckTitle": "いかなるセキュリティグループも 0.0.0.0/0 または ::/0 から高リスクポートへのインバウンドを許可していないことを確認する",
+  "CheckType": [
+    "Infrastructure Security"
+  ],
+  "ServiceName": "ec2",
+  "SubServiceName": "securitygroup",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "critical",
+  "ResourceType": "AwsEc2SecurityGroup",
+  "ResourceGroup": "network",
+  "Description": "いかなるセキュリティグループも 0.0.0.0/0 または ::/0 から、次の高リスクポートへのインバウンドトラフィックを許可していないことを確認します：25（SMTP）、110（POP3）、135（RCP）、143（IMAP）、445（CIFS）、3000（Go、Node.js、Ruby などの Web 開発フレームワーク）、4333（ahsp）、5000（Python Web 開発フレームワーク）、5500（fcp-addr-srvr1）、8080（プロキシ）、8088（レガシー HTTP ポート）。",
+  "Risk": "セキュリティグループが適切に設定されていない場合、攻撃対象領域が拡大します。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "ゼロトラストアプローチを採用し、インバウンドトラフィックを可能な限り絞り込みます。南北トラフィックだけでなく東西トラフィックについても制御を検討してください。",
+      "Url": "https://docs.aws.amazon.com/vpc/latest/userguide/VPC_SecurityGroups.html"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+
+

@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "autoscaling_group_elb_health_check_enabled",
+  "CheckTitle": "ロードバランサーに関連付けられた Auto Scaling グループで ELB ヘルスチェックが有効になっています",
+  "CheckType": [
+    "ソフトウェアと設定チェック/AWS セキュリティベストプラクティス",
+    "ソフトウェアと設定チェック/業界および規制基準/AWS 基礎セキュリティベストプラクティス"
+  ],
+  "ServiceName": "autoscaling",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "low",
+  "ResourceType": "AwsAutoScalingAutoScalingGroup",
+  "ResourceGroup": "compute",
+  "Description": "ロードバランサーに接続された EC2 Auto Scaling グループは、インスタンスのみのチェックではなく、ロードバランサーのターゲットヘルスを使用する**ELB ベースのヘルスチェック**について評価されます。",
+  "Risk": "**ELB ヘルスチェック**がない場合、グループはロードバランサーのプローブに失敗したインスタンスを保持する可能性があり、以下を引き起こします：\n- 不良ターゲットへのルーティングによる**可用性**の低下\n- トランザクション**整合性**に影響を与える高いエラー率\n- 非効率なスケーリングと**コスト**の増加",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/autoscaling-controls.html#autoscaling-1",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/AutoScaling/auto-scaling-group-health-check.html",
+    "https://docs.aws.amazon.com/autoscaling/ec2/userguide/as-add-elb-healthcheck.html#as-add-elb-healthcheck-console"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws autoscaling update-auto-scaling-group --auto-scaling-group-name <auto-scaling-group-name> --health-check-type ELB",
+      "NativeIaC": "```yaml\n# CloudFormation: Auto Scaling グループの ELB ヘルスチェックを有効にします\nResources:\n  <example_resource_name>:\n    Type: AWS::AutoScaling::AutoScalingGroup\n    Properties:\n      HealthCheckType: ELB  # 修正：ELB ヘルスチェックを使用して、ASG がロードバランサーを介してインスタンスのヘルスを評価できるようにします\n```",
+      "Other": "1. AWS コンソールで、EC2 > Auto Scaling Groups に移動します\n2. Auto Scaling グループを選択します\n3. Details タブで、Health checks の下の Edit をクリックします\n4. Additional health check types の下で、Elastic Load Balancing (ELB) を選択します\n5. Update/Save をクリックします",
+      "Terraform": "```hcl\n# Auto Scaling グループで ELB ヘルスチェックを有効にします\nresource \"aws_autoscaling_group\" \"<example_resource_name>\" {\n  health_check_type = \"ELB\"  # 修正：ASG がロードバランサーのヘルスステータスを使用することを保証します\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "ロードバランサーの背後にある Auto Scaling グループに対して**ELB ヘルスチェック**を有効にして、実際のクライアント到達可能性を反映します。以下により**高可用性**と**多層防御**を適用します：\n- アプリケーションに適した LB プローブを使用します\n- フラッピングを避けるためにグレースとしきい値設定を調整します\n- ヘルスメトリクスとアラートを監視します",
+      "Url": "https://hub.prowler.com/check/autoscaling_group_elb_health_check_enabled"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

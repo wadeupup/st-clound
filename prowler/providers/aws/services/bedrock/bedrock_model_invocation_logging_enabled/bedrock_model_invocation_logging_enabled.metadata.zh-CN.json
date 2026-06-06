@@ -1,0 +1,36 @@
+{
+  "Provider": "aws",
+  "CheckID": "bedrock_model_invocation_logging_enabled",
+  "CheckTitle": "确保为 Amazon Bedrock 启用了模型调用日志记录",
+  "CheckType": [],
+  "ServiceName": "bedrock",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:bedrock:region:account-id:model/resource-id",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "ai_ml",
+  "Description": "确保为 Amazon Bedrock 服务启用模型调用日志记录，以便收集 AWS 云账户中所有模型调用的元数据、请求和响应。",
+  "Risk": "在 Amazon Bedrock 中，模型调用日志记录使您能够收集 AWS 账户中所有 'Converse'、'ConverseStream'、'InvokeModel' 和 'InvokeModelWithResponseStream' API 调用的调用请求和响应数据以及元数据。每个日志条目都包含重要详细信息，例如时间戳、请求 ID、模型 ID 和令牌使用情况。调用日志可用于故障排除、性能增强、滥用检测和安全审计。默认情况下，模型调用日志记录处于禁用状态。",
+  "RelatedUrl": "https://docs.aws.amazon.com/bedrock/latest/userguide/model-invocation-logging.html",
+  "Remediation": {
+    "Code": {
+      "CLI": "aws bedrock put-model-invocation-logging-configuration --logging-config 's3Config={bucketName='tm-bedrock-logging-data',keyPrefix='invocation-logs'},textDataDeliveryEnabled=true,imageDataDeliveryEnabled=true,embeddingDataDeliveryEnabled=true'",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/Bedrock/enable-model-invocation-logging.html",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "为 Amazon Bedrock 服务启用模型调用日志记录，以便收集 AWS 云账户中所有模型调用的元数据、请求和响应。",
+      "Url": "https://docs.aws.amazon.com/bedrock/latest/userguide/model-invocation-logging.html#model-invocation-logging-console"
+    }
+  },
+  "Categories": [
+    "logging",
+    "forensics-ready",
+    "gen-ai"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

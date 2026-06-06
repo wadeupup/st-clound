@@ -1,0 +1,44 @@
+{
+  "Provider": "aws",
+  "CheckID": "emr_cluster_master_nodes_no_public_ip",
+  "CheckTitle": "EMR クラスターが Public IP を持たないこと。",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices/Network Reachability",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "TTPs/Initial Access"
+  ],
+  "ServiceName": "emr",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "compute",
+  "Description": "終了していない状態の **Amazon EMR クラスター** について、クラスター ノード（プライマリおよびワーカー）に **Public IP** が割り当てられているかを評価します。この検出は、VPC のプライベートアドレスではなく Public IP で到達可能なクラスターを識別します。",
+  "Risk": "**Public 到達可能な EMR ノード** は管理 UI や SSH をインターネットへ露出し、ブルートフォースやサービス悪用を招きます。プライマリノードが侵害されると、ジョブ改ざんや S3/HDFS からのデータ流出が可能となり、**機密性** と **完全性** が損なわれ、ワークロード中断により **可用性** も低下します。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-plan-vpc-subnet.html",
+    "https://aws.amazon.com/blogs/aws/new-launch-amazon-emr-clusters-in-private-subnets/",
+    "https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-block-public-access.html",
+    "https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-clusters-in-a-vpc.html",
+    "https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-vpc-launching-job-flows.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation: Launch EMR in a private subnet (no public IPs)\nResources:\n  <example_resource_name>:\n    Type: AWS::EMR::Cluster\n    Properties:\n      Name: <example_resource_name>\n      ReleaseLabel: emr-6.10.0\n      ServiceRole: EMR_DefaultRole\n      JobFlowRole: EMR_EC2_DefaultRole\n      Instances:\n        Ec2SubnetId: <example_resource_id>  # CRITICAL: use a PRIVATE subnet to prevent public IPs\n        InstanceGroups:\n          - InstanceRole: MASTER\n            InstanceType: m5.xlarge\n            InstanceCount: 1\n          - InstanceRole: CORE\n            InstanceType: m5.xlarge\n            InstanceCount: 1\n```",
+      "Other": "1. AWS コンソールで EMR > Clusters に移動し、不適合クラスター（Public IP あり）を選択して Terminate します。\n2. Create cluster をクリックします。\n3. Networking で VPC を選択し、プライベートサブネット（自動 Public IPv4 割り当てなし）を選びます。\n4. クラスターを作成します。インスタンスは Public IP なしで起動します。",
+      "Terraform": "```hcl\n# Terraform: Launch EMR in a private subnet (no public IPs)\nresource \"aws_emr_cluster\" \"<example_resource_name>\" {\n  name                = \"<example_resource_name>\"\n  release_label       = \"emr-6.10.0\"\n  master_instance_type = \"m5.xlarge\"\n  core_instance_type   = \"m5.xlarge\"\n\n  service_role = \"EMR_DefaultRole\"\n  ec2_attributes {\n    instance_profile = \"EMR_EC2_DefaultRole\"\n    subnet_id        = \"<example_resource_id>\"  # CRITICAL: private subnet ensures no public IPs\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "EMR は **プライベートサブネット** で運用し、Public IP を使わないでください。AWS サービスには **VPC endpoint** を使用し、必要時のみ **NAT** を利用します。security groups には **最小権限** を適用し、`0.0.0.0/0` を避け、管理アクセスは **SSM** または bastion を優先します。**EMR block public access** を有効に保ち、外部依存先も **プライベート接続** を優先してください。",
+      "Url": "https://hub.prowler.com/check/emr_cluster_master_nodes_no_public_ip"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

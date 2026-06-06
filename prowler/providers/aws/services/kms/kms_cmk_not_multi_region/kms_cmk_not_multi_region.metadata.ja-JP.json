@@ -1,0 +1,40 @@
+{
+  "Provider": "aws",
+  "CheckID": "kms_cmk_not_multi_region",
+  "CheckTitle": "AWS KMS カスタマーマネージドキーは単一リージョンです",
+  "CheckType": [
+    "ソフトウェアと構成のチェック/AWS セキュリティベストプラクティス",
+    "ソフトウェアと構成のチェック/業界および規制基準/AWS 基礎セキュリティベストプラクティス"
+  ],
+  "ServiceName": "kms",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsKmsKey",
+  "ResourceGroup": "security",
+  "Description": "`Enabled` 状態の **AWS KMS カスタマーマネージドキー** は `multi-Region` 設定について評価されます。この発見は、`multi-Region` プロパティが有効になっているキーを強調します。",
+  "Risk": "リージョン間で共有されるキー素材は、あるリージョンでのアクセスが別のリージョンからのデータを復号化できるようにし、**機密性** と **データ居住性** を損ないます。誤った設定のポリシーやレプリカでの弱い制御は、影響範囲を拡大します。署名/HMAC キーの場合、侵害はリージョン間の署名偽造を可能にし、**整合性** と **監査可能性** に影響を与えます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/kms/latest/developerguide/multi-region-keys-overview.html#multi-region-concepts",
+    "https://docs.aws.amazon.com/kms/latest/developerguide/mrk-when-to-use.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation: 単一リージョンの KMS キーを作成します\nResources:\n  ExampleKmsKey:\n    Type: AWS::KMS::Key\n    Properties:\n      MultiRegion: false  # 重要: チェックを通過するためにキーが単一リージョンであることを確認します\n      KeyPolicy:          # キー作成に必要な最小限のポリシー\n        Version: '2012-10-17'\n        Statement:\n          - Effect: Allow\n            Principal:\n              AWS: !Sub arn:aws:iam::${AWS::AccountId}:root\n            Action: 'kms:*'\n            Resource: '*'\n```",
+      "Other": "1. AWS コンソールで、Key Management Service (KMS) > カスタマーマネージドキーに移動します\n2. Multi-Region: Yes と表示されるキーを特定します（これらはチェックに失敗します）\n3. キーの作成をクリックし、Multi-Region が選択されていないことを確認します（単一リージョン）\n4. 新しい単一リージョンキーを使用するようにサービス/エイリアスを更新します\n5. 必要に応じて、新しいキーにデータを再暗号化またはローテーションします\n6. 移行後、古いマルチリージョンキーを無効にし、その削除をスケジュールします",
+      "Terraform": "```hcl\n# Terraform: 単一リージョンの KMS キーを作成します\nresource \"aws_kms_key\" \"example\" {\n  multi_region = false  # 重要: チェックを通過するために単一リージョンキーを作成します\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "デフォルトでは **単一リージョンキー** を優先し、文書化された必要がある場合のみ **マルチリージョン** を使用します。**最小特権** と **職務分離** を適用し、そのようなキーを作成または複製できる人を制限します。リージョン/テナント/ワークロードごとに分離し、リージョン間でポリシーとログを標準化し、不要な場合はマルチリージョンキーを廃止します。",
+      "Url": "https://hub.prowler.com/check/kms_cmk_not_multi_region"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "マルチリージョンキーは、リージョン間の災害復旧など、絶対に必要な場合にのみ使用し、厳格なアクセス制御で慎重に管理する必要があります。"
+}

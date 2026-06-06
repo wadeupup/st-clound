@@ -1,0 +1,36 @@
+{
+  "Provider": "aws",
+  "CheckID": "ec2_instance_port_rdp_exposed_to_internet",
+  "CheckTitle": "确保没有 EC2 实例允许从互联网入站访问 TCP 端口 3389 (RDP)",
+  "CheckType": [
+    "Infrastructure Security"
+  ],
+  "ServiceName": "ec2",
+  "SubServiceName": "instance",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "critical",
+  "ResourceType": "AwsEc2Instance",
+  "ResourceGroup": "compute",
+  "Description": "确保没有 EC2 实例允许从互联网入站访问 TCP 端口 3389 (RDP)",
+  "Risk": "RDP 是 Microsoft 开发的专有协议，用于连接到 Windows 系统。将 RDP 暴露到互联网可能允许攻击者暴力破解登录凭据并获得对 EC2 实例的未经授权访问。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "修改与 EC2 实例关联的安全组，删除允许从互联网入站访问 TCP 端口 3389 (RDP) 的规则。",
+      "Url": "https://docs.aws.amazon.com/vpc/latest/userguide/VPC_SecurityGroups.html"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

@@ -1,0 +1,39 @@
+{
+  "Provider": "aws",
+  "CheckID": "kms_cmk_are_used",
+  "CheckTitle": "KMS 客户管理密钥已启用或计划删除",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践",
+    "软件和配置检查/行业和法规标准/AWS 基础安全最佳实践"
+  ],
+  "ServiceName": "kms",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "low",
+  "ResourceType": "AwsKmsKey",
+  "ResourceGroup": "security",
+  "Description": "**客户管理的 KMS 密钥** 根据密钥状态进行评估。处于 `Enabled` 状态的密钥被视为正在使用中。未处于 `Enabled` 且未处于 `PendingDeletion` 状态的密钥被识别为未使用，而处于 `PendingDeletion` 状态的密钥被视为计划删除。",
+  "Risk": "保留**未使用的 CMK**会增加**攻击面**和**成本**。\n\n如果这些密钥被重新启用或配置错误，它们可能会授予意外的解密权限，影响**机密性**。错误地删除被认为未使用的密钥可能导致**不可恢复的数据丢失**，损害**可用性**。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/kms/latest/developerguide/deleting-keys-determining-usage.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws kms enable-key --key-id <key_id>",
+      "NativeIaC": "```yaml\n# CloudFormation：确保 KMS CMK 已启用\nResources:\n  <example_resource_name>:\n    Type: AWS::KMS::Key\n    Properties:\n      Enabled: true  # 关键：启用密钥，使其状态为 \"Enabled\" (PASS)\n      KeyPolicy:\n        Version: '2012-10-17'\n        Statement:\n          - Sid: Enable IAM User Permissions\n            Effect: Allow\n            Principal:\n              AWS: !Sub arn:aws:iam::${AWS::AccountId}:root\n            Action: 'kms:*'\n            Resource: '*'\n```",
+      "Other": "1. 登录 AWS 控制台并打开密钥管理服务 (KMS)\n2. 转到客户管理密钥并选择受影响的密钥\n3. 选择密钥操作 > 启用\n4. 确认启用密钥",
+      "Terraform": "```hcl\n# Terraform：确保 KMS CMK 已启用\nresource \"aws_kms_key\" \"<example_resource_name>\" {\n  is_enabled = true  # 关键：设置密钥状态为 Enabled (PASS)\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "采用**密钥生命周期**：通过日志、所有者和标签确认实际使用情况；仅在需要时保持密钥 `Enabled`；否则使用等待期**计划删除**。\n\n实施**最小权限**以启用/禁用或删除密钥，要求审批，并通过**职责分离**监控 KMS 活动。",
+      "Url": "https://hub.prowler.com/check/kms_cmk_are_used"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

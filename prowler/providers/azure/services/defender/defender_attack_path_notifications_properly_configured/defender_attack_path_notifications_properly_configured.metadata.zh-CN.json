@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "defender_attack_path_notifications_properly_configured",
+  "CheckTitle": "确保已启用攻击路径邮件通知并设置最小风险级别",
+  "CheckType": [],
+  "ServiceName": "defender",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AzureEmailNotifications",
+  "ResourceGroup": "monitoring",
+  "Description": "确保 Microsoft Defender for Cloud 已配置为针对 Azure 订阅中识别出的攻击路径发送邮件通知，并设置合适的最小风险级别。",
+  "Risk": "如果未启用攻击路径通知，安全团队可能无法及时获知可被利用的攻击链，增加缓解延迟和潜在安全事件风险。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/defender-for-cloud/configure-email-notifications",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://learn.microsoft.com/en-us/azure/defender-for-cloud/configure-email-notifications",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "在 Microsoft Defender for Cloud 中启用攻击路径邮件通知，确保在识别到潜在攻击路径时及时通知安全团队。请根据组织需求配置合适的最小风险级别。",
+      "Url": "https://learn.microsoft.com/en-us/azure/defender-for-cloud/configure-email-notifications"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

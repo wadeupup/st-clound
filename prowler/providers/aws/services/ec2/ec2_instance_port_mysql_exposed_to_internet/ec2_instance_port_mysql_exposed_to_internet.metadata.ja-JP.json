@@ -1,0 +1,36 @@
+{
+  "Provider": "aws",
+  "CheckID": "ec2_instance_port_mysql_exposed_to_internet",
+  "CheckTitle": "EC2 インスタンスがインターネットからの TCP ポート 3306 (MySQL) へのインバウンドを許可していないことを確認",
+  "CheckType": [
+    "Infrastructure Security"
+  ],
+  "ServiceName": "ec2",
+  "SubServiceName": "instance",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "critical",
+  "ResourceType": "AwsEc2Instance",
+  "ResourceGroup": "compute",
+  "Description": "EC2 インスタンスがインターネットからの TCP ポート 3306 (MySQL) へのインバウンドを許可していないことを確認",
+  "Risk": "MySQL は、Web アプリケーションで広く使用されている人気のオープンソースリレーショナルデータベース管理システムです。MySQL をインターネットに公開すると、不正アクセスやデータ流出につながる可能性があります。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "EC2 インスタンスに関連付けられたセキュリティグループを変更して、インターネットからの TCP ポート 3306 (MySQL) へのインバウンドを許可するルールを削除します。",
+      "Url": "https://docs.aws.amazon.com/vpc/latest/userguide/VPC_SecurityGroups.html"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

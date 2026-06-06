@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "vm_linux_enforce_ssh_authentication",
+  "CheckTitle": "Linux ベースの Virtual Machines で SSH 鍵認証が強制されていることを確認する",
+  "CheckType": [],
+  "ServiceName": "vm",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/{vmName}",
+  "Severity": "high",
+  "ResourceType": "Microsoft.Compute/virtualMachines",
+  "ResourceGroup": "compute",
+  "Description": "Azure の Linux ベース仮想マシンで、パスワード認証を無効化し SSH 鍵を使用するよう構成されていることを確認します。",
+  "Risk": "パスワードベースの SSH 認証を許可すると、ブルートフォース攻撃や不正アクセスのリスクが高まります。SSH 鍵認証を強制することで、秘密鍵を持つユーザーのみが VM にアクセスできます。",
+  "RelatedUrl": "https://docs.microsoft.com/en-us/azure/virtual-machines/linux/create-ssh-keys-detailed",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/VirtualMachines/ssh-authentication-type.html",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "SSH 鍵認証を有効にし、パスワード認証を無効にして Linux VM を再作成してください。",
+      "Url": "https://docs.microsoft.com/en-us/azure/virtual-machines/linux/create-ssh-keys-detailed"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

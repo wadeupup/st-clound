@@ -1,0 +1,48 @@
+{
+  "Provider": "aws",
+  "CheckID": "documentdb_cluster_storage_encrypted",
+  "CheckTitle": "DocumentDB クラスターのストレージが保存データ暗号化（at rest）されているか",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/PCI-DSS",
+    "Software and Configuration Checks/Industry and Regulatory Standards/HIPAA Controls (USA)",
+    "Software and Configuration Checks/Industry and Regulatory Standards/NIST 800-53 Controls (USA)",
+    "Software and Configuration Checks/Industry and Regulatory Standards/ISO 27001 Controls",
+    "Effects/Data Exposure"
+  ],
+  "ServiceName": "documentdb",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsRdsDbCluster",
+  "ResourceGroup": "database",
+  "Description": "**Amazon DocumentDB クラスター**の `encrypted` 設定を基に、**保存データの暗号化（encryption at rest）**が有効になっているかを評価します。\n\nAWS KMS 管理の暗号化によってデータボリューム、自動バックアップ、スナップショットが保護されていないクラスターを特定します。",
+  "Risk": "保存データの暗号化が有効でない場合、コピーが漏えい・誤共有されたり、基盤ストレージにアクセスされたりすると、クラスターのデータやスナップショット、バックアップが平文で読み取られる可能性があります。これは**機密性**を損ない、オフライン解析やデータ流出を容易にし、内部不正やバックアップリポジトリ侵害時の被害範囲を拡大させます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/documentdb-controls.html#documentdb-1",
+    "https://docs.aws.amazon.com/documentdb/latest/developerguide/elastic-encryption.html",
+    "https://docs.aws.amazon.com/documentdb/latest/developerguide/encryption-at-rest.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws docdb create-db-cluster --db-cluster-identifier <DB_CLUSTER_ID> --engine docdb --master-username <MASTER_USERNAME> --master-user-password <MASTER_PASSWORD> --storage-encrypted",
+      "NativeIaC": "```yaml\n# CloudFormation: Create an encrypted DocumentDB cluster\nResources:\n  <example_resource_name>:\n    Type: AWS::DocDB::DBCluster\n    Properties:\n      Engine: docdb\n      MasterUsername: <MASTER_USERNAME>\n      MasterUserPassword: <MASTER_PASSWORD>\n      StorageEncrypted: true  # Critical: enables encryption at rest to pass the check\n```",
+      "Other": "1. AWS コンソールで Amazon DocumentDB に移動します\n2. Create cluster をクリックします\n3. Show advanced settings を展開します\n4. Encryption-at-rest セクションで Enable encryption を選択します\n5. KMS キーを選択するか、デフォルトのキーを使用します\n6. Create cluster をクリックします\n\n既存の非暗号化クラスターを置き換えるには:\n1. 暗号化されていないクラスターを選択し、Actions > Take snapshot を実行します\n2. スナップショットが完了したら、それを選択し Actions > Restore snapshot をクリックします\n3. Encryption-at-rest で Enable encryption を選択し、新しいクラスターとして復元します\n4. アプリケーションを新しいクラスターエンドポイントを使用するよう更新します",
+      "Terraform": "```hcl\n# Terraform: Encrypted DocumentDB cluster\nresource \"aws_docdb_cluster\" \"<example_resource_name>\" {\n  master_username   = \"<MASTER_USERNAME>\"\n  master_password   = \"<MASTER_PASSWORD>\"\n  storage_encrypted = true  # Critical: enables encryption at rest to pass the check\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "すべての DocumentDB クラスターで**保存データの暗号化 (encryption at rest)** を有効化し、アクセス制御・ローテーション・失効を自社で管理できる**カスタマー管理型 KMS キー**の利用を優先します。キーの利用には**最小権限**を適用し、**職務分掌**を徹底するとともに、キーおよびスナップショットへのアクセスを監視します。*暗号化されていないクラスターがある場合*は、新しい暗号化クラスターへ移行してください。",
+      "Url": "https://hub.prowler.com/check/documentdb_cluster_storage_encrypted"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+
+

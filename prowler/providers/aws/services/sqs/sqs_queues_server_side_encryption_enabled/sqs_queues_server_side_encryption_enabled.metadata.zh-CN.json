@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "sqs_queues_server_side_encryption_enabled",
+  "CheckTitle": "SQS 队列已启用服务器端加密",
+  "CheckType": [
+    "软件和配置检查/AWS安全最佳实践",
+    "行业与监管标准/AWS 基础安全最佳实践",
+    "影响/数据暴露"
+  ],
+  "ServiceName": "sqs",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsSqsQueue",
+  "ResourceGroup": "messaging",
+  "Description": "**Amazon SQS 队列** 会针对使用 **KMS 密钥**（`SSE-KMS`）配置的 **服务器端加密** 进行评估，以保护静态消息正文。\n\n会识别未关联 KMS 密钥的队列。",
+  "Risk": "如果没有 **KMS 支持的 SSE**，消息正文将缺乏由租户控制的密钥和详细审计。消息中的机密信息、令牌或 PII 会更容易因 **权限滥用**、配置错误或非预期集成而被访问，从而降低 **机密性**，并限制遏制能力，因为你无法通过禁用/轮换密钥来撤销访问权限。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-server-side-encryption.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/SQS/queue-encrypted-with-kms-customer-master-keys.html",
+    "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-configure-sse-existing-queue.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws sqs set-queue-attributes --queue-url <QUEUE_URL> --attributes KmsMasterKeyId=<KMS_KEY_ID_OR_ALIAS>",
+      "NativeIaC": "```yaml\n# CloudFormation：为 SQS 队列启用 SSE-KMS\nResources:\n  <example_resource_name>:\n    Type: AWS::SQS::Queue\n    Properties:\n      KmsMasterKeyId: alias/aws/sqs  # 严重：设置一个 KMS 密钥，启用 SSE-KMS，使队列报告一个 kms_key_id\n```",
+      "Other": "1. 在 AWS 控制台中，前往 Amazon SQS > Queues\n2. 选择该队列并点击 Edit\n3. 展开 Encryption\n4. 将 Server-side encryption 设置为 Enabled\n5. 对于 AWS KMS key，选择 alias/aws/sqs（或选择特定的 KMS 密钥）\n6. 点击 Save",
+      "Terraform": "```hcl\n# 为 SQS 队列启用 SSE-KMS\nresource \"aws_sqs_queue\" \"<example_resource_name>\" {\n  kms_master_key_id = \"alias/aws/sqs\"  # 严重：设置一个 KMS 密钥，启用 SSE-KMS，使队列报告一个 kms_key_id\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "在所有队列上使用**客户管理的 KMS 密钥**启用 **SSE-KMS**。\n- 对密钥和队列策略应用**最小权限**；限制 `Encrypt/Decrypt`\n- 强制执行密钥轮换和职责分离\n- 调整数据密钥重用，以平衡安全性和成本\n- 监控密钥和队列访问，以支持**纵深防御**",
+      "Url": "https://hub.prowler.com/check/sqs_queues_server_side_encryption_enabled"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

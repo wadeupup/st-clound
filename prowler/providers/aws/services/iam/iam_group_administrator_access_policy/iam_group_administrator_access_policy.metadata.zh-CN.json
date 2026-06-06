@@ -1,0 +1,31 @@
+{
+  "Provider": "aws",
+  "CheckID": "iam_group_administrator_access_policy",
+  "CheckTitle": "确保没有 IAM 组附加 AdministratorAccess 策略",
+  "CheckType": [],
+  "ServiceName": "iam",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "high",
+  "ResourceType": "AwsIamGroup",
+  "ResourceGroup": "IAM",
+  "Description": "此检查确保你的 AWS 账户中没有 IAM 组附加 'AdministratorAccess' 策略。附加该策略的 IAM 用户对所有 AWS 服务和资源拥有不受限制的访问权限，一旦被误用将带来显著安全风险。",
+  "Risk": "具有管理员级权限的 IAM 组可以对 AWS 环境中的任何资源执行任何操作。如果这些权限被不必要地授予用户，或授予缺乏足够知识的人员，可能导致安全漏洞、数据泄露、数据丢失或意外费用。",
+  "RelatedUrl": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_groups_manage.html",
+  "Remediation": {
+    "Code": {
+      "CLI": "aws iam detach-group-policy --group-name <groupname> --policy-arn arn:aws:iam::aws:policy/AdministratorAccess",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/IAM/group-with-privileged-access.html",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "将 'AdministratorAccess' 策略替换为遵循最小权限原则的更精细权限。可考虑实施如 'IAM Master' 和 'IAM Manager' 等 IAM 角色，以更安全地管理权限。",
+      "Url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

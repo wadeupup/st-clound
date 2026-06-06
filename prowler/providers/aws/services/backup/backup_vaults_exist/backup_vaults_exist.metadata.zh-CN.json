@@ -1,0 +1,40 @@
+{
+  "Provider": "aws",
+  "CheckID": "backup_vaults_exist",
+  "CheckTitle": "至少存在一个 AWS Backup 库",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices"
+  ],
+  "ServiceName": "backup",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "low",
+  "ResourceType": "AwsBackupBackupVault",
+  "ResourceGroup": "storage",
+  "Description": "账户/区域中的**AWS Backup** 至少包含一个**备份库**，用于存储和组织恢复点以供备份计划和副本使用。",
+  "Risk": "没有库，恢复点无法在 AWS Backup 中创建或保留，降低**可用性**和**完整性**。数据在删除、勒索软件或配置错误后可能无法恢复，并且在事件期间可能无法达到 RPO/RTO 目标。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/aws-backup/latest/devguide/vaults.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws backup create-backup-vault --backup-vault-name <example_resource_name>",
+      "NativeIaC": "```yaml\n# CloudFormation：创建备份库\nResources:\n  BackupVault:\n    Type: AWS::Backup::BackupVault\n    Properties:\n      VaultName: <example_resource_name>  # 关键：创建备份库以满足检查\n```",
+      "Other": "1. 登录 AWS 管理控制台并打开 AWS Backup 控制台\n2. 在左侧导航窗格中，选择备份库\n3. 点击创建备份库\n4. 输入名称（例如，<example_resource_name>）\n5. 点击创建备份库",
+      "Terraform": "```hcl\n# 创建备份库\nresource \"aws_backup_vault\" \"<example_resource_name>\" {\n  name = \"<example_resource_name>\" # 关键：确保至少存在一个备份库\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "在每个所需区域中创建并维护一个**备份库**。强制执行**最小权限**访问，使用**KMS CMK**加密，并启用**库锁定**以防止篡改。使用生命周期规则和跨区域/跨账户副本，并定期测试恢复以实现**纵深防御**。",
+      "Url": "https://hub.prowler.com/check/backup_vaults_exist"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

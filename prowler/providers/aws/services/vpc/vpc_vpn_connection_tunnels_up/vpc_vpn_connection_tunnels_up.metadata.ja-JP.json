@@ -1,0 +1,40 @@
+{
+  "Provider": "aws",
+  "CheckID": "vpc_vpn_connection_tunnels_up",
+  "CheckTitle": "AWS Site-to-Site VPN 接続では、両方のトンネルが稼働しています",
+  "CheckType": [
+    "ソフトウェアおよび設定のチェック/AWS セキュリティのベストプラクティス/ネットワーク到達可能性",
+    "サービスへの影響/拒否"
+  ],
+  "ServiceName": "vpc",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsEc2ClientVpnEndpoint",
+  "ResourceGroup": "network",
+  "Description": "**AWS Site-to-Site VPN** 接続には 2 つの IPsec トンネルがあります。これはトンネルのステータスを評価し、いずれかのトンネルが `UP` ではない場合を検出して、高可用性のために両方のトンネルが同時に利用可能かどうかを示します。",
+  "Risk": "アクティブなトンネルが1本しかない、またはまったくない場合、リンクは冗長性を失い、**可用性** が低下し、障害、セッション切断、またはルートブラックホール化が発生する可能性が高まります。フェイルオーバーが実行できず、重要なワークロードや環境間の運用に支障をきたします。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/vpn/latest/s2svpn/modify-vpn-tunnel-options.html",
+    "https://docs.aws.amazon.com/config/latest/developerguide/vpc-vpn-2-tunnels-up.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "1. AWS コンソールで、VPC > Site-to-Site VPN connections に移動し、トンネルが DOWN の VPN 接続を選択します\n2. Tunnel details タブを開きます\n3. 各トンネル（1 と 2）について、Actions > Download configuration を選択し、お使いのデバイス/ベンダーを選択して、設定をダウンロードします\n4. お使いの customer gateway デバイスで、ダウンロードしたパラメータ（事前共有キー、IKE/IPsec 設定、inside CIDR、および該当する場合はルーティング/BGP）を使用して、両方のトンネルを設定します\n5. お使いのデバイスで異なるパラメータが必要な場合は、AWS コンソールで Actions > Modify VPN tunnel options を選択し、トンネルの outside IP を選択して、必要なオプションのみ（たとえば IKE バージョンや事前共有キー）を調整し、Save します\n6. 数分待ってから、両方のトンネルが Tunnel details の下で Status: UP と表示されることを確認します",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "両方のトンネルを健全な状態に保ち、フェイルオーバーに備えられるようにします:\n- 冗長化されたカスタマーゲートウェイと回復力のあるルーティングを導入する\n- アラートでトンネルの正常性を監視する\n- 定期的にフェイルオーバーをテストし、runbooks を文書化する\n\n単一障害点を回避するために、**高可用性** と **多層防御** を適用する。",
+      "Url": "https://hub.prowler.com/check/vpc_vpn_connection_tunnels_up"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

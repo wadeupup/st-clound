@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "network_flow_log_captured_sent",
+  "CheckTitle": "ネットワーク フロー ログが取得され、中央の Log Analytics ワークスペースに送信されていることを確認する。",
+  "CheckType": [],
+  "ServiceName": "network",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Network",
+  "ResourceGroup": "network",
+  "Description": "ネットワーク フロー ログが取得され、中央の Log Analytics ワークスペースに送信されていることを確認します。",
+  "Risk": "Network Flow Logs はネットワーク周辺のトラフィック フローに関する有用な可視性を提供し、Azure Monitor と Azure Sentinel（利用している場合）の両方に連携されます。これにより、横方向移動などの分析に役立つ可視化フロー図を生成できます。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/security/benchmark/azure/mcsb-logging-threat-detection#lt-4-enable-network-logging-for-security-investigation",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "1. Network Watcher に移動します。2. NSG flow logs を選択します。3. + Create を選択します。4. 対象の Subscription を選択します。5. + Select NSG を選択します。6. ネットワーク セキュリティ グループを選択します。7. Confirm selection をクリックします。8. 既存の Storage Account を選択するか新規作成します。9. ログ保持日数を入力します。10. Next をクリックします。11. Configuration で Version 2 を選択します。12. 高度な分析が必要な場合は Enable Traffic Analytics、処理間隔、Log Analytics Workspace を選択します。13. Next を選択します。14. 必要に応じて Tags を追加します。15. Review + create を選択します。16. Create を選択します。警告: この修復ポリシーは、サブスクリプション名とリソース グループ名を連結して修復デプロイ名を作成します。デプロイ名の最大長は 64 文字で、超過すると修復タスクは失敗します。",
+      "Url": "https://docs.microsoft.com/en-us/azure/network-watcher/network-watcher-nsg-flow-logging-portal"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "NSG Flow logs の構成による主な影響はコストと設定です。デプロイ時に、5 日間のライフサイクルで最小限のデータを保持してから Log Analytics Workspace に送信するストレージ アカウントが作成されます。これにより Azure Monitor で保存・利用されるデータ量が増加します。"
+}

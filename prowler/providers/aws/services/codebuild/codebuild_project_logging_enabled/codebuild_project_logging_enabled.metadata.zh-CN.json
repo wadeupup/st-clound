@@ -1,0 +1,44 @@
+{
+  "Provider": "aws",
+  "CheckID": "codebuild_project_logging_enabled",
+  "CheckTitle": "CodeBuild 项目已启用 CloudWatch Logs 或 S3 日志记录",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices"
+  ],
+  "ServiceName": "codebuild",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsCodeBuildProject",
+  "ResourceGroup": "devops",
+  "Description": "评估 **CodeBuild 项目**的**日志配置**，检查是否配置了 Amazon **CloudWatch Logs** 或 **S3** 作为日志目标，识别至少有一个目标为构建日志和事件启用了 `enabled` 的情况。",
+  "Risk": "缺少**构建日志记录**会为**完整性**和**可追溯性**造成盲点。攻击者或配置错误可能修改构建产物、泄露数据或滥用凭据而几乎没有痕迹，阻碍**取证**和**事件响应**。缺少遥测数据会阻碍与其他警报的关联，危及源代码和密钥的**机密性**。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/codebuild/latest/userguide/change-project.html#change-project-console-logs",
+    "https://codefresh.io/learn/devops-tools/aws-codebuild-the-basics-and-a-quick-tutorial/",
+    "https://asecure.cloud/a/cfgrule_codebuild-project-logging-enabled/",
+    "https://support.icompaas.com/support/solutions/articles/62000233680-ensure-that-codebuild-projects-have-s3-or-cloudwatch-logging-enabled",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/codebuild-controls.html#codebuild-4"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws codebuild update-project --name <project-name> --logs-config \"cloudWatchLogs={status=ENABLED}\"",
+      "NativeIaC": "```yaml\n# CloudFormation: Enable logging on a CodeBuild project\nResources:\n  <example_resource_name>:\n    Type: AWS::CodeBuild::Project\n    Properties:\n      Name: <example_resource_name>\n      ServiceRole: <example_resource_id>\n      Artifacts:\n        Type: NO_ARTIFACTS\n      Environment:\n        Type: LINUX_CONTAINER\n        ComputeType: BUILD_GENERAL1_SMALL\n        Image: aws/codebuild/standard:5.0\n      Source:\n        Type: NO_SOURCE\n      LogsConfig:\n        CloudWatchLogs:\n          Status: ENABLED  # Critical: Enables CloudWatch logging to pass the check\n```",
+      "Other": "1. 在 AWS 控制台中，转到 CodeBuild > 构建项目并打开您的项目\n2. 在日志下，点击编辑\n3. 勾选 CloudWatch 日志并保存（或改为启用 S3 日志）\n4. 确认项目现在显示已启用日志记录",
+      "Terraform": "```hcl\n# Terraform: Enable logging on a CodeBuild project\nresource \"aws_codebuild_project\" \"<example_resource_name>\" {\n  name         = \"<example_resource_name>\"\n  service_role = \"<example_resource_id>\"\n\n  artifacts { type = \"NO_ARTIFACTS\" }\n\n  environment {\n    compute_type = \"BUILD_GENERAL1_SMALL\"\n    image        = \"aws/codebuild/standard:5.0\"\n    type         = \"LINUX_CONTAINER\"\n  }\n\n  source { type = \"NO_SOURCE\" }\n\n  logs_config {\n    cloudwatch_logs {\n      status = \"ENABLED\"  # Critical: Enables CloudWatch logging to pass the check\n    }\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "为每个项目启用日志目标 - **CloudWatch Logs** 或 **S3**（最好两者都启用）。实施**纵深防御**：加密日志、设置保留期，并基于最小权限原则限制访问。集中管理和监控日志，对异常情况发出警报，并避免在输出中包含敏感数据。使用不可变保留以保持**可审计性**。",
+      "Url": "https://hub.prowler.com/check/codebuild_project_logging_enabled"
+    }
+  },
+  "Categories": [
+    "logging"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

@@ -1,0 +1,44 @@
+{
+  "Provider": "aws",
+  "CheckID": "eventbridge_bus_cross_account_access",
+  "CheckTitle": "AWS EventBridge 事件总线不允许跨账户访问",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "TTPs/Initial Access/Unauthorized Access",
+    "Effects/Data Exposure"
+  ],
+  "ServiceName": "eventbridge",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsEventsEventbus",
+  "ResourceGroup": "messaging",
+  "Description": "**EventBridge 事件总线**的**资源策略**向账户外主体授予了**跨账户事件投递**权限，包括宽泛或公开访问。\n\n重点关注策略允许外部账户发送事件的事件总线。",
+  "Risk": "**跨账户事件注入**会削弱**完整性**与**可用性**。伪造事件可能触发规则并调用下游目标，导致非预期操作、经由目标造成的数据暴露、通过高权限角色的横向移动，以及事件洪泛引发的成本上升或服务中断。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/CloudWatchEvents/event-bus-cross-account-access.html",
+    "https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/CWE_GettingStarted.html",
+    "https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/CloudWatchEvents-CrossAccountEventDelivery.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws events remove-permission --event-bus-name <event_bus_name> --statement-id <statement_id>",
+      "NativeIaC": "```yaml\n# CloudFormation: restrict EventBridge event bus to same account only\nResources:\n  <example_resource_name>:\n    Type: AWS::Events::EventBusPolicy\n    Properties:\n      StatementId: <example_resource_id>\n      Action: events:PutEvents\n      Principal: !Ref AWS::AccountId  # Critical: allows only this AWS account, blocking cross-account access\n      EventBusName: <example_resource_name>\n```",
+      "Other": "1. 在 AWS 控制台进入 Amazon EventBridge > Event buses\n2. 选择事件总线（<event_bus_name>）\n3. 打开 Permissions 标签并点击 Edit\n4. 删除任何授予其他账户、组织或 \"*\" 的访问策略语句\n5. 保存更改",
+      "Terraform": "```hcl\n# Terraform: restrict EventBridge event bus to same account only\nresource \"aws_cloudwatch_event_permission\" \"<example_resource_name>\" {\n  statement_id   = \"<example_resource_id>\"\n  action         = \"events:PutEvents\"\n  principal      = \"<example_resource_id>\" # Critical: set to your own AWS account ID to block cross-account access\n  event_bus_name = \"<example_resource_name>\"\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "在事件总线资源策略上执行**最小权限**：仅允许特定账户 ID 或组织范围（如 `aws:PrincipalOrgID`），避免使用通配符 `Principal` 或 `*`。\n\n通过 `account` 字段和受信来源约束规则，并增加监控/限流实现**纵深防御**。",
+      "Url": "https://hub.prowler.com/check/eventbridge_bus_cross_account_access"
+    }
+  },
+  "Categories": [
+    "identity-access",
+    "trust-boundaries"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

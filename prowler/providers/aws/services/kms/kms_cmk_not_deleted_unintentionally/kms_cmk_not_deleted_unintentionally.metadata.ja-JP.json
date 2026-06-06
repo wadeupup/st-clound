@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "kms_cmk_not_deleted_unintentionally",
+  "CheckTitle": "AWS KMS カスタマーマネージドキーは削除予定ではありません",
+  "CheckType": [
+    "ソフトウェアと構成のチェック/AWS セキュリティベストプラクティス",
+    "ソフトウェアと構成のチェック/業界および規制基準/AWS 基礎セキュリティベストプラクティス",
+    "影響/データ破壊"
+  ],
+  "ServiceName": "kms",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "critical",
+  "ResourceType": "AwsKmsKey",
+  "ResourceGroup": "security",
+  "Description": "**カスタマーマネージド KMS キー**は、必須の待機期間中に削除が予定されていることを示す `PendingDeletion` 状態で評価されます。",
+  "Risk": "削除が予定されているキーは、**復号化機能の永久的な喪失**を引き起こし、データとワークロードの**可用性**と**整合性**を低下させる可能性があります。偶発的または悪意のあるスケジューリングにより、**暗号消去**が可能になり、待機ウィンドウ中およびその後に停止、復元の失敗、統合の破損を引き起こします。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/kms/latest/developerguide/deleting-keys-scheduling-key-deletion.html",
+    "https://docs.aws.amazon.com/kms/latest/developerguide/deleting-keys-scheduling-key-deletion.html#deleting-keys-scheduling-key-deletion-console"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws kms cancel-key-deletion --key-id <KEY_ID>",
+      "NativeIaC": "",
+      "Other": "1. AWS マネジメントコンソールにサインインし、AWS KMS を開きます\n2. カスタマーマネージドキーに移動し、ステータスが「削除予定」のキーを選択します\n3. キーアクション > キー削除のキャンセルをクリックします\n4. キャンセルを確認すると、キーのステータスが削除予定から変更されます",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "意図しない削除を防ぐ:\n- キー管理者に対して**最小特権**と**職務分離**を強制する\n- 削除イベントに対する変更承認とアラートを要求する\n- 未使用のキーは削除するよりも**無効化**を優先する\n- 十分な待機期間を設定し、`PendingDeletion` のキーを確認して承認を検証する",
+      "Url": "https://hub.prowler.com/check/kms_cmk_not_deleted_unintentionally"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

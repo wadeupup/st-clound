@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "neptune_cluster_iam_authentication_enabled",
+  "CheckTitle": "Neptune 集群已启用 IAM 身份验证",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践",
+    "软件和配置检查/行业和法规标准/AWS 基础安全最佳实践",
+    "TTPs/凭证访问"
+  ],
+  "ServiceName": "neptune",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsRdsDbCluster",
+  "ResourceGroup": "database",
+  "Description": "Neptune 数据库集群会被评估是否启用了 **IAM 数据库身份验证**。\n\n如果启用此设置，集群支持基于 IAM 的身份验证。\n如果禁用，集群则需要传统的数据库凭证。",
+  "Risk": "**禁用 IAM 数据库身份验证** 会削弱数据库的机密性和完整性。\n\n- 静态或嵌入的数据库凭证可能被盗或被重用，从而启用未经授权的查询和数据泄露\n- 攻击者可能绕过集中访问控制，提升权限，并在没有基于 IAM 的审计跟踪的情况下横向移动",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/neptune-controls.html#neptune-7",
+    "https://docs.aws.amazon.com/config/latest/developerguide/neptune-cluster-iam-database-authentication.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/Neptune/iam-db-authentication.html#",
+    "https://hub.steampipe.io/plugins/turbot/terraform/queries/neptune/neptune_cluster_iam_authentication_enabled"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws neptune modify-db-cluster --db-cluster-identifier <DB_CLUSTER_ID> --enable-iam-database-authentication --apply-immediately",
+      "NativeIaC": "```yaml\nResources:\n  NeptuneCluster:\n    Type: AWS::Neptune::DBCluster\n    Properties:\n      DBClusterIdentifier: <DB_CLUSTER_ID>\n      IamAuthEnabled: true  # 启用 IAM 身份验证以替代静态数据库凭证\n```",
+      "Terraform": "```hcl\nresource \"aws_neptune_cluster\" \"example_resource\" {\n  cluster_identifier                  = \"<DB_CLUSTER_ID>\"\n  iam_database_authentication_enabled = true  # 启用 IAM 身份验证以替代静态数据库凭证\n}\n```",
+      "Other": "1. 登录 AWS 管理控制台并打开 Amazon Neptune > 数据库\n2. 选择数据库集群并选择 **操作** > **修改**\n3. 在 **身份验证** 中，启用 **IAM 数据库身份验证** 并勾选 **立即应用**\n4. 点击 **继续** 然后 **修改数据库集群**"
+    },
+    "Recommendation": {
+      "Text": "采用 **IAM 数据库身份验证** 和集中身份管理以消除静态数据库凭证并提高可审计性。\n\n- 强制执行数据库角色的 **最小权限**\n- 使用短期凭证、集中轮换和日志记录\n- 应用深度防御并将数据库访问与 IAM 集成以提高责任追踪",
+      "Url": "https://hub.prowler.com/check/neptune_cluster_iam_authentication_enabled"
+    }
+  },
+  "Categories": [
+    "identity-access"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

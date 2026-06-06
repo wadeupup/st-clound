@@ -1,0 +1,212 @@
+"use client";
+
+import { Select, SelectItem } from "@heroui/select";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { ShieldIcon, UserIcon } from "lucide-react";
+import { Dispatch, SetStateAction } from "react";
+import { Controller, useForm } from "react-hook-form";
+import * as z from "zod";
+
+import { updateUser, updateUserRole } from "@/actions/users/users";
+import { Card } from "@/components/shadcn";
+import { useToast } from "@/components/ui";
+import { CustomInput } from "@/components/ui/custom";
+import { Form, FormButtons } from "@/components/ui/form";
+import { useI18n } from "@/lib/i18n/context";
+import { editUserFormSchema } from "@/types";
+
+export const EditForm = ({
+  userId,
+  userName,
+  userEmail,
+  userCompanyName,
+  roles = [],
+  currentRole = "",
+  setIsOpen,
+}: {
+  userId: string;
+  userName?: string;
+  userEmail?: string;
+  userCompanyName?: string;
+  roles: Array<{ id: string; name: string }>;
+  currentRole?: string;
+  setIsOpen: Dispatch<SetStateAction<boolean>>;
+}) => {
+  const { t } = useI18n();
+  const formSchema = editUserFormSchema();
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      userId: userId,
+      name: userName,
+      email: userEmail,
+      company_name: userCompanyName,
+      role: roles.find((role) => role.name === currentRole)?.id || "",
+    },
+  });
+
+  const { toast } = useToast();
+
+  const isLoading = form.formState.isSubmitting;
+
+  const onSubmitClient = async (values: z.infer<typeof formSchema>) => {
+    const formData = new FormData();
+
+    // Update basic user data
+    if (values.name !== undefined) {
+      formData.append("name", values.name);
+    }
+    if (values.email !== undefined) {
+      formData.append("email", values.email);
+    }
+    if (values.company_name !== undefined) {
+      formData.append("company_name", values.company_name);
+    }
+
+    // Always include userId
+    formData.append("userId", userId);
+
+    // Handle role updates separately
+    if (values.role !== roles.find((role) => role.name === currentRole)?.id) {
+      const roleFormData = new FormData();
+      roleFormData.append("userId", userId);
+      roleFormData.append("roleId", values.role || "");
+
+      const roleUpdateResponse = await updateUserRole(roleFormData);
+
+      if (roleUpdateResponse?.errors && roleUpdateResponse.errors.length > 0) {
+        const error = roleUpdateResponse.errors[0];
+        toast({
+          variant: "destructive",
+          title: t.users.editModal.roleUpdateFailed,
+          description: `${error.detail}`,
+        });
+        return;
+      }
+    }
+
+    // Update other user attributes
+    const data = await updateUser(formData);
+
+    if (data?.errors && data.errors.length > 0) {
+      const error = data.errors[0];
+      const errorMessage = `${error.detail}`;
+      // Show error
+      toast({
+        variant: "destructive",
+        title: t.users.editModal.somethingWentWrong,
+        description: errorMessage,
+      });
+    } else {
+      toast({
+        title: t.users.editModal.success,
+        description: t.users.editModal.userUpdated,
+      });
+      setIsOpen(false); // Close the modal on success
+    }
+  };
+
+  return (
+    <Form {...form}>
+      <form
+        onSubmit={form.handleSubmit(onSubmitClient)}
+        className="flex flex-col gap-4"
+      >
+        <Card
+          variant="inner"
+          className="flex flex-row items-center justify-center gap-4"
+        >
+          <div className="text-small flex items-center">
+            <UserIcon className="mr-2 h-4 w-4" />
+            <span className="text-text-neutral-secondary">{t.users.editModal.name}:</span>
+            <span className="ml-2 font-semibold">{userName}</span>
+          </div>
+          <div className="text-small flex items-center">
+            <ShieldIcon className="mr-2 h-4 w-4" />
+            <span className="text-text-neutral-secondary">{t.users.editModal.role}:</span>
+            <span className="ml-2 font-semibold">
+              {currentRole ? currentRole : t.users.editModal.noRole}
+            </span>
+          </div>
+        </Card>
+        <div className="flex flex-row gap-4">
+          <div className="w-1/2">
+            <CustomInput
+              control={form.control}
+              name="name"
+              type="text"
+              label={t.users.editModal.name}
+              labelPlacement="outside"
+              placeholder={userName}
+              variant="bordered"
+              isRequired={false}
+            />
+          </div>
+          <div className="w-1/2">
+            <CustomInput
+              control={form.control}
+              name="company_name"
+              type="text"
+              label={t.users.editModal.companyName}
+              labelPlacement="outside"
+              placeholder={userCompanyName}
+              variant="bordered"
+              isRequired={false}
+            />
+          </div>
+        </div>
+
+        <div>
+          <CustomInput
+            control={form.control}
+            name="email"
+            type="email"
+            label={t.users.editModal.email}
+            labelPlacement="outside"
+            placeholder={userEmail}
+            variant="bordered"
+            isRequired={false}
+          />
+        </div>
+
+        <div>
+          <Controller
+            name="role"
+            control={form.control}
+            render={({ field }) => (
+              <Select
+                {...field}
+                label={t.users.editModal.role}
+                labelPlacement="outside"
+                placeholder={t.users.editModal.selectRole}
+                classNames={{
+                  selectorIcon: "right-2",
+                }}
+                variant="bordered"
+                selectedKeys={[field.value || ""]}
+                onSelectionChange={(selected) => {
+                  const selectedKey = Array.from(selected).pop();
+                  field.onChange(selectedKey || "");
+                }}
+              >
+                {roles.map((role: { id: string; name: string }) => (
+                  <SelectItem key={role.id}>{role.name}</SelectItem>
+                ))}
+              </Select>
+            )}
+          />
+
+          {form.formState.errors.role && (
+            <p className="mt-2 text-sm text-red-600">
+              {form.formState.errors.role.message}
+            </p>
+          )}
+        </div>
+        <input type="hidden" name="userId" value={userId} />
+
+        <FormButtons setIsOpen={setIsOpen} isDisabled={isLoading} />
+      </form>
+    </Form>
+  );
+};

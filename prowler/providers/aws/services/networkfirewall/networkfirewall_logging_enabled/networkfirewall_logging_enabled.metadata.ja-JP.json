@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "networkfirewall_logging_enabled",
+  "CheckTitle": "Network Firewallはログ記録が有効になっています",
+  "CheckType": [
+    "ソフトウェアと構成のチェック/AWS セキュリティベストプラクティス",
+    "ソフトウェアと構成のチェック/業界および規制基準/AWS 基礎セキュリティベストプラクティス",
+    "ソフトウェアと構成のチェック/業界および規制基準/NIST 800-53 コントロール (米国)"
+  ],
+  "ServiceName": "networkfirewall",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsNetworkFirewallFirewall",
+  "ResourceGroup": "network",
+  "Description": "**AWS Network Firewall** は、少なくとも1つのログタイプ (`FLOW`、`ALERT`、または `TLS`) とアクティブなログ送信先でステートフルエンジンのログ記録が設定されています",
+  "Risk": "Network Firewallのログがないと、**可視性**と**フォレンジック**が低下します。悪意のあるフロー、C2トラフィック、データの流出が**検出されず**、以下に影響を与える可能性があります:\n- 機密性 (漏洩)\n- 完全性 (不正なトラフィックが許可される)\n- 可用性 (DDoSパターンが見逃される)",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/network-firewall/latest/developerguide/firewall-logging.html",
+    "https://docs.aws.amazon.com/network-firewall/latest/developerguide/firewall-update-logging-configuration.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/networkfirewall-controls.html#networkfirewall-2"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws network-firewall update-logging-configuration --firewall-arn <FIREWALL_ARN> --logging-configuration 'LogDestinationConfigs=[{LogType=FLOW,LogDestinationType=CLOUDWATCH_LOGS,LogDestination={LogGroup=<LOG_GROUP_NAME>}}]'",
+      "NativeIaC": "```yaml\nResources:\n  <example_resource_name>:\n    Type: AWS::NetworkFirewall::LoggingConfiguration\n    Properties:\n      FirewallArn: <example_resource_id>  # 重要: ログ記録を有効にするためにファイアウォールをターゲットにします\n      LoggingConfiguration:\n        LogDestinationConfigs:\n          - LogType: FLOW                  # 重要: 少なくとも1つのログタイプを有効にします\n            LogDestinationType: CloudWatchLogs  # 重要: 有効な送信先タイプを選択します\n            LogDestination:\n              logGroup: <example_log_group_name>  # 重要: ログを受信する既存のCloudWatch Logsグループ\n```",
+      "Other": "1. AWSコンソールを開き、VPC > Network Firewall > Firewallsに移動します\n2. ファイアウォールを選択し、ファイアウォールの詳細タブを開きます\n3. ログ記録セクションで、編集をクリックします\n4. 少なくとも1つのログタイプを有効にします (例: Flow)\n5. 送信先タイプを選択: CloudWatch Logsを選択し、既存のロググループを選択します\n6. 保存をクリックします",
+      "Terraform": "```hcl\nresource \"aws_networkfirewall_logging_configuration\" \"<example_resource_name>\" {\n  firewall_arn = \"<example_resource_id>\"  # 重要: ログ記録を有効にするためにファイアウォールをターゲットにします\n\n  logging_configuration {\n    log_destination_config {\n      log_type             = \"FLOW\"              # 重要: 少なくとも1つのログタイプを有効にします\n      log_destination_type = \"CloudWatchLogs\"   # 重要: 有効な送信先タイプを選択します\n      log_destination = {\n        logGroup = \"<example_log_group_name>\"   # 重要: ログを受信する既存のCloudWatch Logsグループ\n      }\n    }\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "包括的なファイアウォールログ記録を有効にし、`FLOW`、`ALERT`、および*該当する場合* `TLS` イベントを集中管理された改ざん防止の送信先に送信します。ライター/リーダーに**最小特権**を適用し、**暗号化**と**保持**を強制し、**多層防御**のためにアラートを監視と統合します。",
+      "Url": "https://hub.prowler.com/check/networkfirewall_logging_enabled"
+    }
+  },
+  "Categories": [
+    "logging"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

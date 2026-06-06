@@ -1,0 +1,37 @@
+{
+  "Provider": "azure",
+  "CheckID": "postgresql_flexible_server_entra_id_authentication_enabled",
+  "CheckTitle": "PostgreSQL Flexible Server が管理者付きで Microsoft Entra ID 認証を強制していることを確認する",
+  "CheckType": [],
+  "ServiceName": "postgresql",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "PostgreSQL",
+  "ResourceGroup": "database",
+  "Description": "**PostgreSQL Flexible Servers** は `authConfig.activeDirectoryAuth` を `Enabled` に設定し、少なくとも 1 つの **Microsoft Entra 管理者** を割り当てた状態を維持する必要があります。これにより、データベース セッションは未管理の PostgreSQL アカウントではなく、集中管理された ID を継承します。",
+  "Risk": "Entra ID 認証がない場合、盗まれたローカル パスワードにより **MFA** や条件付きアクセスを回避した持続的ログインが可能になります。管理者が不在だと機能が利用不能となり、セキュリティ チームの職務ローテーションを妨げ、未承認アクセスや**権限昇格**を招く可能性があります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://learn.microsoft.com/en-us/azure/postgresql/flexible-server/security-entra-concepts",
+    "https://learn.microsoft.com/en-us/azure/postgresql/flexible-server/security-entra-configure"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "az postgres flexible-server update --resource-group <resourceGroupName> --name <serverName> --active-directory-auth Enabled\naz postgres flexible-server microsoft-entra-admin create --resource-group <resourceGroupName> --server-name <serverName> --object-id <objectId> --display-name <displayName>",
+      "NativeIaC": "",
+      "Other": "1. Azure Portal で Azure Database for PostgreSQL flexible server を開き、対象サーバーを選択します。\n2. Security > Authentication で Microsoft Entra ID authentication（または combined mode）を Enabled に設定し、保存します。\n3. Security > Microsoft Entra ID で、Entra object ID に紐づく管理者（ユーザーまたはグループ）を少なくとも 1 件追加し、割り当てを確定します。",
+      "Terraform": "```hcl\ndata \"azurerm_client_config\" \"current\" {}\n\nresource \"azurerm_postgresql_flexible_server\" \"example\" {\n  name                = \"pg-flex\"\n  resource_group_name = azurerm_resource_group.example.name\n  location            = azurerm_resource_group.example.location\n  sku_name            = \"GP_Standard_D4s_v3\"\n  administrator_login = \"pgadmin\"\n  administrator_password = \"<complexPassword>\"\n  storage_mb          = 131072\n  version             = \"16\"\n\n  authentication {\n    active_directory_auth_enabled = true\n    tenant_id                     = data.azurerm_client_config.current.tenant_id\n  }\n}\n\nresource \"azurerm_postgresql_flexible_server_active_directory_administrator\" \"entra_admin\" {\n  server_id     = azurerm_postgresql_flexible_server.example.id\n  object_id     = var.entra_object_id\n  principal_name = var.entra_principal_name\n  principal_type = \"User\"\n  tenant_id     = data.azurerm_client_config.current.tenant_id\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "**Microsoft Entra ID** を介して PostgreSQL Flexible Server へのアクセスをフェデレーションし、MFA、条件付きアクセス、集中 RBAC でログインを統制します。少なくとも 1 つの委任管理者グループを維持し、ID ガバナンス手順でメンバーをローテーションしてください。",
+      "Url": "https://hub.prowler.com/check/postgresql_flexible_server_entra_id_authentication_enabled"
+    }
+  },
+  "Categories": [
+    "identity-access"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "Microsoft Entra ID 認証が無効、または flexible server microsoft-entra-admin API で管理者が返らない場合、このチェックは失敗します。"
+}

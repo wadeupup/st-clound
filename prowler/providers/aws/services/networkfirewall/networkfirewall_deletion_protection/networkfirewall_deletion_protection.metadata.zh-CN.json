@@ -1,0 +1,39 @@
+{
+  "Provider": "aws",
+  "CheckID": "networkfirewall_deletion_protection",
+  "CheckTitle": "确保已为 Network Firewall 启用删除保护",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices"
+  ],
+  "ServiceName": "networkfirewall",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsNetworkFirewallFirewall",
+  "ResourceGroup": "network",
+  "Description": "**AWS Network Firewall 防火墙**已启用**删除保护**（`DeleteProtection=true`）。",
+  "Risk": "如果未启用删除保护，防火墙可能被误删，或被已泄露身份删除，导致流量绕过检测与日志记录。\n\n这会通过未过滤访问威胁**机密性**与**完整性**，并因路由中断和边界控制丢失而损害**可用性**。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/networkfirewall-controls.html#networkfirewall-9"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws network-firewall update-firewall-delete-protection --firewall-name <FIREWALL_NAME> --delete-protection",
+      "NativeIaC": "```yaml\n# CloudFormation: enable deletion protection on a Network Firewall\nResources:\n  <example_resource_name>:\n    Type: AWS::NetworkFirewall::Firewall\n    Properties:\n      FirewallName: <example_resource_name>  # Required: unique name for the firewall\n      FirewallPolicyArn: <example_resource_id>\n      VpcId: <example_resource_id>\n      SubnetMappings:\n        - SubnetId: <example_resource_id>\n      DeleteProtection: true  # Critical: enables deletion protection to pass the check\n```",
+      "Other": "1. 打开 AWS 控制台并进入 VPC > Network Firewall > Firewalls\n2. 选择目标防火墙\n3. 在 Firewall details 中选择 Edit（或 Change protections）\n4. 启用 Deletion protection\n5. 保存更改",
+      "Terraform": "```hcl\n# Terraform: enable deletion protection on a Network Firewall\nresource \"aws_networkfirewall_firewall\" \"<example_resource_name>\" {\n  name                = \"<example_resource_name>\"\n  firewall_policy_arn = \"<example_resource_id>\"\n  vpc_id              = \"<example_resource_id>\"\n\n  subnet_mapping {\n    subnet_id = \"<example_resource_id>\"\n  }\n\n  delete_protection = true  # Critical: prevents deletion to pass the check\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "为每个防火墙启用**删除保护**（`DeleteProtection=true`）。落实**最小权限**以防止删除操作，对防火墙修改要求**变更审批**，并通过策略即代码实施防护护栏。应用**纵深防御**，以便在防火墙被修改时由替代控制继续约束流量。",
+      "Url": "https://hub.prowler.com/check/networkfirewall_deletion_protection"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

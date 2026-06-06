@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "app_function_access_keys_configured",
+  "CheckTitle": "Azure Functions がセキュリティ強化のためアクセス キーを使用していることを確認する",
+  "CheckType": [],
+  "ServiceName": "app",
+  "SubServiceName": "function",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Microsoft.Web/sites",
+  "ResourceGroup": "serverless",
+  "Description": "Azure Functions は、開発および本番環境で HTTP 関数エンドポイントを保護する方法を提供します。アクセス キーを使用すると、追加の保護レイヤーが加わり、認可されたユーザーまたはシステムのみが関数へアクセスできるようになります。これは、公開アプリや機微データを扱う場合に特に重要です。",
+  "Risk": "保護されていない関数エンドポイントは不正アクセスに対して脆弱となり、データ漏えいや悪意あるアクティビティにつながる可能性があります。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/azure-functions/functions-bindings-http-webhook-trigger?tabs=python-v2%2Cisolated-process%2Cnodejs-v4%2Cfunctionsv2&pivots=programming-language-csharp#authorization-keys",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/Functions/azure-function-anonymous-access.html",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "Azure Functions を保護するためにアクセス キーを使用してください。キーは Azure Portal または Azure CLI で作成・管理できます。詳細は公式ドキュメントを参照してください。",
+      "Url": "https://learn.microsoft.com/en-us/azure/azure-functions/security-concepts?tabs=v4#function-access-keys"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "追加のセキュリティ対策として、アクセス キーと併せてマネージド ID や Key Vault の利用を検討してください。これにより、リソース アクセスのきめ細かな制御と監査性の向上が可能になります。"
+}

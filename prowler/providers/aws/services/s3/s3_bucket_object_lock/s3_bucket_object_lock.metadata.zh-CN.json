@@ -1,0 +1,33 @@
+{
+  "Provider": "aws",
+  "CheckID": "s3_bucket_object_lock",
+  "CheckTitle": "检查 S3 存储桶是否已启用对象锁",
+  "CheckType": [
+    "数据保护"
+  ],
+  "ServiceName": "s3",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:s3:::bucket_name",
+  "Severity": "low",
+  "ResourceType": "AwsS3Bucket",
+  "ResourceGroup": "storage",
+  "Description": "检查 S3 存储桶是否已启用对象锁",
+  "Risk": "使用一次写入多次读取（WORM）模型来存储对象，以帮助您防止对象在固定时间内或无限期内被删除或覆盖。这有助于防止勒索软件攻击。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "aws s3 put-object-lock-configuration --bucket <BUCKET_NAME> --object-lock-configuration '{\"ObjectLockEnabled\":\"Enabled\",\"Rule\":{\"DefaultRetention\":{\"Mode\":\"GOVERNANCE\",\"Days\":1}}}'",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/S3/object-lock.html",
+      "Terraform": "https://docs.prowler.com/checks/aws/general-policies/ensure-that-s3-bucket-has-lock-configuration-enabled-by-default#terraform"
+    },
+    "Recommendation": {
+      "Text": "确保您的 Amazon S3 存储桶已启用对象锁定功能，以防止其存储的对象被删除。",
+      "Url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lock-overview.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

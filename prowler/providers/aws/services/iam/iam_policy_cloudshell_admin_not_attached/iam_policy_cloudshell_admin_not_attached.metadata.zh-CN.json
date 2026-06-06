@@ -1,0 +1,35 @@
+{
+  "Provider": "aws",
+  "CheckID": "iam_policy_cloudshell_admin_not_attached",
+  "CheckTitle": "检查 IAM 身份（用户、组、角色）是否附加了 AWSCloudShellFullAccess 策略。",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践/CIS AWS 基础基准"
+  ],
+  "ServiceName": "iam",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:aws:iam::{account-id}:{resource-type}/{resource-id}",
+  "Severity": "medium",
+  "ResourceType": "AwsIamPolicy",
+  "ResourceGroup": "IAM",
+  "Description": "此控制检查 IAM 身份（用户、角色或组）是否附加了 AWS 管理的策略 AWSCloudShellFullAccess。如果 IAM 身份附加了 AWSCloudShellFullAccess 策略，则控制失败。",
+  "Risk": "将 AWSCloudShellFullAccess 策略附加到 IAM 身份会授予广泛的权限，包括互联网访问和文件传输功能，这可能导致安全风险，例如数据泄露。应遵循最小权限原则以避免过多的权限。",
+  "RelatedUrl": "https://docs.aws.amazon.com/config/latest/developerguide/iam-policy-blacklisted-check.html",
+  "Remediation": {
+    "Code": {
+      "CLI": "aws iam detach-user/role/group-policy --user/role/group-name <user/role/group-name> --policy-arn arn:aws:iam::aws:policy/AWSCloudShellFullAccess",
+      "NativeIaC": "",
+      "Other": "https://docs.aws.amazon.com/securityhub/latest/userguide/iam-controls.html#iam-27",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "从 IAM 身份中分离 AWSCloudShellFullAccess 策略，以限制过多的权限并遵循最小权限原则。",
+      "Url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_manage-attach-detach.html"
+    }
+  },
+  "Categories": [
+    "trust-boundaries"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

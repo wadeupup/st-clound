@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "ecs_task_definitions_logging_enabled",
+  "CheckTitle": "ECS 任务定义为所有容器配置了日志记录",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices/Runtime Behavior Analysis",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices"
+  ],
+  "ServiceName": "ecs",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsEcsTaskDefinition",
+  "ResourceGroup": "container",
+  "Description": "**Amazon ECS 任务定义** 容器在最新活动修订版中为每个容器指定了 **日志配置**，其中包含非空的 `logDriver`。",
+  "Risk": "缺少容器日志会削弱可见性，使入侵、数据窃取和配置篡改未被发现。\n\n缺少审计跟踪会削弱机密性和完整性，阻碍取证，并在中断期间增加 MTTR（平均修复时间），影响可用性和合规性证据。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/ecs-controls.html#ecs-9",
+    "https://docs.aws.amazon.com/AmazonECS/latest/developerguide/using_awslogs.html#specify-log-config",
+    "https://docs.aws.amazon.com/config/latest/developerguide/ecs-task-definition-log-configuration.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws ecs register-task-definition --family <task-family> --container-definitions '[{\"name\":\"<container-name>\",\"image\":\"<image>\",\"logConfiguration\":{\"logDriver\":\"awslogs\",\"options\":{\"awslogs-group\":\"<log-group>\",\"awslogs-region\":\"<region>\"}}}]'",
+      "NativeIaC": "```yaml\n# CloudFormation: ECS task definition with logging enabled for the container\nResources:\n  ExampleTaskDefinition:\n    Type: AWS::ECS::TaskDefinition\n    Properties:\n      ContainerDefinitions:\n        - Name: \"<example_resource_name>\"\n          Image: \"<image>\"\n          LogConfiguration:                 # Critical: ensures container has logging configured\n            LogDriver: awslogs              # Critical: non-null log driver passes the check\n            Options:\n              awslogs-group: \"<log-group>\" # Critical: CloudWatch Logs group\n              awslogs-region: \"<region>\"\n```",
+      "Other": "1. 在 AWS 控制台中，转到 Amazon ECS > 任务定义\n2. 选择您的任务定义并点击创建新修订版\n3. 对于每个容器，打开编辑并将日志配置设置为 awslogs\n4. 将日志组设置为所需的 CloudWatch Logs 组并选择区域\n5. 保存并创建以注册新修订版（确保所有容器都有日志记录）",
+      "Terraform": "```hcl\n# ECS task definition with logging enabled for the container\nresource \"aws_ecs_task_definition\" \"<example_resource_name>\" {\n  family                = \"<example_resource_name>\"\n  container_definitions = jsonencode([\n    {\n      name  = \"<example_resource_name>\"\n      image = \"<image>\"\n      logConfiguration = {                 # Critical: enables container logging\n        logDriver = \"awslogs\"             # Critical: non-null log driver passes the check\n        options = {\n          awslogs-group  = \"<log-group>\"  # Critical: CloudWatch Logs group\n          awslogs-region = \"<region>\"\n        }\n      }\n    }\n  ])\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "为所有任务实施集中式、防篡改的 **容器日志记录**。为每个容器定义 `logDriver`，并将日志发送到具有受限访问权限的托管目标。应用 **最小权限**、加密和保留策略。监控异常并发出告警。*如果使用外部收集器，请确保等效的覆盖范围和持久性。*",
+      "Url": "https://hub.prowler.com/check/ecs_task_definitions_logging_enabled"
+    }
+  },
+  "Categories": [
+    "logging"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

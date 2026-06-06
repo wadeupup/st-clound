@@ -1,0 +1,32 @@
+{
+  "Provider": "aws",
+  "CheckID": "cognito_user_pool_mfa_enabled",
+  "CheckTitle": "Amazon Cognito ユーザープールで多要素認証（MFA）が有効になっていることを確認する",
+  "CheckType": [],
+  "ServiceName": "cognito",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:aws:cognito-idp:region:account:userpool/userpool-id",
+  "Severity": "medium",
+  "ResourceType": "AwsCognitoUserPool",
+  "ResourceGroup": "IAM",
+  "Description": "Amazon Cognito ユーザープールで多要素認証（MFA）が有効になっているかどうかを確認します。",
+  "Risk": "MFA が有効になっていない場合、不正なユーザーがユーザープールにアクセスし、アプリケーションのセキュリティを侵害する可能性があります。",
+  "RelatedUrl": "https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-settings-mfa.html",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "Amazon Cognito ユーザープールで MFA を有効にするには、Amazon Cognito のドキュメントの手順に従ってください。",
+      "Url": "https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-settings-mfa.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "lightsail_instance_public",
+  "CheckTitle": "Lightsail インスタンスには公開アクセス可能なポートがありません",
+  "CheckType": [
+    "ソフトウェアと構成のチェック/AWS セキュリティベストプラクティス/ネットワーク到達可能性",
+    "ソフトウェアと構成のチェック/業界および規制基準/AWS 基礎セキュリティベストプラクティス",
+    "TTPs/初期アクセス"
+  ],
+  "ServiceName": "lightsail",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Other",
+  "ResourceGroup": "compute",
+  "Description": "**Lightsail インスタンス**で**パブリック IP**を持ち、少なくとも1つのファイアウォールルールが**公開ポート**を許可している場合、それは公開されていると見なされます。評価はインスタンスのアドレッシングとポートルールを検査し、`public`としてマークされたポートまたは範囲を検出します。",
+  "Risk": "パブリック IP とオープンポートは、インターネットスキャン、ブルートフォース攻撃、およびエクスプロイトを可能にします。\n- 機密性: データの流出\n- 完全性: 露出したサービスを介した RCE/管理者の乗っ取り\n- 可用性: DoS または悪用（ボットネット、暗号通貨マイニング）、サービスの中断",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/lightsail/latest/userguide/amazon-lightsail-editing-firewall-rules.html",
+    "https://docs.aws.amazon.com/lightsail/latest/userguide/understanding-public-ip-and-private-ip-addresses-in-amazon-lightsail.html#ipv4-addresses"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws lightsail put-instance-public-ports --instance-name <example_resource_name> --port-infos '[]'",
+      "NativeIaC": "```yaml\n# CloudFormation: Lightsail インスタンスからすべての公開ポートを削除\nResources:\n  ClosePublicPorts:\n    Type: AWS::Lightsail::InstancePublicPorts\n    Properties:\n      InstanceName: <example_resource_name>\n      PortInfos: []  # 重要: 空のリストはすべての公開ポートをクリアし、インスタンスが公開されないようにします\n```",
+      "Other": "1. AWS Lightsail コンソールにサインイン\n2. インスタンスに移動し、<example_resource_name>を選択\n3. ネットワーキングタブを開く\n4. IPv4 ファイアウォールで、既存のすべてのルールを削除し、保存\n5. IPv6 が有効な場合、IPv6 ファイアウォールで既存のすべてのルールを削除し、保存",
+      "Terraform": "```hcl\n# Terraform: Lightsail インスタンスで公開ポートが開いていないことを確認\nresource \"aws_lightsail_instance_public_ports\" \"<example_resource_name>\" {\n  instance_name = \"<example_resource_name>\"\n\n  # 重要: port_info ブロックがない -> 公開ポートが設定されていない（すべて閉じる）\n  dynamic \"port_info\" {\n    for_each = []\n    content {\n      from_port = 0\n      to_port   = 0\n      protocol  = \"tcp\"\n    }\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "**最小特権**ネットワークアクセスを適用: 使用していないポートを閉じ、ソースを制限（`0.0.0.0/0`を避ける）、IPv4/IPv6 ルールを見直します。管理には**VPN**または**踏み台ホスト**を使用します。サービスをプライベートネットワーキングまたはロードバランサーの背後に配置し、必要な公開エンドポイントを強化/監視します。",
+      "Url": "https://hub.prowler.com/check/lightsail_instance_public"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

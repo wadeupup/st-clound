@@ -1,0 +1,49 @@
+{
+  "Provider": "aws",
+  "CheckID": "cloudwatch_log_metric_filter_root_usage",
+  "CheckTitle": "アカウントに root アカウント使用に対する CloudWatch Logs メトリクスフィルターとアラームが設定されていること",
+  "CheckType": [
+    "Software and Configuration Checks/Industry and Regulatory Standards/CIS AWS Foundations Benchmark",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "TTPs/Privilege Escalation"
+  ],
+  "ServiceName": "cloudwatch",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsCloudWatchAlarm",
+  "ResourceGroup": "monitoring",
+  "Description": "CloudWatch に保存された **CloudTrail** ログには、**root アカウントアクティビティ**（`{ $.userIdentity.type = \"Root\" && $.userIdentity.invokedBy NOT EXISTS && $.eventType != \"AwsServiceEvent\" }`）を検知するメトリクスフィルターと、そのフィルターにマッチした際にトリガーされる CloudWatch アラームが含まれている必要があります。",
+  "Risk": "**root アクティビティ** に対するアラートがない場合、フル権限の操作が気付かれずに実行される可能性があり、次のような影響を及ぼします：\n- データアクセス/流出による機密性の低下\n- ポリシーや設定の改ざんによる完全性の低下\n- リソース削除やシャットダウンによる可用性の低下\n検知が遅れるほど、被害範囲（ブラスト半径）と攻撃者の滞在期間が拡大します。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudwatch-alarms-for-cloudtrail.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/CloudWatchLogs/root-account-usage-alarm.html",
+    "https://asecure.cloud/a/root_account_login/",
+    "https://support.icompaas.com/support/solutions/articles/62000083624-ensure-a-log-metric-filter-and-alarm-exist-for-usage-of-root-account",
+    "https://www.intelligentdiscovery.io/controls/cloudwatch/cloudwatch-alarm-root-account-usage",
+    "https://aws.amazon.com/blogs/security/how-to-receive-notifications-when-your-aws-accounts-root-access-keys-are-used/",
+    "https://www.tenable.com/audits/items/CIS_Amazon_Web_Services_Foundations_v1.5.0_L1.audit:000adfb028a1475075a6b5d2117f53f4"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation：root アカウント使用に対するメトリクスフィルターとアラームを作成\nResources:\n  RootUsageMetricFilter:\n    Type: AWS::Logs::MetricFilter\n    Properties:\n      LogGroupName: \"<example_resource_name>\"\n      FilterPattern: '{ $.userIdentity.type = \"Root\" && $.userIdentity.invokedBy NOT EXISTS && $.eventType != \"AwsServiceEvent\" }'  # 重要：サービスによって呼び出されていない root ユーザー操作を検知\n      MetricTransformations:\n        - MetricValue: \"1\"\n          MetricNamespace: \"<example_resource_name>\"  # 重要：アラームで使用するメトリクスの名前空間\n          MetricName: \"<example_resource_name>\"       # 重要：アラームで使用するメトリクス名\n\n  RootUsageAlarm:\n    Type: AWS::CloudWatch::Alarm\n    Properties:\n      ComparisonOperator: GreaterThanOrEqualToThreshold\n      EvaluationPeriods: 1\n      MetricName: \"<example_resource_name>\"   # 重要：フィルターで作成されたメトリクスに対してアラーム\n      Namespace: \"<example_resource_name>\"\n      Period: 300\n      Statistic: Sum\n      Threshold: 1\n```",
+      "Other": "1. AWS コンソールで CloudWatch > Logs > Log groups を開き、CloudTrail ロググループを選択します\n2. Metric filters > Create metric filter に進みます\n3. Filter pattern に次を入力します：{ $.userIdentity.type = \"Root\" && $.userIdentity.invokedBy NOT EXISTS && $.eventType != \"AwsServiceEvent\" }\n4. Next をクリックし、任意の Filter name を指定し、Metric namespace と Metric name を設定し、Metric value を 1 にしてメトリクスフィルターを作成します\n5. 新しく作成したメトリクスフィルターを選択し、Create alarm をクリックします\n6. Period を 5 minutes、Statistic を Sum、Threshold type を Static（値 1）、Evaluation periods を 1 に設定し、アラームを作成します",
+      "Terraform": "```hcl\n# root アカウント使用を検知する CloudWatch Logs メトリクスフィルター\nresource \"aws_cloudwatch_log_metric_filter\" \"<example_resource_name>\" {\n  name           = \"<example_resource_name>\"\n  log_group_name = \"<example_resource_name>\"\n  pattern        = \"{ $.userIdentity.type = \\\"Root\\\" && $.userIdentity.invokedBy NOT EXISTS && $.eventType != \\\"AwsServiceEvent\\\" }\" # 重要：root ユーザー操作を検知\n\n  metric_transformation {\n    name      = \"<example_resource_name>\"     # 重要：アラームで使用するメトリクス\n    namespace = \"<example_resource_name>\"\n    value     = \"1\"\n  }\n}\n\n# root 使用メトリクスに対するアラーム\nresource \"aws_cloudwatch_metric_alarm\" \"<example_resource_name>\" {\n  comparison_operator = \"GreaterThanOrEqualToThreshold\"\n  evaluation_periods  = 1\n  metric_name         = \"<example_resource_name>\"   # 重要：メトリクスフィルターと一致\n  namespace           = \"<example_resource_name>\"\n  period              = 300\n  statistic           = \"Sum\"\n  threshold           = 1\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "**root アクティビティ** に対するリアルタイムアラートを有効化し、ログメトリクスフィルターと高優先度アラーム、および通知を構成してください。\n\nリスク低減のために、**最小権限の原則**を徹底し、root は *ブレイクグラス（緊急用）* に限定して MFA を有効化し、root アクセスキーを無効化し、アラートをインシデントレスポンスに連携させて **多層防御（Defense in Depth）** を実現します。",
+      "Url": "https://hub.prowler.com/check/cloudwatch_log_metric_filter_root_usage"
+    }
+  },
+  "Categories": [
+    "logging"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "ロギングおよびモニタリング"
+}
+
+

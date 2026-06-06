@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "cloudfront_distributions_s3_origin_non_existent_bucket",
+  "CheckTitle": "CloudFront 分配的 S3 源引用现有存储桶",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/NIST 800-53 Controls"
+  ],
+  "ServiceName": "cloudfront",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsCloudFrontDistribution",
+  "ResourceGroup": "network",
+  "Description": "具有 `S3OriginConfig` 的**CloudFront 分配**应引用现有的**S3 存储桶源**（不包括静态网站托管）。\n\n识别配置的存储桶名称不存在的源。",
+  "Risk": "**悬空 S3 源**允许潜在的**存储桶接管**：如果访问未受限制，攻击者可以创建缺失的存储桶，并让 CloudFront 检索攻击者控制的对象。\n\n这威胁**完整性**（内容欺骗、缓存中毒）和**可用性**（错误/超时），削弱用户信任。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/whitepapers/latest/secure-content-delivery-amazon-cloudfront/s3-origin-with-cloudfront.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/cloudfront-controls.html#cloudfront-12",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/CloudFront/cloudfront-existing-s3-bucket.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation：确保 CloudFront S3 源引用的 S3 存储桶存在\nResources:\n  <example_resource_name>:\n    Type: AWS::S3::Bucket\n    Properties:\n      BucketName: <example_resource_name>  # 关键：必须完全匹配 CloudFront 源域名中使用的存储桶名称（\".s3\"之前）以使其存在\n```",
+      "Other": "1. 在 AWS 控制台中，打开 CloudFront 并选择分配\n2. 转到源，选择 S3 源，并记下域名（存储桶名称是 \".s3\" 之前的文本）\n3. 打开 S3 控制台，点击创建存储桶，输入步骤 2 中的确切存储桶名称，然后创建存储桶\n4. 重新运行检查",
+      "Terraform": "```hcl\n# 确保 CloudFront S3 源引用的 S3 存储桶存在\nresource \"aws_s3_bucket\" \"<example_resource_name>\" {\n  bucket = \"<example_resource_name>\"  # 关键：必须完全匹配 CloudFront 源域名中使用的存储桶名称（\".s3\"之前）\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "确保源引用有效、拥有的存储桶；删除或更新过时的引用。强制执行**源访问控制**（或 OAI）和严格的存储桶策略，以便只有分配才能访问对象。应用**最小权限**，管理存储桶名称，并监控源运行状况以防止错误路由。",
+      "Url": "https://hub.prowler.com/check/cloudfront_distributions_s3_origin_non_existent_bucket"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

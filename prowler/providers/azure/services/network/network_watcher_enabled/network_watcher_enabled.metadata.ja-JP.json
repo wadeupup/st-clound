@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "network_watcher_enabled",
+  "CheckTitle": "Azure サブスクリプション内のすべてのロケーションで Network Watcher が 'Enabled' であることを確認する",
+  "CheckType": [],
+  "ServiceName": "network",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Network",
+  "ResourceGroup": "network",
+  "Description": "Azure サブスクリプションで Network Watcher を有効化します。",
+  "Risk": "Network Watcher で利用可能なネットワーク診断および可視化ツールは、Azure のネットワークを理解・診断し、洞察を得るのに役立ちます。",
+  "RelatedUrl": "https://docs.microsoft.com/en-us/azure/network-watcher/network-watcher-monitoring-overview",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity-staging/knowledge-base/azure/Network/enable-network-watcher.html",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "Network Watcher の自動有効化をオプトアウトすると恒久的な変更になります。一度オプトアウトすると、サポートへ連絡しない限りオプトインできません。",
+      "Url": "https://learn.microsoft.com/en-us/security/benchmark/azure/security-controls-v2-logging-threat-detection#lt-3-enable-logging-for-azure-network-activities"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "ネットワーク データの実行および保存にはトランザクションごとの追加コストが発生します。高トラフィックのネットワークでは、これらの費用が急速に増加します。"
+}

@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "dynamodb_accelerator_cluster_encryption_enabled",
+  "CheckTitle": "DynamoDB DAX 集群已启用静态加密",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/CIS AWS Foundations Benchmark"
+  ],
+  "ServiceName": "dynamodb",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "database",
+  "Description": "**Amazon DynamoDB Accelerator (DAX) 集群**会被评估是否启用了**服务器端静态加密**。检查结果会指示集群的磁盘缓存、配置和日志是否使用服务管理的密钥进行加密。",
+  "Risk": "如果没有**静态加密**，DAX 磁盘缓存和日志可能被具有底层访问权限的人员从底层存储中提取，从而损害**机密性**并允许离线数据挖掘。\n\n威胁包括：\n- 被入侵的主机或管理员\n- 丢失/退役的介质\n- 未经授权的备份或快照",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DAXEncryptionAtRest.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/DAX/encryption-enabled.html",
+    "https://docs.aws.amazon.com/prescriptive-guidance/latest/encryption-best-practices/dynamodb.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws dax create-cluster --cluster-name <example_resource_name> --node-type <NODE_TYPE> --replication-factor 1 --iam-role-arn <example_resource_id> --sse-specification Enabled=true",
+      "NativeIaC": "```yaml\nResources:\n  DaxCluster:\n    Type: AWS::DAX::Cluster\n    Properties:\n      ClusterName: <example_resource_name>\n      NodeType: <NODE_TYPE>\n      ReplicationFactor: 1\n      IAMRoleARN: <example_resource_id>\n      SSESpecification:           # Critical: enables encryption at rest\n        SSEEnabled: true          # Encrypts DAX cluster data at rest\n```",
+      "Other": "1. 在 AWS 控制台中，打开 **DynamoDB** > 在 **DAX** 下，选择 **Clusters** > **Create cluster**\n2. 输入名称并选择节点类型\n3. 在 **Encryption** 中，选择 **Enable encryption**\n4. 选择 IAM 角色和所需的网络配置，然后点击 **Launch cluster**\n5. 如果要替换现有的未加密集群：将应用程序指向新集群端点，然后删除旧集群",
+      "Terraform": "```hcl\nresource \"aws_dax_cluster\" \"example\" {\n  cluster_name       = \"<example_resource_name>\"\n  node_type          = \"<NODE_TYPE>\"\n  replication_factor = 1\n  iam_role_arn       = \"<example_resource_id>\"\n\n  # Critical: enables encryption at rest\n  server_side_encryption {\n    enabled = true  # Encrypts DAX cluster data at rest\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "在创建 DAX 集群时启用**静态加密**。对 DAX 管理和数据访问应用**最小权限**原则，并通过日志记录进行监控。\n\n采用**纵深防御**策略：启用传输加密，限制网络暴露，避免缓存高度敏感的数据。重新创建未加密的集群以强制执行此设置。",
+      "Url": "https://hub.prowler.com/check/dynamodb_accelerator_cluster_encryption_enabled"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "Data Protection"
+}
+

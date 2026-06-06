@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "awslambda_function_not_publicly_accessible",
+  "CheckTitle": "Lambda 函数基于资源的策略不允许公共访问",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices/Network Reachability",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices"
+  ],
+  "ServiceName": "awslambda",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "critical",
+  "ResourceType": "AwsLambdaFunction",
+  "ResourceGroup": "serverless",
+  "Description": "**AWS Lambda** 函数基于资源的策略会被评估是否存在**公共访问**。此发现会识别具有通配符或空 `Principal` 的策略，这些策略允许任何主体执行 `lambda:InvokeFunction` 等操作。",
+  "Risk": "**公共调用**允许外部人员在函数的 IAM 角色下运行代码。\n\n影响：\n- **机密性**：通过后端访问进行数据泄露\n- **完整性**：副作用导致的未经授权的状态更改\n- **可用性/成本**：调用洪流导致节流和支出激增",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/config/latest/developerguide/lambda-function-public-access-prohibited.html",
+    "https://docs.aws.amazon.com/lambda/latest/dg/access-control-resource-based.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/lambda-controls.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/Lambda/function-exposed.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws lambda remove-permission --function-name <example_function_name> --statement-id <example_statement_id>",
+      "NativeIaC": "```yaml\n# CloudFormation：将 Lambda 权限限制为非公共主体\nResources:\n  <example_resource_name>Permission:\n    Type: AWS::Lambda::Permission\n    Properties:\n      Action: lambda:InvokeFunction\n      FunctionName: <example_resource_name>\n      Principal: 123456789012  # 关键：不是 \"*\"; 将调用权限限制到特定账户以防止公共访问\n```",
+      "Other": "1. 打开 AWS Lambda 控制台并选择函数\n2. 转到配置 > 权限\n3. 在基于资源的策略下，查看策略语句\n4. 查找任何 Principal 设置为 \"*\"（或 { \"AWS\": \"*\" }）的语句\n5. 删除该语句并保存\n6. 如果需要访问，仅重新添加特定主体的权限（例如，AWS 账户 ID 或服务主体）",
+      "Terraform": "```hcl\n# 将 Lambda 权限限制为非公共主体\nresource \"aws_lambda_permission\" \"<example_resource_name>\" {\n  statement_id  = \"AllowSpecificPrincipal\"\n  action        = \"lambda:InvokeFunction\"\n  function_name = \"<example_resource_name>\"\n  principal     = \"123456789012\"  # 关键：不是 \"*\"; 防止公共访问\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "从函数策略中删除公共主体。仅使用固定的 ARN 和**最小权限**向特定账户、角色或服务授予访问权限。添加 `AWS:SourceAccount` 和 `AWS:SourceArn` 等条件来限制服务触发器。强制执行**职责分离**并监控访问以实现**纵深防御**。",
+      "Url": "https://hub.prowler.com/check/awslambda_function_not_publicly_accessible"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "如果函数通过其他公共资源（如 AWS 账户中的 ALB 或 API Gateway）公开暴露，并且策略的主体设置为 AWS 账户 ID，则会产生误报。"
+}
+

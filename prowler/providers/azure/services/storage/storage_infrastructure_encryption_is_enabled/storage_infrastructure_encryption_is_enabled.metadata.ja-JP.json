@@ -1,0 +1,33 @@
+{
+  "Provider": "azure",
+  "CheckID": "storage_infrastructure_encryption_is_enabled",
+  "CheckTitle": "Azure Storage の各 Storage Account で「Enable Infrastructure Encryption」が「enabled」に設定されていることを確認する",
+  "CheckType": [],
+  "ServiceName": "storage",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "low",
+  "ResourceType": "AzureRole",
+  "ResourceGroup": "IAM",
+  "Description": "Azure Storage の各 Storage Account で「Enable Infrastructure Encryption」が「enabled」に設定されていることを確認します。",
+  "Risk": "Azure Storage データを二重暗号化することで、暗号アルゴリズムまたは鍵のいずれかが侵害された場合のリスクを軽減できます。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "Azure ストレージソリューションにアクセスする Storage Account では、既定のソフトウェア暗号化に加えてハードウェアレベルの二重暗号化を有効化します。",
+      "Url": ""
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

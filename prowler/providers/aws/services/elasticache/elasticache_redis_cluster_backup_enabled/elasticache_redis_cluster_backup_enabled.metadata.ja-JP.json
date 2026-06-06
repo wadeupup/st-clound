@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "elasticache_redis_cluster_backup_enabled",
+  "CheckTitle": "ElastiCache Redis キャッシュクラスターで自動スナップショットバックアップが有効になっており、保持期間が少なくとも 7 日である",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Effects/Data Destruction"
+  ],
+  "ServiceName": "elasticache",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Other",
+  "ResourceGroup": "database",
+  "Description": "Amazon ElastiCache Redis レプリケーショングループは、**自動スナップショットバックアップ** が有効になっており、**保持期間**が少なくとも `7` 日です。\n\n評価では、バックアップが有効になっているかどうか、および設定された保持期間が最小しきい値を満たしているかに焦点を当てます。",
+  "Risk": "バックアップがない、または保持期間が短いと、**可用性**が低下し、**データ損失**のリスクが高まります。ハードウェア障害、破損、または誤削除は、必要な時点に回復できない可能性があり、**RPO/RTO** を損ない、中断を長引かせ、キャッシュデータの**フォレンジック**を制限します。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/ElastiCache/enable-automatic-backups.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/elasticache-controls.html#elasticache-1"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws elasticache modify-replication-group --replication-group-id <REPLICATION_GROUP_ID> --snapshot-retention-limit 7 --apply-immediately",
+      "NativeIaC": "```yaml\n# CloudFormation: set automated snapshot retention for a Redis replication group\nResources:\n  <example_resource_name>:\n    Type: AWS::ElastiCache::ReplicationGroup\n    Properties:\n      ReplicationGroupDescription: example\n      SnapshotRetentionLimit: 7  # Critical: enables automatic snapshots and retains them for >=7 days\n```",
+      "Other": "1. AWS コンソールで、ElastiCache を開きます\n2. Redis > レプリケーショングループに移動します\n3. <example_resource_id> を選択し、変更をクリックします\n4. スナップショット保持（日）を 7 以上に設定します\n5. すぐに適用にチェックを入れます\n6. 変更をクリックして保存します",
+      "Terraform": "```hcl\nresource \"aws_elasticache_replication_group\" \"<example_resource_name>\" {\n  replication_group_id       = \"<example_resource_id>\"\n  replication_group_description = \"<example_description>\"\n  snapshot_retention_limit   = 7  # Critical: enable automated backups and keep them for >=7 days\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "**自動バックアップ**を有効化し、**保持期間**を RPO/RTO を満たすように設定します（通常は `7` 日）。\n- 一貫した `snapshot window` を定義します\n- 定期的にリストアをテストします\n- **最小権限**と不変性でバックアップストレージを保護します\n- 障害についてバックアップステータスを監視します\n- レプリカ/多可用区で**多層防御**を適用します",
+      "Url": "https://hub.prowler.com/check/elasticache_redis_cluster_backup_enabled"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

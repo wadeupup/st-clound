@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "sagemaker_training_jobs_intercontainer_encryption_enabled",
+  "CheckTitle": "Amazon SageMaker トレーニングジョブでは、コンテナ間トラフィックの暗号化が有効になっています",
+  "CheckType": [
+    "ソフトウェアおよび設定のチェック/AWS セキュリティのベストプラクティス/ネットワークセキュリティ",
+    "業界および規制基準/AWS基盤セキュリティのベストプラクティス",
+    "影響／データ露出"
+  ],
+  "ServiceName": "sagemaker",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "ai_ml",
+  "Description": "Amazon SageMaker のトレーニングジョブでは、トレーニング中のコンテナ間通信に対して、**コンテナ間トラフィック暗号化** が設定されています。\n\nこの評価では、トレーニングジョブの `EnableInterContainerTrafficEncryption` 設定を検査します。",
+  "Risk": "コンテナ間の暗号化がないと、ノード内トラフィックは平文である可能性があり、侵害されたホストや同居するワークロードによる傍受を可能にします。これは、**機密性**（学習データ、モデルパラメータ、認証情報）と**完全性**（勾配/結果の改ざん）を脅かし、さらにトークンやセッションの窃取を介した**ラテラルムーブメント**を助長する可能性があります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/SageMaker/enable-inter-container-traffic-encryption.html",
+    "https://docs.aws.amazon.com/sagemaker/latest/dg/interface-vpc-endpoint.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation: コンテナ間トラフィック暗号化が有効な SageMaker トレーニングジョブ\nResources:\n  SageMakerTrainingJob:\n    Type: AWS::SageMaker::TrainingJob\n    Properties:\n      TrainingJobName: <example_resource_name>\n      RoleArn: <example_resource_id>\n      AlgorithmSpecification:\n        TrainingImage: <example_resource_id>\n        TrainingInputMode: File\n      OutputDataConfig:\n        S3OutputPath: s3://<example_resource_name>/\n      ResourceConfig:\n        InstanceCount: 1\n        InstanceType: ml.m5.large\n        VolumeSizeInGB: 10\n      StoppingCondition:\n        MaxRuntimeInSeconds: 3600\n      EnableInterContainerTrafficEncryption: true  # 重大: チェックに合格するためにコンテナ間のトラフィックを暗号化する\n```",
+      "Other": "1. AWS コンソールで、Amazon SageMaker > トレーニングジョブ に移動します\n2. 「トレーニングジョブを作成」をクリックします\n3. 必須フィールド（アルゴリズム、ロール、入力、出力、リソース）を設定します\n4. 次の設定を有効にします: コンテナ間トラフィックの暗号化を有効にする\n5. 「作成」をクリックして新しいジョブを開始します（既存のジョブは変更できません）",
+      "Terraform": "```hcl\n# Terraform: コンテナ間トラフィック暗号化を有効にしたSageMakerトレーニングジョブ\nresource \"aws_sagemaker_training_job\" \"job\" {\n  name     = \"<example_resource_name>\"\n  role_arn = \"<example_resource_id>\"\n\n  algorithm_specification {\n    training_image      = \"<example_resource_id>\"\n    training_input_mode = \"File\"\n  }\n\n  output_data_config {\n    s3_output_path = \"s3://<example_resource_name>/\"\n  }\n\n  resource_config {\n    instance_count = 1\n    instance_type  = \"ml.m5.large\"\n    volume_size_gb = 10\n  }\n\n  stopping_condition {\n    max_runtime_in_seconds = 3600\n  }\n\n  enable_inter_container_traffic_encryption = true  # 重要：コンテナ間トラフィックが暗号化されていることを保証します\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "すべてのトレーニングジョブで `EnableInterContainerTrafficEncryption` を有効にして、**転送中の暗号化** を強制します。\n\n**多層防御** を適用します: **ネットワーク分離** と組み合わせ、**最小権限** に従ってロールとコンテナ権限を制限し、暗号化されていないジョブの起動を防ぐために安全なジョブテンプレートまたはガードレールを標準化します。",
+      "Url": "https://hub.prowler.com/check/sagemaker_training_jobs_intercontainer_encryption_enabled"
+    }
+  },
+  "Categories": [
+    "encryption",
+    "gen-ai"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

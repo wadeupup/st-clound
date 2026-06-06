@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "sagemaker_models_network_isolation_enabled",
+  "CheckTitle": "Amazon SageMaker モデルではネットワーク分離が有効になっています",
+  "CheckType": [
+    "ソフトウェアおよび設定のチェック/AWS セキュリティのベストプラクティス/ネットワーク到達可能性",
+    "ソフトウェアと設定のチェック/業界および規制基準/AWS 基盤セキュリティのベストプラクティス",
+    "影響／データ流出"
+  ],
+  "ServiceName": "sagemaker",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Other",
+  "ResourceGroup": "ai_ml",
+  "Description": "**SageMaker モデル**は**ネットワーク分離**の状態について評価されます。これは、必要なサービス制御トラフィックを除き、ホスティング/推論中にモデルコンテナがネットワーク接続を開始できないようにブロックされているかどうかを示します。",
+  "Risk": "**無効化されたネットワーク分離**により、モデルコンテナが外部ネットワークに到達できるようになり、入力、出力、または認証情報の流出、信頼できないコードの取得、および秘匿的なコールバックが可能になります。これは機密性と完全性を損ない、ホスティング環境からのラテラルムーブメントを助長する可能性があります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/sagemaker/latest/dg/studio-notebooks-and-internet-access.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation：ネットワーク分離が有効になっているSageMakerモデル\nResources:\n  <example_resource_name>:\n    Type: AWS::SageMaker::Model\n    Properties:\n      ExecutionRoleArn: <example_resource_arn>\n      PrimaryContainer:\n        Image: <example_image>\n      EnableNetworkIsolation: true  # 重要：モデルコンテナでネットワーク分離が有効になっていることを確認します\n```",
+      "Other": "1. AWSコンソールで、SageMaker > Inference > Models に移動します\n2. Create model をクリックします\n3. 名前を入力し、実行ロールを選択して、コンテナの Image を設定します\n4. Enable network isolation をチェックします\n5. Create model をクリックします\n6. エンドポイントで使用されている場合は、このモデルで新しいエンドポイント設定を作成してエンドポイントを更新し、その後、古い非分離モデルを削除します",
+      "Terraform": "```hcl\n# ネットワーク分離が有効になっているSageMakerモデル\nresource \"aws_sagemaker_model\" \"<example_resource_name>\" {\n  name               = \"<example_resource_name>\"\n  execution_role_arn = \"<example_resource_arn>\"\n\n  primary_container {\n    image = \"<example_image>\"\n  }\n\n  enable_network_isolation = true  # 重大: チェックに合格するためにネットワーク分離を有効にする\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "すべてのホスト型モデルで**ネットワーク分離**を有効にします。エンドポイントを**プライベートVPC**で実行し、厳格な**セキュリティグループ**と**VPCエンドポイント**で外向き通信を制限し、**最小権限のIAM**を徹底します。**多層防御**を採用し、パブリックルートを避け、宛先を許可リスト化し、送信トラフィックを監視します。",
+      "Url": "https://hub.prowler.com/check/sagemaker_models_network_isolation_enabled"
+    }
+  },
+  "Categories": [
+    "trust-boundaries",
+    "container-security",
+    "gen-ai"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

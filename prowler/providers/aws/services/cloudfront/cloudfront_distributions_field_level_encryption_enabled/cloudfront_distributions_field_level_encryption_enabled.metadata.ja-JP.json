@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "cloudfront_distributions_field_level_encryption_enabled",
+  "CheckTitle": "CloudFrontディストリビューションにフィールドレベル暗号化が有効になっている",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Effects/Data Exposure"
+  ],
+  "ServiceName": "cloudfront",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "low",
+  "ResourceType": "AwsCloudFrontDistribution",
+  "ResourceGroup": "network",
+  "Description": "CloudFrontディストリビューションのデフォルトキャッシュ動作は、`field_level_encryption_id`を介して**フィールドレベル暗号化**に関連付けられ、指定されたリクエストフィールドをエッジ暗号化の対象とします。",
+  "Risk": "**フィールドレベル暗号化**がない場合、機密入力（PII、支払いデータ、資格情報）がプレーンテキストでオリジンパス、ログ、またはミドルウェアに表示される可能性があります。これは**機密性**を弱め、データ漏洩と内部者の悪用を可能にし、トークンがキャプチャされた場合、セッションまたはアカウントの侵害につながる可能性があります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/field-level-encryption.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/CloudFront/field-level-encryption-enabled.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws cloudfront create-field-level-encryption-config --field-level-encryption-config file://fle-config.json && aws cloudfront get-distribution-config --id <DISTRIBUTION_ID> --output json > current-config.json && echo 'Manually edit current-config.json to add FieldLevelEncryptionId to DefaultCacheBehavior, then run:' && echo 'aws cloudfront update-distribution --id <DISTRIBUTION_ID> --distribution-config file://current-config.json --if-match $(aws cloudfront get-distribution-config --id <DISTRIBUTION_ID> --query \"ETag\" --output text)'",
+      "NativeIaC": "```yaml\n# CloudFormation：デフォルトキャッシュ動作でフィールドレベル暗号化を有効化\nResources:\n  FLEConfig:\n    Type: AWS::CloudFront::FieldLevelEncryptionConfig\n    Properties:\n      FieldLevelEncryptionConfig:\n        CallerReference: !Ref AWS::StackName\n        ContentTypeProfileConfig:\n          ForwardWhenContentTypeIsUnknown: true\n          ContentTypeProfiles:\n            Quantity: 0\n\n  <example_resource_name>:\n    Type: AWS::CloudFront::Distribution\n    Properties:\n      DistributionConfig:\n        Enabled: true\n        Origins:\n          - DomainName: \"<example_resource_name>.s3.amazonaws.com\"\n            Id: \"<example_resource_id>\"\n            S3OriginConfig: {}\n        DefaultCacheBehavior:\n          TargetOriginId: \"<example_resource_id>\"\n          ViewerProtocolPolicy: redirect-to-https\n          CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6\n          FieldLevelEncryptionId: !Ref FLEConfig  # 重要：デフォルトキャッシュ動作でFLEを有効化\n```",
+      "Other": "1. AWSコンソールで、CloudFrontに移動\n2. フィールドレベル暗号化設定がない場合：\n   - 左側のメニューで、公開鍵 > 公開鍵の追加をクリック（RSA公開鍵を貼り付け）\n   - フィールドレベル暗号化 > プロファイルの作成をクリック（公開鍵を選択し、暗号化するフィールドを追加）\n   - フィールドレベル暗号化 > 設定の作成をクリック（プロファイルをデフォルトプロファイルに設定）\n3. ディストリビューションに添付：\n   - ディストリビューション > <example_resource_id>を選択に移動\n   - 動作 > デフォルト (*)を選択 > 編集を選択\n   - フィールドレベル暗号化設定を作成した設定に設定\n   - 変更を保存し、デプロイを待つ",
+      "Terraform": "```hcl\n# デフォルトキャッシュ動作でフィールドレベル暗号化を有効化\nresource \"aws_cloudfront_field_level_encryption_config\" \"fle\" {\n  content_type_profile_config {\n    forward_when_content_type_is_unknown = true\n  }\n}\n\nresource \"aws_cloudfront_distribution\" \"<example_resource_name>\" {\n  enabled = true\n\n  origin {\n    domain_name = \"<example_resource_name>.s3.amazonaws.com\"\n    origin_id   = \"<example_resource_id>\"\n  }\n\n  default_cache_behavior {\n    target_origin_id       = \"<example_resource_id>\"\n    viewer_protocol_policy = \"redirect-to-https\"\n    cache_policy_id        = \"658327ea-f89d-4fab-a63d-7e88639e58f6\"\n    field_level_encryption_id = aws_cloudfront_field_level_encryption_config.fle.id # 重要：FLEを有効化\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "機密リクエストフィールドに対して**フィールドレベル暗号化**を有効にし、関連するキャッシュ動作にバインドします。復号化キーに**最小権限**を適用し、キーをローテーションおよび監視し、職務を分離します。**多層防御**として、データ収集を最小化し、シークレットのログ記録を避け、エンドツーエンドのHTTPSを要求し、入力を検証します。",
+      "Url": "https://hub.prowler.com/check/cloudfront_distributions_field_level_encryption_enabled"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "Data Protection"
+}
+

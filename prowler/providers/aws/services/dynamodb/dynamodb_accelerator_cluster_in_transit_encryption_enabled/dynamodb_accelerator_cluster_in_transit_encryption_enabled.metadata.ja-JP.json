@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "dynamodb_accelerator_cluster_in_transit_encryption_enabled",
+  "CheckTitle": "DynamoDB Accelerator (DAX) クラスターで転送時暗号化が有効になっているか",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Effects/Data Exposure"
+  ],
+  "ServiceName": "dynamodb",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "database",
+  "Description": "**DAX クラスター**のエンドポイント暗号化が `TLS` に設定されており、クライアントからクラスターへの接続に対して**転送時暗号化**を強制します",
+  "Risk": "**TLS** がない場合、DAX トラフィックが傍受および改ざんされる可能性があり、以下に影響を与えます：\n- 機密性：クエリ、データ、または認証情報の暴露\n- 完全性：改ざんされたリクエスト/レスポンスとキャッシュポイズニング\n- 可用性：セッションハイジャックまたはリプレイによるサービス中断",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/dynamodb-controls.html#dynamodb-7",
+    "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DAXEncryptionInTransit.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws dax create-cluster --cluster-name <cluster-name> --node-type <node-type> --replication-factor <replication-factor> --cluster-endpoint-encryption-type TLS",
+      "NativeIaC": "```yaml\n# CloudFormation: Create DAX cluster with TLS (encryption in transit)\nResources:\n  <example_resource_name>:\n    Type: AWS::DAX::Cluster\n    Properties:\n      ClusterName: <example_resource_name>\n      IAMRoleARN: <example_resource_id>\n      NodeType: <example_node_type>\n      ReplicationFactor: 1\n      ClusterEndpointEncryptionType: TLS  # Critical: Enables TLS for in-transit encryption\n```",
+      "Other": "1. AWS コンソールで、DynamoDB > DAX に移動します\n2. Create cluster をクリックします\n3. Cluster name、Node type、Replication factor、IAM role を設定します\n4. Encryption in transit (TLS) を有効化します\n5. クラスターを作成し、ACTIVE になるまで待ちます\n6. アプリケーションを更新して、新しい DAX クラスターエンドポイントを使用します\n7. 古い TLS が有効でない DAX クラスターを削除します",
+      "Terraform": "```hcl\n# DAX cluster with encryption in transit enabled\nresource \"aws_dax_cluster\" \"<example_resource_name>\" {\n  cluster_name                      = \"<example_resource_name>\"\n  node_type                         = \"<example_node_type>\"\n  replication_factor                = 1\n  iam_role_arn                      = \"<example_resource_id>\"\n  cluster_endpoint_encryption_type  = \"TLS\"  # Critical: Enables TLS for in-transit encryption\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "すべての DAX エンドポイントとクライアントに対して **TLS**（転送時暗号化）を強制します。既存のクラスターにこれがない場合は、新しい TLS 対応クラスターを作成して移行します。\n\n**多層防御**を適用します：ネットワークパスを制限し、アクセスをプライベートに保ち、**最小権限**IAM を使用して影響範囲を縮小します。",
+      "Url": "https://hub.prowler.com/check/dynamodb_accelerator_cluster_in_transit_encryption_enabled"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

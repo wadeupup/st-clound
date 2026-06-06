@@ -1,0 +1,40 @@
+{
+  "Provider": "aws",
+  "CheckID": "lightsail_static_ip_unused",
+  "CheckTitle": "Lightsail 静态 IP 已与实例关联",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践",
+    "影响/资源消耗"
+  ],
+  "ServiceName": "lightsail",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "low",
+  "ResourceType": "Other",
+  "ResourceGroup": "compute",
+  "Description": "**Amazon Lightsail 静态 IP** 被检测为**未关联**到任何实例，表明这些地址已被保留但未使用。\n\n评估重点是每个静态 IP 的关联状态，以突出潜在的遗留问题。",
+  "Risk": "**未附加的静态 IP** 会产生持续费用并表明资产漂移。如果 DNS 或应用程序仍然引用该地址，请求将被黑洞化，影响**可用性**。稍后将相同的 IP 附加到意外的主机上可能会暴露服务和数据，影响**机密性**和**完整性**。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/lightsail/latest/userguide/understanding-public-ip-and-private-ip-addresses-in-amazon-lightsail.html",
+    "https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/Lightsail.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws lightsail attach-static-ip --static-ip-name <example_resource_name> --instance-name <example_resource_name>",
+      "NativeIaC": "```yaml\nResources:\n  AttachStaticIp:\n    Type: AWS::Lightsail::StaticIpAttachment\n    Properties:\n      InstanceName: <example_resource_name>  # 关键：要附加的实例；标记 IP 为已附加\n      StaticIpName: <example_resource_name>  # 关键：要附加的静态 IP；通过关联修复失败\n```",
+      "Other": "1. 在 AWS 控制台中，转到 Lightsail > Networking > Static IPs\n2. 选择未使用的静态 IP 并点击“Attach to instance”\n3. 选择目标实例并确认\n4. 验证静态 IP 现在显示为已附加",
+      "Terraform": "```hcl\nresource \"aws_lightsail_static_ip_attachment\" \"attach\" {\n  static_ip_name = \"<example_resource_name>\"  # 关键：指定要附加的静态 IP\n  instance_name  = \"<example_resource_name>\"  # 关键：目标实例；关联使检查通过\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "释放未使用的静态 IP 或将其附加到预期的实例。\n\n应用**最小权限**进行 IP 分配，强制执行标记和所有权，并定期运行审计以对未附加的地址发出警报。*如果需要保留*，请记录目的并设置时间限制以防止漂移和成本。",
+      "Url": "https://hub.prowler.com/check/lightsail_static_ip_unused"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

@@ -1,0 +1,33 @@
+{
+  "Provider": "azure",
+  "CheckID": "storage_ensure_private_endpoints_in_storage_accounts",
+  "CheckTitle": "确保使用私有终结点访问存储账户",
+  "CheckType": [],
+  "ServiceName": "storage",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AzureStorageAccount",
+  "ResourceGroup": "storage",
+  "Description": "为 Azure 存储账户使用私有终结点，以便客户端和服务通过加密的 Private Link 安全地通过网络访问数据。为此，私有终结点会为每项服务使用来自 VNet 的 IP 地址。不同服务之间的网络流量在 VNet 上安全地加密传输。该 VNet 还可链接地址空间，扩展网络并访问其上资源。同样，它也可作为穿过公共网络的隧道，将远程基础设施互联。通过划分网络流量并阻止外部来源访问，可进一步增强安全性。",
+  "Risk": "未配置使用私有终结点的存储账户可通过公共 Internet 访问，可能导致数据外泄及其他安全问题。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/storage/common/storage-private-endpoints",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity-staging/knowledge-base/azure/StorageAccounts/private-endpoints.html#",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "使用私有终结点访问存储账户",
+      "Url": "https://docs.microsoft.com/en-us/azure/storage/common/storage-private-endpoints"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

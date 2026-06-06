@@ -1,0 +1,34 @@
+{
+  "Provider": "aws",
+  "CheckID": "ec2_launch_template_imdsv2_required",
+  "CheckTitle": "Amazon EC2 启动模板应启用并要求 IMDSv2",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices"
+  ],
+  "ServiceName": "ec2",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:aws:ec2:region:account-id:launch-template/resource-id",
+  "Severity": "high",
+  "ResourceType": "AwsEc2LaunchTemplate",
+  "ResourceGroup": "compute",
+  "Description": "此控制检查 Amazon EC2 启动模板是否配置为启用并要求 IMDSv2。如果启动模板版本中未启用或要求 IMDSv2，则控制失败。",
+  "Risk": "如果不要求 IMDSv2，EC2 实例可能容易受到元数据服务攻击，允许未经授权访问实例元数据，可能导致实例凭据或其他敏感数据被泄露。",
+  "RelatedUrl": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/configuring-instance-metadata-service.html",
+  "Remediation": {
+    "Code": {
+      "CLI": "aws ec2 modify-launch-template --launch-template-id <template-id> --version <version-number> --metadata-options HttpTokens=required",
+      "NativeIaC": "",
+      "Other": "https://docs.aws.amazon.com/securityhub/latest/userguide/ec2-controls.html#ec2-170",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "为确保 EC2 启动模板已启用并要求 IMDSv2，请更新模板以将实例元数据服务版本 2 配置为必需。",
+      "Url": "https://docs.aws.amazon.com/autoscaling/ec2/userguide/create-launch-template.html#change-metadata-options"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

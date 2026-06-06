@@ -1,0 +1,44 @@
+{
+  "Provider": "aws",
+  "CheckID": "cloudtrail_kms_encryption_enabled",
+  "CheckTitle": "CloudTrail トレイルのログが KMS キーで保存時に暗号化されている",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/CIS AWS Foundations Benchmark"
+  ],
+  "ServiceName": "cloudtrail",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsCloudTrailTrail",
+  "ResourceGroup": "monitoring",
+  "Description": "**AWS CloudTrail トレイル** が、S3 に保存されている配信ログファイルを暗号化するために、顧客管理の KMS キーを使用した **SSE-KMS** を使用しているかどうかが評価されます。KMS キーが設定されていないトレイルが識別されます。*単一リージョンとマルチリージョンのトレイルに適用されます。*",
+  "Risk": "**顧客管理の KMS キー** がない場合、ログ保護はストレージ権限のみに依存します。バケットの設定ミスや盗まれた資格情報により、監査データが露出し、回避や横方向の移動を助長する可能性があります。キーレベルの制御、ローテーション、使用監査の欠如は、**機密性** と **フォレンジック整合性** を弱めます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/encrypting-cloudtrail-log-files-with-aws-kms.html",
+    "https://trendmicro.com/cloudoneconformity/knowledge-base/aws/CloudTrail/cloudtrail-logs-encrypted.html",
+    "https://www.stream.security/rules/ensure-cloudtrail-logs-are-encrypted-at-rest",
+    "https://www.clouddefense.ai/compliance-rules/cis-v130/logging/cis-v130-3-7"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws cloudtrail update-trail --name <trail_name> --kms-key-id <kms_key_arn_or_id>",
+      "NativeIaC": "```yaml\n# CloudFormation: enable KMS encryption for an existing/new CloudTrail\nResources:\n  <example_resource_name>:\n    Type: AWS::CloudTrail::Trail\n    Properties:\n      S3BucketName: <example_resource_name>\n      KmsKeyId: <example_resource_id>  # Critical: sets the KMS key to encrypt CloudTrail logs at rest\n```",
+      "Other": "1. AWS コンソールで、CloudTrail > トレイルに移動します\n2. トレイル <trail_name> を選択し、編集をクリックします\n3. ログファイルの暗号化で、KMS キーを使用を選択し、<cloudtrail_kms_key> を選択します\n4. 変更を保存をクリックします",
+      "Terraform": "```hcl\n# Enable KMS encryption for CloudTrail\nresource \"aws_cloudtrail\" \"<example_resource_name>\" {\n  name           = \"<example_resource_name>\"\n  s3_bucket_name = \"<example_resource_name>\"\n  kms_key_id     = \"<example_resource_id>\" # Critical: uses this KMS key to encrypt CloudTrail logs\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "すべてのトレイルで **顧客管理の KMS キー** を使用して **SSE-KMS** を有効にします。**最小権限の原則** を適用して、承認されたロールのみが `Decrypt` できるようにし、キー管理者とログリーダー間で **職務分離** を強制します。キーをローテーションし、キーの使用を監視して、CloudTrail データに **多層防御** を提供します。",
+      "Url": "https://hub.prowler.com/check/cloudtrail_kms_encryption_enabled"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

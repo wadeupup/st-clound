@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "apigateway_restapi_waf_acl_attached",
+  "CheckTitle": "API Gateway ステージに WAF Web ACL が添付されています",
+  "CheckType": [
+    "ソフトウェアと設定チェック/AWS セキュリティベストプラクティス",
+    "ソフトウェアと設定チェック/業界および規制基準/AWS 基礎セキュリティベストプラクティス"
+  ],
+  "ServiceName": "apigateway",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsApiGatewayStage",
+  "ResourceGroup": "api_gateway",
+  "Description": "**Amazon API Gateway (REST API)** ステージは、関連する**AWS WAF Web ACL**について評価されます。この調査結果は、ステージレベルで `web ACL` がリンクされているかどうかを反映します。",
+  "Risk": "**WAF Web ACL**がない場合、API は CIA（機密性、整合性、可用性）に影響を与えるアプリケーション層の脅威にさらされます：\n- 機密性：インジェクションによるデータ流出\n- 整合性：パラメータの改ざんとパストラバーサル\n- 可用性：L7 フラッド、ボットの悪用、リソースの枯渇\n*パブリックエンドポイントはリスクが高まります。*",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/apigateway/latest/developerguide/security-monitoring.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws wafv2 associate-web-acl --web-acl-arn <WEB_ACL_ARN> --resource-arn arn:aws:apigateway:<REGION>::/restapis/<REST_API_ID>/stages/<STAGE_NAME>",
+      "NativeIaC": "```yaml\n# CloudFormation: API Gateway REST API ステージに WAFv2 Web ACL を添付します\nResources:\n  <example_resource_name>:\n    Type: AWS::WAFv2::WebACLAssociation\n    Properties:\n      ResourceArn: arn:aws:apigateway:<example_region>::/restapis/<example_resource_id>/stages/<example_stage_name>  # 重要：ターゲット API Gateway ステージ\n      WebACLArn: <example_resource_arn>  # 重要：添付する Web ACL\n```",
+      "Other": "1. AWS コンソールを開き、WAF & Shield に移動します\n2. Web ACLs（Scope: Regional）を選択し、Web ACL を選択します\n3. Add AWS resource をクリックします\n4. API Gateway を選択し、REST API と特定の Stage を選択します\n5. Add/Associate をクリックして Web ACL を添付します",
+      "Terraform": "```hcl\n# API Gateway REST API ステージに WAFv2 Web ACL を添付します\nresource \"aws_wafv2_web_acl_association\" \"<example_resource_name>\" {\n  resource_arn = \"arn:aws:apigateway:<example_region>::/restapis/<example_resource_id>/stages/<example_stage_name>\" # 重要：ターゲット API Gateway ステージ\n  web_acl_arn  = \"<example_resource_arn>\" # 重要：添付する Web ACL\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "各露出ステージに**AWS WAF Web ACL**を添付し、**多層防御**を適用します：\n- マネージドルールグループとカスタマイズされた許可/拒否リストを使用します\n- レート制限を適用して悪用をスロットルします\n- 最小権限のネットワーク露出を強制します\n- ログとメトリクスを使用してルールを継続的に調整します\n*変更を検証して誤検知を減らします。*",
+      "Url": "https://hub.prowler.com/check/apigateway_restapi_waf_acl_attached"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "",
+  "CheckAliases": [
+    "apigateway_waf_acl_attached"
+  ]
+}
+

@@ -1,0 +1,45 @@
+{
+  "Provider": "aws",
+  "CheckID": "cloudtrail_log_file_validation_enabled",
+  "CheckTitle": "CloudTrail 跟踪已启用日志文件验证",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/CIS AWS Foundations Benchmark"
+  ],
+  "ServiceName": "cloudtrail",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsCloudTrailTrail",
+  "ResourceGroup": "monitoring",
+  "Description": "评估 **AWS CloudTrail 跟踪** 是否启用了 **日志文件完整性验证** (`LogFileValidationEnabled`)。\n\n启用后，CloudTrail 会生成签名的摘要文件，以验证 S3 传送的日志文件是否保持不变。",
+  "Risk": "没有验证，攻击者可以在不被检测的情况下更改、伪造或删除审计条目，从而损害日志 **完整性** 和不可否认性。\n\n这会损害调查，使警报逃避成为可能，并掩盖跨区域或跨账户的未经授权更改。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-log-file-validation-intro.html",
+    "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-log-file-validation-enabling.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/CloudTrail/cloudtrail-log-file-integrity-validation.html",
+    "https://deepwiki.com/acantril/learn-cantrill-io-labs/7.1-cloudtrail-log-file-integrity"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws cloudtrail update-trail --name <trail_name> --enable-log-file-validation",
+      "NativeIaC": "```yaml\n# CloudFormation: Enable log file validation on a CloudTrail trail\nResources:\n  <example_resource_name>:\n    Type: AWS::CloudTrail::Trail\n    Properties:\n      S3BucketName: <example_resource_name>\n      EnableLogFileValidation: true  # Critical: enables integrity validation for delivered log files\n```",
+      "Other": "1. 打开 AWS 控制台并转到 CloudTrail\n2. 单击跟踪并选择 <trail_name>\n3. 单击编辑\n4. 在其他/高级设置中，勾选启用日志文件验证\n5. 单击保存更改",
+      "Terraform": "```hcl\n# Enable log file validation on a CloudTrail trail\nresource \"aws_cloudtrail\" \"<example_resource_name>\" {\n  name               = \"<example_resource_name>\"\n  s3_bucket_name     = \"<example_resource_name>\"\n  enable_log_file_validation = true  # Critical: ensures CloudTrail writes signed digests to detect tampering\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "在所有跟踪上启用 **日志文件完整性验证** (`LogFileValidationEnabled=true`)。\n\n对日志存储桶强制执行 **最小权限原则**，保留和保护摘要文件（例如，S3 对象锁定/MFA 删除），并监控验证结果以支持 **纵深防御**。",
+      "Url": "https://hub.prowler.com/check/cloudtrail_log_file_validation_enabled"
+    }
+  },
+  "Categories": [
+    "logging",
+    "forensics-ready"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

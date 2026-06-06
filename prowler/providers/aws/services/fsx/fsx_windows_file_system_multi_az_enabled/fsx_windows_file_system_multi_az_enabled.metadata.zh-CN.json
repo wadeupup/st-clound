@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "fsx_windows_file_system_multi_az_enabled",
+  "CheckTitle": "FSx Windows 文件系统已配置为 Multi-AZ 部署",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Effects/Denial of Service"
+  ],
+  "ServiceName": "fsx",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "low",
+  "ResourceType": "Other",
+  "ResourceGroup": "storage",
+  "Description": "会评估 **FSx for Windows File Server** 文件系统是否启用 **Multi-AZ 部署**。当 `SubnetIds` 包含位于不同可用区的多个子网时，即判定为 Multi-AZ。",
+  "Risk": "使用 **Single-AZ** 会形成**单点故障**。可用区故障、服务器故障或维护可能导致文件共享长时间不可用，影响可用性。崩溃场景下数据可能不一致，威胁**完整性**，并且恢复可能依赖备份，从而增加 **RTO/RPO**。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/fsx/latest/WindowsGuide/dfs-r.html",
+    "https://docs.aws.amazon.com/fsx/latest/APIReference/API_WindowsFileSystemConfiguration.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/fsx-controls.html",
+    "https://docs.aws.amazon.com/fsx/latest/WindowsGuide/high-availability-multiAZ.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation: Create FSx for Windows File Server with Multi-AZ\nResources:\n  <example_resource_name>:\n    Type: AWS::FSx::FileSystem\n    Properties:\n      FileSystemType: WINDOWS\n      StorageCapacity: 32\n      SubnetIds:\n        - <example_subnet_id_1>  # CRITICAL: two subnets -> Multi-AZ across AZs\n        - <example_subnet_id_2>  # CRITICAL: two subnets -> Multi-AZ across AZs\n      WindowsConfiguration:\n        ThroughputCapacity: 8\n        DeploymentType: MULTI_AZ_1  # CRITICAL: enables Multi-AZ deployment\n        PreferredSubnetId: <example_subnet_id_1>\n```",
+      "Other": "1. 在 AWS 控制台进入 FSx > Create file system > Amazon FSx for Windows File Server\n2. 将 Deployment type 设置为 Multi-AZ\n3. 选择位于不同可用区的两个子网\n4. 设置所需最小容量/吞吐后创建\n5. 将数据迁移到新文件系统，并将客户端重定向到其 DNS 名称\n6. 删除旧的 Single-AZ 文件系统",
+      "Terraform": "```hcl\n# Terraform: FSx for Windows File Server configured for Multi-AZ\nresource \"aws_fsx_windows_file_system\" \"<example_resource_name>\" {\n  storage_capacity    = 32\n  subnet_ids          = [\"<example_subnet_id_1>\", \"<example_subnet_id_2>\"] # CRITICAL: two subnets in different AZs\n  throughput_capacity = 8\n  deployment_type     = \"MULTI_AZ_1\"                                      # CRITICAL: enables Multi-AZ deployment\n  preferred_subnet_id = \"<example_subnet_id_1>\"\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "生产环境优先使用 `MULTI_AZ_1`，以保障**高可用**并避免 AZ 级单点故障。落实**韧性**与**纵深防御**：按可容忍 AZ 故障进行架构设计，为故障切换预留容量，并定期进行故障切换演练。*若必须使用 Single-AZ*，应仅用于非关键或应用层已复制的工作负载，并保持高频且可验证的备份。",
+      "Url": "https://hub.prowler.com/check/fsx_windows_file_system_multi_az_enabled"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

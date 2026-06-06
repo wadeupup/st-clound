@@ -1,0 +1,36 @@
+{
+  "Provider": "aws",
+  "CheckID": "ec2_securitygroup_allow_ingress_from_internet_to_all_ports",
+  "CheckTitle": "确保没有安全组允许从 0.0.0.0/0 或 ::/0 到所有端口的入站访问",
+  "CheckType": [
+    "Infrastructure Security"
+  ],
+  "ServiceName": "ec2",
+  "SubServiceName": "securitygroup",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "critical",
+  "ResourceType": "AwsEc2SecurityGroup",
+  "ResourceGroup": "network",
+  "Description": "确保没有安全组允许从 0.0.0.0/0 或 ::/0 到所有端口的入站访问",
+  "Risk": "如果安全组配置不当，攻击面会增加。攻击者可能利用此错误配置来获得对资源的未经授权访问。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": "https://docs.prowler.com/checks/aws/networking-policies/ensure-aws-security-group-does-not-allow-all-traffic-on-all-ports/"
+    },
+    "Recommendation": {
+      "Text": "使用零信任方法。尽可能缩小入站流量范围。考虑南北向以及东西向流量。",
+      "Url": "https://docs.aws.amazon.com/vpc/latest/userguide/VPC_SecurityGroups.html"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

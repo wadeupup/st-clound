@@ -1,0 +1,45 @@
+{
+  "Provider": "aws",
+  "CheckID": "apigateway_restapi_client_certificate_enabled",
+  "CheckTitle": "API Gateway REST API ステージでクライアント証明書が有効になっています",
+  "CheckType": [
+    "ソフトウェアと設定チェック/AWS セキュリティベストプラクティス/転送中の暗号化",
+    "ソフトウェアと設定チェック/業界および規制基準/AWS 基礎セキュリティベストプラクティス",
+    "ソフトウェアと設定チェック/業界および規制基準/PCI-DSS",
+    "ソフトウェアと設定チェック/業界および規制基準/NIST 800-53 コントロール（米国）"
+  ],
+  "ServiceName": "apigateway",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsApiGatewayStage",
+  "ResourceGroup": "api_gateway",
+  "Description": "**API Gateway ステージ**に**クライアント証明書**が設定されているため、HTTP/S 統合は**相互 TLS** を実行し、API Gateway をバックエンドに対して認証できます",
+  "Risk": "バックエンドへのクライアント認証がない場合、リクエストが API Gateway から発信されたことを証明できません。バックエンドへの直接呼び出しは、ゲートウェイポリシーをバイパスし、不正なアクセスとデータの改ざんを可能にします。これにより、**整合性**と**機密性**が低下し、監査可能性が低下します。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://aws.amazon.com/blogs/compute/introducing-mutual-tls-authentication-for-amazon-api-gateway/"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws apigateway update-stage --rest-api-id <REST_API_ID> --stage-name <STAGE_NAME> --patch-operations op=replace,path=/clientCertificateId,value=<CLIENT_CERT_ID>",
+      "NativeIaC": "```yaml\n# CloudFormation: REST API ステージにクライアント証明書を添付します\nResources:\n  ClientCert:\n    Type: AWS::ApiGateway::ClientCertificate\n\n  ApiStage:\n    Type: AWS::ApiGateway::Stage\n    Properties:\n      StageName: <example_resource_name>\n      RestApiId: <example_resource_id>\n      DeploymentId: <example_resource_id>\n      ClientCertificateId: !Ref ClientCert  # 重要：ステージでクライアント証明書を有効にします\n```",
+      "Other": "1. AWS コンソールで、API Gateway > REST APIs に移動し、API を選択します\n2. 左側のメニューで、Client Certificates をクリックし、作成します（Generate）\n3. 左側のメニューで、Stages をクリックし、ターゲットステージを選択します\n4. Settings で、Client certificate を見つけ、作成した証明書を選択します\n5. Save Changes をクリックします",
+      "Terraform": "```hcl\n# Terraform: REST API ステージにクライアント証明書を添付します\nresource \"aws_api_gateway_client_certificate\" \"example\" {}\n\nresource \"aws_api_gateway_stage\" \"<example_resource_name>\" {\n  stage_name          = \"<example_resource_name>\"\n  rest_api_id         = \"<example_resource_id>\"\n  deployment_id       = \"<example_resource_id>\"\n  client_certificate_id = aws_api_gateway_client_certificate.example.id  # 重要：ステージでクライアント証明書を有効にします\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "**クライアント証明書**を使用して、API Gateway からバックエンドへの**相互 TLS** を有効にし、バックエンドがその ID のみを信頼するように設定します。**ゼロトラスト**と**最小権限**を適用します：バックエンドへのパブリックアクセスをブロックし、ネットワークを制限し、証明書をローテーションし、認証失敗を監視します。",
+      "Url": "https://hub.prowler.com/check/apigateway_restapi_client_certificate_enabled"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "",
+  "CheckAliases": [
+    "apigateway_client_certificate_enabled"
+  ]
+}
+

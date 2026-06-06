@@ -1,0 +1,35 @@
+{
+  "Provider": "aws",
+  "CheckID": "iam_user_mfa_enabled_console_access",
+  "CheckTitle": "すべてのコンソールパスワードを持つIAMユーザーに対して多要素認証（MFA）が有効になっていることを確認してください。",
+  "CheckType": [
+    "ソフトウェアと構成のチェック",
+    "業界および規制の標準",
+    "CIS AWS Foundations ベンチマーク"
+  ],
+  "ServiceName": "iam",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "high",
+  "ResourceType": "AwsIamUser",
+  "ResourceGroup": "IAM",
+  "Description": "すべてのコンソールパスワードを持つIAMユーザーに対して多要素認証（MFA）が有効になっていることを確認してください。",
+  "Risk": "パスワードが安全でない場合や、何らかの方法で漏洩した場合、この重要なアカウントへの不正アクセスが発生する可能性があります。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "ユーザーのアカウントにMFAを有効にします。MFAは、ユーザー名とパスワードに加えて追加の保護層を提供するシンプルなベストプラクティスです。仮想MFAよりもハードウェアキーの使用を推奨します。",
+      "Url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_mfa_enable_virtual.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

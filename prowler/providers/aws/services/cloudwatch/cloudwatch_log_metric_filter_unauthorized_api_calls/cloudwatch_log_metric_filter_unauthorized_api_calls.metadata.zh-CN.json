@@ -1,0 +1,47 @@
+{
+  "Provider": "aws",
+  "CheckID": "cloudwatch_log_metric_filter_unauthorized_api_calls",
+  "CheckTitle": "已为未授权 API 调用配置 CloudWatch Logs 度量过滤器和告警",
+  "CheckType": [
+    "Software and Configuration Checks/Industry and Regulatory Standards/CIS AWS Foundations Benchmark",
+    "Software and Configuration Checks/AWS Security Best Practices/Runtime Behavior Analysis",
+    "TTPs/Initial Access/Unauthorized Access"
+  ],
+  "ServiceName": "cloudwatch",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsCloudWatchAlarm",
+  "ResourceGroup": "monitoring",
+  "Description": "用于 CloudTrail 的 **CloudWatch Logs** 中包含一个度量过滤器，用于匹配未授权的 API 错误（`$.errorCode=\"*UnauthorizedOperation\"` 或 `$.errorCode=\"AccessDenied*\"`），以及在事件匹配过滤器时触发的关联告警。",
+  "Risk": "如果未对**未授权 API 调用**进行告警，权限探测和被攻陷身份的失败访问尝试可能长期不被发现。攻击者可以枚举服务、横向移动并尝试权限提升，从而威胁数据的**机密性**和**完整性**。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudwatch-alarms-for-cloudtrail.html",
+    "https://asecure.cloud/a/unauthorized_api_calls/",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/CloudWatchLogs/authorization-failures-alarm.html",
+    "https://www.tenable.com/policies/[type]/AC_AWS_0559",
+    "https://www.intelligentdiscovery.io/controls/cloudwatch/cloudwatch-unauthorized-api-calls",
+    "https://support.icompaas.com/support/solutions/articles/62000083561-ensure-a-log-metric-filter-and-alarm-exist-for-unauthorized-api-calls"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation：为未授权 API 调用创建度量过滤器和告警\nResources:\n  MetricFilterUnauthorized:\n    Type: AWS::Logs::MetricFilter\n    Properties:\n      LogGroupName: <example_resource_name>\n      FilterPattern: '{($.errorCode = \"*UnauthorizedOperation\") || ($.errorCode = \"AccessDenied*\")}'  # 关键：检测未授权/被拒绝的 API 调用\n      MetricTransformations:\n        - MetricName: unauthorized_api_calls_metric\n          MetricNamespace: CISBenchmark\n          MetricValue: \"1\"\n\n  AlarmUnauthorized:\n    Type: AWS::CloudWatch::Alarm\n    Properties:\n      ComparisonOperator: GreaterThanOrEqualToThreshold\n      EvaluationPeriods: 1\n      MetricName: unauthorized_api_calls_metric  # 关键：对过滤器产生的度量创建告警\n      Namespace: CISBenchmark\n      Period: 300\n      Statistic: Sum\n      Threshold: 1\n```",
+      "Other": "1. 在 AWS 控制台中打开 CloudWatch > Logs > Log groups，并选择 CloudTrail 日志组\n2. 进入 Metric filters > Create metric filter\n3. 将 Filter pattern 设置为：{($.errorCode = \"*UnauthorizedOperation\") || ($.errorCode = \"AccessDenied*\")}\n4. 将度量命名为 unauthorized_api_calls_metric，命名空间设为 CISBenchmark，值设为 1，然后创建\n5. 选中新建的度量过滤器并单击 Create alarm\n6. 设置 Statistic: Sum，Period: 5 minutes，Threshold type: Static，Threshold: 1，Evaluation periods: 1\n7. 创建告警",
+      "Terraform": "```hcl\n# Terraform：为未授权 API 调用创建度量过滤器和告警\nresource \"aws_cloudwatch_log_metric_filter\" \"unauthorized\" {\n  name           = \"unauthorized_api_calls_metric\"\n  log_group_name = \"<example_resource_name>\"\n  pattern        = \"{($.errorCode = \\\"*UnauthorizedOperation\\\") || ($.errorCode = \\\"AccessDenied*\\\")}\"  # 关键：检测未授权/被拒绝的 API 调用\n\n  metric_transformation {\n    name      = \"unauthorized_api_calls_metric\"\n    namespace = \"CISBenchmark\"\n    value     = \"1\"\n  }\n}\n\nresource \"aws_cloudwatch_metric_alarm\" \"unauthorized\" {\n  comparison_operator = \"GreaterThanOrEqualToThreshold\"\n  evaluation_periods  = 1\n  metric_name         = \"unauthorized_api_calls_metric\"   # 关键：对该度量创建告警\n  namespace           = \"CISBenchmark\"\n  period              = 300\n  statistic           = \"Sum\"\n  threshold           = 1\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "通过为未授权错误（`*UnauthorizedOperation`、`AccessDenied*`）添加 CloudWatch Logs 度量过滤器，并将其与告警关联以通知响应人员，从而启用实时**告警**。\n- 实施**最小权限原则**以降低告警噪音\n- 与事件响应（IR）工具集成，实现**纵深防御**",
+      "Url": "https://hub.prowler.com/check/cloudwatch_log_metric_filter_unauthorized_api_calls"
+    }
+  },
+  "Categories": [
+    "logging"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "日志记录与监控"
+}
+
+

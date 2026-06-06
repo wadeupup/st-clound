@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "sqlserver_tde_encrypted_with_cmk",
+  "CheckTitle": "确保 SQL 服务器的透明数据加密（TDE）保护器使用客户管理密钥加密",
+  "CheckType": [],
+  "ServiceName": "sqlserver",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "SQLServer",
+  "ResourceGroup": "database",
+  "Description": "使用客户管理密钥支持的透明数据加密（TDE）可提升对 TDE 保护器的透明度与控制力，借助 HSM 支持的外部服务提高安全性，并促进职责分离。",
+  "Risk": "透明数据加密（TDE）的客户管理密钥支持允许用户控制 TDE 加密密钥，并限制哪些人可在何时访问。Azure Key Vault 作为 Azure 云端外部密钥管理系统，是首个与 TDE 集成支持客户管理密钥的密钥管理服务。启用客户管理密钥后，数据库加密密钥由存储在 Key Vault 中的非对称密钥保护。该非对称密钥在服务器级别设置，并由该服务器下所有数据库继承。",
+  "RelatedUrl": "https://docs.microsoft.com/en-us/sql/relational-databases/security/encryption/transparent-data-encryption-byok-azure-sql",
+  "Remediation": {
+    "Code": {
+      "CLI": "az sql server tde-key set --resource-group resourceName --server dbServerName --server-key-type {AzureKeyVault} --kid keyIdentifier",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity-staging/knowledge-base/azure/Sql/use-byok-for-transparent-data-encryption.html#",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "1. 进入 SQL servers。对于目标服务器实例：2. 点击 Transparent data encryption。3. 将 Transparent data encryption 设置为 Customer-managed key。4. 浏览你的 key vault，选择现有密钥或在 Azure Key Vault 中创建新密钥。5. 勾选 Make selected key the default TDE protector。",
+      "Url": "https://learn.microsoft.com/en-us/azure/azure-sql/database/transparent-data-encryption-byok-overview?view=azuresql"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "一旦 TDE 保护器使用客户管理密钥加密，相应密钥管理责任将完全转移给你。因此，为保证对应 SQL 服务器及托管数据库中的数据可访问，需谨慎执行与该密钥相关的任何操作。部署客户管理密钥时，建议同时部署自动化密钥管理工具集（应包含发现与密钥轮换），并将密钥存储在 HSM 或硬件支持的密钥库（如 Azure Key Vault）中。关于工具集，请咨询你的加密密钥提供商，他们可能将其作为附加服务提供。"
+}

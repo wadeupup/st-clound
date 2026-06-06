@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "vpc_endpoint_services_allowed_principals_trust_boundaries",
+  "CheckTitle": "VPC 端点服务仅允许受信任的主体或不允许任何主体",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践/网络可达性",
+    "软件和配置检查/行业和监管标准/AWS 基础安全最佳实践",
+    "TTPs/初始访问",
+    "影响/数据暴露"
+  ],
+  "ServiceName": "vpc",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsEc2VpcEndpointService",
+  "ResourceGroup": "network",
+  "Description": "**VPC 端点服务**会根据其**允许的主体**进行评估，将每个主体与已配置的受信任账户集进行比较，并识别任何**不受信任的主体**或允许列表中存在的通配符 `*`。",
+  "Risk": "不受信任或通配符主体可以创建到您的服务的 PrivateLink 连接，从而削弱隔离性。这会导致未经授权的数据访问（**机密性**）、滥用内部 API（**完整性**），以及后端的额外负载（**可用性**）。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/vpc/latest/privatelink/vpc-endpoints-access.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n#仅允许受信任的主体（或不附加任何主体以禁止所有主体）\nResources:\n  <example_resource_name>:\n    Type: AWS::EC2::VPCEndpointServicePermissions\n    Properties:\n      ServiceId: <example_resource_id>\n      AllowedPrincipals:\n        - arn:aws:iam::<TRUSTED_ACCOUNT_ID>:root  #严重：仅限此受信任账户访问\n```",
+      "Other": "1. 打开 AWS VPC 控制台并前往 Endpoint services\n2. 选择端点服务（<example_resource_id>）\n3. 打开 Allowed principals 选项卡并点击 Edit allowed principals\n4. 删除所有不受信任的条目，包括任何通配符 (*)\n5. 可以选择将列表留空（无 principals），或仅保留受信任的账户 ID/ARN\n6. 保存更改",
+      "Terraform": "```hcl\n#仅允许受信任的主体（删除此资源以不允许任何主体）\nresource \"aws_vpc_endpoint_service_allowed_principal\" \"<example_resource_name>\" {\n  service_id    = \"<example_resource_id>\"\n  principal_arn = \"arn:aws:iam::<TRUSTED_ACCOUNT_ID>:root\"  #关键：只有此受信任账户才能创建端点\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "应用**最小权限**：将**允许的主体**限制为经过审核的账户 ID，并避免使用 `*`。维护一个中央信任注册表，通过审批工作流来执行**职责分离**，并定期审查条目。使用**纵深防御**，采用强大的服务身份验证和持续的配置监控。",
+      "Url": "https://hub.prowler.com/check/vpc_endpoint_services_allowed_principals_trust_boundaries"
+    }
+  },
+  "Categories": [
+    "trust-boundaries"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

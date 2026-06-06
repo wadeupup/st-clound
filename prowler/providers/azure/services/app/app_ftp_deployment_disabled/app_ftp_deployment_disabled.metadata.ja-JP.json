@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "app_ftp_deployment_disabled",
+  "CheckTitle": "FTP デプロイが無効化されていることを確認する",
+  "CheckType": [],
+  "ServiceName": "app",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Microsoft.Web/sites/config",
+  "ResourceGroup": "serverless",
+  "Description": "既定では、Azure Functions、Web、API Services は FTP 経由でデプロイできます。重要なデプロイ ワークフローで FTP が必要な場合は、すべての App Service アプリおよび Functions の FTP ログインで FTPS を必須にする必要があります。",
+  "Risk": "Azure の FTP デプロイ エンドポイントは公開されています。リモート従業員が使用する Wi-Fi ネットワークや企業ネットワークでトラフィックを盗聴する攻撃者は、ログイン トラフィックを平文で確認でき、結果としてアプリまたはサービスのコードベースを完全に制御できる可能性があります。デプロイ用ユーザー資格情報が、アプリごとに一意な既定のアプリケーション資格情報ではなく、サブスクリプション レベルで設定されている場合、この問題はより重大になります。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/app-service/deploy-ftp?tabs=portal",
+  "Remediation": {
+    "Code": {
+      "CLI": "az webapp config set --resource-group <resource group name> --name <app name> --ftps-state [disabled|FtpsOnly]",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/AppService/ftp-access-disabled.html",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-general-policies/ensure-ftp-deployments-are-disabled#terraform"
+    },
+    "Recommendation": {
+      "Text": "1. Azure Portal に移動します 2. App Services を選択します 3. アプリをクリックします 4. Settings、次に Configuration を選択します 5. General Settings の Platform Settings で、FTP state を Disabled または FTPS Only に設定します",
+      "Url": ""
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "WebDeploy または HTTPS エンドポイントではなく、FTP または FTPS に依存するデプロイ ワークフローは影響を受ける可能性があります。"
+}

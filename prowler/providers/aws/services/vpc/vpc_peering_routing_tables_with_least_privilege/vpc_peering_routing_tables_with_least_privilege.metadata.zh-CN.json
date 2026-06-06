@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "vpc_peering_routing_tables_with_least_privilege",
+  "CheckTitle": "VPC 对等连接路由表不包含 0.0.0.0/0 或整个请求方/接受方 VPC CIDR 路由",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践/网络可达性",
+    "软件和配置检查/行业和监管标准/AWS 基础安全最佳实践",
+    "TTPs/横向移动",
+    "影响/数据暴露"
+  ],
+  "ServiceName": "vpc",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsEc2VpcPeeringConnection",
+  "ResourceGroup": "network",
+  "Description": "**AWS VPC 对等连接**路由表会根据**最小权限路由**进行评估。目标为 `0.0.0.0/0` 或整个对等 VPC CIDR 的路由被视为过于宽泛；应仅通过对等连接链路发布特定子网或更窄的前缀。",
+  "Risk": "广泛的对等连接路由会扩大跨 VPC 的可达性，使横向移动和未授权发现成为可能，从而损害**机密性**和**完整性**。使用 `0.0.0.0/0` 或完整 CIDR 路径还会在地址范围重叠时增加错误路由的风险，降低网络**可用性**。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://www.trendmicro.com/cloudoneconformity-staging/knowledge-base/aws/VPC/vpc-peering-access.html#",
+    "https://docs.aws.amazon.com/vpc/latest/peering/peering-configurations-partial-access.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation：将 VPC 对等连接路由限制到特定子网（最小权限）\nResources:\n  PeeringSpecificRoute:\n    Type: AWS::EC2::Route\n    Properties:\n      RouteTableId: <example_resource_id>\n      DestinationCidrBlock: 10.0.1.0/24  # 关键：使用特定的子网，而不是 0.0.0.0/0 或完整的 VPC CIDR\n      VpcPeeringConnectionId: <example_resource_id>\n```",
+      "Other": "1. 在 AWS 控制台中，前往 VPC > Route tables\n2. 选择用于访问对等 VPC 的路由表，然后点击 Routes > Edit routes\n3. 删除任何目标为 VPC 对等连接、且指向 0.0.0.0/0 或整个 requester/accepter VPC CIDR 的路由\n4. 仅添加指向对等 VPC 中所需子网 CIDR 的路由，并将目标设置为相同的 VPC 对等连接\n5. 保存更改，并在对等 VPC 的路由表中重复上述操作",
+      "Terraform": "```hcl\n# 将 VPC 对等连接路由限制到特定子网（最小权限）\nresource \"aws_route\" \"peering_specific\" {\n  route_table_id             = \"<example_resource_id>\"\n  destination_cidr_block     = \"10.0.1.0/24\"  # 严重：指定特定子网，而不是 0.0.0.0/0 或完整的 VPC CIDR\n  vpc_peering_connection_id  = \"<example_resource_id>\"\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "在对等连接中强制执行**最小权限**：仅通告所需的子网或更具体的前缀；避免使用 `0.0.0.0/0` 和整个 VPC 范围。保持双方路由对称，并使用安全组和 NACLs 实施**纵深防御**。*如果需要广泛连接*，优先选择分段设计或中转网关。",
+      "Url": "https://hub.prowler.com/check/vpc_peering_routing_tables_with_least_privilege"
+    }
+  },
+  "Categories": [
+    "trust-boundaries"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

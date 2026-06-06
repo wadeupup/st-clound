@@ -1,0 +1,34 @@
+{
+  "Provider": "aws",
+  "CheckID": "bedrock_guardrail_sensitive_information_filter_enabled",
+  "CheckTitle": "为 Amazon Bedrock 防护栏配置敏感信息过滤器",
+  "CheckType": [],
+  "ServiceName": "bedrock",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:bedrock:region:account-id:guardrails/resource-id",
+  "Severity": "high",
+  "ResourceType": "Other",
+  "ResourceGroup": "ai_ml",
+  "Description": "确保为 Amazon Bedrock 防护栏启用敏感信息过滤器，以防止个人身份信息（PII）、财务数据或机密企业信息等敏感数据的泄露。",
+  "Risk": "如果未启用敏感信息过滤器，Bedrock 模型可能会在响应中无意中生成或暴露机密或敏感信息，导致数据泄露、违规或声誉损害。",
+  "RelatedUrl": "https://docs.aws.amazon.com/bedrock/latest/userguide/guardrails.html",
+  "Remediation": {
+    "Code": {
+      "CLI": "aws bedrock put-guardrails-configuration --guardrails-config 'sensitiveInformationFilter=true'",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/Bedrock/guardrails-with-pii-mask-block.html",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "为 Amazon Bedrock 防护栏启用敏感信息过滤器，以防止敏感或机密信息的暴露。",
+      "Url": "https://docs.aws.amazon.com/bedrock/latest/userguide/guardrails-sensitive-filters.html"
+    }
+  },
+  "Categories": [
+    "gen-ai"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

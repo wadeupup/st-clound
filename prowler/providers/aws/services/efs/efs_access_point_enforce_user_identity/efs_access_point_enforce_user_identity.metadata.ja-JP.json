@@ -1,0 +1,46 @@
+{
+  "Provider": "aws",
+  "CheckID": "efs_access_point_enforce_user_identity",
+  "CheckTitle": "EFS ファイルシステムのすべてのアクセスポイントに定義された POSIX ユーザーがある",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Effects/Data Exposure",
+    "TTPs/Privilege Escalation"
+  ],
+  "ServiceName": "efs",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsEfsAccessPoint",
+  "ResourceGroup": "storage",
+  "Description": "**Amazon EFS アクセスポイント** は、定義された **POSIX ユーザー**（`uid`、`gid`、オプションのセカンダリグループ）について評価されます。このチェックは、ファイルシステム上の各アクセスポイントを検査し、POSIX ユーザーアイデンティティが設定されていないアクセスポイントをフラグ付けします。",
+  "Risk": "強制された **POSIX アイデンティティ** がないと、NFS クライアントは任意の UID/GID を提供でき、なりすまし、不正な読み取り/書き込み、および所有権のスプーフィングを可能にします。これにより、共有データの **機密性** と **整合性** が損なわれ、ファイルシステムを共有するアプリケーション間での **横方向の移動** が可能になる可能性があります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/efs/latest/ug/efs-access-points.html",
+    "https://repost.aws/knowledge-center/efs-access-points-directory-access",
+    "https://www.plerion.com/cloud-knowledge-base/efs-access-points-should-be-configured-to-enforce-a-user-identity",
+    "https://docs.aws.amazon.com/efs/latest/ug/enforce-identity-access-points.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/efs-controls.html#efs-4"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\nResources:\n  ExampleAccessPoint:\n    Type: AWS::EFS::AccessPoint\n    Properties:\n      FileSystemId: \"<example_resource_id>\"\n      PosixUser:               # Critical: enforces a POSIX user for all requests via this access point\n        Uid: \"<uid>\"          # Critical: POSIX user ID enforced\n        Gid: \"<gid>\"          # Critical: POSIX group ID enforced\n```",
+      "Other": "1. AWS コンソールで、Amazon EFS > アクセスポイントに移動します\n2. アクセスポイントを作成をクリックし、ファイルシステムを選択し、POSIX ユーザーを設定します：ユーザー ID とグループ ID を入力します\n3. アクセスポイントを作成をクリックします\n4. クライアントを更新して、新しいアクセスポイント ID を使用してマウントします\n5. POSIX ユーザーがない古いアクセスポイントを削除します",
+      "Terraform": "```hcl\nresource \"aws_efs_access_point\" \"example\" {\n  file_system_id = \"<example_resource_id>\"\n\n  # Critical: enforces a POSIX user for all requests via this access point\n  posix_user {\n    uid = 1000  # Critical: user ID enforced\n    gid = 1000  # Critical: group ID enforced\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "最小権限の `uid`/`gid`（`0` を避ける）を使用して、各アクセスポイントで **POSIX ユーザーアイデンティティ** を強制します。アプリケーションごとに専用のアクセスポイントと最小限のグループを使用して **職務の分離** を適用します。**IAM** を使用してアクセスポイントの使用を要求し、制限されたルートディレクトリを強制することで **多層防御** を追加します。",
+      "Url": "https://hub.prowler.com/check/efs_access_point_enforce_user_identity"
+    }
+  },
+  "Categories": [
+    "identity-access"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

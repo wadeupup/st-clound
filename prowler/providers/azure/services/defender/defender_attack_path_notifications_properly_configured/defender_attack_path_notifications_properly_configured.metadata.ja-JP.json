@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "defender_attack_path_notifications_properly_configured",
+  "CheckTitle": "攻撃経路のメール通知が有効化され、最小リスク レベルが設定されていることを確認する",
+  "CheckType": [],
+  "ServiceName": "defender",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AzureEmailNotifications",
+  "ResourceGroup": "monitoring",
+  "Description": "Azure サブスクリプションで特定された攻撃経路について、適切な最小リスク レベルでメール通知を送信するよう Microsoft Defender for Cloud が構成されていることを確認します。",
+  "Risk": "攻撃経路通知が有効化されていない場合、悪用可能な攻撃シーケンスをセキュリティ チームが迅速に把握できず、緩和対応の遅延や潜在的な侵害リスクが高まる可能性があります。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/defender-for-cloud/configure-email-notifications",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://learn.microsoft.com/en-us/azure/defender-for-cloud/configure-email-notifications",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "Microsoft Defender for Cloud で攻撃経路のメール通知を有効化し、潜在的な攻撃経路が特定された際にセキュリティ チームへ通知されるようにしてください。最小リスク レベルは組織要件に合わせて設定してください。",
+      "Url": "https://learn.microsoft.com/en-us/azure/defender-for-cloud/configure-email-notifications"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

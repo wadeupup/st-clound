@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "vm_sufficient_daily_backup_retention_period",
+  "CheckTitle": "Azure 仮想マシンに十分な日次バックアップ保持期間が設定されていることを確認する。",
+  "CheckType": [],
+  "ServiceName": "vm",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Microsoft.Compute/virtualMachines",
+  "ResourceGroup": "compute",
+  "Description": "Azure 仮想マシンに十分な日次バックアップ保持期間が設定されていることを確認します。",
+  "Risk": "Azure 仮想マシンに最適な日次バックアップ保持期間を設定することで、組織が推進するコンプライアンス規制で定められたベストプラクティスに沿ったバックアップ戦略を実施できます。VM バックアップをより長期間保持することで、障害発生時のデータ復元プロセスをより効率的に実行できます。",
+  "RelatedUrl": "https://docs.microsoft.com/en-us/azure/backup/backup-azure-vms-introduction",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/VirtualMachines/sufficient-backup-retention-period.html",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "各 VM のバックアップポリシーで、日次バックアップ保持期間を組織の最小要件を満たす、またはそれ以上に設定してください。",
+      "Url": "https://docs.microsoft.com/en-us/azure/backup/backup-azure-vms-introduction"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

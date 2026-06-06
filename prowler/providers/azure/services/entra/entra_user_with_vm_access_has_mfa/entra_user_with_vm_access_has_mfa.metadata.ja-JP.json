@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "entra_user_with_vm_access_has_mfa",
+  "CheckTitle": "MFA が有効な ID のみが特権仮想マシンへアクセスできることを確認する",
+  "CheckType": [],
+  "ServiceName": "entra",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "#microsoft.graph.users",
+  "ResourceGroup": "IAM",
+  "Description": "MFA なしで、別個のログイン資格情報を用いて特権仮想マシンにログインできる ID を検証します。攻撃者はそのアクセスを悪用してラテラル ムーブメントを行い、仮想マシンのマネージド ID で操作を実行する可能性があります。仮想マシンには必要最小限の権限のみを付与し、最小権限の原則に従って管理者レベル権限を取り消してください。",
+  "Risk": "マネージド ディスクは既定で基盤ハードウェア上で暗号化されているため、基本保護に追加暗号化は不要です。追加暗号化が必要な場合は利用可能です。マネージド ディスクは設計上、ストレージ アカウントよりも耐障害性があります。ARM でデプロイされた仮想マシンについて、Azure Advisor は将来的にセキュリティおよびコスト管理の観点から VHD をマネージド ディスクへ移行することを推奨します。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "1. Azure portal にログインします。仮想マシンに関連付けられたマネージド ID のアクセス権を削減します。2. これは、ユーザーへの MFA 有効化、ユーザーアクセスの削除、または次で対処できます。• ケース I：仮想マシンへアクセス可能なユーザーに MFA を有効化。1. 左ペインから Azure AD に移動し、Manage セクションで Users を選択します。2. 上部メニューの Per-User MFA をクリックし、MULTI-FACTOR AUTH STATUS が Disabled で仮想マシンへログイン可能な各ユーザーを選択します。 右側の quick steps で enable を選択します。 enable multi-factor auth をクリックし、必要に応じて MFA を設定するためのリンクをユーザーへ共有します。• ケース II：仮想マシンへのユーザーアクセスを削除。1. Subscription を選択し、Access control (IAM) をクリックします。2. Role assignments を選択し、Virtual Machine Administrator Login、Virtual Machine User Login、または仮想マシンへのログイン権限を持つロールを検索します。3. Role Name をクリックし、Assignments を選択して、MFA 未構成の ID を削除します。• ケース III：仮想マシンに関連付けられたマネージド ID のアクセスを削減。1. Subscription を選択し、Access control (IAM) をクリックします。2. 上部メニューの Role Assignments を選択し、Assignment type を Privileged administrator roles、Type を Virtual Machines でフィルターします。3. Role Name をクリックし、Assignments を選択して ID アクセスを削除し、最小権限の原則に従っていることを確認します。",
+      "Url": ""
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "この推奨事項の実装には Azure AD P2 ライセンスが必要です。仮想マシンにプロビジョニングされる ID には RBAC/ABAC グループを利用し、Azure PIM でロール割り当てを行い、ロール設定で MFA を必須にするか、仮想マシンアクセスに別の PAM ソリューション（例: CyberArk）を使用してください。"
+}

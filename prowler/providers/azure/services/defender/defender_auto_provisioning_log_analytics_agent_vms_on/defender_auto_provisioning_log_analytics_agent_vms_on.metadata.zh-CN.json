@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "defender_auto_provisioning_log_analytics_agent_vms_on",
+  "CheckTitle": "确保“适用于 Azure VM 的 Log Analytics 代理”的自动预配设置为“开启”",
+  "CheckType": [],
+  "ServiceName": "defender",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AzureDefenderPlan",
+  "ResourceGroup": "security",
+  "Description": "确保“适用于 Azure VM 的 Log Analytics 代理”的自动预配设置为“开启”。Microsoft Monitoring Agent 会扫描多种与安全相关的配置和事件，例如系统更新、操作系统漏洞、终端防护，并提供告警。",
+  "Risk": "可能会缺失有关 Azure VM 的关键安全信息，例如安全告警、安全建议和变更跟踪。",
+  "RelatedUrl": "https://docs.microsoft.com/en-us/azure/security-center/security-center-data-security",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity-staging/knowledge-base/azure/SecurityCenter/automatic-provisioning-of-monitoring-agent.html",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "确保对潜在安全漏洞具备全面可见性，包括缺失更新、操作系统安全设置配置错误以及活动威胁，从而能够及时缓解风险并提升整体安全态势",
+      "Url": "https://learn.microsoft.com/en-us/azure/defender-for-cloud/monitoring-components"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

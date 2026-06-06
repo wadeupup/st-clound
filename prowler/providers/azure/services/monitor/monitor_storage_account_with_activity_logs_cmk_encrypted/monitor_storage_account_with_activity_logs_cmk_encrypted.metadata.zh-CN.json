@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "monitor_storage_account_with_activity_logs_cmk_encrypted",
+  "CheckTitle": "确保包含活动日志容器的存储账户使用客户管理密钥加密",
+  "CheckType": [],
+  "ServiceName": "monitor",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Monitor",
+  "ResourceGroup": "monitoring",
+  "Description": "包含活动日志导出的存储账户可配置为使用客户管理密钥（CMK）。",
+  "Risk": "将活动日志导出容器所在存储账户配置为使用 CMK，可为日志数据提供额外机密性控制。因为用户不仅需要对应存储账户的读取权限，还必须被 CMK 授予解密权限。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/security/benchmark/azure/security-controls-v3-data-protection#dp-5-encrypt-sensitive-data-at-rest",
+  "Remediation": {
+    "Code": {
+      "CLI": "az storage account update --name <name of the storage account> --resource-group <resource group for a storage account> --encryption-key-source=Microsoft.Keyvault --encryption-key-vault <Key Vault URI> --encryption-key-name <KeyName> --encryption-key-version <Key Version>",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity-staging/knowledge-base/azure/Monitor/use-cmk-for-activity-log-storage-container-encryption.html",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-general-policies/ensure-that-storage-accounts-use-customer-managed-key-for-encryption#terraform"
+    },
+    "Recommendation": {
+      "Text": "1. 进入 Activity log。2. 选择 Export。3. 选择 Subscription。4. 在 Storage Account 区域记录存储账户名称。5. 关闭 Export Audit Logs 页面，再关闭 Monitor - Activity Log 页面。6. 在右侧栏点击 Storage Accounts 服务进入存储账户页面。7. 点击步骤 4 记录的存储账户名称，打开该账户详情页面。8. 在 Security + networking 下点击 Encryption。9. 确保已选择 Customer-managed keys，并设置了 Key URI。",
+      "Url": "https://learn.microsoft.com/en-us/azure/azure-monitor/essentials/activity-log?tabs=cli#managing-legacy-log-profiles"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "注意：你必须先完成 Key Vault 的相关配置才能使用此能力。所有审计日志将使用你提供的密钥进行加密。你需要单独配置客户管理密钥，并按此处说明选择要使用的密钥。你需要自行负责密钥生命周期管理，并按自行确定的周期手动轮换密钥以保持数据安全。"
+}

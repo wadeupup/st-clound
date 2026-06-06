@@ -1,0 +1,44 @@
+{
+  "Provider": "aws",
+  "CheckID": "kms_key_not_publicly_accessible",
+  "CheckTitle": "Cloud KMS 密钥不授予 allUsers 或 allAuthenticatedUsers 访问权限",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践",
+    "行业和法规标准/AWS 基础安全最佳实践",
+    "TTPs/初始访问/未经授权的访问",
+    "影响/数据暴露"
+  ],
+  "ServiceName": "kms",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "critical",
+  "ResourceType": "AwsKmsKey",
+  "ResourceGroup": "security",
+  "Description": "**KMS 密钥**在密钥策略或授权中被评估为**过度访问**，包括 `*` 主体和广泛范围的多个身份权限。",
+  "Risk": "对**KMS 密钥**的广泛访问可能导致未经授权的 `kms:Decrypt` 和数据密钥生成，破坏**机密性**。拥有管理员权限的攻击者可以更改策略或计划删除，削弱控制的**完整性**并威胁依赖于密钥的数据的**可用性**。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/gcp/CloudKMS/publicly-accessible-kms-cryptokeys.html",
+    "https://support.icompaas.com/support/solutions/articles/62000232904-1-9-ensure-cloud-kms-cryptokeys-are-not-accessible-to-anonymous-or-public-users-automated-",
+    "https://docs.aws.amazon.com/kms/latest/developerguide/determining-access.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws kms put-key-policy --key-id <example_resource_id> --policy-name default --policy '{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::<account_id>:root\"},\"Action\":\"kms:*\",\"Resource\":\"*\"}]}'",
+      "NativeIaC": "```yaml\n# CloudFormation：将 KMS 密钥策略限制为账户根（移除任何公共访问）\nResources:\n  <example_resource_name>:\n    Type: AWS::KMS::Key\n    Properties:\n      KeyPolicy:\n        Version: '2012-10-17'\n        Statement:\n          - Effect: Allow\n            Principal:\n              AWS: arn:aws:iam::<account_id>:root  # 关键：只有账户根可以访问；防止公共 \"*\" 主体\n            Action: kms:*\n            Resource: '*'\n```",
+      "Other": "1. 打开 AWS 控制台 > 密钥管理服务 (KMS)\n2. 选择受影响的密钥并转到密钥策略选项卡\n3. 点击编辑并移除任何主体设置为 \"*\" (或 AWS: \"*\") 的语句\n4. 确保存在仅允许 arn:aws:iam::<account_id>:root 的语句\n5. 保存更改",
+      "Terraform": "```hcl\n# 将 KMS 密钥策略限制为账户根以避免任何公共（\"*\"）主体\ndata \"aws_caller_identity\" \"current\" {}\n\nresource \"aws_kms_key\" \"<example_resource_name>\" {\n  policy = jsonencode({\n    Version   = \"2012-10-17\"\n    Statement = [\n      {\n        Effect    = \"Allow\"\n        Principal = { AWS = \"arn:aws:iam::${data.aws_caller_identity.current.account_id}:root\" } # 关键：限制为账户根以移除公共访问\n        Action    = \"kms:*\"\n        Resource  = \"*\"\n      }\n    ]\n  })\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "对 KMS 密钥应用**最小权限**：\n- 将主体限制为特定角色和账户\n- 优先使用狭窄的、时间限制的授权\n- 将密钥管理与使用分开\n- 使用条件限制上下文\n- 定期审查并移除通配符或跨账户暴露",
+      "Url": "https://hub.prowler.com/check/kms_key_not_publicly_accessible"
+    }
+  },
+  "Categories": [
+    "internet-exposed",
+    "identity-access"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

@@ -1,0 +1,48 @@
+{
+  "Provider": "aws",
+  "CheckID": "cloudwatch_log_metric_filter_sign_in_without_mfa",
+  "CheckTitle": "已为未使用 MFA 的管理控制台登录配置 CloudWatch 日志度量过滤器和告警",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/CIS AWS Foundations Benchmark",
+    "TTPs/Initial Access",
+    "Unusual Behaviors/User"
+  ],
+  "ServiceName": "cloudwatch",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsCloudWatchAlarm",
+  "ResourceGroup": "monitoring",
+  "Description": "CloudWatch 中的 **CloudTrail 日志** 会被检查是否存在用于检测控制台登录的度量过滤器和告警，其中 `$.eventName = ConsoleLogin` 且 `$.additionalEventData.MFAUsed != \\\"Yes\\\"`。\n\n该检查反映是否对未使用 **MFA** 的登录配置了告警。",
+  "Risk": "如果缺少对未使用 MFA 的控制台登录的告警，成功利用被盗密码的行为可能**无法被发现**，从而导致：\n- 未经授权的控制台访问和 IAM 变更\n- 数据外泄或删除\n\n影响：导致**机密性**和**完整性**丧失，并可能引发**可用性**中断。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudwatch-alarms-for-cloudtrail.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/CloudWatchLogs/console-sign-in-without-mfa.html",
+    "https://www.tenable.com/audits/items/CIS_Amazon_Web_Services_Foundations_v3.0.0_L1.audit:1957056ee174cc38502d5f5f1864333b",
+    "https://www.clouddefense.ai/compliance-rules/gdpr/data-protection/log-metric-filter-console-login-mfa",
+    "https://www.intelligentdiscovery.io/controls/cloudwatch/cloudwatch-alarm-no-mfa",
+    "https://support.icompaas.com/support/solutions/articles/62000083605-ensure-a-log-metric-filter-and-alarm-exist-for-management-console-sign-in-without-mfa"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation：为未使用 MFA 的控制台登录创建度量过滤器和告警\nResources:\n  NoMFAConsoleSigninMetricFilter:\n    Type: AWS::Logs::MetricFilter\n    Properties:\n      LogGroupName: \"<example_resource_name>\"\n      FilterPattern: '{ ($.eventName = \"ConsoleLogin\") && ($.additionalEventData.MFAUsed != \"Yes\") }' # 关键：检测未使用 MFA 的 ConsoleLogin 事件\n      MetricTransformations:\n        - MetricName: \"<example_resource_name>\"\n          MetricNamespace: \"<example_resource_name>\"\n          MetricValue: \"1\"  # 关键：每次匹配都会发出一个度量\n\n  NoMFAConsoleSigninAlarm:\n    Type: AWS::CloudWatch::Alarm\n    Properties:\n      MetricName: \"<example_resource_name>\"   # 关键：告警使用过滤器产生的度量\n      Namespace: \"<example_resource_name>\"\n      ComparisonOperator: GreaterThanOrEqualToThreshold\n      EvaluationPeriods: 1\n      Period: 300\n      Statistic: Sum\n      Threshold: 1  # 关键：在首次出现时触发告警\n```",
+      "Other": "1. 在 AWS 控制台中，进入 CloudWatch > Logs > Log groups 并打开 CloudTrail 日志组\n2. 转到 Metric filters > Create metric filter\n3. 将 Filter pattern 设置为：{ ($.eventName = \"ConsoleLogin\") && ($.additionalEventData.MFAUsed != \"Yes\") }\n4. 点击 Next，设置 Filter name、Metric namespace、Metric name，将 Metric value 设置为 1，然后创建度量过滤器\n5. 选中新建的过滤器 > Create alarm\n6. 设置 Statistic = Sum，Period = 5 minutes，Threshold type = Static，Threshold = 1，Whenever >= 1；Next\n7. 如不需要可跳过动作，给告警命名并创建告警",
+      "Terraform": "```hcl\n# 为未使用 MFA 的控制台登录创建度量过滤器\nresource \"aws_cloudwatch_log_metric_filter\" \"nomfa\" {\n  name           = \"<example_resource_name>\"\n  log_group_name = \"<example_resource_name>\"\n  pattern        = \"{ ($.eventName = \\\"ConsoleLogin\\\") && ($.additionalEventData.MFAUsed != \\\"Yes\\\") }\"  # 关键：检测未使用 MFA 的 ConsoleLogin\n\n  metric_transformation {\n    name      = \"<example_resource_name>\"\n    namespace = \"<example_resource_name>\"\n    value     = \"1\"  # 关键：每次匹配计数 1\n  }\n}\n\n# 针对上述度量的告警\nresource \"aws_cloudwatch_metric_alarm\" \"nomfa\" {\n  alarm_name          = \"<example_resource_name>\"\n  metric_name         = aws_cloudwatch_log_metric_filter.nomfa.metric_transformation[0].name  # 关键：将告警绑定到该度量\n  namespace           = aws_cloudwatch_log_metric_filter.nomfa.metric_transformation[0].namespace\n  comparison_operator = \"GreaterThanOrEqualToThreshold\"\n  evaluation_periods  = 1\n  period              = 300\n  statistic           = \"Sum\"\n  threshold           = 1  # 关键：首个事件即触发告警\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "对所有具备控制台访问能力的身份强制启用 **MFA**，并保持对 `ConsoleLogin` 且 `MFAUsed != \\\"Yes\\\"` 事件的告警。\n\n应用**最小权限原则**，将告警路由到受监控的渠道，并针对 SSO 场景进行调优以减少噪音。定期测试告警，将其覆盖范围审查纳入**纵深防御**的一部分。",
+      "Url": "https://hub.prowler.com/check/cloudwatch_log_metric_filter_sign_in_without_mfa"
+    }
+  },
+  "Categories": [
+    "logging"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "日志记录与监控"
+}
+
+

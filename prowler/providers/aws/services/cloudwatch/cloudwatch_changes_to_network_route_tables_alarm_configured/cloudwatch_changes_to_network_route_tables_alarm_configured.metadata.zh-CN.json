@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "cloudwatch_changes_to_network_route_tables_alarm_configured",
+  "CheckTitle": "账号使用 CloudWatch Logs 指标过滤器和警报监控 VPC 路由表更改",
+  "CheckType": [
+    "Software and Configuration Checks/Industry and Regulatory Standards/CIS AWS Foundations Benchmark",
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "TTPs/Defense Evasion",
+    "Effects/Data Exfiltration"
+  ],
+  "ServiceName": "cloudwatch",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsCloudWatchAlarm",
+  "ResourceGroup": "monitoring",
+  "Description": "通过 **CloudWatch Logs 指标过滤器** 及其关联的 **警报**，从 **CloudTrail 日志** 中捕获 **VPC 路由表更改**，包括 `CreateRoute`、`CreateRouteTable`、`ReplaceRoute`、`ReplaceRouteTableAssociation`、`DeleteRoute`、`DeleteRouteTable` 和 `DisassociateRouteTable` 等事件。",
+  "Risk": "如果不监控 **路由表更改**，未经授权或意外的编辑可能重定向流量、绕过检查或造成路由黑洞，影响 **机密性**（数据外泄）、**完整性**（路径被篡改）和 **可用性**（错误路由导致中断）。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudwatch-alarms-for-cloudtrail.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation: Metric filter + alarm for VPC route table changes\nResources:\n  RouteTableChangeMetricFilter:\n    Type: AWS::Logs::MetricFilter\n    Properties:\n      LogGroupName: \"<example_resource_name>\"\n      # CRITICAL: Detect EC2 route table change events in CloudTrail logs\n      # Includes eventSource and the required eventNames\n      FilterPattern: '{($.eventSource = ec2.amazonaws.com) && (($.eventName = CreateRoute) || ($.eventName = CreateRouteTable) || ($.eventName = ReplaceRoute) || ($.eventName = ReplaceRouteTableAssociation) || ($.eventName = DeleteRouteTable) || ($.eventName = DeleteRoute) || ($.eventName = DisassociateRouteTable))}'\n      MetricTransformations:\n        - MetricValue: \"1\"\n          MetricNamespace: \"<example_resource_name>\"\n          MetricName: \"<example_resource_name>\"\n\n  RouteTableChangeAlarm:\n    Type: AWS::CloudWatch::Alarm\n    Properties:\n      # CRITICAL: Alarm on the metric from the filter above\n      Namespace: \"<example_resource_name>\"\n      MetricName: \"<example_resource_name>\"\n      ComparisonOperator: GreaterThanOrEqualToThreshold\n      EvaluationPeriods: 1\n      Period: 300\n      Statistic: Sum\n      Threshold: 1\n```",
+      "Other": "1. 在 AWS 控制台中，打开 CloudWatch > 日志组并选择 CloudTrail 日志组\n2. 转到“指标过滤器”>“创建指标过滤器”\n3. 将过滤器模式设置为：\n   {($.eventSource = ec2.amazonaws.com) && (($.eventName = CreateRoute) || ($.eventName = CreateRouteTable) || ($.eventName = ReplaceRoute) || ($.eventName = ReplaceRouteTableAssociation) || ($.eventName = DeleteRouteTable) || ($.eventName = DeleteRoute) || ($.eventName = DisassociateRouteTable))}\n4. 为指标命名并将指标值设置为 1；选择任意命名空间/名称\n5. 创建过滤器\n6. 在过滤器上点击“创建警报”\n7. 设置统计：总和，周期：5 分钟，阈值类型：静态，阈值：1，触发条件：大于/等于\n8. 创建警报（通知可选）",
+      "Terraform": "```hcl\n# Metric filter + alarm for VPC route table changes\nresource \"aws_cloudwatch_log_metric_filter\" \"routes\" {\n  name           = \"<example_resource_name>\"\n  log_group_name = \"<example_resource_name>\"\n  # CRITICAL: Detect EC2 route table change events in CloudTrail logs\n  pattern = \"{($.eventSource = ec2.amazonaws.com) && (($.eventName = CreateRoute) || ($.eventName = CreateRouteTable) || ($.eventName = ReplaceRoute) || ($.eventName = ReplaceRouteTableAssociation) || ($.eventName = DeleteRouteTable) || ($.eventName = DeleteRoute) || ($.eventName = DisassociateRouteTable))}\"\n\n  metric_transformation {\n    name      = \"<example_resource_name>\"\n    namespace = \"<example_resource_name>\"\n    value     = \"1\"\n  }\n}\n\nresource \"aws_cloudwatch_metric_alarm\" \"routes\" {\n  alarm_name          = \"<example_resource_name>\"\n  # CRITICAL: Alarm targets the metric from the filter above\n  metric_name         = \"<example_resource_name>\"\n  namespace           = \"<example_resource_name>\"\n  comparison_operator = \"GreaterThanOrEqualToThreshold\"\n  evaluation_periods  = 1\n  period              = 300\n  statistic           = \"Sum\"\n  threshold           = 1\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "在 CloudTrail 之上实现 **CloudWatch Logs 指标过滤器和警报** 来监控这些路由表事件，并通知响应人员。对路由修改实施 **最小权限原则**，要求 **变更控制**，并结合 VPC Flow Logs 和防护栏实施 **纵深防御**，以预防并快速遏制不安全的路由更改。",
+      "Url": "https://hub.prowler.com/check/cloudwatch_changes_to_network_route_tables_alarm_configured"
+    }
+  },
+  "Categories": [
+    "logging"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+
+

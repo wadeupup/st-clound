@@ -1,0 +1,33 @@
+{
+  "Provider": "aws",
+  "CheckID": "s3_bucket_lifecycle_enabled",
+  "CheckTitle": "检查 S3 存储桶是否已启用生命周期配置",
+  "CheckType": [
+    "AWS 基础安全最佳实践"
+  ],
+  "ServiceName": "s3",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:s3:::bucket_name",
+  "Severity": "low",
+  "ResourceType": "AwsS3Bucket",
+  "ResourceGroup": "storage",
+  "Description": "检查 S3 存储桶是否已启用生命周期配置。",
+  "Risk": "未为 S3 存储桶启用生命周期管理的风险包括更高的存储成本、未受管理的数据保留以及可能不符合数据策略。",
+  "RelatedUrl": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lifecycle-mgmt.html",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://docs.aws.amazon.com/securityhub/latest/userguide/s3-controls.html#s3-13",
+      "Terraform": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/S3/lifecycle-configuration.html"
+    },
+    "Recommendation": {
+      "Text": "在您的 S3 存储桶上启用生命周期策略，以自动管理数据的转换和过期。",
+      "Url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/how-to-set-lifecycle-configuration-intro.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

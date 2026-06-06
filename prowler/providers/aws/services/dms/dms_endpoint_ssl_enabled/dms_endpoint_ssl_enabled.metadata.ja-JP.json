@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "dms_endpoint_ssl_enabled",
+  "CheckTitle": "DMS エンドポイントで SSL が有効になっている",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Effects/Data Exposure"
+  ],
+  "ServiceName": "dms",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsDmsEndpoint",
+  "ResourceGroup": "database",
+  "Description": "**AWS DMS エンドポイント**の SSL/TLS モードが検査されます。`none` 以外の値は、レプリケーションインスタンスとデータベース間の暗号化された接続を示します。\n\nサポートされているモードには、`require`、`verify-ca`、`verify-full` が含まれます。",
+  "Risk": "TLS がない場合、転送中のデータが読み取られたり改ざんされたりする可能性があり、以下に影響します：\n- **機密性**：パケットスニッフィングと認証情報の漏洩による\n- **完全性**：**中間者攻撃**による移行ストリームの改ざん\n- **可用性**：セッションハイジャックまたはタスクの中断",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://aws.amazon.com/blogs/database/configuring-ssl-encryption-on-oracle-and-postgresql-endpoints-in-aws-dms/",
+    "https://docs.aws.amazon.com/dms/latest/userguide/CHAP_Security.SSL.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/dms-controls.html#dms-9"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws dms modify-endpoint --endpoint-arn <endpoint-arn> --ssl-mode require",
+      "NativeIaC": "```yaml\n# CloudFormation: DMS エンドポイントで SSL を設定\nResources:\n  <example_resource_name>:\n    Type: AWS::DMS::Endpoint\n    Properties:\n      EndpointIdentifier: <example_resource_name>\n      EndpointType: source\n      EngineName: sqlserver\n      ServerName: <server_name>\n      Port: 1433\n      Username: <username>\n      Password: <password>\n      SslMode: require  # 重要：SSL を有効にする（\"none\" ではない）、この検出を修正\n```",
+      "Other": "1. AWS DMS コンソールで、エンドポイントに移動\n2. 非準拠のエンドポイントを選択し、変更を選択\n3. SSL モードを Require に設定（エンジンでサポートされており、証明書が利用可能な場合は、Verify-ca/Verify-full も選択可能）\n4. Verify-ca/Verify-full が選択されている場合、適切な CA 証明書を選択\n5. 変更を保存し、接続をテストして確認",
+      "Terraform": "```hcl\n# Terraform: DMS エンドポイントで SSL を設定\nresource \"aws_dms_endpoint\" \"<example_resource_name>\" {\n  endpoint_id   = \"<example_resource_name>\"\n  endpoint_type = \"source\"\n  engine_name   = \"sqlserver\"\n  server_name   = \"<server_name>\"\n  port          = 1433\n  username      = \"<username>\"\n  password      = \"<password>\"\n\n  ssl_mode = \"require\" # 重要：SSL を有効にする（\"none\" ではない）、この検出を修正\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "エンドポイントを少なくとも `require` の SSL/TLS を使用するように設定します。サポートされている場合は、`verify-ca` または `verify-full` を優先します。信頼できる CA マテリアルを管理し、定期的にローテーションします。プライベート接続と厳格な IAM で**多層防御**を適用し、ポリシー即コードと継続的な検証を通じてこのポスチャを強制します。",
+      "Url": "https://hub.prowler.com/check/dms_endpoint_ssl_enabled"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

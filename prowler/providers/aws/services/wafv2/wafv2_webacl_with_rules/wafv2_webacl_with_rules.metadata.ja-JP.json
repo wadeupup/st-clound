@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "wafv2_webacl_with_rules",
+  "CheckTitle": "AWS WAFv2 Web ACL には少なくとも 1 つのルールまたはルールグループが関連付けられています",
+  "CheckType": [
+    "ソフトウェアと構成チェック/AWSセキュリティのベストプラクティス",
+    "ソフトウェアと設定のチェック/業界および規制基準/AWS 基盤セキュリティのベストプラクティス",
+    "ソフトウェアおよび設定のチェック／業界および規制基準／NIST 800-53 管理策"
+  ],
+  "ServiceName": "wafv2",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsWafv2WebAcl",
+  "ResourceGroup": "security",
+  "Description": "**AWS WAFv2 web ACL** は、HTTP(S) リクエストがどのように検査され、処理されるかを定義する、少なくとも 1 つの設定済み **rule** または **rule group** の存在について評価されます。",
+  "Risk": "ルールがない場合、トラフィックは web ACL の `DefaultAction` のみによって制御され、多くの場合、検査なしでリクエストを許可してしまいます。これにより、**機密性**（インジェクションによるデータ流出）、**完全性**（XSS/パラメータ改ざん）、および **可用性**（レイヤー7 DDoS、ボット悪用）に対するリスクが高まります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/waf/latest/developerguide/web-acl-editing.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/waf-controls.html#waf-10",
+    "https://support.icompaas.com/support/solutions/articles/62000233642-ensure-aws-wafv2-webacl-has-at-least-one-rule-or-rule-group"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation: WAFv2 WebACL に少なくとも 1 つのルールを追加する\nResources:\n  <example_resource_name>:\n    Type: AWS::WAFv2::WebACL\n    Properties:\n      Scope: REGIONAL\n      DefaultAction:\n        Allow: {}\n      VisibilityConfig:\n        SampledRequestsEnabled: true\n        CloudWatchMetricsEnabled: true\n        MetricName: <example_resource_name>\n      Rules:  # 重大: ここにルール/ルールグループを追加すると、Web ACL が空でなくなるため、この検出結果は修正されます\n        - Name: <example_rule_name>\n          Priority: 0\n          Statement:\n            ManagedRuleGroupStatement:\n              VendorName: AWS\n              Name: AWSManagedRulesCommonRuleSet  # AWS マネージドルールグループを使用する\n          OverrideAction:\n            Count: {}  # 影響を最小限に抑えるため、非ブロッキング\n          VisibilityConfig:\n            SampledRequestsEnabled: true\n            CloudWatchMetricsEnabled: true\n            MetricName: <example_rule_name>\n```",
+      "Other": "1. AWS コンソールで、AWS WAF に移動します\n2. Web ACLs を開き、失敗している Web ACL を選択します\n3. Rules タブに移動し、Add rules をクリックします\n4. Add managed rule group を選択し、AWS > AWSManagedRulesCommonRuleSet を選択します\n5. アクションを Count（ブロックを避けるため）に設定し、次に Add rule と Save をクリックします\n6. Web ACL に少なくとも 1 つのルールが表示されていることを確認します",
+      "Terraform": "```hcl\n# Terraform: WAFv2 Web ACL に少なくとも 1 つのルールがあることを確認する\nresource \"aws_wafv2_web_acl\" \"<example_resource_name>\" {\n  name  = \"<example_resource_name>\"\n  scope = \"REGIONAL\"\n\n  default_action {\n    allow {}\n  }\n\n  visibility_config {\n    cloudwatch_metrics_enabled = true\n    metric_name                = \"<example_resource_name>\"\n    sampled_requests_enabled   = true\n  }\n\n  rule { # 重大: このルールが存在すると、Web ACL が空ではなくなり、チェックに合格します\n    name     = \"<example_rule_name>\"\n    priority = 0\n    statement {\n      managed_rule_group_statement {\n        name        = \"AWSManagedRulesCommonRuleSet\"\n        vendor_name = \"AWS\"  # 最小限のマネージドルールグループ\n      }\n    }\n    override_action { count {} } # ノンブロッキング\n    visibility_config {\n      cloudwatch_metrics_enabled = true\n      metric_name                = \"<example_rule_name>\"\n      sampled_requests_enabled   = true\n    }\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "各 web ACL に、最小権限の Web アクセスを実施するための、対象を絞ったルールまたはマネージドルールグループを設定します。一般的な攻撃（SQLi/XSS）、IP レピュテーション、レート制限を対象とし、アプリに合わせてスコープを設定します。保守的な `DefaultAction` を使用し、メトリクス/ログを監視し、継続的にチューニングします。これは、**多層防御** と **ゼロトラスト** を支えるものです。",
+      "Url": "https://hub.prowler.com/check/wafv2_webacl_with_rules"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

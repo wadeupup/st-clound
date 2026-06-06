@@ -1,0 +1,36 @@
+{
+  "Provider": "aws",
+  "CheckID": "ec2_ami_public",
+  "CheckTitle": "EC2 AMI がパブリックに設定されていないことを確認",
+  "CheckType": [
+    "Infrastructure Security"
+  ],
+  "ServiceName": "ec2",
+  "SubServiceName": "ami",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "critical",
+  "ResourceType": "Other",
+  "ResourceGroup": "compute",
+  "Description": "EC2 AMI がパブリックに設定されていないことを確認",
+  "Risk": "AMI がパブリックにアクセス可能な場合、コミュニティ AMI で利用可能になり、AWS アカウントを持つすべてのユーザーがそれらを使用して EC2 インスタンスを起動できます。AMI にはアプリケーションのスナップショット（データを含む）が含まれている可能性があるため、この方法でスナップショットを公開することは推奨されません。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "aws ec2 modify-image-attribute --region <REGION> --image-id <EC2_AMI_ID> --launch-permission {\"Remove\":[{\"Group\":\"all\"}]}",
+      "NativeIaC": "",
+      "Other": "https://docs.prowler.com/checks/aws/public-policies/public_8",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "EC2 AMI がパブリックにアクセス可能でないこと、または一般的にコミュニティ AMI で利用可能でないことを推奨します。",
+      "Url": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/cancel-sharing-an-AMI.html"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

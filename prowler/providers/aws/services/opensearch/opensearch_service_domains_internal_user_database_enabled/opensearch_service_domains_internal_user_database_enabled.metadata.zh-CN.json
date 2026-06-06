@@ -1,0 +1,39 @@
+{
+  "Provider": "aws",
+  "CheckID": "opensearch_service_domains_internal_user_database_enabled",
+  "CheckTitle": "Amazon OpenSearch Service 域已禁用内部用户数据库",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践"
+  ],
+  "ServiceName": "opensearch",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsOpenSearchServiceDomain",
+  "ResourceGroup": "database",
+  "Description": "**Amazon OpenSearch Service 域**会针对**内部用户数据库**设置 (`InternalUserDatabaseEnabled`) 进行评估。此发现标识依赖内置 HTTP 基本用户而非外部身份提供者的域。",
+  "Risk": "启用的内部用户数据库会导致**凭证扩散**和弱**账户生命周期**。缺少集中化的 MFA、轮换和撤销会增加未经授权访问的风险，影响**机密性**和**完整性**。\n\n暴露端点上的基本认证简化了暴力破解并降低了**可审计性**。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/fgac.html",
+    "https://docs.aws.amazon.com/opensearch-service/latest/developerguide/fgac.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws opensearch update-domain-config --domain-name <example_resource_name> --advanced-security-options '{\"InternalUserDatabaseEnabled\":false}'",
+      "NativeIaC": "```yaml\n# CloudFormation：为域禁用内部用户数据库\nResources:\n  <example_resource_name>:\n    Type: AWS::OpenSearchService::Domain\n    Properties:\n      AdvancedSecurityOptions:\n        InternalUserDatabaseEnabled: false  # 关键：禁用内部用户数据库以通过检查\n```",
+      "Other": "1. 在 AWS 控制台中，转到 Amazon OpenSearch Service > 域\n2. 选择域并选择编辑安全配置\n3. 在细粒度访问控制下，关闭内部用户数据库\n4. 点击保存更改",
+      "Terraform": "```hcl\n# Terraform：为域禁用内部用户数据库\nresource \"aws_opensearch_domain\" \"<example_resource_name>\" {\n  domain_name = \"<example_resource_name>\"\n\n  advanced_security_options {\n    internal_user_database_enabled = false  # 关键：禁用内部用户数据库以通过检查\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "优先选择**联合身份验证**（IAM、SAML 或 Amazon Cognito），并禁用**内部用户数据库**。实施**最小权限**角色，要求**MFA**，集中化凭证轮换和离职管理，并记录访问。使用**VPC 访问**和限制性策略；避免使用 HTTP 基本认证以减少暴露。",
+      "Url": "https://hub.prowler.com/check/opensearch_service_domains_internal_user_database_enabled"
+    }
+  },
+  "Categories": [
+    "identity-access"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

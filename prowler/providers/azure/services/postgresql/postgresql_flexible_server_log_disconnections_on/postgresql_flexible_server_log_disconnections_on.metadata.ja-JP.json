@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "postgresql_flexible_server_log_disconnections_on",
+  "CheckTitle": "PostgreSQL Database Server のサーバー パラメーター 'log_disconnections' が 'ON' に設定されていることを確認する",
+  "CheckType": [],
+  "ServiceName": "postgresql",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "PostgreSQL",
+  "ResourceGroup": "database",
+  "Description": "PostgreSQL サーバーで log_disconnections を有効化します。",
+  "Risk": "log_disconnections を有効化すると、PostgreSQL Database はセッション終了（継続時間を含む）を記録でき、結果としてクエリ/エラー ログが生成されます。クエリ/エラー ログは、構成エラーや最適でないパフォーマンスの特定、トラブルシュート、修復に利用できます。",
+  "RelatedUrl": "https://docs.microsoft.com/en-us/rest/api/postgresql/singleserver/configurations/list-by-server",
+  "Remediation": {
+    "Code": {
+      "CLI": "az postgres server configuration set --resource-group <resourceGroupName> --server-name <serverName> --name log_disconnections --value on",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/PostgreSQL/log-disconnections.html",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "Azure Portal から 1. Azure Home で Portal Menu を選択します。2. Azure Database for PostgreSQL servers に移動します。3. 各データベースで Server parameters をクリックします。4. log_disconnections を検索します。5. ON をクリックして保存します。Azure CLI から log_disconnections 設定を更新するには次のコマンドを使用します。az postgres server configuration set --resource-group <resourceGroupName> -- server-name <serverName> --name log_disconnections --value on。PowerShell から log_disconnections 設定を更新するには次のコマンドを使用します。Update-AzPostgreSqlConfiguration -ResourceGroupName <ResourceGr",
+      "Url": "https://learn.microsoft.com/en-us/azure/postgresql/single-server/how-to-configure-server-parameters-using-portal"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "この設定を有効化すると、すべての切断がログに記録されます。高トラフィック サーバーで有効にすると、ログが指数的に増加する可能性があります。"
+}

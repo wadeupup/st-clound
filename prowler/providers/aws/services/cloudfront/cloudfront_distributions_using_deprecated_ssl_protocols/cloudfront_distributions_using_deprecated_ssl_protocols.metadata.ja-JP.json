@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "cloudfront_distributions_using_deprecated_ssl_protocols",
+  "CheckTitle": "CloudFrontディストリビューションがオリジン接続にSSLv3、TLSv1、またはTLSv1.1を使用していない",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices"
+  ],
+  "ServiceName": "cloudfront",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "low",
+  "ResourceType": "AwsCloudFrontDistribution",
+  "ResourceGroup": "network",
+  "Description": "CloudFrontディストリビューションのオリジンの`OriginSslProtocols`は、CloudFrontからオリジンへのHTTPS接続に**非推奨のSSL/TLSバージョン**（`SSLv3`、`TLSv1`、`TLSv1.1`）を許可しています。",
+  "Risk": "CloudFrontとオリジン間の弱いプロトコルにより、ダウングレードと既知のエクスプロイト（例：POODLE/BEAST）が可能になり、盗聴やコンテンツの改ざんが可能になります。これにより、転送中のデータの**機密性**と**整合性**が損なわれ、Cookie、資格情報、ビューアーに提供される応答が公開されます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/secure-connections-supported-viewer-protocols-ciphers.html",
+    "https://trendmicro.com/cloudoneconformity/knowledge-base/aws/CloudFront/cloudfront-insecure-origin-ssl-protocols.html",
+    "https://support.icompaas.com/support/solutions/articles/62000223404-ensure-cloudfront-distributions-are-not-using-deprecated-ssl-protocols"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws cloudfront get-distribution-config --id <DISTRIBUTION_ID> --output json > current-config.json && echo 'Manually edit current-config.json to change Origins[].CustomOriginConfig.OriginSslProtocols to [TLSv1.2], then run:' && echo 'aws cloudfront update-distribution --id <DISTRIBUTION_ID> --distribution-config file://current-config.json --if-match $(aws cloudfront get-distribution-config --id <DISTRIBUTION_ID> --query \"ETag\" --output text)'",
+      "NativeIaC": "```yaml\n# CloudFormation：オリジンに接続する際にTLSv1.2のみを許可するようにオリジンを設定\nResources:\n  <example_resource_name>:\n    Type: AWS::CloudFront::Distribution\n    Properties:\n      DistributionConfig:\n        Enabled: true\n        Origins:\n          - Id: <example_origin_id>\n            DomainName: <origin.example.com>\n            CustomOriginConfig:\n              OriginProtocolPolicy: https-only\n              OriginSslProtocols:\n                - TLSv1.2  # 重要：オリジンSSLプロトコルをTLSv1.2に制限してSSLv3/TLSv1/TLSv1.1を削除\n        DefaultCacheBehavior:\n          TargetOriginId: <example_origin_id>\n          ViewerProtocolPolicy: redirect-to-https\n```",
+      "Other": "1. AWSコンソールを開き、CloudFrontに移動\n2. ディストリビューションを選択し、オリジンタブを開く\n3. カスタムオリジンを選択し、編集をクリック\n4. オリジンSSLプロトコルの下で、TLSv1.2のみを選択\n5. 変更を保存\n6. ディストリビューション内の他のカスタムオリジンについても繰り返す",
+      "Terraform": "```hcl\n# Terraform：オリジンに接続する際にTLSv1.2のみを許可するようにオリジンを設定\nresource \"aws_cloudfront_distribution\" \"<example_resource_name>\" {\n  enabled = true\n\n  origin {\n    domain_name = \"<origin.example.com>\"\n    origin_id   = \"<example_origin_id>\"\n\n    custom_origin_config {\n      http_port              = 80\n      https_port             = 443\n      origin_protocol_policy = \"https-only\"\n      origin_ssl_protocols   = [\"TLSv1.2\"]  # 重要：オリジンSSLプロトコルをTLSv1.2に制限\n    }\n  }\n\n  default_cache_behavior {\n    target_origin_id       = \"<example_origin_id>\"\n    viewer_protocol_policy = \"redirect-to-https\"\n    allowed_methods        = [\"GET\", \"HEAD\"]\n    cached_methods         = [\"GET\", \"HEAD\"]\n    forwarded_values { query_string = false }\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "CloudFrontからオリジンへのトラフィックに**TLS 1.2+**を強制します。許可されたプロトコルから`SSLv3`、`TLSv1`、`TLSv1.1`を削除し、モダンな暗号スイートを優先します。オリジンの互換性を確認し、証明書とライブラリを更新し、**多層防御**と**最小権限**の一部としてポリシーを定期的に確認します。",
+      "Url": "https://hub.prowler.com/check/cloudfront_distributions_using_deprecated_ssl_protocols"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

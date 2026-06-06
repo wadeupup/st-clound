@@ -1,0 +1,37 @@
+{
+  "Provider": "aws",
+  "CheckID": "ec2_securitygroup_allow_ingress_from_internet_to_any_port",
+  "CheckTitle": "确保没有安全组允许从 0.0.0.0/0 或 ::/0 对任意端口入站访问",
+  "CheckType": [
+    "Infrastructure Security"
+  ],
+  "ServiceName": "ec2",
+  "SubServiceName": "securitygroup",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "high",
+  "ResourceType": "AwsEc2SecurityGroup",
+  "ResourceGroup": "network",
+  "Description": "确保没有安全组允许从 0.0.0.0/0 或 ::/0 对任意端口入站访问，也没有附加到不允许的网络接口类型或实例所有者的网络接口。默认允许的网络接口类型包括 “api_gateway_managed” 和 “vpc_endpoint”，默认允许的实例所有者包括 “amazon-elb”，你可以通过设置变量 “ec2_allowed_interface_types” 和 “ec2_allowed_instance_owners” 来自定义这些值。",
+  "Risk": "该安全组允许来自互联网的所有流量访问任意端口，可能导致攻击者可以访问实例。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "采用零信任（Zero Trust）方法，将入站流量尽可能收窄，并同时考虑南北向与东西向流量的限制。",
+      "Url": "https://docs.aws.amazon.com/vpc/latest/userguide/VPC_SecurityGroups.html"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+
+

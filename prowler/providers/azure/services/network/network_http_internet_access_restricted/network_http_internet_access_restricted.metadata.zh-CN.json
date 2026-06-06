@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "network_http_internet_access_restricted",
+  "CheckTitle": "确保来自 Internet 的 HTTP(S) 访问已评估并受限",
+  "CheckType": [],
+  "ServiceName": "network",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Network",
+  "ResourceGroup": "network",
+  "Description": "应定期评估网络安全组中的端口配置错误。对于可能暴露到 Internet 的特定端口和协议，应评估其必要性；凡非明确需要且未进行最小化配置的，应限制访问。",
+  "Risk": "通过 Internet 使用 HTTP(S) 的潜在安全问题在于，攻击者可使用多种暴力破解技术获取对 Azure 资源的访问权限。一旦得手，攻击者可将该资源作为跳板，进一步入侵 Azure 租户内的其他资源。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/security/benchmark/azure/security-controls-v3-network-security#ns-1-establish-network-segmentation-boundaries",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity-staging/knowledge-base/azure/Network/unrestricted-http-access.html",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "对于附加到网络安全组的资源，若并未明确需要且未进行最小化配置，不应开放 HTTP(S) 访问，应限制或消除来自 Internet 的访问。对于相关资源的内部访问，可配置加密网络隧道，例如：ExpressRoute、Site-to-site VPN、Point-to-site VPN。",
+      "Url": ""
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

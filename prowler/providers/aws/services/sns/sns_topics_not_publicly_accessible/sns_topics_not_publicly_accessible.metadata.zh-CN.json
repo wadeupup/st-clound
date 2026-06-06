@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "sns_topics_not_publicly_accessible",
+  "CheckTitle": "SNS 主题不可公开访问",
+  "CheckType": [
+    "软件和配置检查/AWS安全最佳实践",
+    "软件和配置检查/行业和监管标准/AWS 基础安全最佳实践",
+    "影响/数据暴露",
+    "TTPs/初始访问"
+  ],
+  "ServiceName": "sns",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsSnsTopic",
+  "ResourceGroup": "messaging",
+  "Description": "**SNS 主题策略**会分析是否存在**公共主体**（例如 `*`）。如果主题授予访问权限时没有使用诸如 `aws:SourceArn`、`aws:SourceAccount`、`aws:PrincipalOrgID` 或 `sns:Endpoint` 范围限定之类的限制性条件，则会被视为可公开访问。",
+  "Risk": "**公开的 SNS 主题** 允许任何人或未知账户：\n- **订阅** 并窃取消息（机密性）\n- **发布** 伪造的有效负载以篡改工作流（完整性）\n- **洪泛** 消息，导致中断和成本增加（可用性）\n它们还会助长跨账户滥用，并绕过预期的信任边界。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/SNS/topics-everyone-publish.html",
+    "https://docs.aws.amazon.com/config/latest/developerguide/sns-topic-policy.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws sns set-topic-attributes --topic-arn <TOPIC_ARN> --attribute-name Policy --attribute-value '{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::<ACCOUNT_ID>:root\"},\"Action\":\"sns:Publish\",\"Resource\":\"<TOPIC_ARN>\"}]}'",
+      "NativeIaC": "```yaml\n# CloudFormation：将 SNS 主题策略限制为账户（非公开）\nResources:\n  <example_resource_name>:\n    Type: AWS::SNS::TopicPolicy\n    Properties:\n      Topics:\n        - arn:aws:sns:<region>:<account_id>:<example_resource_name>\n      PolicyDocument:\n        Version: '2012-10-17'\n        Statement:\n          - Effect: Allow\n            Action: sns:Publish\n            Resource: arn:aws:sns:<region>:<account_id>:<example_resource_name>\n            Principal:\n              AWS: arn:aws:iam::<account_id>:root  # 严重：限制为账户根以移除公共访问权限\n```",
+      "Other": "1. 打开 Amazon SNS 控制台并选择 Topics\n2. 选择该主题并转到 Access policy 选项卡\n3. 编辑策略并删除任何设置为 \"*\"（Everyone/Public）的 Principal\n4. 添加一条仅允许你的账户 root 的语句：Principal = arn:aws:iam::<ACCOUNT_ID>:root，并将 Action 设为 sns:Publish，Resource 设为该主题 ARN\n5. 保存更改",
+      "Terraform": "```hcl\n# 将 SNS 主题策略限制为账户（非公开）\nresource \"aws_sns_topic_policy\" \"<example_resource_name>\" {\n  arn    = \"<TOPIC_ARN>\"\n  policy = jsonencode({\n    Version   = \"2012-10-17\"\n    Statement = [{\n      Effect    = \"Allow\"\n      Action    = \"sns:Publish\"\n      Resource  = \"<TOPIC_ARN>\"\n      Principal = { AWS = \"arn:aws:iam::<ACCOUNT_ID>:root\" } # 关键：将主体限制为该账户以移除公共访问权限\n    }]\n  })\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "将**主题策略**限制为特定主体和最小操作：\n- 避免使用 `Principal:*`\n- 仅允许所需的操作（例如 `sns:Publish`）\n- 添加条件，如 `aws:SourceArn`、`aws:SourceAccount`、`aws:PrincipalOrgID` 或 `sns:Endpoint`\n应用**最小权限**原则、职责分离，并定期审查策略。",
+      "Url": "https://hub.prowler.com/check/sns_topics_not_publicly_accessible"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

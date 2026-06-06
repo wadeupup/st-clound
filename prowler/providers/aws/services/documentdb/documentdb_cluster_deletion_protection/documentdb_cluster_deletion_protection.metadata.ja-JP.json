@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "documentdb_cluster_deletion_protection",
+  "CheckTitle": "DocumentDB クラスターで削除保護が有効になっているか",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices"
+  ],
+  "ServiceName": "documentdb",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsRdsDbCluster",
+  "ResourceGroup": "database",
+  "Description": "**Amazon DocumentDB クラスター**について、クラスター設定の `deletion_protection` 設定を評価します。\n\nこの保護が有効になっていないクラスターが検出結果として強調表示されます。",
+  "Risk": "**削除保護**がない場合、クラスターは誤操作や悪用により削除される可能性があり、突然の停止や回復ポイントの喪失を引き起こし、**可用性**と**データ整合性**に影響を与えます。\n\n侵害されたアカウントや誤った自動化により、データベースが削除されたり、最終スナップショットがスキップされたりし、復元が妨げられる可能性があります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://support.icompaas.com/support/solutions/articles/62000233689-ensure-documentdb-clusters-has-deletion-protection-enabled",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/DocumentDB/deletion-protection.html",
+    "https://docs.aws.amazon.com/documentdb/latest/developerguide/db-cluster-delete.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/documentdb-controls.html#documentdb-5"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws docdb modify-db-cluster --db-cluster-identifier <DB_CLUSTER_ID> --deletion-protection --apply-immediately",
+      "NativeIaC": "```yaml\n# CloudFormation: Enable deletion protection on a DocumentDB cluster\nResources:\n  <example_resource_name>:\n    Type: AWS::DocDB::DBCluster\n    Properties:\n      MasterUsername: \"<MASTER_USERNAME>\"\n      MasterUserPassword: \"<MASTER_USER_PASSWORD>\"\n      DeletionProtection: true  # CRITICAL: Prevents cluster deletion until disabled\n```",
+      "Other": "1. AWS コンソールで Amazon DocumentDB > Clusters に移動します\n2. 対象クラスターを選択し、Modify をクリックします\n3. Deletion protection を有効化します\n4. Apply immediately にチェックを入れ、Save changes をクリックします",
+      "Terraform": "```hcl\n# Terraform: Enable deletion protection on a DocumentDB cluster\nresource \"aws_docdb_cluster\" \"<example_resource_name>\" {\n  master_username     = \"<MASTER_USERNAME>\"\n  master_password     = \"<MASTER_USER_PASSWORD>\"\n  deletion_protection = true  # CRITICAL: Prevents cluster deletion until disabled\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "すべての非一時的なクラスターで**削除保護**を有効化し、本番環境を優先します。\n\n削除および変更アクションに**最小権限**を適用し、保護設定の切り替えには変更管理を要求し、この設定を継続的に強制する自動化により**多層防御**を実装します。*廃止する前に*、最終スナップショットを取得してください。",
+      "Url": "https://hub.prowler.com/check/documentdb_cluster_deletion_protection"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

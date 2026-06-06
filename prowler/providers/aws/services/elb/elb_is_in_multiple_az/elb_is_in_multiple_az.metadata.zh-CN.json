@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "elb_is_in_multiple_az",
+  "CheckTitle": "Classic Load Balancer 部署在多个可用区中",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Effects/Denial of Service"
+  ],
+  "ServiceName": "elb",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsElbLoadBalancer",
+  "ResourceGroup": "network",
+  "Description": "**Classic Load Balancer** 至少跨越配置要求的 **Availability Zones** 数量。\n\n该评估会识别启用 AZ 数量低于指定最小值的负载均衡器。",
+  "Risk": "运行在过少 AZ 会使负载均衡器成为**单点故障**。当某个 AZ 故障或出现可用区级退化时，可能导致**服务不可用**、连接中断和容量不均，从而削弱应用**可用性**与韧性，并增加恢复时间。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/ELB/ec2-instances-distribution-across-availability-zones.html",
+    "https://docs.aws.amazon.com/elasticloadbalancing/latest/classic/enable-disable-crosszone-lb.html",
+    "https://docs.aws.amazon.com/elasticloadbalancing/latest/classic/introduction.html#classic-load-balancer-overview"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation: Ensure CLB spans at least two Availability Zones by adding two subnets\nResources:\n  <example_resource_name>:\n    Type: AWS::ElasticLoadBalancing::LoadBalancer\n    Properties:\n      Subnets:\n        - <example_subnet_id_a>  # Critical: add a subnet in AZ A to ensure multiple AZs\n        - <example_subnet_id_b>  # Critical: add a subnet in a different AZ (>=2 AZs total)\n      Listeners:\n        - LoadBalancerPort: 80\n          InstancePort: 80\n          Protocol: HTTP\n```",
+      "Other": "1. 打开 Amazon EC2 控制台并进入 Load Balancers\n2. 选择你的 Classic Load Balancer（type: classic）\n3. 选择 Edit subnets（或 Subnets 标签 > Edit）\n4. 添加一个与现有 AZ 不同的子网（确保至少两个 AZ）\n5. 点击 Save\n6. 若你的 CLB 位于 EC2-Classic，请改用 Edit Availability Zones 并额外选择一个 AZ，然后保存",
+      "Terraform": "```hcl\n# Terraform: Ensure CLB spans at least two Availability Zones by adding two subnets\nresource \"aws_elb\" \"<example_resource_name>\" {\n  name    = \"<example_resource_name>\"\n  subnets = [\n    \"<example_subnet_id_a>\", # Critical: subnet in AZ A to ensure multiple AZs\n    \"<example_subnet_id_b>\"  # Critical: subnet in different AZ (>=2 AZs total)\n  ]\n\n  listener {\n    lb_port        = 80\n    lb_protocol    = \"http\"\n    instance_port  = 80\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "按**多 AZ 高可用**进行设计：\n- 每个负载均衡器至少启用 `2` 个 AZ\n- 在各 AZ 间均衡分布目标，并结合跨 AZ 的 Auto Scaling\n- 启用**跨可用区负载均衡**以平滑不均衡\n- 定期测试故障切换与健康阈值\n\n应用**故障隔离**与**纵深防御**原则。",
+      "Url": "https://hub.prowler.com/check/elb_is_in_multiple_az"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

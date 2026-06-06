@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "opensearch_service_domains_use_cognito_authentication_for_kibana",
+  "CheckTitle": "Amazon OpenSearch Service 域已为 Kibana 启用了 Amazon Cognito 或 SAML 身份验证",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践",
+    "软件和配置检查/行业和法规标准/AWS 基础安全最佳实践",
+    "TTPs/初始访问/未经授权的访问",
+    "影响/数据暴露"
+  ],
+  "ServiceName": "opensearch",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsOpenSearchServiceDomain",
+  "ResourceGroup": "database",
+  "Description": "**OpenSearch Service 域**使用**Amazon Cognito**或**SAML**来验证对 Kibana/OpenSearch Dashboards 的访问。\n\n评估识别出为 Dashboards 访问启用了任一提供者的域。",
+  "Risk": "没有**联合身份验证**，Dashboards 可以通过弱或共享凭据或广泛的 IP 规则访问，从而启用未经授权的查询和管理操作。这威胁到：\n- **机密性**：数据泄露\n- **完整性**：索引更改或删除\n- **可用性**：繁重查询导致集群性能下降",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-ac.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws opensearch update-domain-config --domain-name <DOMAIN_NAME> --cognito-options Enabled=true,UserPoolId=<USER_POOL_ID>,IdentityPoolId=<IDENTITY_POOL_ID>,RoleArn=<ROLE_ARN>",
+      "NativeIaC": "```yaml\n# 为 OpenSearch Dashboards 启用 Amazon Cognito 身份验证\nResources:\n  <example_resource_name>:\n    Type: AWS::OpenSearchService::Domain\n    Properties:\n      DomainName: <example_resource_name>\n      CognitoOptions:\n        Enabled: true  # 关键：启用 Dashboards 的 Cognito 身份验证以通过检查\n        UserPoolId: <USER_POOL_ID>\n        IdentityPoolId: <IDENTITY_POOL_ID>\n        RoleArn: <ROLE_ARN>\n```",
+      "Other": "1. 在 AWS 控制台中，转到**OpenSearch Service** > **Domains**并选择您的域\n2. 点击**编辑**\n3. 在**OpenSearch Dashboards 身份验证**下，选择**Amazon Cognito**并启用它\n4. 输入 Cognito 的**用户池 ID**、**身份池 ID**和**IAM 角色**\n5. 点击**保存更改**并等待域更新完成",
+      "Terraform": "```hcl\n# 为 OpenSearch Dashboards 启用 Amazon Cognito 身份验证\nresource \"aws_opensearch_domain\" \"<example_resource_name>\" {\n  domain_name = \"<example_resource_name>\"\n\n  cognito_options {\n    enabled          = true  # 关键：启用 Dashboards 的 Cognito 身份验证以通过检查\n    user_pool_id     = \"<USER_POOL_ID>\"\n    identity_pool_id = \"<IDENTITY_POOL_ID>\"\n    role_arn         = \"<ROLE_ARN>\"\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "为 Dashboards 启用**Cognito**或**SAML**并应用**最小权限**与细粒度访问控制。优先选择**带 MFA 的 SSO**，避免共享/基本凭据，并通过**VPC/私有端点**和网络控制限制访问。使用审计日志进行监控并实施**职责分离**。",
+      "Url": "https://hub.prowler.com/check/opensearch_service_domains_use_cognito_authentication_for_kibana"
+    }
+  },
+  "Categories": [
+    "identity-access"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

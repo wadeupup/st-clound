@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "kafka_cluster_uses_latest_version",
+  "CheckTitle": "MSK 集群使用最新的 Kafka 版本或是 AWS 管理的无服务器版本",
+  "CheckType": [
+    "软件和配置检查/补丁管理",
+    "软件和配置检查/AWS 安全最佳实践",
+    "软件和配置检查/行业和法规标准/AWS 基础安全最佳实践"
+  ],
+  "ServiceName": "kafka",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsMskCluster",
+  "ResourceGroup": "messaging",
+  "Description": "**Amazon MSK 集群**会被评估是否使用最新支持的**Apache Kafka 版本**。预置集群会与最新版本进行比较，而**无服务器集群**则被视为自动管理版本。",
+  "Risk": "过时的 Kafka 可能会被已知漏洞和弱加密利用，导致数据泄露或篡改（**机密性/完整性**）。缺少修复会增加代理崩溃和分区不稳定的风险（**可用性**）。在支持结束后，静默自动升级可能会引发意外行为和兼容性问题。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/msk/latest/developerguide/version-support.html#version-upgrades",
+    "https://docs.aws.amazon.com/lightsail/latest/userguide/amazon-lightsail-databases.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/MSK/enable-apache-kafka-latest-security-features.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws kafka update-cluster-kafka-version --cluster-arn <example_resource_id> --current-version <current_version> --target-kafka-version <latest_version>",
+      "NativeIaC": "```yaml\n# CloudFormation：将 MSK 集群升级到最新的 Kafka 版本\nResources:\n  <example_resource_name>:\n    Type: AWS::MSK::Cluster\n    Properties:\n      ClusterName: <example_resource_name>\n      KafkaVersion: <latest_version>  # 关键：设置为最新的 Kafka 版本以通过检查\n      NumberOfBrokerNodes: 2\n      BrokerNodeGroupInfo:\n        InstanceType: kafka.m5.large\n        ClientSubnets:\n          - <example_resource_id>\n          - <example_resource_id>\n```",
+      "Other": "1. 打开 AWS 管理控制台并进入 Amazon MSK\n2. 选择您的集群并选择操作 > 更新集群\n3. 在 Kafka 版本中，选择最新可用版本\n4. 审核并开始升级（更新/开始升级）\n5. 等待操作完成并且集群状态返回为活动",
+      "Terraform": "```hcl\n# Terraform：将 MSK 集群升级到最新的 Kafka 版本\nresource \"aws_msk_cluster\" \"<example_resource_name>\" {\n  cluster_name           = \"<example_resource_name>\"\n  kafka_version          = \"<latest_version>\"  # 关键：设置为最新的 Kafka 版本以通过检查\n  number_of_broker_nodes = 2\n\n  broker_node_group_info {\n    instance_type  = \"kafka.m5.large\"\n    client_subnets = [\"<example_resource_id>\", \"<example_resource_id>\"]\n\n    storage_info {\n      ebs_storage_info { volume_size = 1000 }\n    }\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "采用受控升级策略：\n- 跟踪 MSK 版本支持并在支持结束前升级\n- 在预发布环境中测试并安排维护窗口\n- 使用蓝/绿或滚动升级以减少停机时间\n- 验证客户端兼容性和安全设置\n- 如果自动版本管理符合您的风险模型，考虑使用无服务器 MSK",
+      "Url": "https://hub.prowler.com/check/kafka_cluster_uses_latest_version"
+    }
+  },
+  "Categories": [
+    "vulnerabilities"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

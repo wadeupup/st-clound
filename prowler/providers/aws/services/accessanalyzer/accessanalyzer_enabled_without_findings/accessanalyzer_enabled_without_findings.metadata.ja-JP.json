@@ -1,0 +1,53 @@
+{
+  "Provider": "aws",
+  "CheckID": "accessanalyzer_enabled_without_findings",
+  "CheckTitle": "IAM Access Analyzer アナライザーがアクティブで、アクティブな調査結果がありません",
+  "CheckType": [
+    "ソフトウェアと設定チェック/AWS セキュリティベストプラクティス",
+    "ソフトウェアと設定チェック/業界および規制基準/AWS 基礎セキュリティベストプラクティス",
+    "TTPs/初期アクセス/不正アクセス",
+    "影響/データ露出"
+  ],
+  "ServiceName": "accessanalyzer",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "low",
+  "ResourceType": "Other",
+  "ResourceGroup": "security",
+  "Description": "**IAM Access Analyzer** アナライザーは `Active` 状態にあり、現在、監視対象リソースの範囲内で `Active` の調査結果がゼロであることを報告しています。",
+  "Risk": "未解決の `Active` 調査結果は、意図しない外部または内部アクセスパスを示しています。\n- **機密性**：データ（バケット、スナップショット、シークレット）のパブリック/クロスアカウント読み取り\n- **整合性**：不正なロールの引き受けまたは KMS の使用により、ポリシー/データの変更が可能になる\n- アカウント間の**横方向の移動**",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/IAM/latest/UserGuide/access-analyzer-findings-remediate.html",
+    "https://docs.aws.amazon.com/IAM/latest/UserGuide/access-analyzer-findings-view.html",
+    "https://aws.amazon.com/iam/access-analyzer/",
+    "https://docs.aws.amazon.com/IAM/latest/UserGuide/access-analyzer-getting-started.html",
+    "https://docs.aws.amazon.com/IAM/latest/UserGuide/access-analyzer-concepts.html",
+    "https://docs.aws.amazon.com/IAM/latest/UserGuide/access-analyzer-dashboard.html",
+    "https://docs.aws.amazon.com/IAM/latest/UserGuide/access-analyzer-findings.html",
+    "https://aws.amazon.com/blogs/security/automate-resolution-for-iam-access-analyzer-cross-account-access-findings-on-iam-roles/",
+    "https://docs.aws.amazon.com/IAM/latest/UserGuide/what-is-access-analyzer.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/AccessAnalyzer/findings.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\nResources:\n  example_resource:\n    Type: AWS::AccessAnalyzer::Analyzer\n    Properties:\n      AnalyzerName: example_resource\n      Type: ACCOUNT  # この行はセキュリティ問題を修正します\n```",
+      "Other": "1. AWS コンソールで、IAM > Access analyzer に移動します\n2. アナライザーが存在しない場合、Create analyzer をクリックし、Type: Account を選択し、example_resource という名前を付けて、Create をクリックします\n3. アクティブな調査結果をクリアするには：Resource analysis の下で、アナライザーを選択し、すべての Active 調査結果を選択し、Actions > Archive を選択します\n4. 意図しないアクセスの調査結果については、調査結果を開き、リンクされたリソースに従って違反する権限を削除します（リソースポリシーまたはロール信頼ポリシーを編集）、その後、調査結果に戻り、Rescan を選択します\n5. ダッシュボードに 0 個の Active 調査結果が表示されることを確認します",
+      "Terraform": "```hcl\nresource \"aws_accessanalyzer_analyzer\" \"example_resource\" {\n  analyzer_name = \"example_resource\"\n  type          = \"ACCOUNT\" # この行はセキュリティ問題を修正します\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "すべての関連リージョンおよび組織/アカウントスコープで **IAM Access Analyzer** を有効にします。すべての `Active` 調査結果を分類します：\n- リソースと信頼ポリシーを厳格化して、意図しないアクセスを削除します\n- **最小権限**と職務の分離を強制します\n- 検証済みの意図されたアクセスのみをアーカイブします\n- 継続的に監視し、レビューを自動化します",
+      "Url": "https://hub.prowler.com/check/accessanalyzer_enabled_without_findings"
+    }
+  },
+  "Categories": [
+    "identity-access",
+    "trust-boundaries",
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

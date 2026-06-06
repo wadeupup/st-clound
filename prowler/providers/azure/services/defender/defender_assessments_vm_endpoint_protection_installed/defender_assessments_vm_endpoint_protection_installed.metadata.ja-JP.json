@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "defender_assessments_vm_endpoint_protection_installed",
+  "CheckTitle": "すべての仮想マシンにエンドポイント保護がインストールされていることを確認する",
+  "CheckType": [],
+  "ServiceName": "defender",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Microsoft.Security/assessments",
+  "ResourceGroup": "security",
+  "Description": "すべての仮想マシンにエンドポイント保護をインストールします。",
+  "Risk": "エンドポイント保護システム（Azure 向けマルウェア対策など）を導入すると、ウイルス、スパイウェア、その他の悪意あるソフトウェアの特定と除去に役立つリアルタイム保護機能を提供できます。また、既知の悪意あるソフトウェアや不要なソフトウェアが Azure システムにインストールまたは実行されようとした際に、設定可能なアラートも提供します。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/security/fundamentals/antimalware",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/VirtualMachines/install-endpoint-protection.html#",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "Microsoft Azure のドキュメントに従って、セキュリティ センターからエンドポイント保護をインストールしてください。代替として、OS 向けに独自のエンドポイント保護ツールを使用することもできます。",
+      "Url": ""
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "エンドポイント保護には追加コストが発生します。"
+}

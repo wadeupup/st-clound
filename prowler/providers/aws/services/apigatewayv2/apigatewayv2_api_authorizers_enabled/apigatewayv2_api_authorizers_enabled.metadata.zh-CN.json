@@ -1,0 +1,46 @@
+{
+  "Provider": "aws",
+  "CheckID": "apigatewayv2_api_authorizers_enabled",
+  "CheckTitle": "API Gateway V2 API 已配置授权器",
+  "CheckAliases": [
+    "apigatewayv2_authorizers_enabled"
+  ],
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践",
+    "TTPs/初始访问",
+    "影响/数据暴露"
+  ],
+  "ServiceName": "apigatewayv2",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsApiGatewayV2Api",
+  "ResourceGroup": "api_gateway",
+  "Description": "**API Gateway v2 API** 使用**授权器**（JWT/Cognito 或 Lambda）来验证请求。此检查评估 API 是否配置了授权器以控制对其路由的访问。",
+  "Risk": "没有授权器，任何人都可以调用路由。\n- 机密性：数据和元数据的暴露\n- 完整性：未授权的状态更改或操作\n- 可用性/成本：对后端的自动化滥用、流量激增和意外支出",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-use-lambda-authorizer.html",
+    "https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-lambda-authorizer.html",
+    "https://support.icompaas.com/support/solutions/articles/62000127114-ensure-api-gateway-has-configured-authorizers"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws apigatewayv2 create-authorizer --api-id <API_ID> --authorizer-type REQUEST --name <example_resource_name> --authorizer-uri arn:aws:apigateway:<REGION>:lambda:path/2015-03-31/functions/<LAMBDA_FUNCTION_ARN>/invocations --identity-source '$request.header.Authorization'",
+      "NativeIaC": "```yaml\n# CloudFormation: 为 API Gateway v2 创建最小的 Lambda 授权器\nResources:\n  <example_resource_name>:\n    Type: AWS::ApiGatewayV2::Authorizer\n    Properties:\n      ApiId: <example_resource_id>\n      AuthorizerType: REQUEST  # 关键：在 API 上启用 Lambda REQUEST 授权器\n      AuthorizerUri: arn:aws:apigateway:<REGION>:lambda:path/2015-03-31/functions/<LAMBDA_FUNCTION_ARN>/invocations  # 关键：要调用的 Lambda 授权器函数\n      IdentitySource:  # 关键：从中读取身份验证令牌的位置\n        - \"$request.header.Authorization\"\n      Name: <example_resource_name>\n```",
+      "Other": "1. 在 AWS 控制台中，转到 API Gateway > APIs 并选择您的 HTTP/WebSocket API\n2. 在左侧导航中，单击 Authorizers > Create authorizer\n3. 选择 Lambda 作为授权器类型，并选择您的 Lambda 函数\n4. 将 Identity source 设置为：$request.header.Authorization\n5. 单击 Create 以添加授权器",
+      "Terraform": "```hcl\n# 最小的 AWS API Gateway v2 Lambda 授权器\nresource \"aws_apigatewayv2_authorizer\" \"<example_resource_name>\" {\n  api_id           = \"<example_resource_id>\"\n  name             = \"<example_resource_name>\"\n  authorizer_type  = \"REQUEST\"  # 关键：创建 Lambda REQUEST 授权器\n  authorizer_uri   = \"arn:aws:apigateway:<REGION>:lambda:path/2015-03-31/functions/<LAMBDA_FUNCTION_ARN>/invocations\"  # 关键：要调用的 Lambda\n  identity_sources = [\"$request.header.Authorization\"]  # 关键：授权的身份源\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "启用**授权器**（JWT/Cognito 或 Lambda），以便只有经过身份验证的主体才能调用路由。\n- 使用范围/声明或策略决策强制执行**最小权限**\n- 使用资源策略、节流和 WAF 应用**纵深防御**\n- 除非明确需要，否则避免公共路由",
+      "Url": "https://hub.prowler.com/check/apigatewayv2_api_authorizers_enabled"
+    }
+  },
+  "Categories": [
+    "identity-access"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

@@ -1,0 +1,47 @@
+{
+  "Provider": "aws",
+  "CheckID": "opensearch_service_domains_cloudwatch_logging_enabled",
+  "CheckTitle": "Amazon OpenSearch Service 域将搜索和索引慢日志发布到 CloudWatch Logs",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践/运行时行为分析",
+    "软件和配置检查/行业和法规标准/AWS 基础安全最佳实践"
+  ],
+  "ServiceName": "opensearch",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "low",
+  "ResourceType": "AwsOpenSearchServiceDomain",
+  "ResourceGroup": "database",
+  "Description": "**Amazon OpenSearch Service** 域已启用**慢日志发布**，将**搜索**和**索引**操作的日志发布到 CloudWatch Logs (`SEARCH_SLOW_LOGS` 和 `INDEX_SLOW_LOGS`)。",
+  "Risk": "没有这些日志，对**高成本搜索**和**慢速索引**的可见性将丧失，掩盖热点和滥用。\n- 可用性：超时、限流、节点压力\n- 完整性：索引遗漏或延迟\n- 操作：较慢的事件响应和容量规划",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-createdomain-configure-slow-logs.html",
+    "https://support.icompaas.com/support/solutions/articles/62000129471-ensure-amazon-elasticsearch-service-es-domains-have-logging-enabled",
+    "https://docs.prowler.com/checks/aws/elasticsearch-policies/elasticsearch_7",
+    "https://docs.prowler.com/checks/aws/elasticsearch-policies/elasticsearch_7#terraform",
+    "https://bigdataboutique.com/blog/inspecting-search-slow-logs-on-elasticsearch-and-opensearch-b05d87",
+    "https://repost.aws/knowledge-center/opensearch-troubleshoot-slow-logs",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/Elasticsearch/slow-logs.html",
+    "https://medium.com/heyjobs-tech/how-to-create-an-opensearch-cluster-using-terraform-926b4a62b489",
+    "https://docs.aws.amazon.com/opensearch-service/latest/developerguide/createdomain-configure-slow-logs.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws opensearch update-domain-config --domain-name <DOMAIN_NAME> --log-publishing-options \"SEARCH_SLOW_LOGS={CloudWatchLogsLogGroupArn=<LOG_GROUP_ARN>,Enabled=true},INDEX_SLOW_LOGS={CloudWatchLogsLogGroupArn=<LOG_GROUP_ARN>,Enabled=true}\"",
+      "NativeIaC": "```yaml\n# CloudFormation：启用 OpenSearch 搜索和索引慢日志到 CloudWatch\nResources:\n  <example_resource_name>:\n    Type: AWS::OpenSearchService::Domain\n    Properties:\n      DomainName: <example_resource_name>\n      LogPublishingOptions:\n        SEARCH_SLOW_LOGS:\n          CloudWatchLogsLogGroupArn: <LOG_GROUP_ARN>\n          Enabled: true  # 关键：启用 SEARCH_SLOW_LOGS 发布\n        INDEX_SLOW_LOGS:\n          CloudWatchLogsLogGroupArn: <LOG_GROUP_ARN>\n          Enabled: true  # 关键：启用 INDEX_SLOW_LOGS 发布\n```",
+      "Other": "1. 在 AWS 控制台中，打开 Amazon OpenSearch Service 并选择您的域\n2. 转到日志选项卡\n3. 对于搜索慢日志，点击启用，选择或创建一个 CloudWatch 日志组，接受/附加建议的资源策略，然后保存\n4. 对于索引慢日志，点击启用，选择或创建一个 CloudWatch 日志组，接受/附加建议的资源策略，然后保存\n5. 等待域状态返回到活动状态",
+      "Terraform": "```hcl\n# 启用 OpenSearch 搜索和索引慢日志到 CloudWatch\nresource \"aws_opensearch_domain\" \"<example_resource_name>\" {\n  domain_name = \"<example_resource_name>\"\n\n  # 关键：启用 SEARCH_SLOW_LOGS 发布\n  log_publishing_options {\n    log_type                 = \"SEARCH_SLOW_LOGS\"\n    cloudwatch_log_group_arn = \"<LOG_GROUP_ARN>\"\n    enabled                  = true\n  }\n\n  # 关键：启用 INDEX_SLOW_LOGS 发布\n  log_publishing_options {\n    log_type                 = \"INDEX_SLOW_LOGS\"\n    cloudwatch_log_group_arn = \"<LOG_GROUP_ARN>\"\n    enabled                  = true\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "为所有域启用 `SEARCH_SLOW_LOGS` 和 `INDEX_SLOW_LOGS` 并发布到 CloudWatch。设置有意义的阈值和保留期，分离日志组，并对异常进行警报。对日志访问应用**最小权限**，并使用**深度防御**结合错误和审计日志。",
+      "Url": "https://hub.prowler.com/check/opensearch_service_domains_cloudwatch_logging_enabled"
+    }
+  },
+  "Categories": [
+    "logging"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

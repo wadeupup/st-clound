@@ -1,0 +1,35 @@
+{
+  "Provider": "aws",
+  "CheckID": "iam_user_two_active_access_key",
+  "CheckTitle": "IAMユーザーが2つのアクティブなアクセスキーを持っているか確認します",
+  "CheckType": [
+    "ソフトウェアと構成のチェック",
+    "業界および規制の標準",
+    "CIS AWS Foundations ベンチマーク"
+  ],
+  "ServiceName": "iam",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "medium",
+  "ResourceType": "AwsIamUser",
+  "ResourceGroup": "IAM",
+  "Description": "IAMユーザーが2つのアクティブなアクセスキーを持っているか確認します",
+  "Risk": "アクセスキーが紛失または盗難される可能性があります。これは重大なリスクを生み出します。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "長期間使用するアクセスキーの使用を避けてください。",
+      "Url": "https://docs.aws.amazon.com/IAM/latest/APIReference/API_ListAccessKeys.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

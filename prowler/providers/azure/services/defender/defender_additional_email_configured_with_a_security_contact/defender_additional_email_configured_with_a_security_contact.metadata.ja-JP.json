@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "defender_additional_email_configured_with_a_security_contact",
+  "CheckTitle": "「Additional email addresses」にセキュリティ連絡先メールが設定されていることを確認する",
+  "CheckType": [],
+  "ServiceName": "defender",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AzureEmailNotifications",
+  "ResourceGroup": "monitoring",
+  "Description": "Microsoft Defender for Cloud は、サブスクリプションで高重大度アラートが発生するとサブスクリプション所有者にメールを送信します。追加メール アドレスとしてセキュリティ連絡先メールを設定する必要があります。",
+  "Risk": "Microsoft Defender for Cloud はサブスクリプション所有者にセキュリティ アラートを通知します。「Additional email addresses」フィールドにセキュリティ連絡先のメール アドレスを追加することで、組織のセキュリティ チームをこれらの通知に含めることができます。これにより、適切な担当者が潜在的な侵害を把握し、タイムリーにリスク低減対応できます。",
+  "RelatedUrl": "https://docs.microsoft.com/en-us/azure/security-center/security-center-provide-security-contact-details",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/SecurityCenter/security-contact-email.html",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-general-policies/ensure-that-security-contact-emails-is-set#terraform"
+    },
+    "Recommendation": {
+      "Text": "1. Azure Home から Portal Menu を選択します 2. Microsoft Defender for Cloud を選択します 3. Environment Settings をクリックします 4. 対象の Management Group、Subscription、または Workspace をクリックします 5. Email notifications をクリックします 6. Additional email addresses フィールドに有効なセキュリティ連絡先メール（複数の場合はカンマ区切り）を入力します 7. Save をクリックします",
+      "Url": "https://learn.microsoft.com/en-us/rest/api/defenderforcloud/security-contacts/list?view=rest-defenderforcloud-2020-01-01-preview&tabs=HTTP"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

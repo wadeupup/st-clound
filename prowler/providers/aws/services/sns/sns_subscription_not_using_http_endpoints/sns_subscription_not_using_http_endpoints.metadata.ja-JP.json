@@ -1,0 +1,40 @@
+{
+  "Provider": "aws",
+  "CheckID": "sns_subscription_not_using_http_endpoints",
+  "CheckTitle": "SNSサブスクリプションはHTTPSエンドポイントを使用します",
+  "CheckType": [
+    "ソフトウェアおよび設定のチェック/AWS セキュリティのベストプラクティス/ネットワーク到達可能性",
+    "影響／データ露出"
+  ],
+  "ServiceName": "sns",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsSnsTopic",
+  "ResourceGroup": "messaging",
+  "Description": "Amazon SNS のサブスクリプションは、エンドポイントのプロトコルについて評価されます。`http` を使用するサブスクリプションが特定され、一方で **HTTPS** エンドポイントは転送中に暗号化された配信を示します。",
+  "Risk": "**HTTP** を使用すると、SNS 配信は暗号化されないままとなり、盗聴によって **機密性** が損なわれます。MITM 攻撃者はペイロードやヘッダーを改ざんして **完全性** を損ない、下流システムに悪意のあるコンテンツを注入したり、なりすましや不正な操作のためにサブスクリプションデータを取得したりする可能性があります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-sns-subscription.html",
+    "https://docs.aws.amazon.com/sns/latest/dg/sns-security-best-practices.html#enforce-encryption-data-in-transit"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation：SNS サブスクリプションが HTTPS を使用するようにする\nResources:\n  <example_resource_name>:\n    Type: AWS::SNS::Subscription\n    Properties:\n      TopicArn: <example_resource_id>\n      Protocol: https              # 重大: HTTP の使用を是正するために HTTPS プロトコルを使用してください\n      Endpoint: https://<example_endpoint>  # 重要: HTTPS エンドポイント URL\n```",
+      "Other": "1. Amazon SNS コンソールを開き、Subscriptions に移動します\n2. Protocol が HTTP に設定されているサブスクリプションを選択し、Delete をクリックします\n3. Create subscription をクリックします\n4. 同じ Topic ARN を選択し、Protocol を HTTPS に設定して、HTTPS エンドポイント URL を入力します\n5. サブスクリプションを作成し、必要に応じてエンドポイントから確認します",
+      "Terraform": "```hcl\n# Terraform: SNSサブスクリプションがHTTPSを使用することを確認する\nresource \"aws_sns_topic_subscription\" \"<example_resource_name>\" {\n  topic_arn = \"<example_resource_id>\"\n  protocol  = \"https\"                      # 重要: HTTPSプロトコルを強制する\n  endpoint  = \"https://<example_endpoint>\" # 重要: HTTPS エンドポイント URL\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "すべてのSNSサブスクリプションエンドポイントに **HTTPS** を必須にします。ドメインベースのエンドポイントを優先し、SNSメッセージの署名を検証し、**最小権限** を適用します。`aws:SecureTransport` のようなIAM条件を使用してTLSを強制し、可能な場合は多層防御のためにプライベート接続（VPCエンドポイント）を使用します。",
+      "Url": "https://hub.prowler.com/check/sns_subscription_not_using_http_endpoints"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

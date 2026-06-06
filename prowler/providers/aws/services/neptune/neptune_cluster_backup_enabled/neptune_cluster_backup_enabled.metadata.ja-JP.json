@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "neptune_cluster_backup_enabled",
+  "CheckTitle": "Neptune クラスターは、自動バックアップが有効になっており、保持期間が設定された最小値以上です。",
+  "CheckType": [
+    "ソフトウェアと構成のチェック/業界および規制基準/AWS 基礎セキュリティベストプラクティス"
+  ],
+  "ServiceName": "neptune",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsRdsDbCluster",
+  "ResourceGroup": "database",
+  "Description": "Neptune DB クラスターの自動バックアップが有効で、保持日数が必要な最小保持期間（デフォルトで `7` 日）を超えています。",
+  "Risk": "**不十分なバックアップ保持**は、データの破損、誤削除、またはランサムウェアからの復旧能力を低下させ、**可用性**と**整合性**に影響を与えます。\n\n- 必要な日付への時点復旧を防ぎます\n- ダウンタイム、不可逆的なデータ損失、コンプライアンス違反を増加させます",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/neptune-controls.html#neptune-5",
+    "https://trendmicro.com/cloudoneconformity/knowledge-base/aws/Neptune/sufficient-backup-retention-period.html",
+    "https://support.icompaas.com/support/solutions/articles/62000233327-check-for-neptune-clusters-backup-retention-period",
+    "https://asecure.cloud/a/p_configrule_neptune_cluster_backup_retention_check/"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws neptune modify-db-cluster --db-cluster-identifier <DB_CLUSTER_ID> --backup-retention-period 7 --apply-immediately",
+      "NativeIaC": "```yaml\nParameters:\n  DBClusterId:\n    Type: String\nResources:\n  NeptuneCluster:\n    Type: AWS::Neptune::DBCluster\n    Properties:\n      DBClusterIdentifier: !Ref DBClusterId\n      BackupRetentionPeriod: 7  # 7日間の保持期間を最低限として自動バックアップを有効にします\n```",
+      "Terraform": "```hcl\nresource \"aws_neptune_cluster\" \"example_resource\" {\n  cluster_identifier      = var.cluster_id\n  backup_retention_period = 7  # 7日間の保持期間を最低限として自動バックアップを有効にします\n}\n```",
+      "Other": "1. AWS マネジメントコンソールにサインインします\n2. サービス → Amazon Neptune → データベース\n3. DB クラスターを選択し、[Modify] をクリックします\n4. バックアップ保持期間で値を 7（またはそれ以上）に設定します\n5. [Apply immediately] を選択し、[Modify cluster] をクリックします"
+    },
+    "Recommendation": {
+      "Text": "自動バックアップが有効であり、保持が **RPO/RTO** および規制要件（少なくとも `7` 日）に一致していることを確認します。\n\n- バックアップライフサイクルとストレージ保持ポリシーを定義します\n- 復元手順を定期的にテストし、バックアップの健全性を監視します\n- バックアップを災害復旧および保持ガバナンスに組み込みます",
+      "Url": "https://hub.prowler.com/check/neptune_cluster_backup_enabled"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

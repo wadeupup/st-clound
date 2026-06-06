@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "defender_container_images_resolved_vulnerabilities",
+  "CheckTitle": "容器使用的镜像应已修复漏洞",
+  "CheckType": [],
+  "ServiceName": "defender",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Microsoft.Security/assessments",
+  "ResourceGroup": "security",
+  "Description": "容器使用的镜像应已修复漏洞。适用于容器注册表的 Azure Defender 可帮助你识别并修复容器镜像中的漏洞。它可为容器镜像提供漏洞扫描和按优先级排序的安全建议。你可以使用适用于容器注册表的 Azure Defender 扫描镜像漏洞，并获取按优先级排序的修复建议。你还可以使用它监控容器注册表中的安全威胁，并获取按优先级排序的处置建议。适用于容器注册表的 Azure Defender 与 Azure Security Center 集成，可为你的容器注册表及其他 Azure 资源提供统一的安全视图。适用于容器注册表的 Azure Defender 属于 Azure Defender 的一部分，后者可为混合工作负载提供高级威胁防护。Azure Defender 使用高级分析与全球威胁情报来检测可能被忽略的攻击。",
+  "Risk": "如果漏洞未被修复，攻击者可能利用这些漏洞获取对容器化应用和数据的未授权访问。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/container-registry/container-registry-check-health",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "",
+      "Url": "https://learn.microsoft.com/en-us/azure/container-registry/scan-images-defender"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

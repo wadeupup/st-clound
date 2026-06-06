@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "sqlserver_va_scan_reports_configured",
+  "CheckTitle": "SQL server で Vulnerability Assessment（VA）設定 'Send scan reports to' が構成されていることを確認する",
+  "CheckType": [],
+  "ServiceName": "sqlserver",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "SQLServer",
+  "ResourceGroup": "database",
+  "Description": "重要な SQL サーバーについて、関係するデータオーナー/ステークホルダーのメール アドレスで 'Send scan reports to' を構成します。",
+  "Risk": "Vulnerability Assessment（VA）スキャン レポートとアラートは、'Send scan reports to' に設定したメール アドレスへ送信されます。これにより、リスクの特定と是正対応に要する時間を短縮できる可能性があります。",
+  "RelatedUrl": "https://docs.microsoft.com/en-us/azure/sql-database/sql-vulnerability-assessment",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-general-policies/ensure-that-va-setting-send-scan-reports-to-is-configured-for-a-sql-server#terraform"
+    },
+    "Recommendation": {
+      "Text": "1. SQL servers に移動します。2. サーバー インスタンスを選択します。3. Microsoft Defender for Cloud を選択します。4. Enablement status の横にある Configure を選択します。5. Microsoft Defender for SQL を On に設定します。6. Vulnerability Assessment Settings 配下で Storage Account を選択します。7. Periodic recurring scans を On に設定します。8. Send scan reports to にデータオーナーとステークホルダーのメール アドレスを入力します。9. Save をクリックします。",
+      "Url": "https://learn.microsoft.com/en-us/azure/defender-for-cloud/sql-azure-vulnerability-assessment-enable"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "Microsoft Defender for SQL 機能を有効化すると、各 SQL サーバーに対して追加コストが発生します。"
+}

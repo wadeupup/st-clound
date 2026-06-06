@@ -1,0 +1,44 @@
+{
+  "Provider": "aws",
+  "CheckID": "cloudtrail_kms_encryption_enabled",
+  "CheckTitle": "CloudTrail 跟踪日志使用 KMS 密钥进行静态加密",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/CIS AWS Foundations Benchmark"
+  ],
+  "ServiceName": "cloudtrail",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsCloudTrailTrail",
+  "ResourceGroup": "monitoring",
+  "Description": "评估 **AWS CloudTrail 跟踪** 是否使用 **SSE-KMS** 和客户管理的 KMS 密钥来加密 S3 中静态存储的传送日志文件。识别未配置 KMS 密钥的跟踪。*适用于单区域和多区域跟踪。*",
+  "Risk": "缺少 **客户管理的 KMS 密钥**，日志保护仅依赖于存储权限。存储桶配置错误或凭据被盗可能暴露审计数据，助长逃避和横向移动。缺少密钥级别的控制、轮换和使用审计会削弱 **机密性** 和 **取证完整性**。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/encrypting-cloudtrail-log-files-with-aws-kms.html",
+    "https://trendmicro.com/cloudoneconformity/knowledge-base/aws/CloudTrail/cloudtrail-logs-encrypted.html",
+    "https://www.stream.security/rules/ensure-cloudtrail-logs-are-encrypted-at-rest",
+    "https://www.clouddefense.ai/compliance-rules/cis-v130/logging/cis-v130-3-7"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws cloudtrail update-trail --name <trail_name> --kms-key-id <kms_key_arn_or_id>",
+      "NativeIaC": "```yaml\n# CloudFormation: enable KMS encryption for an existing/new CloudTrail\nResources:\n  <example_resource_name>:\n    Type: AWS::CloudTrail::Trail\n    Properties:\n      S3BucketName: <example_resource_name>\n      KmsKeyId: <example_resource_id>  # Critical: sets the KMS key to encrypt CloudTrail logs at rest\n```",
+      "Other": "1. 在 AWS 控制台中，转到 CloudTrail > 跟踪\n2. 选择跟踪 <trail_name>，单击编辑\n3. 在日志文件加密下，选择使用 KMS 密钥并选择 <cloudtrail_kms_key>\n4. 单击保存更改",
+      "Terraform": "```hcl\n# Enable KMS encryption for CloudTrail\nresource \"aws_cloudtrail\" \"<example_resource_name>\" {\n  name           = \"<example_resource_name>\"\n  s3_bucket_name = \"<example_resource_name>\"\n  kms_key_id     = \"<example_resource_id>\" # Critical: uses this KMS key to encrypt CloudTrail logs\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "在每个跟踪上使用 **客户管理的 KMS 密钥** 启用 **SSE-KMS**。应用 **最小权限原则**，以便只有授权的角色可以 `Decrypt`，并在密钥管理员和日志读取者之间强制执行 **职责分离**。轮换密钥并监控密钥使用情况，为 CloudTrail 数据提供 **纵深防御**。",
+      "Url": "https://hub.prowler.com/check/cloudtrail_kms_encryption_enabled"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

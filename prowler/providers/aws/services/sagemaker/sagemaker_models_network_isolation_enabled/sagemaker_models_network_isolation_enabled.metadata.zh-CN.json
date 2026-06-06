@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "sagemaker_models_network_isolation_enabled",
+  "CheckTitle": "Amazon SageMaker 模型已启用网络隔离",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践/网络可达性",
+    "软件和配置检查/行业和监管标准/AWS 基础安全最佳实践",
+    "影响/数据外泄"
+  ],
+  "ServiceName": "sagemaker",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Other",
+  "ResourceGroup": "ai_ml",
+  "Description": "**SageMaker 模型**会评估其**网络隔离**状态，以表明模型容器在托管/推理期间是否被阻止发起网络连接，除所需的服务控制流量外。",
+  "Risk": "**禁用网络隔离**会允许模型容器访问外部网络，从而能够泄露输入、输出或凭证，获取不受信任的代码，并进行隐蔽回调。这会破坏机密性和完整性，并可能促进从托管环境进行横向移动。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/sagemaker/latest/dg/studio-notebooks-and-internet-access.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation：启用了网络隔离的 SageMaker 模型\nResources:\n  <example_resource_name>:\n    Type: AWS::SageMaker::Model\n    Properties:\n      ExecutionRoleArn: <example_resource_arn>\n      PrimaryContainer:\n        Image: <example_image>\n      EnableNetworkIsolation: true  # 关键：确保模型容器已启用网络隔离\n```",
+      "Other": "1. 在 AWS 控制台中，转到 SageMaker > Inference > Models\n2. 点击 Create model\n3. 输入名称并选择执行角色；设置容器 Image\n4. 勾选 Enable network isolation\n5. 点击 Create model\n6. 如果由端点使用，请使用此模型创建新的端点配置并更新端点，然后删除旧的非隔离模型",
+      "Terraform": "```hcl\n# 启用了网络隔离的 SageMaker 模型\nresource \"aws_sagemaker_model\" \"<example_resource_name>\" {\n  name               = \"<example_resource_name>\"\n  execution_role_arn = \"<example_resource_arn>\"\n\n  primary_container {\n    image = \"<example_image>\"\n  }\n\n  enable_network_isolation = true  # 关键：启用网络隔离以通过检查\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "为所有托管模型启用**网络隔离**。在**私有 VPC** 中运行端点，使用严格的**安全组**和 **VPC 端点**限制出站流量，并强制实施**最小权限 IAM**。采用**纵深防御**：避免公共路由，允许列入白名单的目标，并监控出站流量。",
+      "Url": "https://hub.prowler.com/check/sagemaker_models_network_isolation_enabled"
+    }
+  },
+  "Categories": [
+    "trust-boundaries",
+    "container-security",
+    "gen-ai"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

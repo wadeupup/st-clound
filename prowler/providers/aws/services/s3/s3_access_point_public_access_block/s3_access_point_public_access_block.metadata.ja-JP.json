@@ -1,0 +1,33 @@
+{
+  "Provider": "aws",
+  "CheckID": "s3_access_point_public_access_block",
+  "CheckTitle": "アクセスポイントで有効になっているパブリックアクセス設定をブロックします。",
+  "CheckType": [
+    "データ保護"
+  ],
+  "ServiceName": "s3",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:s3:::bucket_name",
+  "Severity": "critical",
+  "ResourceType": "AwsS3AccessPoint",
+  "ResourceGroup": "storage",
+  "Description": "S 3アクセスポイント上のパブリックアクセスがブロックされていることを確認します。",
+  "Risk": "AWSでS 3アクセスポイントを一般に公開すると、データ漏洩、違反、コンプライアンス違反、不正アクセス、データ整合性の問題が発生する可能性があります。",
+  "RelatedUrl": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-points.html#access-points-policies",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://docs.aws.amazon.com/securityhub/latest/userguide/s3-controls.html#s3-19",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "S 3アクセスポイントがデフォルトでプライベートであることを確認し、厳格なアクセス制御を適用し、権限が付与されていないパブリックアクセスを防ぐために定期的に監査する。",
+      "Url": "https://docs.aws.amazon.com/config/latest/developerguide/s3-access-point-public-access-blocks.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "defender_ensure_mcas_is_enabled",
+  "CheckTitle": "Microsoft Defender for Cloud Apps と Microsoft Defender for Cloud の統合が選択されていることを確認する",
+  "CheckType": [],
+  "ServiceName": "defender",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "DefenderSettings",
+  "ResourceGroup": "security",
+  "Description": "この統合設定により、Microsoft Defender for Cloud Apps（旧称「Microsoft Cloud App Security」または「MCAS」）が Microsoft Defender for Cloud と連携できるようになります。",
+  "Risk": "Microsoft Defender for Cloud は、Azure のコントロール プレーンとみなされる Azure Resource Manager イベントを利用して追加の保護レイヤーを提供します。Azure Resource Manager の記録を分析することで、Azure サブスクリプション環境内の異常または潜在的に有害な操作を検出します。これらの分析のいくつかは Microsoft Defender for Cloud Apps により提供されます。これらの分析を利用するには、サブスクリプションに Cloud App Security ライセンスが必要です。Microsoft Defender for Cloud Apps は Standard ティアのサブスクリプションでのみ動作します。",
+  "RelatedUrl": "https://learn.microsoft.com/en-in/azure/defender-for-cloud/defender-for-cloud-introduction#secure-cloud-applications",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/SecurityCenter/defender-cloud-apps-integration.html#",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "1. Azure Home から Portal Menu を選択します。2. Microsoft Defender for Cloud を選択します。3. Environment Settings ブレードを選択します。4. サブスクリプションを選択します。5. App Service Defender Plan を On にします。6. Save を選択します。",
+      "Url": "https://docs.microsoft.com/en-us/rest/api/securitycenter/settings/list"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "Microsoft Defender for Cloud Apps は Standard 料金ティアのサブスクリプションで動作します。Microsoft Defender for Cloud の Standard 料金ティアを選択すると、リソースごとに追加費用が発生します。"
+}

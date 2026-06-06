@@ -1,0 +1,36 @@
+{
+  "Provider": "aws",
+  "CheckID": "ec2_instance_port_sqlserver_exposed_to_internet",
+  "CheckTitle": "确保没有 EC2 实例允许从互联网入站访问 TCP 端口 1433 或 1434 (SQL Server)",
+  "CheckType": [
+    "Infrastructure Security"
+  ],
+  "ServiceName": "ec2",
+  "SubServiceName": "instance",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "critical",
+  "ResourceType": "AwsEc2Instance",
+  "ResourceGroup": "compute",
+  "Description": "确保没有 EC2 实例允许从互联网入站访问 TCP 端口 1433 或 1434 (SQL Server)",
+  "Risk": "SQL Server 是一个用于存储和检索数据的数据库管理系统。如果 EC2 实例允许从互联网入站访问 TCP 端口 1433 或 1434，它可能容易受到未经授权的访问和数据泄露。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "修改安全组以删除允许从互联网入站访问 TCP 端口 1433 或 1434 (SQL Server) 的规则。",
+      "Url": "https://docs.aws.amazon.com/vpc/latest/userguide/VPC_SecurityGroups.html"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

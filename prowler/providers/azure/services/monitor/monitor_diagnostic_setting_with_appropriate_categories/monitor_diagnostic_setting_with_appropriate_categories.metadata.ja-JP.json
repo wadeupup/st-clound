@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "monitor_diagnostic_setting_with_appropriate_categories",
+  "CheckTitle": "診断設定が適切なカテゴリを取得していることを確認する",
+  "CheckType": [],
+  "ServiceName": "monitor",
+  "SubServiceName": "診断設定の構成",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Monitor",
+  "ResourceGroup": "monitoring",
+  "Description": "前提条件: 診断設定が存在している必要があります。診断設定が存在しない場合、この推奨事項内のナビゲーションおよびオプションは利用できません。本サブセクションの冒頭にある「'Diagnostic Setting' が存在することを確認する」という推奨事項を確認してください。診断設定は、コントロール/管理プレーンから適切なアクティビティを記録するように構成する必要があります。",
+  "Risk": "診断設定は診断ログのエクスポート方法を制御します。適切なコントロール/管理プレーン アクティビティに対する診断設定カテゴリを取得することで、適切なアラートが可能になります。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/azure-monitor/essentials/diagnostic-settings",
+  "Remediation": {
+    "Code": {
+      "CLI": "az monitor diagnostic-settings subscription create --subscription <subscription id> --name <diagnostic settings name> --location <location> <[- -event-hub <event hub ID> --event-hub-auth-rule <event hub auth rule ID>] [-- storage-account <storage account ID>] [--workspace <log analytics workspace ID>] --logs '[{category:Security,enabled:true},{category:Administrative,enabled:true},{ca tegory:Alert,enabled:true},{category:Policy,enabled:true}]'>",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/Monitor/diagnostic-setting-categories.html",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "1. Azure Monitor に移動します。2. Activity log をクリックします。3. Export Activity Logs をクリックします。4. ドロップダウン メニューからサブスクリプションを選択します。5. Add diagnostic setting をクリックします。6. 新しい Diagnostic Setting の名前を入力します。7. 次のカテゴリを選択します: Administrative、Alert、Policy、Security。8. 組織の要件に応じて送信先の詳細を選択します。",
+      "Url": "https://learn.microsoft.com/en-us/azure/storage/common/manage-storage-analytics-logs?toc=%2Fazure%2Fstorage%2Fblobs%2Ftoc.json&bc=%2Fazure%2Fstorage%2Fblobs%2Fbreadcrumb%2Ftoc.json&tabs=azure-portal"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "Azure Portal で診断設定を作成する場合、既定ではカテゴリは選択されません。"
+}

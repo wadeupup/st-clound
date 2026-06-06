@@ -1,0 +1,39 @@
+{
+  "Provider": "aws",
+  "CheckID": "trustedadvisor_premium_support_plan_subscribed",
+  "CheckTitle": "AWS アカウントは AWS Premium Support プランに加入しています",
+  "CheckType": [
+    "ソフトウェアと構成チェック/AWSセキュリティのベストプラクティス"
+  ],
+  "ServiceName": "trustedadvisor",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "low",
+  "ResourceType": "Other",
+  "ResourceGroup": "monitoring",
+  "Description": "**AWS アカウント** は **AWS Premium Support プラン**（例：Business または Enterprise）に加入しています",
+  "Risk": "**プレミアムサポート**がないと、重大インシデントへの対応が遅くなり、**可用性**が低下し、セキュリティイベントの封じ込めが遅延します。Trusted Advisor の対象範囲が限定されているため、**設定ミス**が放置され、**データ漏えい**や**権限の不正使用**のリスクが高まります。専門家のガイダンスがないことで、本番環境への影響時の変更リスクが増大します。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://www.trendmicro.com/cloudoneconformity-staging/knowledge-base/aws/Support/support-plan.html",
+    "https://aws.amazon.com/premiumsupport/plans/"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "1. アカウントのルートユーザーとして AWS マネジメントコンソールにサインインします\n2. https://console.aws.amazon.com/support/home#/plans を開きます\n3. 「Change plan」をクリックします\n4. 「Business Support」（またはそれ以上）を選択し、「Continue」をクリックします\n5. アップグレード内容を確認して確定します",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "本番環境およびミッションクリティカルなアカウントには、**Business** 以上を採用してください。\n- 定義された連絡先/重大度を含めて、Support を IR に統合する\n- ケースアクセスに対して **最小権限** を徹底する\n- 予防的なハードニングのために Trusted Advisor を活用する\n- オプトアウトする場合は、同等の 24/7 サポートおよびエスカレーション経路を確保する",
+      "Url": "https://hub.prowler.com/check/trustedadvisor_premium_support_plan_subscribed"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

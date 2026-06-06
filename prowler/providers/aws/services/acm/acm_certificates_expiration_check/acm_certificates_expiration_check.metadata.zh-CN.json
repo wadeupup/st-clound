@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "acm_certificates_expiration_check",
+  "CheckTitle": "ACM 证书在配置的阈值天数内过期",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践",
+    "软件和配置检查/行业和监管标准/AWS 基础安全最佳实践",
+    "影响/拒绝服务"
+  ],
+  "ServiceName": "acm",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsCertificateManagerCertificate",
+  "ResourceGroup": "security",
+  "Description": "**ACM 证书**根据可配置的阈值评估**到期时间**。接近有效期结束或已过期的证书会被标记，包括附加到服务的证书，以及*如果在范围内*，未使用的证书。",
+  "Risk": "过期或即将过期的 **TLS 证书**可能会中断握手，导致**服务中断**和 API 调用失败（**可用性**）。紧急修复会增加配置错误的风险，可能启用禁用的验证或弱密码，从而允许**中间人攻击（MITM）**和数据暴露（**机密性**/**完整性**）。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/ACM/certificate-expires-in-45-days.html",
+    "https://repost.aws/es/knowledge-center/acm-notification-certificate-renewal",
+    "https://docs.aws.amazon.com/config/latest/developerguide/acm-certificate-expiration-check.html",
+    "https://repost.aws/questions/QU3sMaeZPMRo2kLcsfJsfuVA/acm-notifications-for-expiring-certificates"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "1. 在 AWS 控制台中，打开 Certificate Manager (ACM)\n2. 如果即将过期的证书是 ACM 颁发的：选择它并完成/恢复验证（在 Route 53 中创建记录或添加显示的 CNAME），以便续订可以继续进行\n3. 如果即将过期的证书是导入的：单击 Import a certificate，上传新证书和私钥，然后保存\n4. 更新服务以使用新/续订的证书：\n   - ALB/NLB：EC2 > Load Balancers > Listeners > Edit > Change certificate 到新的 ACM 证书\n   - CloudFront：Distributions > Edit > Viewer certificate > 选择新的 ACM 证书\n   - API Gateway：Custom domain names > Edit > 选择新的 ACM 证书\n5. 验证旧证书不再使用；如果不需要，请删除它",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "采用**自动化证书生命周期管理**：优先使用**具有自动续订的 ACM 颁发的证书**，或将导入与自动化续订/轮换管道集成。通过警报跟踪过期情况，对证书操作强制执行**最小权限**，删除未使用的证书，并测试轮换以避免停机。",
+      "Url": "https://hub.prowler.com/check/acm_certificates_expiration_check"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

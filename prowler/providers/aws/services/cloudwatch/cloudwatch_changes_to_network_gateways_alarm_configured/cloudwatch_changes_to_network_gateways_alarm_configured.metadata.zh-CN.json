@@ -1,0 +1,45 @@
+{
+  "Provider": "aws",
+  "CheckID": "cloudwatch_changes_to_network_gateways_alarm_configured",
+  "CheckTitle": "存在用于网络网关更改的 CloudWatch Logs 指标过滤器和警报",
+  "CheckType": [
+    "Software and Configuration Checks/Industry and Regulatory Standards/CIS AWS Foundations Benchmark",
+    "Software and Configuration Checks/AWS Security Best Practices/Runtime Behavior Analysis",
+    "Software and Configuration Checks/AWS Security Best Practices/Network Reachability",
+    "TTPs/Command and Control"
+  ],
+  "ServiceName": "cloudwatch",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsCloudWatchAlarm",
+  "ResourceGroup": "monitoring",
+  "Description": "通过匹配接收跟踪日志的日志组中的 CloudTrail 事件（如 `CreateCustomerGateway`、`DeleteCustomerGateway`、`AttachInternetGateway`、`CreateInternetGateway`、`DeleteInternetGateway` 和 `DetachInternetGateway`）来识别用于 **网络网关更改** 的 CloudWatch 日志指标过滤器和警报。",
+  "Risk": "没有此监控，网关更改可能会将私有网络暴露到 Internet 或破坏连接性。攻击者或错误可能启用数据窃取、绕过网络检查，并通过删除或分离触发中断，影响 **机密性** 和 **可用性**。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudwatch-alarms-for-cloudtrail.html",
+    "https://support.icompaas.com/support/solutions/articles/62000083807-ensure-a-log-metric-filter-and-alarm-exist-for-changes-to-network-gateways",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/cloudwatch-controls.html#cloudwatch-12",
+    "https://paper.bobylive.com/Security/CIS/CIS_Amazon_Web_Services_Foundations_Benchmark_v1_3_0.pdf"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation: Create metric filter and alarm for network gateway changes\nResources:\n  NetworkGatewayMetricFilter:\n    Type: AWS::Logs::MetricFilter\n    Properties:\n      LogGroupName: <example_resource_name>\n      FilterPattern: '{ ($.eventName = CreateCustomerGateway) || ($.eventName = DeleteCustomerGateway) || ($.eventName = AttachInternetGateway) || ($.eventName = CreateInternetGateway) || ($.eventName = DeleteInternetGateway) || ($.eventName = DetachInternetGateway) }'  # Critical: matches gateway change events\n      MetricTransformations:\n        - MetricName: <example_resource_name>\n          MetricNamespace: <example_resource_name>\n          MetricValue: \"1\"\n\n  NetworkGatewayAlarm:\n    Type: AWS::CloudWatch::Alarm\n    Properties:\n      ComparisonOperator: GreaterThanOrEqualToThreshold\n      EvaluationPeriods: 1\n      MetricName: <example_resource_name>  # Critical: alarm targets the metric created by the filter\n      Namespace: <example_resource_name>\n      Period: 300\n      Statistic: Sum\n      Threshold: 1\n```",
+      "Other": "1. 在 AWS 控制台中，转到 CloudWatch > 日志 > 日志组并打开 CloudTrail 日志组\n2. 创建指标过滤器：\n   - 过滤器模式：{ ($.eventName = CreateCustomerGateway) || ($.eventName = DeleteCustomerGateway) || ($.eventName = AttachInternetGateway) || ($.eventName = CreateInternetGateway) || ($.eventName = DeleteInternetGateway) || ($.eventName = DetachInternetGateway) }\n   - 指标名称：<example_resource_name>\n   - 指标命名空间：<example_resource_name>\n   - 指标值：1\n3. 从过滤器中选择创建警报：\n   - 统计：总和，周期：5 分钟，阈值：>= 1，评估周期：1\n   - 创建警报（操作可选）\n",
+      "Terraform": "```hcl\n# CloudWatch Logs metric filter for network gateway changes\nresource \"aws_cloudwatch_log_metric_filter\" \"<example_resource_name>\" {\n  name           = \"<example_resource_name>\"\n  log_group_name = \"<example_resource_name>\"\n  pattern        = \"{ ($.eventName = CreateCustomerGateway) || ($.eventName = DeleteCustomerGateway) || ($.eventName = AttachInternetGateway) || ($.eventName = CreateInternetGateway) || ($.eventName = DeleteInternetGateway) || ($.eventName = DetachInternetGateway) }\" # Critical: matches gateway change events\n\n  metric_transformation {\n    name      = \"<example_resource_name>\"\n    namespace = \"<example_resource_name>\"\n    value     = \"1\"\n  }\n}\n\n# Alarm on the metric filter\nresource \"aws_cloudwatch_metric_alarm\" \"<example_resource_name>\" {\n  alarm_name          = \"<example_resource_name>\"\n  comparison_operator = \"GreaterThanOrEqualToThreshold\"\n  evaluation_periods  = 1\n  metric_name         = \"<example_resource_name>\"   # Critical: must match metric from the filter\n  namespace           = \"<example_resource_name>\"\n  period              = 300\n  statistic           = \"Sum\"\n  threshold           = 1\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "将 CloudTrail 发送到 CloudWatch Logs，并为列出的网关事件创建指标过滤器，配置通知响应者的警报。对网关修改强制执行 **最小权限原则**，要求变更批准，并将警报路由到监控渠道，作为 **纵深防御** 的一部分。",
+      "Url": "https://hub.prowler.com/check/cloudwatch_changes_to_network_gateways_alarm_configured"
+    }
+  },
+  "Categories": [
+    "logging"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "Logging and Monitoring"
+}
+

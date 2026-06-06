@@ -1,0 +1,39 @@
+{
+  "Provider": "aws",
+  "CheckID": "elbv2_cross_zone_load_balancing_enabled",
+  "CheckTitle": "ELBv2 Network 或 Gateway Load Balancer 已启用跨可用区负载均衡",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices"
+  ],
+  "ServiceName": "elbv2",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsElbv2LoadBalancer",
+  "ResourceGroup": "network",
+  "Description": "**Network 和 Gateway Load Balancer** 已启用**跨可用区负载均衡**（`load_balancing.cross_zone.enabled`），因此每个节点会将请求分发到所有已启用可用区中的目标，而不是仅分发到本可用区。",
+  "Risk": "如果没有跨可用区分发，流量可能集中在单一区域，导致目标过载、故障切换不均衡和连接中断，从而降低**可用性**。在可用区受损时，可能出现部分服务中断并在高负载下增加**延迟**。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/ELBv2/enable-cross-zone-load-balancing.html#",
+    "https://docs.aws.amazon.com/elasticloadbalancing/latest/network/network-load-balancers.html#cross-zone-load-balancing"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws elbv2 modify-load-balancer-attributes --load-balancer-arn <load-balancer-arn> --attributes Key=load_balancing.cross_zone.enabled,Value=true",
+      "NativeIaC": "```yaml\nResources:\n  <example_resource_name>:\n    Type: AWS::ElasticLoadBalancingV2::LoadBalancer\n    Properties:\n      Type: network\n      Subnets:\n        - <subnet-id-1>\n        - <subnet-id-2>\n      LoadBalancerAttributes:\n        - Key: load_balancing.cross_zone.enabled  # Critical: enable cross-zone load balancing\n          Value: true  # Ensures the check passes for NLB/GLB\n```",
+      "Other": "1. 打开 AWS EC2 控制台并进入 Load Balancers\n2. 选择目标 Network 或 Gateway Load Balancer\n3. 进入 Attributes 标签 > Edit attributes\n4. 打开 Cross-zone load balancing\n5. 保存更改",
+      "Terraform": "```hcl\nresource \"aws_lb\" \"<example_resource_name>\" {\n  load_balancer_type = \"network\"\n  subnets            = [\"<subnet-id-1>\", \"<subnet-id-2>\"]\n  enable_cross_zone_load_balancing = true  # Critical: enable cross-zone load balancing\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "启用**跨可用区负载均衡**以在各可用区分散负载，并按 AZ 冗余进行架构设计。\n\n- 按 AZ 均衡容量并使用基于健康状态的路由\n- 避免对单一 AZ 依赖和粘性架构\n- 监控可用区健康状态以维持**容错能力**",
+      "Url": "https://hub.prowler.com/check/elbv2_cross_zone_load_balancing_enabled"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

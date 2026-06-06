@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "sagemaker_training_jobs_intercontainer_encryption_enabled",
+  "CheckTitle": "Amazon SageMaker 训练作业已启用容器间流量加密",
+  "CheckType": [
+    "软件和配置检查/AWS安全最佳实践/网络安全",
+    "行业与监管标准/AWS 基础安全最佳实践",
+    "影响/数据暴露"
+  ],
+  "ServiceName": "sagemaker",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "ai_ml",
+  "Description": "Amazon SageMaker 训练作业已为训练期间的容器到容器通信配置了**容器间流量加密**。\n\n该评估会检查训练作业上的 `EnableInterContainerTrafficEncryption` 设置。",
+  "Risk": "如果没有容器间加密，节点内流量可能是明文，从而使受损主机或同驻工作负载能够进行捕获。这威胁到**机密性**（训练数据、模型参数、凭证）和**完整性**（篡改梯度/结果），并且还可能通过令牌或会话窃取助长**横向移动**。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/SageMaker/enable-inter-container-traffic-encryption.html",
+    "https://docs.aws.amazon.com/sagemaker/latest/dg/interface-vpc-endpoint.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation：已启用容器间流量加密的 SageMaker 训练作业\nResources:\n  SageMakerTrainingJob:\n    Type: AWS::SageMaker::TrainingJob\n    Properties:\n      TrainingJobName: <example_resource_name>\n      RoleArn: <example_resource_id>\n      AlgorithmSpecification:\n        TrainingImage: <example_resource_id>\n        TrainingInputMode: File\n      OutputDataConfig:\n        S3OutputPath: s3://<example_resource_name>/\n      ResourceConfig:\n        InstanceCount: 1\n        InstanceType: ml.m5.large\n        VolumeSizeInGB: 10\n      StoppingCondition:\n        MaxRuntimeInSeconds: 3600\n      EnableInterContainerTrafficEncryption: true  # 严重：对容器之间的流量进行加密以通过检查\n```",
+      "Other": "1. 在 AWS 控制台中，前往 Amazon SageMaker > 训练作业\n2. 点击创建训练作业\n3. 配置必填字段（算法、角色、输入、输出、资源）\n4. 启用设置：启用容器间流量加密\n5. 点击创建以启动新作业（现有作业无法修改）",
+      "Terraform": "```hcl\n# Terraform：启用了容器间流量加密的 SageMaker 训练作业\nresource \"aws_sagemaker_training_job\" \"job\" {\n  name     = \"<example_resource_name>\"\n  role_arn = \"<example_resource_id>\"\n\n  algorithm_specification {\n    training_image      = \"<example_resource_id>\"\n    training_input_mode = \"File\"\n  }\n\n  output_data_config {\n    s3_output_path = \"s3://<example_resource_name>/\"\n  }\n\n  resource_config {\n    instance_count = 1\n    instance_type  = \"ml.m5.large\"\n    volume_size_gb = 10\n  }\n\n  stopping_condition {\n    max_runtime_in_seconds = 3600\n  }\n\n  enable_inter_container_traffic_encryption = true  # 关键：确保容器间流量已加密\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "在所有训练作业上启用 `EnableInterContainerTrafficEncryption` 以强制执行**传输中加密**。\n\n应用**纵深防御**：结合使用**网络隔离**，按照**最小权限**原则限制角色和容器权限，并标准化安全作业模板或防护措施，以防止启动未加密的作业。",
+      "Url": "https://hub.prowler.com/check/sagemaker_training_jobs_intercontainer_encryption_enabled"
+    }
+  },
+  "Categories": [
+    "encryption",
+    "gen-ai"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

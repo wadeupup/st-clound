@@ -1,0 +1,44 @@
+{
+  "Provider": "aws",
+  "CheckID": "cloudwatch_log_metric_filter_security_group_changes",
+  "CheckTitle": "已为安全组变更配置 CloudWatch Logs 度量过滤器和告警",
+  "CheckType": [
+    "Software and Configuration Checks/Industry and Regulatory Standards/CIS AWS Foundations Benchmark",
+    "Software and Configuration Checks/AWS Security Best Practices/Runtime Behavior Analysis"
+  ],
+  "ServiceName": "cloudwatch",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsCloudWatchAlarm",
+  "ResourceGroup": "monitoring",
+  "Description": "**CloudTrail** 中与**安全组配置变更**相关的事件通过 **CloudWatch Logs 度量过滤器**及其关联的 **告警** 进行监控。过滤器会匹配 `AuthorizeSecurityGroupIngress/Egress`、`RevokeSecurityGroupIngress/Egress`、`CreateSecurityGroup`、`DeleteSecurityGroup` 等操作，以发现任何安全组修改。",
+  "Risk": "如果未对**安全组变更**进行告警，未授权或错误的规则可能会将服务暴露到互联网，从而为暴力破解和横向移动创造条件（影响**机密性、完整性**）。删除或过度收紧的规则也可能中断连接（影响**可用性**）。告警延迟会增加攻击者驻留时间和整体影响。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudwatch-alarms-for-cloudtrail.html",
+    "https://support.icompaas.com/support/solutions/articles/62000084030-ensure-a-log-metric-filter-and-alarm-exist-for-security-group-changes",
+    "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/Alarm-On-Logs.html",
+    "https://asecure.cloud/a/cwalarm_securitygroup_changes/"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation：为安全组变更创建度量过滤器和告警\nResources:\n  MetricFilter:\n    Type: AWS::Logs::MetricFilter\n    Properties:\n      LogGroupName: <example_log_group_name>\n      # 关键：匹配本检查要求的安全组变更事件\n      # 当这些事件出现在 CloudTrail 日志中时发布度量\n      FilterPattern: '{ ($.eventName = AuthorizeSecurityGroupIngress) || ($.eventName = AuthorizeSecurityGroupEgress) || ($.eventName = RevokeSecurityGroupIngress) || ($.eventName = RevokeSecurityGroupEgress) || ($.eventName = CreateSecurityGroup) || ($.eventName = DeleteSecurityGroup) }'\n      MetricTransformations:\n        - MetricName: <example_metric_name>\n          MetricNamespace: <example_metric_namespace>\n          MetricValue: \"1\"\n\n  Alarm:\n    Type: AWS::CloudWatch::Alarm\n    Properties:\n      # 关键：对该度量创建告警以满足控制要求\n      MetricName: <example_metric_name>\n      Namespace: <example_metric_namespace>\n      Statistic: Sum\n      Period: 300\n      EvaluationPeriods: 1\n      Threshold: 1\n      ComparisonOperator: GreaterThanOrEqualToThreshold\n```",
+      "Other": "1. 打开 CloudWatch 控制台 > Logs > Log groups，并选择 CloudTrail 日志组\n2. 使用以下模式创建度量过滤器：\n   { ($.eventName = AuthorizeSecurityGroupIngress) || ($.eventName = AuthorizeSecurityGroupEgress) || ($.eventName = RevokeSecurityGroupIngress) || ($.eventName = RevokeSecurityGroupEgress) || ($.eventName = CreateSecurityGroup) || ($.eventName = DeleteSecurityGroup) }\n3. 为度量指定名称 <example_metric_name>、命名空间 <example_metric_namespace>，值设为 1，然后创建过滤器\n4. 从该度量过滤器中选择 Create alarm，设置：Statistic=Sum，Period=5 minutes，Threshold type=Static，条件 Greater/Equal，阈值 1，Evaluation periods=1，最后创建告警",
+      "Terraform": "```hcl\n# 用于安全组变更的度量过滤器\nresource \"aws_cloudwatch_log_metric_filter\" \"sg\" {\n  name           = \"<example_resource_name>\"\n  log_group_name = \"<example_log_group_name>\"\n  # 关键：匹配本检查要求的安全组变更事件\n  pattern = \"{ ($.eventName = AuthorizeSecurityGroupIngress) || ($.eventName = AuthorizeSecurityGroupEgress) || ($.eventName = RevokeSecurityGroupIngress) || ($.eventName = RevokeSecurityGroupEgress) || ($.eventName = CreateSecurityGroup) || ($.eventName = DeleteSecurityGroup) }\"\n\n  metric_transformation {\n    name      = \"<example_metric_name>\"\n    namespace = \"<example_metric_namespace>\"\n    value     = \"1\"\n  }\n}\n\n# 针对上述度量的告警\nresource \"aws_cloudwatch_metric_alarm\" \"sg\" {\n  alarm_name          = \"<example_resource_name>\"\n  # 关键：对安全组变更度量创建告警以通过该控制\n  metric_name         = \"<example_metric_name>\"\n  namespace           = \"<example_metric_namespace>\"\n  statistic           = \"Sum\"\n  period              = 300\n  evaluation_periods  = 1\n  threshold           = 1\n  comparison_operator = \"GreaterThanOrEqualToThreshold\"\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "通过将 CloudTrail 日志发送到 CloudWatch、创建度量过滤器与告警，并通知响应人员，建立对**安全组修改**的实时告警。\n- 对安全组变更实施**最小权限原则**\n- 使用变更管理与标签\n- 集中日志、定期测试告警并维护运行手册\n- 结合 NACL 与 WAF 等手段实现**纵深防御**",
+      "Url": "https://hub.prowler.com/check/cloudwatch_log_metric_filter_security_group_changes"
+    }
+  },
+  "Categories": [
+    "logging"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "日志记录与监控"
+}
+
+

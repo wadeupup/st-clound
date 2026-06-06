@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "wafv2_webacl_rule_logging_enabled",
+  "CheckTitle": "AWS WAFv2 Web ACL 已为所有规则和规则组启用 Amazon CloudWatch 指标",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践/运行时行为分析",
+    "软件和配置检查/行业和监管标准/AWS 基础安全最佳实践",
+    "软件和配置检查/行业和监管标准/NIST 800-53 控制措施"
+  ],
+  "ServiceName": "wafv2",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsWafv2WebAcl",
+  "ResourceGroup": "security",
+  "Description": "**AWS WAFv2 Web ACL** 会被评估，以确认每个关联的 **rule** 和 **rule group** 都已启用 **CloudWatch metrics**，从而能够查看规则评估和流量情况",
+  "Risk": "如果缺少 **CloudWatch 指标**，WAF 遥测数据将会丢失，从而掩盖流量激增、规则绕过和错误配置。这会延迟对 SQLi/XSS 探测和机器人洪泛攻击的发现，进而危及数据机密性、请求完整性和应用程序可用性。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://support.icompaas.com/support/solutions/articles/62000233644-ensure-aws-wafv2-webacl-rule-or-rule-group-has-amazon-cloudwatch-metrics-enabled",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/waf-controls.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/waf-controls.html#waf-12"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation：在 WAFv2 Web ACL 规则上启用 CloudWatch 指标\nResources:\n  <example_resource_name>:\n    Type: AWS::WAFv2::WebACL\n    Properties:\n      Name: <example_resource_name>\n      Scope: REGIONAL\n      DefaultAction:\n        Allow: {}\n      VisibilityConfig:\n        SampledRequestsEnabled: true\n        CloudWatchMetricsEnabled: true\n        MetricName: <metric_name>\n      Rules:\n        - Name: <example_rule_name>\n          Priority: 1\n          Statement:\n            ManagedRuleGroupStatement:\n              VendorName: AWS\n              Name: AWSManagedRulesCommonRuleSet\n          OverrideAction:\n            None: {}\n          VisibilityConfig:\n            SampledRequestsEnabled: true\n            CloudWatchMetricsEnabled: true  # 重要：为此规则启用 CloudWatch 指标\n            MetricName: <rule_metric_name>  # CloudWatch 指标需要\n```",
+      "Other": "1. 在 AWS 控制台中，前往 AWS WAF & Shield > Web ACLs，选择该 Web ACL\n2. 打开 Rules 选项卡，编辑每条规则，并启用 CloudWatch 指标（Visibility configuration > CloudWatch metrics enabled），然后保存\n3. 对于规则组：前往 AWS WAF & Shield > Rule groups，选择该规则组，编辑 Visibility configuration，启用 CloudWatch 指标，然后保存",
+      "Terraform": "```hcl\n# Terraform：在 WAFv2 Web ACL 规则上启用 CloudWatch 指标\nresource \"aws_wafv2_web_acl\" \"<example_resource_name>\" {\n  name  = \"<example_resource_name>\"\n  scope = \"REGIONAL\"\n\n  default_action { allow {} }\n\n  visibility_config {\n    cloudwatch_metrics_enabled = true\n    metric_name                = \"<metric_name>\"\n    sampled_requests_enabled   = true\n  }\n\n  rule {\n    name     = \"<example_rule_name>\"\n    priority = 1\n\n    statement {\n      managed_rule_group_statement {\n        vendor_name = \"AWS\"\n        name        = \"AWSManagedRulesCommonRuleSet\"\n      }\n    }\n\n    override_action { none {} }\n\n    visibility_config {\n      cloudwatch_metrics_enabled = true  # 重要：为此规则启用 CloudWatch 指标\n      metric_name                = \"<rule_metric_name>\"  # CloudWatch 指标需要\n      sampled_requests_enabled   = true\n    }\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "为所有 WAF 规则和规则组（*包括托管规则组*）启用 **CloudWatch 指标**。使用一致的指标名称，集中管理仪表板和告警，并审查趋势以验证规则的有效性。与 SIEM 集成以实现 **纵深防御**，并根据遥测数据调整规则。",
+      "Url": "https://hub.prowler.com/check/wafv2_webacl_rule_logging_enabled"
+    }
+  },
+  "Categories": [
+    "logging"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

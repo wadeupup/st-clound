@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "mq_broker_auto_minor_version_upgrades",
+  "CheckTitle": "Amazon MQ broker 已启用自动小版本升级",
+  "CheckType": [
+    "软件和配置检查/补丁管理",
+    "软件和配置检查/行业和监管标准/NIST 800-53 控制"
+  ],
+  "ServiceName": "mq",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "low",
+  "ResourceType": "AwsAmazonMQBroker",
+  "ResourceGroup": "messaging",
+  "Description": "**Amazon MQ brokers** 已启用 `autoMinorVersionUpgrade`，以便在计划的维护窗口期间自动应用支持的小版本和补丁引擎更新。",
+  "Risk": "如果没有自动小版本升级，broker 可能运行**已知易受攻击的引擎版本**，从而导致以下影响：\n- **机密性**：消息泄露\n- **完整性**：篡改或重放\n- **可用性**：崩溃/拒绝服务和不稳定\n\n延迟补丁还会增加操作风险和偏离。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/MQ/auto-minor-version-upgrade.html",
+    "https://docs.aws.amazon.com/amazon-mq/latest/developer-guide/upgrading-brokers.html#upgrading-brokers-automatic-upgrades",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/mq-controls.html#mq-3",
+    "https://docs.aws.amazon.com/amazon-mq/latest/developer-guide/upgrading-brokers.html#upgrading-brokers-automatic-upgrades.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws mq update-broker --broker-id <example_resource_id> --auto-minor-version-upgrade",
+      "NativeIaC": "```yaml\n# CloudFormation：在 MQ broker 上启用自动小版本升级\nResources:\n  <example_resource_name>:\n    Type: AWS::AmazonMQ::Broker\n    Properties:\n      BrokerName: <example_resource_name>\n      AutoMinorVersionUpgrade: true  # 关键：启用自动小版本升级\n      DeploymentMode: SINGLE_INSTANCE\n      EngineType: ACTIVEMQ\n      EngineVersion: <ENGINE_VERSION>\n      HostInstanceType: mq.t3.micro\n      PubliclyAccessible: true\n      Users:\n        - Username: <USERNAME>\n          Password: <PASSWORD>\n```",
+      "Other": "1. 打开 Amazon MQ 控制台\n2. 转到 Brokers 并选择目标 broker\n3. 点击编辑\n4. 在维护下，勾选启用自动小版本升级\n5. 点击保存",
+      "Terraform": "```hcl\n# Terraform：在 MQ broker 上启用自动小版本升级\nresource \"aws_mq_broker\" \"<example_resource_name>\" {\n  broker_name                = \"<example_resource_name>\"\n  engine_type                = \"ActiveMQ\"\n  engine_version             = \"<ENGINE_VERSION>\"\n  host_instance_type         = \"mq.t3.micro\"\n  publicly_accessible        = true\n  auto_minor_version_upgrade = true  # 关键：启用自动小版本升级\n\n  user {\n    username = \"<USERNAME>\"\n    password = \"<PASSWORD>\"\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "在所有 broker 上启用 `autoMinorVersionUpgrade` 以减少补丁延迟。\n\n- 将升级与定义的维护窗口对齐\n- 在生产环境之前在暂存环境中验证更改\n- 更新后监控 broker 健康和日志\n- 维护高可用性和经过测试的备份以进行回滚（*深度防御*）",
+      "Url": "https://hub.prowler.com/check/mq_broker_auto_minor_version_upgrades"
+    }
+  },
+  "Categories": [
+    "vulnerabilities"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

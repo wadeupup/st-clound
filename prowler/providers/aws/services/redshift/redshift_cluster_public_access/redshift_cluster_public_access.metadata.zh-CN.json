@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "redshift_cluster_public_access",
+  "CheckTitle": "Redshift 集群未公开暴露于互联网",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践/网络可达性",
+    "软件和配置检查/行业和法规标准/AWS 基础安全最佳实践"
+  ],
+  "ServiceName": "redshift",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "critical",
+  "ResourceType": "AwsRedshiftCluster",
+  "ResourceGroup": "analytics",
+  "Description": "具有 `publicly accessible` 端点的 Amazon Redshift 集群位于**公共子网**中，并且安全组允许来自 `0.0.0.0/0` 或 `::/0` 的 TCP，被识别为暴露于互联网。\n\n由于私有子网或限制性规则而没有互联网可达性的公共端点被单独识别。",
+  "Risk": "暴露于互联网的 Redshift 端点允许任何主机直接访问数据库，影响包括：\n- **机密性**：凭证暴力破解、未经授权的查询、数据泄露\n- **完整性**：未经授权的写入或架构更改\n- **可用性**：扫描/滥用导致连接耗尽或中断",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/de_de/redshift/latest/mgmt/rs-ra3-VPC-public-private.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/Redshift/redshift-cluster-publicly-accessible.html",
+    "https://docs.aws.amazon.com/redshift/latest/mgmt/managing-clusters-vpc.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws redshift modify-cluster --cluster-identifier <CLUSTER_ID> --no-publicly-accessible",
+      "NativeIaC": "```yaml\n# CloudFormation：Redshift 集群不可公开访问\nResources:\n  <example_resource_name>:\n    Type: AWS::Redshift::Cluster\n    Properties:\n      ClusterType: single-node\n      DBName: <example_db_name>\n      MasterUsername: <example_username>\n      MasterUserPassword: <example_password>\n      NodeType: dc2.large\n      PubliclyAccessible: false  # 关键：禁用公共访问以防止互联网暴露\n```",
+      "Other": "1. 打开 AWS 管理控制台并进入 Amazon Redshift\n2. 选择您的集群\n3. 点击编辑（或操作 > 修改）\n4. 将 Publicly accessible 设置为 Off/No\n5. 保存更改并应用修改",
+      "Terraform": "```hcl\n# Redshift 集群不可公开访问\nresource \"aws_redshift_cluster\" \"<example_resource_name>\" {\n  cluster_identifier  = \"<example_resource_id>\"\n  node_type           = \"dc2.large\"\n  cluster_type        = \"single-node\"\n  master_username     = \"<example_username>\"\n  master_password     = \"<example_password>\"\n\n  publicly_accessible = false  # 关键：禁用公共访问以防止互联网暴露\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "优先选择**私有连接**：禁用公共访问，将集群放置在私有子网中，并应用**最小权限**安全组，仅限于受信任的 CIDR 或 VPC 来源。使用**深度防御**结合 VPN/对等连接/端点、强身份验证和监控。避免对数据库端口使用 `0.0.0.0/0` 或 `::/0`。",
+      "Url": "https://hub.prowler.com/check/redshift_cluster_public_access"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

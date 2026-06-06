@@ -1,0 +1,33 @@
+{
+  "Provider": "azure",
+  "CheckID": "aisearch_service_not_publicly_accessible",
+  "CheckTitle": "AI Search サービスへのパブリック ネットワーク アクセスを制限する",
+  "CheckType": [],
+  "ServiceName": "aisearch",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AzureSearchService",
+  "ResourceGroup": "database",
+  "Description": "Search サービスへのパブリック ネットワーク アクセスが制限されていることを確認します。",
+  "Risk": "パブリックに公開されていると、Search サービスが攻撃、未承認の利用、データ侵害のリスクにさらされます。アクセスを制限することで攻撃対象領域を最小化し、許可されたネットワークのみが検索サービスへアクセスできるようにします。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/search/service-configure-firewall#configure-network-access-in-azure-portal",
+  "Remediation": {
+    "Code": {
+      "CLI": "az search service update --resource-group <resource_group_name> --name <service_name> --public-access disabled",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "パブリック アクセスを制限した後、必要なサービスからのアクセスを許可するために、必要な仮想ネットワーク構成や IP ルールが設定されていることを確認してください。安全な環境を維持するため、ネットワーク アクセス設定を定期的に見直してください。Search サービスへのパブリック ネットワーク アクセスを制限する手順：1. Azure ポータルで Search サービスに移動します。2. 「設定」->「ネットワーク」で、「パブリック ネットワーク アクセス」を「無効」に設定します。3. 安全なアクセスのため、必要に応じて仮想ネットワーク サービス エンドポイントまたはプライベート エンドポイントを設定します。4. 必要に応じて IP アクセス ルールを確認し、調整します。",
+      "Url": "https://learn.microsoft.com/en-us/azure/search/service-configure-firewall#configure-network-access-in-azure-portal"
+    }
+  },
+  "Categories": [
+    "gen-ai"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

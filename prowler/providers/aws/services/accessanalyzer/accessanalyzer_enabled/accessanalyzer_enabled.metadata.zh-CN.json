@@ -1,0 +1,48 @@
+{
+  "Provider": "aws",
+  "CheckID": "accessanalyzer_enabled",
+  "CheckTitle": "IAM Access Analyzer 已启用",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践",
+    "软件和配置检查/行业和监管标准/AWS 基础安全最佳实践"
+  ],
+  "ServiceName": "accessanalyzer",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "low",
+  "ResourceType": "Other",
+  "ResourceGroup": "security",
+  "Description": "**IAM Access Analyzer** 的存在和状态按账户和区域进行评估。处于 `ACTIVE` 状态的分析器表示持续分析受支持的资源和 IAM 活动，以识别外部、内部和未使用的访问。",
+  "Risk": "没有活动的分析器，将失去对意外公共访问、跨账户访问或风险内部访问的可见性。攻击者可以利用暴露的 S3、快照、KMS 密钥或宽松的角色信任进行数据泄露和权限提升。未使用的权限持续存在，扩大了攻击面。这会降低机密性和完整性。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/IAM/latest/UserGuide/access-analyzer-manage-external.html",
+    "https://aws.amazon.com/iam/access-analyzer/",
+    "https://docs.aws.amazon.com/IAM/latest/UserGuide/access-analyzer-getting-started.html",
+    "https://docs.aws.amazon.com/access-analyzer/latest/APIReference/API_CreateAnalyzer.html",
+    "https://docs.aws.amazon.com/IAM/latest/UserGuide/what-is-access-analyzer.html",
+    "https://docs.aws.amazon.com/IAM/latest/UserGuide/access-analyzer-create-external.html",
+    "https://docs.aws.amazon.com/access-analyzer/latest/APIReference/Welcome.html",
+    "https://docs.aws.amazon.com/IAM/latest/UserGuide/access-analyzer-create-internal.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws accessanalyzer create-analyzer --analyzer-name example_resource --type ACCOUNT",
+      "NativeIaC": "```yaml\nResources:\n  example_resource:\n    Type: AWS::AccessAnalyzer::Analyzer  # 此资源启用 IAM Access Analyzer\n    Properties:\n      AnalyzerName: example_resource\n      Type: ACCOUNT  # 此行修复安全问题\n```",
+      "Other": "1. 在 AWS 控制台中，打开 IAM\n2. 转到 Access analyzer > Analyzer settings\n3. 确认所需区域\n4. 单击 Create analyzer\n5. 选择 Resource analysis - External access\n6. 将 Name 设置为 \"example_resource\"，将 Zone of trust 设置为 \"Current account\"\n7. 单击 Create",
+      "Terraform": "```hcl\nresource \"aws_accessanalyzer_analyzer\" \"example_resource\" {\n  analyzer_name = \"example_resource\"\n  type          = \"ACCOUNT\" # 此行修复安全问题\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "在所有账户和活动区域（*或组织范围*）启用 **IAM Access Analyzer**。遵循最小权限原则：持续审查发现结果，删除意外访问，并清理未使用的权限。谨慎使用归档规则，将审查集成到变更/CI/CD 工作流中，并在策略变更时强制执行职责分离。",
+      "Url": "https://hub.prowler.com/check/accessanalyzer_enabled"
+    }
+  },
+  "Categories": [
+    "identity-access",
+    "trust-boundaries"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

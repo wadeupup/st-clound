@@ -1,0 +1,35 @@
+{
+  "Provider": "aws",
+  "CheckID": "s3_bucket_cross_region_replication",
+  "CheckTitle": "检查 S3 存储桶是否使用跨区域复制。",
+  "CheckType": [
+    "安全访问管理"
+  ],
+  "ServiceName": "s3",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:s3:::bucket_name",
+  "Severity": "low",
+  "ResourceType": "AwsS3Bucket",
+  "ResourceGroup": "storage",
+  "Description": "验证 S3 存储桶是否已启用跨区域复制，以确保数据在多个 AWS 区域之间的冗余和可用性",
+  "Risk": "如果S3存储桶没有进行跨区域复制，一旦整个区域宕机，数据就有丢失或无法访问的风险，从而可能导致服务中断和数据不可用。",
+  "RelatedUrl": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/replication.html",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://docs.aws.amazon.com/securityhub/latest/userguide/s3-controls.html#s3-7",
+      "Terraform": "https://docs.prowler.com/checks/aws/general-policies/ensure-that-s3-bucket-has-cross-region-replication-enabled#terraform"
+    },
+    "Recommendation": {
+      "Text": "确保 S3 存储桶已启用跨区域复制。",
+      "Url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/replication-walkthrough1.html"
+    }
+  },
+  "Categories": [
+    "redundancy"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

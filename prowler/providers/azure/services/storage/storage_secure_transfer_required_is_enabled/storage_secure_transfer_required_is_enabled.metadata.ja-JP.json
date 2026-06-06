@@ -1,0 +1,33 @@
+{
+  "Provider": "azure",
+  "CheckID": "storage_secure_transfer_required_is_enabled",
+  "CheckTitle": "クライアントと Azure Storage Account 間で転送されるすべてのデータが HTTPS プロトコルで暗号化されていることを確認する。",
+  "CheckType": [],
+  "ServiceName": "storage",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AzureStorageAccount",
+  "ResourceGroup": "storage",
+  "Description": "クライアントと Azure Storage Account 間で転送されるすべてのデータが HTTPS プロトコルで暗号化されていることを確認します。",
+  "Risk": "セキュアではない接続でストレージアカウントに送信されたリクエストは盗聴される可能性があります。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "az storage account update --name <STORAGE_ACCOUNT_NAME> --https-only true",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/StorageAccounts/secure-transfer-required.html",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-networking-policies/ensure-that-storage-account-enables-secure-transfer"
+    },
+    "Recommendation": {
+      "Text": "転送中データの暗号化を有効化してください。",
+      "Url": ""
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

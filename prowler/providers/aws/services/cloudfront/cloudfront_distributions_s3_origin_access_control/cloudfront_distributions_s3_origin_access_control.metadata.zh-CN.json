@@ -1,0 +1,44 @@
+{
+  "Provider": "aws",
+  "CheckID": "cloudfront_distributions_s3_origin_access_control",
+  "CheckTitle": "CloudFront 分配对所有 S3 源使用源访问控制 (OAC)",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Effects/Data Exposure"
+  ],
+  "ServiceName": "cloudfront",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsCloudFrontDistribution",
+  "ResourceGroup": "network",
+  "Description": "具有**Amazon S3 源**的**CloudFront 分配**应在每个 S3 源上使用**源访问控制**（`OAC`）。\n\n评估会检查包含 `s3_origin_config` 的分配，并识别缺少关联 OAC 的 S3 源。",
+  "Risk": "没有**OAC**，S3 对象可以在 CloudFront 外部访问，绕过边缘控制并削弱**机密性**和**完整性**。\n- 直接访问可能导致数据泄露\n- 失去 WAF、速率限制和详细日志记录；成本滥用\n- 对签名写入和**SSE-KMS**的支持有限，增加了篡改风险",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/CloudFront/s3-origin.html",
+    "https://repost.aws/knowledge-center/cloudfront-access-to-amazon-s3",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/cloudfront-controls.html#cloudfront-13",
+    "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/private-content-restricting-access-to-s3.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws cloudfront create-origin-access-control --origin-access-control-config '{Name\":\"<example_resource_name>\",\"SigningProtocol\":\"sigv4\",\"SigningBehavior\":\"always\",\"OriginAccessControlOriginType\":\"s3\"}' && aws cloudfront get-distribution-config --id <DISTRIBUTION_ID> --output json > current-config.json && echo 'Manually edit current-config.json to add OriginAccessControlId to S3 origins, then run:' && echo 'aws cloudfront update-distribution --id <DISTRIBUTION_ID> --distribution-config file://current-config.json --if-match $(aws cloudfront get-distribution-config --id <DISTRIBUTION_ID> --query \"ETag\" --output text)'",
+      "NativeIaC": "```yaml\n# CloudFormation：在 CloudFront 分配中将 OAC 附加到 S3 源\nResources:\n  ExampleOAC:\n    Type: AWS::CloudFront::OriginAccessControl\n    Properties:\n      OriginAccessControlConfig:\n        Name: <example_resource_name>\n        OriginAccessControlOriginType: s3\n        SigningBehavior: always\n        SigningProtocol: sigv4\n\n  ExampleDistribution:\n    Type: AWS::CloudFront::Distribution\n    Properties:\n      DistributionConfig:\n        Enabled: true\n        Origins:\n          - Id: s3-<example_resource_id>\n            DomainName: <example_bucket>.s3.amazonaws.com\n            OriginAccessControlId: !Ref ExampleOAC  # 关键：将 OAC 附加到 S3 源以满足检查\n            S3OriginConfig:\n              OriginAccessIdentity: \"\"             # 关键：使用 OAC 时禁用 OAI\n        DefaultCacheBehavior:\n          TargetOriginId: s3-<example_resource_id>\n          ViewerProtocolPolicy: redirect-to-https\n          CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6\n```",
+      "Other": "1. 在 AWS 控制台中，打开 CloudFront 并转到安全 > 源访问 > 源访问控制 (OAC)。点击创建控制设置，选择源类型 S3，保持签名请求，然后创建 OAC。\n2. 打开您的 CloudFront 分配，转到源选项卡。\n3. 对于每个 S3 源：点击编辑，选择源访问控制设置（推荐），选择在步骤 1 中创建的 OAC，然后保存更改。\n4. 对分配中的所有 S3 源重复步骤 3。",
+      "Terraform": "```hcl\n# Terraform：在 CloudFront 分配中将 OAC 附加到 S3 源\nresource \"aws_cloudfront_origin_access_control\" \"oac\" {\n  name                              = \"<example_resource_name>\"\n  origin_access_control_origin_type = \"s3\"\n  signing_behavior                  = \"always\"\n  signing_protocol                  = \"sigv4\"\n}\n\nresource \"aws_cloudfront_distribution\" \"dist\" {\n  enabled = true\n\n  origin {\n    domain_name = \"<example_bucket>.s3.amazonaws.com\"\n    origin_id   = \"s3-<example_resource_id>\"\n\n    origin_access_control_id = aws_cloudfront_origin_access_control.oac.id  # 关键：将 OAC 附加到 S3 源以满足检查\n\n    s3_origin_config {\n      origin_access_identity = \"\"  # 关键：使用 OAC 时禁用 OAI\n    }\n  }\n\n  default_cache_behavior {\n    target_origin_id       = \"s3-<example_resource_id>\"\n    viewer_protocol_policy = \"redirect-to-https\"\n    cache_policy_id        = \"658327ea-f89d-4fab-a63d-7e88639e58f6\"\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "为所有 S3 源启用**源访问控制**，并保持存储桶非公开。\n\n应用**最小权限**：将存储桶和密钥权限范围限定到 CloudFront 和预期的分配。确保源请求已签名，从旧版 OAI 迁移，并使用 WAF 和监控的**纵深防御**来保护和观察访问。",
+      "Url": "https://hub.prowler.com/check/cloudfront_distributions_s3_origin_access_control"
+    }
+  },
+  "Categories": [
+    "trust-boundaries"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

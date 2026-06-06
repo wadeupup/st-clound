@@ -1,0 +1,39 @@
+{
+  "Provider": "aws",
+  "CheckID": "servicecatalog_portfolio_shared_within_organization_only",
+  "CheckTitle": "Service Catalog 产品组合仅在 AWS Organization 内共享",
+  "CheckType": [
+    "软件和配置检查/AWS安全最佳实践",
+    "TTPs/初始访问/未授权访问"
+  ],
+  "ServiceName": "servicecatalog",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Other",
+  "ResourceGroup": "governance",
+  "Description": "**AWS Service Catalog 产品组合**会被评估，以确认共享是通过 **AWS Organizations** 集成进行的，而不是直接使用 `ACCOUNT` 共享。它会审查已共享的产品组合，并识别那些以单个账户为目标而非组织范围的产品组合。",
+  "Risk": "与单个账户共享会使接收者能够在集中式防护措施之外导入和启动产品，并继承启动角色。这可能导致未经授权的资源配置、数据暴露和配置漂移——通过被滥用的权限和不受控制的成本影响机密性、完整性和可用性。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/servicecatalog/latest/adminguide/catalogs_portfolios_sharing.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws servicecatalog create-portfolio-share --portfolio-id <portfolio-id> --organization-ids <org-id>",
+      "NativeIaC": "```yaml\n# CloudFormation：仅在 AWS Organizations 内共享 Service Catalog 产品组合\nResources:\n  <example_resource_name>:\n    Type: AWS::ServiceCatalog::PortfolioShare\n    Properties:\n      PortfolioId: <example_resource_id>\n      OrganizationNode:               # 关键：在 AWS Organizations 内共享\n        Type: ORGANIZATION            # 与整个组织共享该投资组合\n        Value: <example_resource_id>  # 例如，o-xxxxxxxxxx\n```",
+      "Other": "1. 在 AWS Console 中，前往 Service Catalog > Portfolios 并打开目标 portfolio\n2. 打开 Shares/Sharing 选项卡\n3. 删除所有类型为“Account”的共享（停止与每个账户共享）\n4. 点击 Share，选择 “AWS Organizations”，将 Type 设为 “Organization”，输入你的 Org ID（o-xxxxxxxxxx），然后进行共享\n5. 验证不存在任何剩余类型为“Account”的共享",
+      "Terraform": "```hcl\n# 仅在 AWS Organization 内共享 Service Catalog 产品组合\nresource \"aws_servicecatalog_portfolio_share\" \"<example_resource_name>\" {\n  portfolio_id = \"<example_resource_id>\"\n\n  organization_node {           # 关键：在 AWS Organizations 内共享\n    type  = \"ORGANIZATION\"     # 与整个组织共享该投资组合\n    value = \"<example_resource_id>\"  # 例如，o-xxxxxxxxxx\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "优先为产品组合使用**组织共享**，避免使用 `ACCOUNT` 目标。对产品组合访问权限和启动角色实施**最小权限**原则，并定期审查共享。应用**职责分离**和**纵深防御**，以便只有受治理的账户使用产品，并将爆炸半径保持在受限范围内。",
+      "Url": "https://hub.prowler.com/check/servicecatalog_portfolio_shared_within_organization_only"
+    }
+  },
+  "Categories": [
+    "trust-boundaries"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

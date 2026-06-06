@@ -1,0 +1,44 @@
+{
+  "Provider": "aws",
+  "CheckID": "cloudfront_distributions_logging_enabled",
+  "CheckTitle": "CloudFrontディストリビューションにログが有効になっている",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices"
+  ],
+  "ServiceName": "cloudfront",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsCloudFrontDistribution",
+  "ResourceGroup": "network",
+  "Description": "**CloudFrontディストリビューション**は、**標準アクセスログ**または添付された**リアルタイムログ設定**を使用してビューアーリクエストを記録します。\n\nこの検出結果は、各ディストリビューションのリクエストメタデータがキャプチャされるようにログが設定されているかどうかを評価します。",
+  "Risk": "**CloudFrontログ**がない場合、エッジリクエストの監視が妨げられ、ボット悪用、資格情報スタッフィング、オリジン調査、キャッシュバイパス試行の検出が困難になります。\n\nこれにより、インシデント対応が遅延し、フォレンジックの証拠が弱まり、**機密性**、**整合性**、**可用性**に影響を与えます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/AccessLogs.html",
+    "https://repost.aws/knowledge-center/cloudfront-logging-requests",
+    "https://aws.amazon.com/awstv/watch/e895e7811ac/",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/CloudFront/enable-real-time-logging.html",
+    "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/real-time-logs.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws cloudfront get-distribution-config --id <DISTRIBUTION_ID> --output json > current-config.json && echo 'Manually edit current-config.json to add Logging.Bucket: <example_bucket>.s3.amazonaws.com', then run:' && echo 'aws cloudfront update-distribution --id <DISTRIBUTION_ID> --distribution-config file://current-config.json --if-match $(aws cloudfront get-distribution-config --id <DISTRIBUTION_ID> --query \"ETag\" --output text)'",
+      "NativeIaC": "```yaml\n# CloudFormation：CloudFront標準アクセスログを有効化\nResources:\n  <example_resource_name>:\n    Type: AWS::CloudFront::Distribution\n    Properties:\n      DistributionConfig:\n        Enabled: true\n        Origins:\n          - Id: origin1\n            DomainName: <example_origin_domain>\n            S3OriginConfig: {}\n        DefaultCacheBehavior:\n          TargetOriginId: origin1\n          ViewerProtocolPolicy: allow-all\n        Logging:\n          Bucket: <example_bucket>.s3.amazonaws.com  # 重要：このディストリビューションに対してS3への標準アクセスログを有効化\n          # Bucketを持つLoggingの存在によりアクセスログが有効になります\n```",
+      "Other": "1. AWSコンソールで、CloudFrontに移動し、ディストリビューションを選択\n2. 一般タブを開き、編集をクリック\n3. 標準ログで、オンに設定\n4. ログを受信するS3バケットを選択\n5. S3バケットのオブジェクト所有権がACL有効（バケット所有者優先/オブジェクトライター）に設定されていることを確認\n6. 変更を保存",
+      "Terraform": "```hcl\n# アクセスログを有効にするために、既存のCloudFrontディストリビューションにこのブロックを追加\nresource \"aws_cloudfront_distribution\" \"<example_resource_name>\" {\n  # ... 既存の必須設定 ...\n  logging_config {\n    bucket = \"<example_bucket>.s3.amazonaws.com\"  # 重要：S3への標準アクセスログを有効化\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "すべてのディストリビューションに対して**標準アクセスログ**または**リアルタイムログ**を有効にします。\n\nログストレージに**最小権限**を適用し、保持と不変性を強制し、アラートで集中取り込みを行います。\n\n**多層防御**を使用：WAFメトリクスと相関させ、必要に応じてリアルタイムをサンプリングし、ログ記録のために新しいディストリビューションを監査します。",
+      "Url": "https://hub.prowler.com/check/cloudfront_distributions_logging_enabled"
+    }
+  },
+  "Categories": [
+    "logging"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "Logging and Monitoring"
+}
+

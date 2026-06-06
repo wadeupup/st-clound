@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "cloudtrail_bucket_requires_mfa_delete",
+  "CheckTitle": "CloudTrail 跟踪 S3 存储桶已启用 MFA 删除",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/CIS AWS Foundations Benchmark"
+  ],
+  "ServiceName": "cloudtrail",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsCloudTrailTrail",
+  "ResourceGroup": "monitoring",
+  "Description": "对正在记录日志的跟踪的 **CloudTrail 日志存储桶** 评估关联 S3 存储桶上的 **MFA 删除**。评估确定是否在账户内日志存储桶上配置了 `MFA Delete`；*如果存储桶位于另一个账户中，应单独验证其配置*。",
+  "Risk": "如果没有 **MFA 删除**，被盗用或权限过高的凭据可以永久删除日志版本或更改版本控制，从而损害日志的 **完整性** 和 **可用性**。这使得攻击者能够掩盖痕迹，阻碍 **取证**，并削弱调查证据。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/AmazonS3/latest/userguide/MultiFactorAuthenticationDelete.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/CloudTrail/cloudtrail-bucket-mfa-delete-enabled.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws s3api put-bucket-versioning --bucket <CLOUDTRAIL_BUCKET_NAME> --versioning-configuration Status=Enabled,MFADelete=Enabled --mfa \"<MFA_SERIAL> <MFA_CODE>\"",
+      "NativeIaC": "",
+      "Other": "1. 以启用了 MFA 的 root 用户身份登录 AWS 管理控制台\n2. 打开 AWS CloudShell（从顶部导航栏）\n3. 运行：\n   ```bash\n   aws s3api put-bucket-versioning --bucket <CLOUDTRAIL_BUCKET_NAME> --versioning-configuration Status=Enabled,MFADelete=Enabled --mfa \"<MFA_SERIAL> <MFA_CODE>\"\n   ```",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "在启用了版本控制的 CloudTrail 日志存储桶上启用 `MFA Delete`。强制执行 **最小权限原则**，以便只有严格控制的身份才能删除或更改日志，并要求对此类操作使用 MFA。使用专用日志账户和日志文件完整性验证应用 **纵深防御**。",
+      "Url": "https://hub.prowler.com/check/cloudtrail_bucket_requires_mfa_delete"
+    }
+  },
+  "Categories": [
+    "identity-access",
+    "forensics-ready"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

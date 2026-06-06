@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "cloudwatch_log_metric_filter_for_s3_bucket_policy_changes",
+  "CheckTitle": "已为 S3 存储桶策略变更配置 CloudWatch 日志度量过滤器和告警",
+  "CheckType": [
+    "Software and Configuration Checks/Industry and Regulatory Standards/CIS AWS Foundations Benchmark",
+    "Software and Configuration Checks/AWS Security Best Practices/Runtime Behavior Analysis"
+  ],
+  "ServiceName": "cloudwatch",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsCloudWatchAlarm",
+  "ResourceGroup": "monitoring",
+  "Description": "**CloudTrail** 日志会被评估是否存在一个匹配 S3 存储桶配置变更（ACL、策略、CORS、生命周期、复制；例如 `PutBucketPolicy`、`DeleteBucketPolicy`）的 **CloudWatch 度量过滤器**，以及相应的 **CloudWatch 告警**。",
+  "Risk": "如果没有对 S3 策略和 ACL 变更进行告警，未授权的修改可能长期不被发现，从而削弱数据的**机密性**和**完整性**。滥用这些变更可能导致存储桶被公开暴露，授予写入/删除权限或更改复制路径，从而实现数据外泄和破坏性操作。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudwatch-alarms-for-cloudtrail.html",
+    "https://support.icompaas.com/support/solutions/articles/62000086674-ensure-a-log-metric-filter-and-alarm-exist-for-s3-bucket-policy-changes",
+    "https://www.tenable.com/audits/items/CIS_Amazon_Web_Services_Foundations_v5.0.0_L1.audit:8101350d6907e07863ac6748689b3e12"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation：针对 S3 存储桶策略变更的 CloudWatch 度量过滤器和告警\nResources:\n  <example_resource_name>MetricFilter:\n    Type: AWS::Logs::MetricFilter\n    Properties:\n      LogGroupName: <example_resource_name>  # 关键：需要监控的 CloudTrail 日志组\n      FilterPattern: '{($.eventSource=s3.amazonaws.com) && (($.eventName=PutBucketAcl) || ($.eventName=PutBucketPolicy) || ($.eventName=PutBucketCors) || ($.eventName=PutBucketLifecycle) || ($.eventName=PutBucketReplication) || ($.eventName=DeleteBucketPolicy) || ($.eventName=DeleteBucketCors) || ($.eventName=DeleteBucketLifecycle) || ($.eventName=DeleteBucketReplication))}'  # 关键：检测 S3 存储桶策略相关变更\n      MetricTransformations:\n        - MetricName: <example_resource_name>\n          MetricNamespace: <example_resource_name>\n          MetricValue: \"1\"\n\n  <example_resource_name>Alarm:\n    Type: AWS::CloudWatch::Alarm\n    Properties:\n      AlarmName: <example_resource_name>\n      Namespace: <example_resource_name>   # 关键：必须与度量过滤器一致\n      MetricName: <example_resource_name>  # 关键：必须与度量过滤器一致\n      ComparisonOperator: GreaterThanOrEqualToThreshold\n      EvaluationPeriods: 1\n      Period: 300\n      Statistic: Sum\n      Threshold: 1\n```",
+      "Other": "1. 打开 CloudWatch 控制台，进入 Logs > Log groups。\n2. 选择接收 CloudTrail 事件的日志组。\n3. 创建度量过滤器：\n   - 选择“Create metric filter”（创建度量过滤器）。\n   - 在 Filter pattern 中填写：\n     ```\n     {($.eventSource=s3.amazonaws.com) && (($.eventName=PutBucketAcl) || ($.eventName=PutBucketPolicy) || ($.eventName=PutBucketCors) || ($.eventName=PutBucketLifecycle) || ($.eventName=PutBucketReplication) || ($.eventName=DeleteBucketPolicy) || ($.eventName=DeleteBucketCors) || ($.eventName=DeleteBucketLifecycle) || ($.eventName=DeleteBucketReplication))}\n     ```\n   - 设置 Metric name 和 Namespace（任意合适的值），Metric value = 1，然后保存。\n4. 在 Metric filters 选项卡中选择新建的过滤器并点击“Create alarm”（创建告警）。\n5. 设置：Statistic = Sum，Period = 5 minutes，Threshold type = Static，Condition = Greater/Equal，Threshold = 1，Evaluation periods = 1，然后创建告警。",
+      "Terraform": "```hcl\n# 用于 S3 存储桶策略变更的 CloudWatch 度量过滤器\nresource \"aws_cloudwatch_log_metric_filter\" \"<example_resource_name>\" {\n  name           = \"<example_resource_name>\"\n  log_group_name = \"<example_resource_name>\"\n  # 关键：从 CloudTrail 日志中检测 S3 存储桶策略变更\n  pattern = \"{($.eventSource=s3.amazonaws.com) && (($.eventName=PutBucketAcl) || ($.eventName=PutBucketPolicy) || ($.eventName=PutBucketCors) || ($.eventName=PutBucketLifecycle) || ($.eventName=PutBucketReplication) || ($.eventName=DeleteBucketPolicy) || ($.eventName=DeleteBucketCors) || ($.eventName=DeleteBucketLifecycle) || ($.eventName=DeleteBucketReplication))}\"\n\n  metric_transformation {\n    name      = \"<example_resource_name>\"\n    namespace = \"<example_resource_name>\"\n    value     = \"1\"\n  }\n}\n\n# 针对上述度量的告警\nresource \"aws_cloudwatch_metric_alarm\" \"<example_resource_name>\" {\n  alarm_name          = \"<example_resource_name>\"\n  metric_name         = \"<example_resource_name>\"  # 关键：与度量过滤器一致\n  namespace           = \"<example_resource_name>\"  # 关键：与度量过滤器一致\n  comparison_operator = \"GreaterThanOrEqualToThreshold\"\n  evaluation_periods  = 1\n  period              = 300\n  statistic           = \"Sum\"\n  threshold           = 1\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "为 S3 存储桶的策略、ACL、CORS、生命周期和复制配置并维护 **度量过滤器** 与 **告警**。将告警路由到受监控的渠道并与 SIEM 集成。对访问权限实施**最小权限原则**，强制变更审查，并通过**深度防御**快速发现和阻断不安全的存储桶策略变更。",
+      "Url": "https://hub.prowler.com/check/cloudwatch_log_metric_filter_for_s3_bucket_policy_changes"
+    }
+  },
+  "Categories": [
+    "logging"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "日志记录与监控"
+}
+
+

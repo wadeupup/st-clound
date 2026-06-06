@@ -1,0 +1,33 @@
+{
+  "Provider": "aws",
+  "CheckID": "iam_administrator_access_with_mfa",
+  "CheckTitle": "AdministratorAccess ポリシーを持つグループのユーザーで MFA トークンが有効になっていることを確認する",
+  "CheckType": [
+    "Infrastructure Security"
+  ],
+  "ServiceName": "iam",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "high",
+  "ResourceType": "AwsIamUser",
+  "ResourceGroup": "IAM",
+  "Description": "AdministratorAccess ポリシーを持つグループのユーザーで MFA トークンが有効になっていることを確認する",
+  "Risk": "このポリシーにより匿名ユーザーが操作を実行できる可能性があります。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "このリポジトリとその内容が公開アクセス可能であることを確認してください。",
+      "Url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_mfa_enable_virtual.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

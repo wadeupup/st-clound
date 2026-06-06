@@ -1,0 +1,35 @@
+{
+  "Provider": "aws",
+  "CheckID": "ec2_securitygroup_allow_ingress_from_internet_to_tcp_port_cassandra_7199_9160_8888",
+  "CheckTitle": "Ensure no security groups allow ingress from the internet to Cassandra ports TCP 7199, 9160 and 8888.",
+  "CheckType": [
+    "Infrastructure Security"
+  ],
+  "ServiceName": "ec2",
+  "SubServiceName": "securitygroup",
+  "ResourceIdTemplate": "arn:partition:ec2:region:account-id:security-group/security-group-id",
+  "Severity": "critical",
+  "ResourceType": "AwsEc2SecurityGroup",
+  "ResourceGroup": "network",
+  "Description": "Ensure no security groups allow ingress from the internet to Cassandra ports TCP 7199, 9160 and 8888.",
+  "Risk": "Exposing Cassandra ports to the internet can allow unauthorized access to database services and may lead to data disclosure, data loss or service compromise.",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "Modify the security group to remove ingress rules that allow traffic from the internet to TCP ports 7199, 9160 or 8888.",
+      "Url": "https://docs.aws.amazon.com/vpc/latest/userguide/VPC_SecurityGroups.html"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

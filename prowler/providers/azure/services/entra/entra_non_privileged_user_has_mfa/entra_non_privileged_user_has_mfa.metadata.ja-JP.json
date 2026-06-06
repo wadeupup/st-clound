@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "entra_non_privileged_user_has_mfa",
+  "CheckTitle": "すべての非特権ユーザーで「Multi-Factor Auth Status」が「Enabled」であることを確認する",
+  "CheckType": [],
+  "ServiceName": "entra",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "#microsoft.graph.users",
+  "ResourceGroup": "IAM",
+  "Description": "すべての非特権ユーザーに対して多要素認証を有効化します。",
+  "Risk": "多要素認証では、アクセスが許可される前に最低 2 つの異なる認証要素の提示が必要です。これにより、アクセスを試みる個人が本人であることをより強く保証できます。多要素認証を使用すると、攻撃者は少なくとも 2 つの異なる認証メカニズムを侵害する必要があり、侵害の難易度が上がってリスクが低減します。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/entra/identity/authentication/concept-mfa-howitworks",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/ActiveDirectory/multi-factor-authentication-for-all-non-privileged-users.html#",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "Microsoft Entra ID のユーザーに対して、利用可能な多要素認証方式のいずれかを有効化してください。",
+      "Url": "https://learn.microsoft.com/en-us/entra/identity/authentication/tutorial-enable-azure-mfa"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "アクセス許可前に 2 つの認証要素が必要になります。また、二重認証方式の管理に追加の運用負荷が発生します。"
+}

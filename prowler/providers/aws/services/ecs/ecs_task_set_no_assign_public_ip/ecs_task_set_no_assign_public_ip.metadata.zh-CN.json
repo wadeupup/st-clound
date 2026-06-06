@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "ecs_task_set_no_assign_public_ip",
+  "CheckTitle": "ECS 任务集不会自动分配公共 IP 地址",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices/Network Reachability",
+    "Effects/Data Exposure"
+  ],
+  "ServiceName": "ecs",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsEcsService",
+  "ResourceGroup": "container",
+  "Description": "评估 **ECS 任务集** 是否通过 `AssignPublicIP` 自动分配公共 IP。当设置为 `ENABLED` 时，任务会在其网络配置中获得公共地址。",
+  "Risk": "公共 IP 使任务可以直接从互联网访问，从而可能进行扫描、暴力破解和利用尝试。\n\n影响：**机密性**（数据暴露）、**完整性**（未经授权的操作）、**可用性**（DoS）。攻击者可以绕过内部控制并转向进行横向移动。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/AmazonECS/latest/developerguide/update-task-definition-console-v2.html",
+    "https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_TaskSet.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/ecs-controls.html#ecs-16"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation to ensure ECS Task Set does not auto-assign public IP\nResources:\n  <example_resource_name>:\n    Type: AWS::ECS::TaskSet\n    Properties:\n      Cluster: \"<example_resource_id>\"\n      Service: \"<example_resource_id>\"\n      TaskDefinition: \"<example_resource_id>\"\n      NetworkConfiguration:\n        AwsvpcConfiguration:\n          AssignPublicIp: DISABLED  # CRITICAL: disables automatic public IP assignment\n          Subnets:\n            - \"<example_resource_id>\"\n```",
+      "Other": "1. 在 AWS 控制台中，转到 ECS > 集群 > 选择您的集群\n2. 打开您的服务并选择更新（或编辑）\n3. 在网络中，将公共 IP 分配设置为已禁用\n4. 保存/部署更新以创建新的部署/任务集\n5. 在新任务集成为主要且稳定后，删除启用了公共 IP 的旧任务集",
+      "Terraform": "```hcl\n# ECS Task Set with public IP assignment disabled\nresource \"aws_ecs_task_set\" \"<example_resource_name>\" {\n  cluster         = \"<example_resource_id>\"\n  service         = \"<example_resource_id>\"\n  task_definition = \"<example_resource_id>\"\n\n  network_configuration {\n    subnets          = [\"<example_resource_id>\"]\n    assign_public_ip = false  # CRITICAL: disables automatic public IP assignment\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "在任务集上禁用 **自动公共 IP**。\n\n在受控入口点（负载均衡器、API 网关或服务发现）后面的私有子网中使用。强制执行 **最小权限** 安全组和 **纵深防御**。优先使用私有连接（VPC 端点/VPN）。*仅暴露前端，而非任务。*",
+      "Url": "https://hub.prowler.com/check/ecs_task_set_no_assign_public_ip"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

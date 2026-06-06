@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "postgresql_flexible_server_allow_access_services_disabled",
+  "CheckTitle": "确保 PostgreSQL 数据库服务器“Allow access to Azure services”已禁用",
+  "CheckType": [],
+  "ServiceName": "postgresql",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "PostgreSQL",
+  "ResourceGroup": "database",
+  "Description": "禁用 Azure 服务访问 PostgreSQL 数据库服务器。",
+  "Risk": "如果启用了来自 Azure 服务的访问，服务器防火墙将接受来自所有 Azure 资源的连接（包括不在你订阅内的资源）。这通常不是期望配置。应改为设置防火墙规则，仅允许特定网络范围访问，或设置 VNET 规则，仅允许特定虚拟网络访问。",
+  "RelatedUrl": "https://docs.microsoft.com/en-us/azure/postgresql/concepts-firewall-rules",
+  "Remediation": {
+    "Code": {
+      "CLI": "az postgres server firewall-rule delete --name AllowAllWindowsAzureIps --resource-group <resourceGroupName> --server-name <serverName>",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/PostgreSQL/disable-all-services-access.html#",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-general-policies/ensure-allow-access-to-azure-services-for-postgresql-database-server-is-disabled#terraform"
+    },
+    "Recommendation": {
+      "Text": "通过 Azure Portal：1. 使用 https://portal.azure.com 登录 Azure Portal。2. 进入 Azure Database for PostgreSQL servers。3. 对每个数据库，点击 Connection security。4. 在 Firewall rules 下，将 Allow access to Azure services 设置为 No。5. 点击 Save。通过 Azure CLI：使用以下命令删除 PostgreSQL 数据库的 AllowAllWindowsAzureIps 规则。az postgres server firewall-rule delete --name AllowAllWindowsAzureIps -- resource-group <resourceGroupName> --server-name <serverName>",
+      "Url": "https://learn.microsoft.com/en-us/azure/postgresql/single-server/quickstart-create-server-database-azure-cli#configure-a-server-based-firewall-rule"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

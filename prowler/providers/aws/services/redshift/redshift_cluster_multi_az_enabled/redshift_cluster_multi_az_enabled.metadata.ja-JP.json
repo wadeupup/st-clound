@@ -1,0 +1,39 @@
+{
+  "Provider": "aws",
+  "CheckID": "redshift_cluster_multi_az_enabled",
+  "CheckTitle": "Redshift クラスターに Multi-AZ が有効になっています",
+  "CheckType": [
+    "ソフトウェアと構成のチェック/AWS セキュリティベストプラクティス"
+  ],
+  "ServiceName": "redshift",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsRedshiftCluster",
+  "ResourceGroup": "analytics",
+  "Description": "**Amazon Redshift クラスター**は、プロビジョニングされた `RA3` クラスターでの**Multi-AZ デプロイメント**について評価され、コンピュートが2つのアベイラビリティーゾーンにまたがり、単一のエンドポイントを介して提供されることを確認します。",
+  "Risk": "**Multi-AZ**がない場合、単一AZのクラスターはAZまたはノードの障害にさらされ、接続が切断され、クエリが中止され、ETL/BIジョブが停止します。これにより、**可用性**が低下し、RTOが増加し、分析が遅れ、パイプラインのバックログが連鎖的に発生することでSLA違反のリスクが高まります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/redshift/latest/mgmt/managing-cluster-multi-az.html",
+    "https://docs.aws.amazon.com/redshift/latest/mgmt/overview-multi-az.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws redshift modify-cluster --cluster-identifier <cluster-id> --multi-az",
+      "NativeIaC": "```yaml\n# CloudFormation: Redshift クラスターで Multi-AZ を有効にする\nResources:\n  <example_resource_name>:\n    Type: AWS::Redshift::Cluster\n    Properties:\n      ClusterIdentifier: <example_resource_id>\n      MultiAZ: true  # 重要: チェックが通過するように Multi-AZ を有効にします\n```",
+      "Other": "1. Amazon Redshift コンソールで、クラスターに移動します\n2. 対象のクラスターを選択します\n3. アクション > Multi-AZ を有効化 を選択します\n4. 確認し、クラスターが Multi-AZ: Yes と表示されるまで待ちます",
+      "Terraform": "```hcl\n# Redshift クラスターで Multi-AZ を有効にする\nresource \"aws_redshift_cluster\" \"<example_resource_name>\" {\n  cluster_identifier = \"<example_resource_id>\"\n  multi_az           = true  # 重要: チェックが通過するように Multi-AZ を有効にします\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "プロビジョニングされた `RA3` クラスターに対して**Multi-AZ デプロイメント**を有効にし、単一AZ依存を回避します。設計を**フォールトトレランス**と**高可用性**に合わせます: 十分な容量をプロビジョニングし、クライアント/ETLのリトライと再接続を実装し、フェイルオーバーを定期的に検証し、パフォーマンスとエラーレートを監視します。",
+      "Url": "https://hub.prowler.com/check/redshift_cluster_multi_az_enabled"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

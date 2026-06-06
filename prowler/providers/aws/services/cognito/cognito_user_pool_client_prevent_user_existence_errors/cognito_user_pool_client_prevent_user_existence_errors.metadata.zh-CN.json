@@ -1,0 +1,32 @@
+{
+  "Provider": "aws",
+  "CheckID": "cognito_user_pool_client_prevent_user_existence_errors",
+  "CheckTitle": "Amazon Cognito 用户池应防止用户存在性错误",
+  "CheckType": [],
+  "ServiceName": "cognito",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:aws:cognito-idp:region:account:userpool/userpool-id",
+  "Severity": "medium",
+  "ResourceType": "AwsCognitoUserPoolClient",
+  "ResourceGroup": "IAM",
+  "Description": "Amazon Cognito 用户池应配置为防止用户存在性错误。此设置通过要求用户输入用户名和密码来登录，从而防止用户存在性错误。如果用户不存在，用户将收到错误消息。",
+  "Risk": "泄露用户存在性错误可能构成安全风险，因为它可能允许攻击者确定系统中是否存在用户。这可用于执行用户枚举攻击。",
+  "RelatedUrl": "https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pool-managing-errors.html",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "为防止用户存在性错误，您应该配置 Amazon Cognito 用户池，要求用户输入用户名和密码才能登录。如果用户不存在，用户将收到错误消息。",
+      "Url": "https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pool-managing-errors.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

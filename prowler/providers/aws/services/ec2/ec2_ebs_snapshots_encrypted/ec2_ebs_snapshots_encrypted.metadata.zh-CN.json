@@ -1,0 +1,36 @@
+{
+  "Provider": "aws",
+  "CheckID": "ec2_ebs_snapshots_encrypted",
+  "CheckTitle": "检查 EBS 快照是否已加密",
+  "CheckType": [
+    "Data Protection"
+  ],
+  "ServiceName": "ec2",
+  "SubServiceName": "snapshot",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "compute",
+  "Description": "检查 EBS 快照是否已加密",
+  "Risk": "静态数据加密可在数据被未经授权访问或窃取时防止数据泄露",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "aws ec2 --region <REGION> enable-ebs-encryption-by-default",
+      "NativeIaC": "https://docs.prowler.com/checks/aws/general-policies/general_3-encrypt-ebs-volume#cloudformation",
+      "Other": "https://docs.prowler.com/checks/aws/general-policies/general_3-encrypt-ebs-volume#aws-console",
+      "Terraform": "https://docs.prowler.com/checks/aws/general-policies/general_3-encrypt-ebs-volume#terraform"
+    },
+    "Recommendation": {
+      "Text": "加密所有 EBS 快照并默认启用加密。您可以配置 AWS 账户以强制加密您创建的新 EBS 卷和快照副本。例如，Amazon EBS 会加密您在启动实例时创建的 EBS 卷以及您从未加密快照复制的快照。",
+      "Url": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EBSEncryption.html#encryption-by-default"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

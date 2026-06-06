@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "postgresql_flexible_server_log_retention_days_greater_3",
+  "CheckTitle": "确保 PostgreSQL 数据库服务器参数“log_retention_days”大于 3 天",
+  "CheckType": [],
+  "ServiceName": "postgresql",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "PostgreSQL",
+  "ResourceGroup": "database",
+  "Description": "确保 PostgreSQL 服务器上的 log_retention_days 设置为合适值。",
+  "Risk": "配置 log_retention_days 可决定 Azure Database for PostgreSQL 保留日志文件的天数。查询和错误日志可用于识别、排查并修复配置错误及性能不佳问题。",
+  "RelatedUrl": "https://docs.microsoft.com/en-us/azure/postgresql/howto-configure-server-parameters-using-portal",
+  "Remediation": {
+    "Code": {
+      "CLI": "az postgres server configuration set --resource-group <resourceGroupName> --server-name <serverName> --name log_retention_days --value <4-7>",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity-staging/knowledge-base/azure/PostgreSQL/log-retention-days.html",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "通过 Azure Portal：1. 在 Azure Home 中选择 Portal Menu。2. 进入 Azure Database for PostgreSQL servers。3. 对每个数据库点击 Server parameters。4. 搜索 log_retention_days。5. 输入 4 到 7（含）之间的值并点击 Save。通过 Azure CLI：使用以下命令更新 log_retention_days 配置。az postgres server configuration set --resource-group <resourceGroupName> -- server-name <serverName> --name log_retention_days --value <4-7>。通过 Powershell：使用以下命令更新 log_retention_days 配置。Update-AzPostgreSqlConfiguration -ResourceGroupName <ResourceGroupName> - ServerName <ServerName> -Name log_retention_days -Value <4-7>",
+      "Url": "https://learn.microsoft.com/en-us/rest/api/postgresql/singleserver/configurations/list-by-server?view=rest-postgresql-singleserver-2017-12-01&tabs=HTTP"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "配置该设置后，日志将按指定天数保留。若在高流量服务器上启用，日志可能快速增长并占用大量磁盘空间，此时你可能需要设置较低的天数。"
+}

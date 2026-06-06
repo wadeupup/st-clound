@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "containerregistry_uses_private_link",
+  "CheckTitle": "Azure Container Registry へのアクセスにプライベート リンクを使用していることを確認する",
+  "CheckType": [],
+  "ServiceName": "containerregistry",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "ContainerRegistry",
+  "ResourceGroup": "container",
+  "Description": "Azure Container Registry へのアクセスにプライベート リンクを使用していることを確認し、セキュリティを強化するとともに、パブリック インターネット経由でのレジストリへのアクセスを制限します。",
+  "Risk": "プライベート リンクを使用しない場合、Azure Container Registry がパブリック インターネットに公開される可能性があり、不正アクセスや潜在的なデータ漏えいのリスクが高まります。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/private-link/private-link-overview",
+  "Remediation": {
+    "Code": {
+      "CLI": "az network private-endpoint create  --connection-name <ConnectionName> --resource-group <ResourceGroupName> --name <Name> --private-connection-resource-id <RegistryId> --vnet-name <VnetName> --subnet <SubnetName> --group-ids registry",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "Azure Portal から Azure Container Registry 用のプライベート リンクを作成します: 1. 対象の Container Registry に移動します。2. 設定で「Networking」を選択します。3. 「Private access」を選択します。4. レジストリ用のプライベート エンドポイントを構成します。",
+      "Url": "https://learn.microsoft.com/en-us/azure/container-registry/container-registry-private-link"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "この機能は Premium SKU レジストリでのみ利用できます。"
+}

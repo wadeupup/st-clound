@@ -1,0 +1,40 @@
+{
+  "Provider": "aws",
+  "CheckID": "opensearch_service_domains_audit_logging_enabled",
+  "CheckTitle": "Amazon OpenSearch Service ドメインには監査ログが有効になっています",
+  "CheckType": [
+    "ソフトウェアと構成のチェック/AWS セキュリティベストプラクティス",
+    "ソフトウェアと構成のチェック/業界および規制基準/AWS 基礎セキュリティベストプラクティス"
+  ],
+  "ServiceName": "opensearch",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsOpenSearchServiceDomain",
+  "ResourceGroup": "database",
+  "Description": "**Amazon OpenSearch Service ドメイン**には、`AUDIT_LOGS`を介して**監査ログ**が有効になっています",
+  "Risk": "監査ログがないと、重要なアクションの責任追跡ができず、**機密性**と**完全性**が低下します。\n\n不正アクセス、権限の誤用、インデックスの改ざんが**検出されず**、**インシデント対応**や**フォレンジック**が妨げられ、データの流出や横方向の移動が追跡不可能になります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/audit-logs.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws opensearch update-domain-config --domain-name <example_resource_name> --log-publishing-options \"AUDIT_LOGS={CloudWatchLogsLogGroupArn=<CLOUDWATCH_LOG_GROUP_ARN>,Enabled=true}\"",
+      "NativeIaC": "```yaml\n# CloudFormation: OpenSearch ドメインに対して AUDIT_LOGS を有効にする\nResources:\n  OpenSearchDomain:\n    Type: AWS::OpenSearchService::Domain\n    Properties:\n      DomainName: <example_resource_name>\n      LogPublishingOptions:\n        AUDIT_LOGS:\n          CloudWatchLogsLogGroupArn: <CLOUDWATCH_LOG_GROUP_ARN>  # 重要: 監査ログが送信される場所\n          Enabled: true  # 重要: チェックを通過するために AUDIT_LOGS をオンにする\n```",
+      "Other": "1. AWS コンソールを開き、OpenSearch Service に移動します\n2. ドメイン <example_resource_name> を選択します\n3. [Logs] タブを開き、[Audit logs] を見つけて [Enable] をクリックします\n4. CloudWatch ロググループを選択または作成し、プロンプトが表示された場合はリソースポリシーを確認します\n5. [Save changes] をクリックして AUDIT_LOGS を有効にします\n6. 詳細なアクセス制御が有効になっていない場合は、最初にそれを有効にし、次にステップ 3-5 を繰り返します",
+      "Terraform": "```hcl\n# OpenSearch ドメインに対して AUDIT_LOGS を有効にする\nresource \"aws_opensearch_domain\" \"example\" {\n  domain_name = \"<example_resource_name>\"\n\n  log_publishing_options {\n    log_type                 = \"AUDIT_LOGS\"\n    cloudwatch_log_group_arn = \"<CLOUDWATCH_LOG_GROUP_ARN>\"  # 重要: 監査ログの送信先\n    enabled                  = true                           # 重要: チェックを通過するために AUDIT_LOGS をオンにする\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "すべてのドメインに対して`AUDIT_LOGS`を有効にし、それらを集中化された耐久性のあるログストアにルーティングします。\n\n認証失敗や機密インデックス操作を記録するようにカテゴリを調整します。ログアクセスには**最小特権**を適用し、保持と不変性を強制し、アラートを統合して**多層防御**と迅速な対応を提供します。",
+      "Url": "https://hub.prowler.com/check/opensearch_service_domains_audit_logging_enabled"
+    }
+  },
+  "Categories": [
+    "logging",
+    "forensics-ready"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

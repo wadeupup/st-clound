@@ -1,0 +1,36 @@
+{
+  "Provider": "aws",
+  "CheckID": "ec2_instance_imdsv2_enabled",
+  "CheckTitle": "检查 EC2 实例元数据服务版本 2 (IMDSv2) 是否已启用并设为必需",
+  "CheckType": [
+    "Infrastructure Security"
+  ],
+  "ServiceName": "ec2",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "high",
+  "ResourceType": "AwsEc2Instance",
+  "ResourceGroup": "compute",
+  "Description": "检查 EC2 实例元数据服务版本 2 (IMDSv2) 是否已启用并设为必需",
+  "Risk": "使用 IMDSv2 可以防范配置错误和 SSRF 漏洞。IMDSv1 则不能。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "aws ec2 modify-instance-metadata-options --instance-id <instance-id> --http-tokens required --http-endpoint enabled",
+      "NativeIaC": "https://docs.prowler.com/checks/aws/general-policies/bc_aws_general_31#cloudformation",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/EC2/require-imds-v2.html",
+      "Terraform": "https://docs.prowler.com/checks/aws/general-policies/bc_aws_general_31#terraform"
+    },
+    "Recommendation": {
+      "Text": "如果您不需要 IMDS，可以将其关闭。使用 aws-cli 可以强制实例仅使用 IMDSv2。",
+      "Url": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/configuring-instance-metadata-service.html#configuring-instance-metadata-options"
+    }
+  },
+  "Categories": [
+    "ec2-imdsv1"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

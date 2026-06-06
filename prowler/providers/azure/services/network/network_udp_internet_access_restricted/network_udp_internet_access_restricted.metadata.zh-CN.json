@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "network_udp_internet_access_restricted",
+  "CheckTitle": "确保来自 Internet 的 UDP 访问已评估并受限",
+  "CheckType": [],
+  "ServiceName": "network",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Network",
+  "ResourceGroup": "network",
+  "Description": "应定期评估网络安全组中的端口配置错误。对于可能暴露到 Internet 的特定端口和协议，应评估其必要性；凡非明确需要的应进行访问限制。",
+  "Risk": "在 Internet 上广泛暴露 UDP 服务的潜在安全问题在于，攻击者可利用 DDoS 放大技术，从 Azure 虚拟机反射伪造的 UDP 流量。此类攻击最常见方式是将暴露的 DNS、NTP、SSDP、SNMP、CLDAP 及其他基于 UDP 的服务作为放大源，干扰 Azure 虚拟网络中的其他主机服务，甚至攻击 Azure 外部的联网设备。",
+  "RelatedUrl": "https://docs.microsoft.com/en-us/azure/security/fundamentals/network-best-practices#secure-your-critical-azure-service-resources-to-only-your-virtual-networks",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity-staging/knowledge-base/azure/Network/unrestricted-udp-access.html#",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-networking-policies/ensure-that-udp-services-are-restricted-from-the-internet#terraform"
+    },
+    "Recommendation": {
+      "Text": "对于附加到网络安全组的资源，若并未明确需要且未进行最小化配置，不应开放 UDP 访问，应限制或消除来自 Internet 的访问。对于相关资源的内部访问，可配置加密网络隧道，例如：ExpressRoute、Site-to-site VPN、Point-to-site VPN。",
+      "Url": "https://docs.microsoft.com/en-us/azure/security/fundamentals/ddos-best-practices"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

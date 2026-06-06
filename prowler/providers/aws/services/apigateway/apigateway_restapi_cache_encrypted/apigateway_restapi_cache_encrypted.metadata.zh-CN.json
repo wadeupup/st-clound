@@ -1,0 +1,46 @@
+{
+  "Provider": "aws",
+  "CheckID": "apigateway_restapi_cache_encrypted",
+  "CheckTitle": "API Gateway REST API 阶段缓存数据在静态时已加密",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践",
+    "软件和配置检查/行业和监管标准/AWS 基础安全最佳实践"
+  ],
+  "ServiceName": "apigateway",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsApiGatewayStage",
+  "ResourceGroup": "api_gateway",
+  "Description": "启用缓存的 API Gateway REST API 阶段具有**静态加密的缓存数据**。该评估针对启用缓存的阶段，并验证存储的响应是否通过 `Encrypt cache data` 设置受到保护。",
+  "Risk": "未加密的缓存内容可能会暴露响应负载、令牌或 PII（个人身份信息），如果缓存存储、备份或管理工具在正常控制之外被访问，会损害**机密性**并启用重放或会话劫持。\n\n泄露还会揭示 API 模式，有助于**横向移动**和有针对性的滥用。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://www.clouddefense.ai/compliance-rules/nist-800-53-5/au/apigateway-stage-cache-encryption-at-rest-enabled",
+    "https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-caching.html#enable-api-gateway-caching",
+    "https://support.icompaas.com/support/solutions/articles/62000233641-ensure-api-gateway-rest-api-cache-data-is-encrypted-at-rest",
+    "https://docs.fortifyfox.com/docs/aws-foundational-security-best-practices/apigateway/api-gw-cache-encrypted/index.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/apigateway-controls.html#apigateway-5",
+    "https://www.clouddefense.ai/compliance-rules/aws-fs-practices/apigateway/foundational-security-apigateway-5",
+    "https://www.cloudanix.com/docs/aws/audit/apigatewaymonitoring/rules/apigateway_enable_encryption_api_cache"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws apigateway update-stage --rest-api-id <restapi-id> --stage-name <stage-name> --patch-operations op=replace,path=/*/*/caching/dataEncrypted,value=true",
+      "NativeIaC": "```yaml\n# CloudFormation: 为阶段中所有缓存的方法启用加密\nResources:\n  <example_resource_name>:\n    Type: AWS::ApiGateway::Stage\n    Properties:\n      StageName: <example_resource_name>\n      RestApiId: <example_resource_id>\n      DeploymentId: <example_resource_id>\n      MethodSettings:\n        - ResourcePath: /*\n          HttpMethod: \"*\"\n          CacheDataEncrypted: true  # 关键：为所有方法静态加密缓存的响应\n```",
+      "Other": "1. 打开 AWS 控制台并转到 API Gateway\n2. 选择您的 REST API，然后单击 Stages 并选择受影响的阶段\n3. 在 Method overrides（或 Cache settings）中，启用 Encrypt cache data\n4. 保存更改",
+      "Terraform": "```hcl\n# 为阶段中所有缓存的方法启用加密\nresource \"aws_api_gateway_stage\" \"<example_resource_name>\" {\n  rest_api_id   = \"<example_resource_id>\"\n  stage_name    = \"<example_resource_name>\"\n  deployment_id = \"<example_resource_id>\"\n\n  method_settings {\n    resource_path        = \"/*\"\n    http_method          = \"*\"\n    cache_data_encrypted = true  # 关键：静态加密缓存的响应\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "- 为任何缓存的阶段启用**静态加密**（`Encrypt cache data`）。\n- 对阶段管理和缓存失效应用**最小权限**。\n- 避免缓存敏感端点；使用短 TTL 和计划的缓存刷新以实现**纵深防御**。",
+      "Url": "https://hub.prowler.com/check/apigateway_restapi_cache_encrypted"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

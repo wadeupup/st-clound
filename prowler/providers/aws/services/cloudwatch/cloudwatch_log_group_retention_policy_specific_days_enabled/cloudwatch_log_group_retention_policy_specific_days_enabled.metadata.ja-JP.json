@@ -1,0 +1,49 @@
+{
+  "Provider": "aws",
+  "CheckID": "cloudwatch_log_group_retention_policy_specific_days_enabled",
+  "CheckTitle": "CloudWatch ロググループに、設定された最小日数以上または期限なしの保持ポリシーが設定されている",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/NIST 800-53 Controls (USA)",
+    "Software and Configuration Checks/Industry and Regulatory Standards/PCI-DSS",
+    "Software and Configuration Checks/Industry and Regulatory Standards/SOC 2"
+  ],
+  "ServiceName": "cloudwatch",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsLogsLogGroup",
+  "ResourceGroup": "monitoring",
+  "Description": "**CloudWatch ロググループ** について、保持期間が設定されたしきい値（例：`365` 日）以上、または **期限なし（Never expire）** に設定されているかどうかが評価されます。より短い保持期間のロググループが特定されます。",
+  "Risk": "短いログ保持期間は監査証跡を損ないます。攻撃者はこのウィンドウが過ぎるのを待つことで、検知、フォレンジック、およびコンプライアンス報告にギャップを生じさせることができます。これは過去ログの **可用性** を低下させ、インシデントタイムラインの **整合性** を損ないます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://trendmicro.com/cloudoneconformity/knowledge-base/aws/CloudWatchLogs/cloudwatch-logs-retention-period.html",
+    "https://boto3.amazonaws.com/v1/documentation/api/1.26.93/reference/services/logs/client/put_retention_policy.html",
+    "https://medium.com/pareture/aws-cloudwatch-log-group-retention-periods-bb8a2fb9c358",
+    "https://www.blinkops.com/blog/cloudwatch-retention",
+    "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/AWS_Logs.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws logs put-retention-policy --log-group-name <LOG_GROUP_NAME> --retention-in-days <DAYS>",
+      "NativeIaC": "```yaml\n# CloudFormation: set retention on a CloudWatch Log Group\nResources:\n  <example_resource_name>:\n    Type: AWS::Logs::LogGroup\n    Properties:\n      LogGroupName: \"<example_resource_name>\"\n      RetentionInDays: <DAYS>  # Critical: sets log retention to the required minimum to pass the check\n```",
+      "Other": "1. AWS コンソールで CloudWatch > Log groups に移動します\n2. 対象のロググループを選択します\n3. [Expire events after/Retention] 列の現在の値をクリックします\n4. 保持期間として <DAYS> 以上、または [Never expire] を選択します\n5. [保存] をクリックします",
+      "Terraform": "```hcl\n# Set retention on a CloudWatch Log Group\nresource \"aws_cloudwatch_log_group\" \"<example_resource_name>\" {\n  name              = \"<example_resource_name>\"\n  retention_in_days = <DAYS> # Critical: set to at least the required minimum to pass the check\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "法的および調査ニーズに合わせて、最小保持ベースライン（例：`>=365` 日）を定義します。一貫して適用し、例外は文書化します。自動的に強制し、変更を監視し、**最小権限の原則** と **多層防御** のもとで保持期間を変更できる主体を制限します。",
+      "Url": "https://hub.prowler.com/check/cloudwatch_log_group_retention_policy_specific_days_enabled"
+    }
+  },
+  "Categories": [
+    "logging",
+    "forensics-ready"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+
+

@@ -1,0 +1,35 @@
+{
+  "Provider": "aws",
+  "CheckID": "iam_support_role_created",
+  "CheckTitle": "AWSサポートとのインシデントを管理するためのサポートロールが作成されていることを確認します。",
+  "CheckType": [
+    "ソフトウェアと構成のチェック",
+    "業界および規制の標準",
+    "CIS AWS Foundations ベンチマーク"
+  ],
+  "ServiceName": "iam",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "medium",
+  "ResourceType": "AwsIamRole",
+  "ResourceGroup": "IAM",
+  "Description": "AWSサポートとのインシデントを管理するためのサポートロールが作成されていることを確認します。",
+  "Risk": "AWSは、インシデントの通知と対応、技術サポート、およびカスタマーサービスに使用できるサポートセンターを提供しています。AWSサポートとのインシデントを管理するために、認可されたユーザーが使用できるIAMロールを作成します。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "AWSのインシデントを管理するためのIAMロールを作成します。",
+      "Url": "https://docs.aws.amazon.com/awssupport/latest/user/using-service-linked-roles-sup.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "CAF セキュリティエピック: IAM"
+}

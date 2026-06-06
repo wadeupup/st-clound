@@ -1,0 +1,33 @@
+{
+  "Provider": "aws",
+  "CheckID": "s3_multi_region_access_point_public_access_block",
+  "CheckTitle": "マルチリージョンアクセスポイントでパブリックアクセスをブロックする設定が有効になっています。",
+  "CheckType": [
+    "ソフトウェアと設定のチェック/業界および規制基準/AWS 基盤セキュリティのベストプラクティス"
+  ],
+  "ServiceName": "s3",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:aws:s3:region:account-id:accesspoint/access-point-name",
+  "Severity": "high",
+  "ResourceType": "AwsS3AccessPoint",
+  "ResourceGroup": "storage",
+  "Description": "S3アクセスポイントでパブリックアクセスがブロックされていることを確認します。",
+  "Risk": "AWSでS3マルチリージョンアクセスポイントを公開状態のままにしておくと、データの露出、侵害、コンプライアンス違反、不正アクセス、およびデータ整合性の問題につながる可能性があります。",
+  "RelatedUrl": "https://aws.amazon.com/es/getting-started/hands-on/getting-started-with-amazon-s3-multi-region-access-points/",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://docs.aws.amazon.com/securityhub/latest/userguide/s3-controls.html#s3-24",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "S3のマルチリージョンアクセスポイントがデフォルトでプライベートになるようにし、厳格なアクセス制御を適用し、不正な公開アクセスを防ぐために権限を定期的に監査してください。",
+      "Url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/multi-region-access-point-block-public-access.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

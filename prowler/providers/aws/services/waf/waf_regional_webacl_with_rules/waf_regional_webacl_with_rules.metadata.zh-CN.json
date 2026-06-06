@@ -1,0 +1,40 @@
+{
+  "Provider": "aws",
+  "CheckID": "waf_regional_webacl_with_rules",
+  "CheckTitle": "AWS WAF Classic 区域性 Web ACL 至少有一个规则或规则组",
+  "CheckType": [
+    "软件和配置检查/AWS安全最佳实践",
+    "软件和配置检查/行业和监管标准/AWS 基础安全最佳实践",
+    "软件和配置检查/行业和监管标准/NIST 800-53 控制措施"
+  ],
+  "ServiceName": "waf",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsWafRegionalWebAcl",
+  "ResourceGroup": "security",
+  "Description": "**AWS WAF Classic Regional web ACL** 包含至少一个 **rule** 或 **rule group**，用于检查并对 HTTP(S) 请求采取操作。没有条目的 ACL 被视为空。",
+  "Risk": "如果没有规则，Web ACL 将不会执行任何检查，从而让恶意流量通过。\n- **机密性**：通过 SQLi/XSS 导致数据泄露\n- **完整性**：未经授权的操作或篡改\n- **可用性**：滥用/机器人流量导致性能下降或服务中断",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/waf-controls.html#waf-4",
+    "https://docs.aws.amazon.com/waf/latest/developerguide/classic-web-acl-editing.html",
+    "https://docs.aws.amazon.com/waf/latest/developerguide/waf-rules.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws waf-regional update-web-acl --web-acl-id <your-web-acl-id> --change-token $(aws waf-regional get-change-token --query 'ChangeToken' --output text) --updates '[{\"Action\":\"INSERT\",\"ActivatedRule\":{\"Priority\":1,\"RuleId\":\"<your-rule-id>\",\"Action\":{\"Type\":\"BLOCK\"}}}]'",
+      "NativeIaC": "```yaml\n# CloudFormation：确保 Web ACL 至少有一条规则\nResources:\n  <example_resource_name>:\n    Type: AWS::WAFRegional::WebACL\n    Properties:\n      Name: \"<example_resource_name>\"\n      MetricName: \"<example_resource_name>\"\n      DefaultAction:\n        Type: ALLOW\n      # 关键：向 Web ACL 添加任何规则都会使其变为非空并通过检查\n      Rules:\n        - Action:\n            Type: BLOCK\n          Priority: 1\n          RuleId: \"<example_resource_id>\"  # 插入到 Web ACL 中的规则\n```",
+      "Other": "1. 打开 AWS 控制台并进入 AWS WAF\n2. 在左侧窗格中，点击 Web ACLs，并在出现提示时切换到 AWS WAF Classic\n3. 选择 Regional Web ACL 并打开 Rules 选项卡\n4. 点击 Edit web ACL\n5. 在 Rules 中，选择现有规则或规则组，然后选择 Add rule to web ACL\n6. 点击 Save changes",
+      "Terraform": "```hcl\n# Terraform：确保 Web ACL 至少有一条规则\nresource \"aws_wafregional_web_acl\" \"<example_resource_name>\" {\n  name        = \"<example_resource_name>\"\n  metric_name = \"<example_resource_name>\"\n\n  default_action {\n    type = \"ALLOW\"\n  }\n\n  # 关键：至少添加一条规则，以使 Web ACL 不为空\n  rules {\n    priority = 1\n    rule_id  = \"<example_resource_id>\"\n    action {\n      type = \"BLOCK\"\n    }\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "为每个 Web ACL 至少配置一条**规则**或**规则组**，用于检查请求并强制实施**最小权限**。通过结合托管规则和自定义规则来实现纵深防御，在适当情况下包括速率控制，并定期审查。*默认阻止不需要的流量；仅允许必要的模式*。",
+      "Url": "https://hub.prowler.com/check/waf_regional_webacl_with_rules"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

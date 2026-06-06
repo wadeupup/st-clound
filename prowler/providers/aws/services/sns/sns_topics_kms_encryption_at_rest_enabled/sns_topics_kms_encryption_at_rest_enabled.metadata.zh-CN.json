@@ -1,0 +1,44 @@
+{
+  "Provider": "aws",
+  "CheckID": "sns_topics_kms_encryption_at_rest_enabled",
+  "CheckTitle": "SNS 主题在静态存储时使用 KMS 加密",
+  "CheckType": [
+    "软件和配置检查/AWS安全最佳实践",
+    "软件和配置检查/行业和监管标准/AWS 基础安全最佳实践",
+    "软件和配置检查/行业和监管标准/NIST 800-53 控制（美国）",
+    "软件和配置检查/行业和监管标准/NIST CSF 控制（美国）",
+    "软件和配置检查/行业和监管标准/PCI-DSS",
+    "软件和配置检查/行业和监管标准/ISO 27001 控制措施"
+  ],
+  "ServiceName": "sns",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsSnsTopic",
+  "ResourceGroup": "messaging",
+  "Description": "**Amazon SNS 主题**会评估其是否使用 **AWS KMS** 进行**服务器端加密**。未配置 KMS 密钥的主题（例如缺少 `kms_master_key_id`）会被识别为静态未加密。",
+  "Risk": "如果没有 KMS 支持的 SSE，SNS 会在静态存储时以未加密形式保存消息正文，从而削弱**机密性**。\n\n拥有特权的内部人员或被攻陷的服务组件可能会在持久化期间访问明文，导致数据泄露。你还会失去 KMS 控制，例如密钥策略、轮换以及详细的审计跟踪。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/SNS/topic-encrypted-with-kms-customer-master-keys.html",
+    "https://docs.aws.amazon.com/sns/latest/dg/sns-server-side-encryption.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws sns set-topic-attributes --topic-arn <TOPIC_ARN> --attribute-name KmsMasterKeyId --attribute-value alias/aws/sns",
+      "NativeIaC": "```yaml\n# CloudFormation：为 SNS 主题启用 SSE\nResources:\n  <example_resource_name>:\n    Type: AWS::SNS::Topic\n    Properties:\n      KmsMasterKeyId: alias/aws/sns  # 严重：使用 AWS 托管的 KMS 密钥启用静态加密\n```",
+      "Other": "1. 打开 AWS 控制台并进入 Amazon SNS > 主题\n2. 选择该主题并点击编辑\n3. 在“加密”下，启用加密并为 SNS 选择 AWS 托管密钥 (alias/aws/sns)\n4. 点击保存更改",
+      "Terraform": "```hcl\n# 为 SNS 主题启用 SSE\nresource \"aws_sns_topic\" \"<example_resource_name>\" {\n  name               = \"<example_resource_name>\"\n  kms_master_key_id  = \"alias/aws/sns\" # 严重：启用静态加密\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "在所有 SNS 主题上使用 **AWS KMS** 启用**服务器端加密**；为获得更强的控制能力，优先使用**客户管理型密钥**。\n\n对密钥使用实施**最小权限**，强制轮换，并监控密钥/访问日志。尽量减少消息中的敏感数据，并在*可行的情况下*使用端到端加密，以增加纵深防御。",
+      "Url": "https://hub.prowler.com/check/sns_topics_kms_encryption_at_rest_enabled"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

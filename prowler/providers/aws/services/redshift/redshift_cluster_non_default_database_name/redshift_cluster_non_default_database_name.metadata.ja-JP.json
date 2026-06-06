@@ -1,0 +1,40 @@
+{
+  "Provider": "aws",
+  "CheckID": "redshift_cluster_non_default_database_name",
+  "CheckTitle": "Redshift クラスターがデフォルトのデータベース名 dev を使用していません",
+  "CheckType": [
+    "ソフトウェアと構成のチェック/AWS セキュリティベストプラクティス",
+    "TTPs/Discovery"
+  ],
+  "ServiceName": "redshift",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "low",
+  "ResourceType": "AwsRedshiftCluster",
+  "ResourceGroup": "analytics",
+  "Description": "**Amazon Redshift クラスター**は、データベース名がデフォルトの `dev` と等しい場合に識別され、カスタム名ではありません。",
+  "Risk": "予測可能な `dev` 名を使用することは、**機密性**と**完全性**を弱めます。誤ってスコープされた IAM またはネットワークルールがデータベースに意図せず一致する可能性があり、既知の名前は列挙やターゲット接続試行を助長し、不正なクエリやデータ漏洩の可能性を高めます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/redshift-controls.html#redshift-9",
+    "https://docs.aws.amazon.com/redshift/latest/gsg/getting-started.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation: デフォルトでない DB 名を持つ Redshift クラスターを作成\nResources:\n  <example_resource_name>:\n    Type: AWS::Redshift::Cluster\n    Properties:\n      ClusterType: single-node\n      NodeType: <NODE_TYPE>\n      MasterUsername: <MASTER_USERNAME>\n      MasterUserPassword: <MASTER_PASSWORD>\n      DBName: <new-db-name>  # 重要: チェックを通過するために初期データベース名を \"dev\" 以外の値に設定します\n```",
+      "Other": "1. AWS マネジメントコンソールで、Amazon Redshift > プロビジョニング済みクラスターに移動します\n2. クラスターの作成をクリックします\n3. データベース設定で、データベース名を \"dev\" 以外の値に設定します\n4. ウィザードを完了し、クラスターを作成します\n5. ワークロードを新しいクラスターに移行し、デフォルトの \"dev\" データベース名を使用していた古いクラスターを削除します",
+      "Terraform": "```hcl\n# Terraform: デフォルトでないデータベース名を持つ Redshift クラスター\nresource \"aws_redshift_cluster\" \"example\" {\n  cluster_identifier = \"<example_resource_id>\"\n  node_type          = \"<NODE_TYPE>\"\n  cluster_type       = \"single-node\"\n  master_username    = \"<MASTER_USERNAME>\"\n  master_password    = \"<MASTER_PASSWORD>\"\n  database_name      = \"<new-db-name>\" # 重要: チェックを通過するためにこれが \"dev\" でないことを確認します\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "クラスターごとに**一意でデフォルトでないデータベース名**を使用します。一般的な値（例：`dev`、`test`）を避け、広範なポリシー条件を防ぐ命名標準を定義し、**最小特権**をサポートします。IAM およびネットワークルールを見直し、意図された明示的なリソースのみを参照するようにします。",
+      "Url": "https://hub.prowler.com/check/redshift_cluster_non_default_database_name"
+    }
+  },
+  "Categories": [
+    "vulnerabilities"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

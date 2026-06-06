@@ -1,0 +1,36 @@
+{
+  "Provider": "aws",
+  "CheckID": "ec2_instance_port_mongodb_exposed_to_internet",
+  "CheckTitle": "确保没有 EC2 实例允许从互联网入站访问 TCP 端口 27017 或 27018 (MongoDB)",
+  "CheckType": [
+    "Infrastructure Security"
+  ],
+  "ServiceName": "ec2",
+  "SubServiceName": "instance",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "critical",
+  "ResourceType": "AwsEc2Instance",
+  "ResourceGroup": "compute",
+  "Description": "确保没有 EC2 实例允许从互联网入站访问 TCP 端口 27017 或 27018 (MongoDB)",
+  "Risk": "MongoDB 是一个流行的 NoSQL 数据库，常用于 Web 应用程序中。如果 EC2 实例允许从互联网入站访问 TCP 端口 27017 或 27018，它可能容易受到未经授权的访问和数据泄露。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "修改安全组以删除允许从互联网入站访问 TCP 端口 27017 或 27018 (MongoDB) 的规则。",
+      "Url": "https://docs.aws.amazon.com/vpc/latest/userguide/VPC_SecurityGroups.html"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

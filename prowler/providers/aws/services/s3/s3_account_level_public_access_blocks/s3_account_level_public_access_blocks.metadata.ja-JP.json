@@ -1,0 +1,33 @@
+{
+  "Provider": "aws",
+  "CheckID": "s3_account_level_public_access_blocks",
+  "CheckTitle": "S3アカウントレベルのパブリックアクセスブロックを確認してください。",
+  "CheckType": [
+    "データ保護"
+  ],
+  "ServiceName": "s3",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:s3:::bucket_name",
+  "Severity": "high",
+  "ResourceType": "AwsS3AccountPublicAccessBlock",
+  "ResourceGroup": "storage",
+  "Description": "S3アカウントレベルのパブリックアクセスブロックを確認してください。",
+  "Risk": "公開アクセス・ポリシーが機密データ・バケットに適用される可能性があります。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "aws s3control put-public-access-block --public-access-block-configuration BlockPublicAcls=true,IgnorePublicAcls=true,BlockPublicPolicy=true,RestrictPublicBuckets=true --account-id <account_id>",
+      "NativeIaC": "https://docs.prowler.com/checks/aws/s3-policies/bc_aws_s3_21#cloudformation",
+      "Other": "https://github.com/cloudmatos/matos/tree/master/remediations/aws/s3/s3control/block-public-access",
+      "Terraform": "https://docs.prowler.com/checks/aws/s3-policies/bc_aws_s3_21#terraform"
+    },
+    "Recommendation": {
+      "Text": "S3 に保存されたデータが公開されるのを防ぐために、アカウントレベルで Public Access Block を有効にできます。",
+      "Url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-control-block-public-access.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

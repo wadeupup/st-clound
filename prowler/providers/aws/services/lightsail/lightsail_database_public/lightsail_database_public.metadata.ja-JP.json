@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "lightsail_database_public",
+  "CheckTitle": "Lightsail データベースのパブリックアクセスが無効になっています",
+  "CheckType": [
+    "ソフトウェアと構成のチェック/AWS セキュリティベストプラクティス/ネットワーク到達可能性",
+    "ソフトウェアと構成のチェック/業界および規制基準/AWS 基礎セキュリティベストプラクティス",
+    "影響/データの露出",
+    "TTPs/初期アクセス"
+  ],
+  "ServiceName": "lightsail",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Other",
+  "ResourceGroup": "compute",
+  "Description": "**Lightsail 管理データベース**は**パブリックアクセス可能性**について評価されます。`public mode`が有効になっている場合、データベースはそのエンドポイントとポートを使用してインターネットからの接続を受け入れます。それ以外の場合、アクセスは認可された Lightsail リソースに限定されます。",
+  "Risk": "**パブリックに到達可能なデータベース**は、機密データや資格情報をインターネットにさらし、以下を可能にします:\n- **ブルートフォース攻撃**や資格情報詰め込み\n- 不正なクエリによる**データ流出**\n- スキャンやDoSによる**サービス妨害**\n\n妥協が**横方向の移動**や改ざんを可能にし、機密性、完全性、可用性に影響を与えます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/lightsail/latest/userguide/amazon-lightsail-databases.html",
+    "https://docs.aws.amazon.com/lightsail/latest/userguide/amazon-lightsail-configuring-database-public-mode.html",
+    "https://spinupwp.com/doc/external-database-amazon-lightsail/"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws lightsail update-relational-database --relational-database-name <example_resource_name> --no-publicly-accessible",
+      "NativeIaC": "```yaml\n# CloudFormation: 既存の Lightsail データベースでパブリックアクセスを無効にします\nResources:\n  <example_resource_name>:\n    Type: AWS::Lightsail::Database\n    Properties:\n      RelationalDatabaseName: <example_resource_name>\n      PubliclyAccessible: false  # 重要: パブリックモードをオフにして、データベースがパブリックにアクセスできないようにします\n```",
+      "Other": "1. AWS コンソールで、Lightsail > Databases に移動します\n2. <example_resource_name> を選択します\n3. ネットワーキングタブを開きます\n4. パブリックモードで、オフに切り替えます\n5. ステータスが利用可能に戻るまで待ちます",
+      "Terraform": "```hcl\n# Lightsail データベースのパブリックアクセスを無効にします\nresource \"aws_lightsail_database\" \"<example_resource_name>\" {\n  name                 = \"<example_resource_name>\"\n  availability_zone    = \"<availability_zone>\"\n  blueprint_id         = \"<blueprint_id>\"\n  bundle_id            = \"<bundle_id>\"\n  master_database_name = \"<master_database_name>\"\n  master_username      = \"<master_username>\"\n  master_password      = \"<master_password>\"\n\n  publicly_accessible = false  # 重要: データベースがパブリックにアクセスできないことを保証します\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "**パブリックモード**を無効にし、信頼できるプライベートネットワークからのみデータベースにアクセス可能にします。\n\n- **最小特権**とネットワークセグメンテーションを強制します\n- 管理アクセスにはバスチオンホスト、トンネル、またはプライベートエンドポイントを使用します\n- 露出が避けられない場合は、IPで制限し、資格情報をローテーションし、**多層防御**のために接続を監視します",
+      "Url": "https://hub.prowler.com/check/lightsail_database_public"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

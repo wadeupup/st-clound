@@ -1,0 +1,34 @@
+{
+  "Provider": "aws",
+  "CheckID": "ec2_securitygroup_default_restrict_traffic",
+  "CheckTitle": "确保每个 VPC 的默认安全组限制所有流量",
+  "CheckType": [
+    "Infrastructure Security"
+  ],
+  "ServiceName": "ec2",
+  "SubServiceName": "securitygroup",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "high",
+  "ResourceType": "AwsEc2SecurityGroup",
+  "ResourceGroup": "network",
+  "Description": "确保每个 VPC 的默认安全组限制所有流量。",
+  "Risk": "即使有边界防火墙，开放的安全组也允许任何拥有 VPC 访问权限的用户或恶意软件扫描已知和敏感端口，并获得对实例的访问权限。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://docs.prowler.com/checks/aws/networking-policies/networking_4#aws-console",
+      "Terraform": "https://docs.prowler.com/checks/aws/networking-policies/networking_4#terraform"
+    },
+    "Recommendation": {
+      "Text": "采用零信任（Zero Trust）方法。实施流程以扫描和修复不受限制或过于宽松的安全组。推荐的最佳实践是将定义收窄到所需的最少端口。",
+      "Url": "https://docs.aws.amazon.com/eks/latest/userguide/sec-group-reqs.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

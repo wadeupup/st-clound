@@ -1,0 +1,40 @@
+{
+  "Provider": "aws",
+  "CheckID": "neptune_cluster_storage_encrypted",
+  "CheckTitle": "Neptune クラスターのストレージは保存時に暗号化されています",
+  "CheckType": [
+    "ソフトウェアと構成のチェック/業界および規制基準/AWS 基礎セキュリティベストプラクティス",
+    "機密データの識別/セキュリティ"
+  ],
+  "ServiceName": "neptune",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Other",
+  "ResourceGroup": "database",
+  "Description": "Neptune DB クラスターは**保存時の暗号化**について評価されます。クラスターの基盤ストレージが暗号化されていないことを示しています。",
+  "Risk": "**暗号化されていない Neptune ストレージ**は、保存されたデータとメタデータの機密性を低下させ、攻撃の表面を増加させます。\n\n考えられる影響:\n- 基盤ボリュームやスナップショットからの不正アクセスやデータ流出\n- 流出または共有されたスナップショットからの影響範囲の拡大",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/neptune-controls.html#neptune-1",
+    "https://docs.aws.amazon.com/neptune/latest/userguide/encrypt.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\nResources:\n  EncryptedNeptuneCluster:\n    Type: AWS::Neptune::DBCluster\n    Properties:\n      DBClusterIdentifier: !Sub ${DBClusterIdentifier}\n      StorageEncrypted: true  # データ保護のために保存時の暗号化を有効にする\n```",
+      "Terraform": "```hcl\nresource \"aws_neptune_cluster\" \"example_resource\" {\n  cluster_identifier = \"<cluster-id>\"\n  storage_encrypted  = true  # データ保護のために保存時の暗号化を有効にする\n}\n```",
+      "Other": ""
+    },
+    "Recommendation": {
+      "Text": "すべての新しい Neptune DB クラスターを**保存時の暗号化**でプロビジョニングし、キーの所有権と監査可能性のために**カスタマーマネージドキー (CMK)** を優先してください。\n\nKMS キーに対して**最小特権**を強制し、キーのライフサイクルプラクティス（ローテーション、失効）を実施し、バックアップ/スナップショットが暗号化されたままであることを確認して露出を防ぎます。",
+      "Url": "https://hub.prowler.com/check/neptune_cluster_storage_encrypted"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

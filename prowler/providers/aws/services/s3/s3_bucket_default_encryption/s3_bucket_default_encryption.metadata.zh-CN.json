@@ -1,0 +1,35 @@
+{
+  "Provider": "aws",
+  "CheckID": "s3_bucket_default_encryption",
+  "CheckTitle": "检查 S3 存储桶是否已启用默认加密（SSE），或使用存储桶策略来强制执行它。",
+  "CheckType": [
+    "数据保护"
+  ],
+  "ServiceName": "s3",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:s3:::bucket_name",
+  "Severity": "medium",
+  "ResourceType": "AwsS3Bucket",
+  "ResourceGroup": "storage",
+  "Description": "检查 S3 存储桶是否已启用默认加密（SSE），或使用存储桶策略来强制执行它。",
+  "Risk": "Amazon S3 默认加密提供了一种为 S3 存储桶设置默认加密行为的方法。这将确保静态数据被加密。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "aws s3api put-bucket-encryption --bucket <bucket_name> --server-side-encryption-configuration '{'Rules': [{'ApplyServerSideEncryptionByDefault': {'SSEAlgorithm': 'AES256'}}]}'",
+      "NativeIaC": "https://docs.prowler.com/checks/aws/s3-policies/s3_14-data-encrypted-at-rest#cloudformation",
+      "Other": "",
+      "Terraform": "https://docs.prowler.com/checks/aws/s3-policies/s3_14-data-encrypted-at-rest#terraform"
+    },
+    "Recommendation": {
+      "Text": "确保已为 S3 存储桶启用静态加密。",
+      "Url": "https://aws.amazon.com/blogs/security/how-to-prevent-uploads-of-unencrypted-objects-to-amazon-s3/"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

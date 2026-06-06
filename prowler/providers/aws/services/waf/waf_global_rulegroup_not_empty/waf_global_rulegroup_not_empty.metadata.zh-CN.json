@@ -1,0 +1,39 @@
+{
+  "Provider": "aws",
+  "CheckID": "waf_global_rulegroup_not_empty",
+  "CheckTitle": "AWS WAF Classic 全局规则组至少有一条规则",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践/网络可达性",
+    "软件和配置检查/行业和监管标准/NIST 800-53 控制措施"
+  ],
+  "ServiceName": "waf",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsWafRuleGroup",
+  "ResourceGroup": "security",
+  "Description": "**AWS WAF Classic 全局规则组**会根据是否存在**一条或多条规则**进行评估。即使空组被 Web ACL 引用，也会被识别出来，这意味着该组不会增加任何匹配逻辑。",
+  "Risk": "空规则组不会执行任何检查，因此 Web 请求会在没有 WAF 审查的情况下通过。这会造成盲点，从而使以下情况成为可能：\n- **机密性**：通过 SQLi/XSS 进行数据外泄\n- **完整性**：参数篡改\n- **可用性**：机器人滥用和第 7 层 DoS\n\n它还会在附加后造成一种虚假的保护感。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/waf/latest/developerguide/waf-rule-groups.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/waf-controls.html#waf-7",
+    "https://docs.aws.amazon.com/waf/latest/developerguide/classic-rule-group-editing.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws waf update-rule-group --rule-group-id <rule-group-id> --updates Action=INSERT,ActivatedRule={Priority=1,RuleId=<rule-id>,Action={Type=BLOCK}} --change-token <change-token> --region us-east-1",
+      "NativeIaC": "```yaml\n# CloudFormation：确保 WAF Classic 全局规则组至少具有一条规则\nResources:\n  <example_resource_name>:\n    Type: AWS::WAF::RuleGroup\n    Properties:\n      Name: <example_resource_name>\n      MetricName: examplemetric\n      ActivatedRules:\n        - Priority: 1                 # 关键：向该组添加一条规则（使其不再为空）\n          RuleId: <example_resource_id>  # 关键：要添加的现有规则的 ID\n          Action:\n            Type: BLOCK              # 关键：激活该规则时需要执行的操作\n```",
+      "Other": "1. 打开 AWS 控制台并进入 AWS WAF，然后切换到 AWS WAF Classic\n2. 在顶部，将范围设置为 Global (CloudFront)\n3. 转到 Rule groups 并选择目标规则组\n4. 点击 Edit rule group\n5. 选择一个现有规则，选择其操作（例如，BLOCK），然后点击 Add rule to rule group\n6. 点击 Update 进行保存",
+      "Terraform": "```hcl\n# Terraform：确保 WAF Classic 全局规则组至少有一条规则\nresource \"aws_waf_rule_group\" \"<example_resource_name>\" {\n  name        = \"<example_resource_name>\"\n  metric_name = \"examplemetric\"\n\n  activated_rule {\n    priority = 1                      # 关键：向该组添加一条规则（使其不再为空）\n    rule_id  = \"<example_resource_id>\" # 关键：要添加的现有规则的 ID\n    action {\n      type = \"BLOCK\"                 # 关键：激活该规则时需要执行的操作\n    }\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "用与应用威胁相一致的**有效规则**填充每个规则组；根据需要选择 `block` 或 `count` 操作。优先使用**托管规则组**作为基线，并分层添加自定义规则以实现**最小权限**。避免使用占位规则组，在预发布环境中测试，并监控指标以进行调优。",
+      "Url": "https://hub.prowler.com/check/waf_global_rulegroup_not_empty"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

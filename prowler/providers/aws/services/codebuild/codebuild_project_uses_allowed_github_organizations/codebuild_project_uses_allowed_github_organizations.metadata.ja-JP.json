@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "codebuild_project_uses_allowed_github_organizations",
+  "CheckTitle": "GitHub を使用する CodeBuild プロジェクトが許可された GitHub 組織を使用している",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices"
+  ],
+  "ServiceName": "codebuild",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsCodeBuildProject",
+  "ResourceGroup": "devops",
+  "Description": "**GitHub/GitHub Enterprise** からソースを取得する **CodeBuild プロジェクト**（CodeBuild を信頼するサービスロールを使用）を評価し、リポジトリの URL から組織を導出し、**許可された組織**のリストと比較します。",
+  "Risk": "**信頼されていない GitHub 組織**からのリポジトリを使用すると、外部ワークフローがプロジェクトロールを引き受け、AWS 認証情報を取得できる可能性があります。\n- 機密性：データ/シークレットの流出\n- 整合性：不正な変更\n- 可用性：ビルドの悪用またはサービスの中断",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://medium.com/@adan.alvarez/gaining-long-term-aws-access-with-codebuild-and-github-873324638784",
+    "https://paul-hands-phd.medium.com/using-aws-codebuild-to-set-up-github-continuous-integration-19b92efbd094",
+    "https://docs.aws.amazon.com/codebuild/latest/userguide/connections-github-app.html",
+    "https://docs.aws.amazon.com/codebuild/latest/userguide/auth-and-access-control-iam-identity-based-access-control.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws codebuild update-project --name <example_resource_name> --source type=GITHUB,location=https://github.com/<ALLOWED_GITHUB_ORG>/<REPO>",
+      "NativeIaC": "```yaml\n# CloudFormation: point CodeBuild project to a repo in an allowed GitHub org\nResources:\n  <example_resource_name>:\n    Type: AWS::CodeBuild::Project\n    Properties:\n      ServiceRole: <example_resource_arn>\n      Artifacts:\n        Type: NO_ARTIFACTS\n      Environment:\n        Type: LINUX_CONTAINER\n        ComputeType: BUILD_GENERAL1_SMALL\n        Image: aws/codebuild/standard:7.0\n      Source:\n        Type: GITHUB\n        Location: https://github.com/<ALLOWED_GITHUB_ORG>/<REPO>  # FIX: repo org must be in the allowed list\n```",
+      "Other": "1. AWS コンソールを開き、CodeBuild > ビルドプロジェクトに移動します\n2. プロジェクトを選択し、編集をクリックします\n3. ソースで、リポジトリ URL を https://github.com/<ALLOWED_GITHUB_ORG>/<REPO> に設定します\n4. 更新をクリックして保存します",
+      "Terraform": "```hcl\n# Terraform: set CodeBuild source to a repo under an allowed GitHub org\nresource \"aws_codebuild_project\" \"<example_resource_name>\" {\n  name         = \"<example_resource_name>\"\n  service_role = \"<example_resource_arn>\"\n\n  artifacts { type = \"NO_ARTIFACTS\" }\n\n  environment {\n    compute_type = \"BUILD_GENERAL1_SMALL\"\n    image        = \"aws/codebuild/standard:7.0\"\n    type         = \"LINUX_CONTAINER\"\n  }\n\n  source {\n    type     = \"GITHUB\"\n    location = \"https://github.com/<ALLOWED_GITHUB_ORG>/<REPO>\" # FIX: use an allowed GitHub org\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "明示的な許可リストを介して、ソースを**承認された GitHub 組織**に制限します。CodeBuild サービスロールに**最小権限**を強制し、管理者権限を避けます。許可リストの変更に**職務の分離**を適用し、**多層防御**（ブランチ保護、レビュー、監視）を追加して、ワークフローの悪用を防ぎます。",
+      "Url": "https://hub.prowler.com/check/codebuild_project_uses_allowed_github_organizations"
+    }
+  },
+  "Categories": [
+    "software-supply-chain",
+    "ci-cd"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

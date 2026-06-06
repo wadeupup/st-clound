@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "cloudwatch_cross_account_sharing_disabled",
+  "CheckTitle": "CloudWatch 不允许跨账户共享",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Effects/Data Exposure"
+  ],
+  "ServiceName": "cloudwatch",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsIamRole",
+  "ResourceGroup": "IAM",
+  "Description": "通过 `CloudWatch-CrossAccountSharingRole` 进行的 **Amazon CloudWatch** 跨账户共享，允许其他 AWS 账户查看你的指标、仪表板和警报。存在该角色表明当前已启用共享。",
+  "Risk": "授予其他账户对可观测性数据的可见性会降低 **机密性** 并启用 **侦察**。攻击者或权限过高的合作方可以映射架构、分析工作负载并发现告警盲区，从而提高 **横向移动** 和 **规避检测** 的成功概率。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/Cross-Account-Cross-Region.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws cloudformation delete-stack --stack-name CloudWatch-CrossAccountSharingRole",
+      "NativeIaC": "",
+      "Other": "1. 登录 AWS 管理控制台并打开 IAM\n2. 转到“角色”\n3. 查找并选择名为 \"CloudWatch-CrossAccountSharingRole\" 的角色\n4. 点击删除并确认\n5. 如果删除被阻止，提示该角色由 CloudFormation 管理：打开 CloudFormation，选择名为 \"CloudWatch-CrossAccountSharingRole\" 的堆栈，然后点击删除",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "除非严格必要，否则应禁用 **跨账户共享**。如确有需要，应将访问限制到特定受信账户，将只读权限仅限定在必要资源上，并使用专用监控账户。应用 **最小权限原则** 和 **职责分离**，并定期审计角色信任关系和访问模式。",
+      "Url": "https://hub.prowler.com/check/cloudwatch_cross_account_sharing_disabled"
+    }
+  },
+  "Categories": [
+    "trust-boundaries",
+    "identity-access"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+
+

@@ -1,0 +1,44 @@
+{
+  "Provider": "aws",
+  "CheckID": "guardduty_is_enabled",
+  "CheckTitle": "GuardDuty detector が有効で停止されていないこと",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices/Runtime Behavior Analysis",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/CIS AWS Foundations Benchmark"
+  ],
+  "ServiceName": "guardduty",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsGuardDutyDetector",
+  "ResourceGroup": "security",
+  "Description": "**Amazon GuardDuty** detector の存在と健全性をリージョンごとに評価します。アカウントで GuardDuty が未有効、detector にステータスがない、または設定済みでも `suspended` の detector を特定します。",
+  "Risk": "有効な **GuardDuty** がないと、CloudTrail、VPC Flow Logs、DNS、S3、EKS、EBS、Lambda における脅威を見逃す可能性があります。攻撃者はデータ流出、横方向移動、暗号資産マイニングを行い、機密性・完全性・可用性を低下させます。特に未監視リージョンでリスクが高まります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/guardduty/latest/ug/guardduty_settingup.html",
+    "https://aws.plainenglish.io/how-to-protect-your-organizations-aws-account-with-aws-guardduty-a1a635c417aa",
+    "https://medium.com/swlh/aws-cdk-automating-guardduty-event-notifications-in-all-regions-f0bbcec6077d",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/GuardDuty/guardduty-enabled.html",
+    "https://docs.aws.amazon.com/prescriptive-guidance/latest/patterns/use-terraform-to-automatically-enable-amazon-guardduty-for-an-organization.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation: Ensure GuardDuty detector is enabled (not suspended) in the Region\nResources:\n  ExampleGuardDutyDetector:\n    Type: AWS::GuardDuty::Detector\n    Properties:\n      Enable: true  # Critical: enables the detector so GuardDuty is active (not suspended)\n```",
+      "Other": "1. AWS Console にサインインして Amazon GuardDuty を開きます\n2. 対象の AWS Region に切り替えます\n3. Get started が表示されたら Enable GuardDuty をクリックします\n4. GuardDuty が設定済みで suspended の場合は、Settings で Enable（または Resume）をクリックして detector を有効化します\n5. 必要な各 Region で繰り返します",
+      "Terraform": "```hcl\n# Terraform: Ensure GuardDuty detector is enabled (not suspended) in the Region\nresource \"aws_guardduty_detector\" \"example_resource_name\" {\n  enable = true  # Critical: turns GuardDuty on and ensures it is not suspended\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "委任管理者のもと、対応する全リージョンと全アカウントで **GuardDuty** を有効かつ稼働状態に維持してください。関連する保護プランを有効化し、新規アカウントを自動登録します。`suspended` detector を避け、管理者には**最小権限**を適用し、検出結果を対応フローに統合して**多層防御**を実現してください。",
+      "Url": "https://hub.prowler.com/check/guardduty_is_enabled"
+    }
+  },
+  "Categories": [
+    "forensics-ready"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

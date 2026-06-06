@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "directoryservice_ldap_certificate_expiration",
+  "CheckTitle": "Directory Service LDAP 证书在90天以上后过期",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices"
+  ],
+  "ServiceName": "directoryservice",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "IAM",
+  "Description": "评估**AWS Directory Service** 安全 LDAP (LDAPS) 证书的即将过期情况，通过比较每个目录的证书过期时间与当前时间，识别剩余时间 `<= 90` 天的证书。",
+  "Risk": "过期的 LDAPS 证书会导致 TLS 握手失败，阻止目录绑定和查询，并中断身份验证和应用集成（可用性）。如果客户端回退到纯 LDAP，凭据和目录数据可能被拦截或更改（机密性和完整性）。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/directoryservice/latest/admin-guide/ms_ad_ldap.html",
+    "https://support.icompaas.com/support/solutions/articles/62000229587-ensure-to-monitor-directory-service-ldap-certificates-expiration"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws ds register-certificate --directory-id <DIRECTORY_ID> --certificate-data file://certificate.pem",
+      "NativeIaC": "",
+      "Other": "1. 在 AWS 控制台中，打开 Directory Service 并选择您的 AWS Managed Microsoft AD (<example_resource_id>)\n2. 转到 Networking & security > Secure LDAP\n3. 点击 Edit（Manage certificate）\n4. 选择 Replace certificate（或 Upload certificate）\n5. 上传来自受信任 CA 的新 LDAPS 服务器证书（包含私钥，有效期 >90 天）；如果使用 .pfx，请输入密码\n6. 保存并等待证书状态变为 Active",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "采用证书生命周期管理：清点 LDAPS 证书，在过期前提前告警，并通过分阶段推出和重叠实现自动续期。强制执行仅 TLS LDAP 并禁用明文回退。对证书颁发和部署应用**最小权限**和**职责分离**。",
+      "Url": "https://hub.prowler.com/check/directoryservice_ldap_certificate_expiration"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

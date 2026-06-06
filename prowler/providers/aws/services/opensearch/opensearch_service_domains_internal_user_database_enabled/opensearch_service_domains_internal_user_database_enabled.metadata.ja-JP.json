@@ -1,0 +1,39 @@
+{
+  "Provider": "aws",
+  "CheckID": "opensearch_service_domains_internal_user_database_enabled",
+  "CheckTitle": "Amazon OpenSearch Service ドメインで内部ユーザーデータベースが無効になっています",
+  "CheckType": [
+    "ソフトウェアと構成のチェック/AWS セキュリティベストプラクティス"
+  ],
+  "ServiceName": "opensearch",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsOpenSearchServiceDomain",
+  "ResourceGroup": "database",
+  "Description": "**Amazon OpenSearch Service ドメイン**は、**内部ユーザーデータベース**設定 (`InternalUserDatabaseEnabled`) について評価されます。この検出は、外部のアイデンティティプロバイダーではなく、組み込みのHTTP基本ユーザーに依存しているドメインを特定します。",
+  "Risk": "内部ユーザーデータベースが有効になっていると、**資格情報のスプロール**と弱い**アカウントライフサイクル**が発生します。集中管理されたMFA、ローテーション、および取り消しが欠如していると、無許可のアクセスリスクが高まり、**機密性**と**整合性**に影響を与えます。\n\n公開されたエンドポイントでの基本認証はブルートフォースを容易にし、**監査可能性**を低下させます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/fgac.html",
+    "https://docs.aws.amazon.com/opensearch-service/latest/developerguide/fgac.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws opensearch update-domain-config --domain-name <example_resource_name> --advanced-security-options '{\"InternalUserDatabaseEnabled\":false}'",
+      "NativeIaC": "```yaml\n# CloudFormation: ドメインの内部ユーザーデータベースを無効にする\nResources:\n  <example_resource_name>:\n    Type: AWS::OpenSearchService::Domain\n    Properties:\n      AdvancedSecurityOptions:\n        InternalUserDatabaseEnabled: false  # 重要: チェックを通過するために内部ユーザーDBを無効にします\n```",
+      "Other": "1. AWS コンソールで、Amazon OpenSearch Service > ドメインに移動\n2. ドメインを選択し、セキュリティ設定の編集を選択\n3. 詳細なアクセス制御の下で、内部ユーザーデータベースをオフにする\n4. 変更を保存をクリック",
+      "Terraform": "```hcl\n# Terraform: ドメインの内部ユーザーデータベースを無効にする\nresource \"aws_opensearch_domain\" \"<example_resource_name>\" {\n  domain_name = \"<example_resource_name>\"\n\n  advanced_security_options {\n    internal_user_database_enabled = false  # 重要: チェックを通過するために内部ユーザーDBを無効にします\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "**フェデレーテッド認証**（IAM、SAML、または Amazon Cognito）を優先し、**内部ユーザーデータベース**を無効にします。**最小特権**ロールを強制し、**MFA**を要求し、資格情報のローテーションとオフボーディングを集中管理し、アクセスをログに記録します。**VPCアクセス**と制限付きポリシーを使用し、HTTP基本認証を避けて露出を最小限に抑えます。",
+      "Url": "https://hub.prowler.com/check/opensearch_service_domains_internal_user_database_enabled"
+    }
+  },
+  "Categories": [
+    "identity-access"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

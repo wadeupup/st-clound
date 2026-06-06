@@ -1,0 +1,44 @@
+{
+  "Provider": "aws",
+  "CheckID": "appstream_fleet_default_internet_access_disabled",
+  "CheckTitle": "AppStream 队列已禁用默认互联网访问",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践/网络可达性",
+    "软件和配置检查/行业和监管标准/AWS 基础安全最佳实践",
+    "软件和配置检查/行业和监管标准/CIS AWS 基础基准"
+  ],
+  "ServiceName": "appstream",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "compute",
+  "Description": "**Amazon AppStream 队列**根据 `EnableDefaultInternetAccess` 设置进行评估，识别流式传输实例具有默认互联网连接的队列。",
+  "Risk": "**直接互联网访问**使流式传输实例暴露于公共环境。威胁包括：\n- 远程利用和恶意软件，破坏**机密性**和**完整性**\n- 不受控制的出口流量使**数据泄露**成为可能\n\n它还强制执行约 100 个实例的限制，降低了高并发部署的**可用性**。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/appstream2/latest/developerguide/set-up-stacks-fleets.html",
+    "https://support.icompaas.com/support/solutions/articles/62000233540-ensure-default-internet-access-from-your-amazon-appstream-fleet-streaming-instances-remains-unchecked",
+    "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-appstream-fleet.html",
+    "https://docs.aws.amazon.com/appstream2/latest/developerguide/internet-access.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws appstream update-fleet --name <example_resource_name> --no-enable-default-internet-access",
+      "NativeIaC": "```yaml\n# CloudFormation: 在 AppStream 队列上禁用默认互联网访问\nResources:\n  <example_resource_name>:\n    Type: AWS::AppStream::Fleet\n    Properties:\n      Name: <example_resource_name>\n      InstanceType: <INSTANCE_TYPE>\n      EnableDefaultInternetAccess: false  # 关键：禁用默认互联网访问以通过检查\n```",
+      "Other": "1. 在 AWS 控制台中，转到 Amazon AppStream 2.0 > Fleets\n2. 选择目标队列\n3. 如果队列正在运行，单击 Actions > Stop 并等待状态变为 Stopped\n4. 单击 Edit（或 Modify）\n5. 取消选中 \"Default internet access\"（禁用 \"Enable default internet access\"）\n6. 保存/更新队列，如需要则启动它",
+      "Terraform": "```hcl\n# Terraform: 在 AppStream 队列上禁用默认互联网访问\nresource \"aws_appstream_fleet\" \"<example_resource_name>\" {\n  name          = \"<example_resource_name>\"\n  instance_type = \"stream.standard.small\"\n  image_name    = \"<IMAGE_NAME>\"\n  compute_capacity { desired_instances = 1 }\n\n  enable_default_internet_access = false  # 关键：禁用默认互联网访问以通过检查\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "禁用默认互联网访问（`EnableDefaultInternetAccess=false`），并将队列放置在**私有子网**中。通过**NAT 网关**或代理提供出口流量，强制执行**出口过滤**，并应用**最小权限**和**零信任**来限制出站流量。尽可能使用与 AWS 服务的私有连接。",
+      "Url": "https://hub.prowler.com/check/appstream_fleet_default_internet_access_disabled"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "Infrastructure Security"
+}
+

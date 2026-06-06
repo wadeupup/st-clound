@@ -1,0 +1,44 @@
+{
+  "Provider": "aws",
+  "CheckID": "cloudwatch_log_group_kms_encryption_enabled",
+  "CheckTitle": "CloudWatch 日志组已使用 AWS KMS 密钥加密",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Effects/Data Exposure"
+  ],
+  "ServiceName": "cloudwatch",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "monitoring",
+  "Description": "通过检查日志组是否通过 `kmsKeyId` 关联了 **AWS KMS 密钥**，来评估 **CloudWatch 日志组** 是否启用了 **静态加密**。",
+  "Risk": "如果没有 **客户管理的 KMS 密钥**，日志依赖于服务管理的加密，限制了控制和审计能力。\n- 机密性：针对未授权读取的密钥策略防护较弱\n- 完整性/可用性：无法进行自定义轮换或快速吊销，阻碍事件响应和合规满足",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/cli/latest/reference/logs/associate-kms-key.html",
+    "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_log_group",
+    "https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/logs/client/associate_kms_key.html",
+    "https://support.icompaas.com/support/solutions/articles/62000233436-ensure-cloudwatch-log-groups-are-protected-by-aws-kms",
+    "https://varunmanik1.medium.com/proactively-mitigating-a-medium-severity-prowler-issue-enabling-kms-encryption-for-cloudwatch-logs-51d43416c7fc"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws logs associate-kms-key --log-group-name <LOG_GROUP_NAME> --kms-key-id arn:aws:kms:<REGION>:<ACCOUNT_ID>:key/<KEY_ID>",
+      "NativeIaC": "```yaml\n# CloudFormation: Encrypt a CloudWatch Log Group with KMS\nResources:\n  <example_resource_name>:\n    Type: AWS::Logs::LogGroup\n    Properties:\n      KmsKeyId: arn:aws:kms:<REGION>:<ACCOUNT_ID>:key/<KEY_ID>  # Critical: associates a CMK to encrypt the log group\n```",
+      "Other": "1. 在 AWS 控制台中，转到 CloudWatch > 日志组\n2. 单击“创建日志组”并输入名称\n3. 在“加密”下，选择 KMS 密钥并提供密钥 ARN\n4. 单击“创建日志组”\n5. 对于现有日志组，控制台无法附加 KMS 密钥；请使用上方提供的 CLI 命令",
+      "Terraform": "```hcl\n# Encrypt a CloudWatch Log Group with KMS\nresource \"aws_cloudwatch_log_group\" \"<example_resource_name>\" {\n  name       = \"<example_resource_name>\"\n  kms_key_id = \"arn:aws:kms:<REGION>:<ACCOUNT_ID>:key/<KEY_ID>\" # Critical: associates a CMK to encrypt the log group\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "通过 `kmsKeyId` 为每个日志组关联一个 **客户管理的 KMS 密钥**。\n- 在密钥和 IAM 策略中实施 **最小权限原则**，仅向必要主体授予 `kms:Decrypt`\n- 启用密钥轮换并监控密钥使用情况\n- 按应用/租户分隔密钥，以支持 **纵深防御** 和快速吊销",
+      "Url": "https://hub.prowler.com/check/cloudwatch_log_group_kms_encryption_enabled"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

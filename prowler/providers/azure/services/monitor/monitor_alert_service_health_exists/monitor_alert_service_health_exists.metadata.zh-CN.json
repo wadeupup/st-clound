@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "monitor_alert_service_health_exists",
+  "CheckTitle": "确保存在用于 Service Health 的活动日志告警",
+  "CheckType": [],
+  "ServiceName": "monitor",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Monitor",
+  "ResourceGroup": "monitoring",
+  "Description": "确保已配置 Azure 活动日志告警，以便在你的 Microsoft Azure 云账户中发生 Service Health 事件时触发。当新事件匹配告警规则配置中的指定条件时，应激活该告警。",
+  "Risk": "若缺少对 Service Health 事件的监控，可能会错过关键服务问题、计划维护、安全公告或其他可能影响所用 Azure 服务与区域的变更。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/service-health/overview",
+  "Remediation": {
+    "Code": {
+      "CLI": "az monitor activity-log alert create --subscription <subscription-id> --resource-group <resource-group> --name <alert-rule> --condition category=ServiceHealth and properties.incidentType=Incident --scope /subscriptions/<subscription-id> --action-group <action-group>",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/ActivityLog/service-health-alert.html",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "为 Service Health 事件创建活动日志告警，并配置操作组以通知相关人员。",
+      "Url": "https://learn.microsoft.com/en-us/azure/service-health/alerts-activity-log-service-notifications-portal"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "默认情况下，在你的 Azure 订阅中不会为 Service Health 事件配置任何活动日志告警。"
+}

@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "opensearch_service_domains_access_control_enabled",
+  "CheckTitle": "Amazon OpenSearch Service ドメインには詳細なアクセス制御が有効になっています",
+  "CheckType": [
+    "ソフトウェアと構成のチェック/AWS セキュリティベストプラクティス",
+    "ソフトウェアと構成のチェック/業界および規制基準/AWS 基礎セキュリティベストプラクティス"
+  ],
+  "ServiceName": "opensearch",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsOpenSearchServiceDomain",
+  "ResourceGroup": "database",
+  "Description": "**Amazon OpenSearch Service ドメイン**は、`advanced-security-options`で**詳細なアクセス制御**が有効になっているか評価され、APIおよびダッシュボードへのアクセスにおいてインデックス、ドキュメント、フィールドレベルでのロールベースの認可を確保します。",
+  "Risk": "**詳細なアクセス制御**がない場合、アイデンティティは過度に広範な権限を得る可能性があり、インデックスやダッシュボード全体での不正な読み取りや書き込みを可能にします。これは**機密性**と**整合性**を損ない、横方向の移動を促進し、アカウントが侵害された場合の影響範囲を拡大します。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://repost.aws/questions/QUvejSG0WDRByFVMcDchn_5w/how-do-resource-based-access-policies-interact-with-fgac-master-users-in-amazon-opensearch-service",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/opensearch-controls.html#opensearch-7",
+    "https://docs.aws.amazon.com/opensearch-service/latest/developerguide/fgac.html#fgac-enabling",
+    "https://ealtili.medium.com/how-to-use-fine-grained-access-control-in-amazon-opensearch-service-4dc86bffd40d"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws opensearch update-domain-config --domain-name <DOMAIN_NAME> --advanced-security-options '{\"Enabled\":true,\"MasterUserOptions\":{\"MasterUserARN\":\"<MASTER_USER_ARN>\"}}'",
+      "NativeIaC": "```yaml\n# CloudFormation: OpenSearch ドメインで詳細なアクセス制御 (FGAC) を有効にする\nResources:\n  <example_resource_name>:\n    Type: AWS::OpenSearchService::Domain\n    Properties:\n      DomainName: <example_resource_name>\n      AdvancedSecurityOptions:\n        Enabled: true  # 重要: FGAC をオンにします\n        MasterUserOptions:\n          MasterUserARN: <MASTER_USER_ARN>  # 重要: IAM プリンシパルを使用して FGAC を有効にするために必要です\n```",
+      "Other": "1. AWS コンソールで Amazon OpenSearch Service に移動\n2. ドメインを選択し、セキュリティ設定の編集を選択\n3. 詳細なアクセス制御を有効にする\n4. マスター ユーザーを設定する（IAM ARN を選択し、<MASTER_USER_ARN> を入力するか、内部マスター ユーザーを作成する）\n5. 変更を保存し、更新が完了するのを待つ",
+      "Terraform": "```hcl\n# OpenSearch ドメインで詳細なアクセス制御 (FGAC) を有効にする\nresource \"aws_opensearch_domain\" \"<example_resource_name>\" {\n  domain_name = \"<example_resource_name>\"\n\n  advanced_security_options {\n    enabled = true  # 重要: FGAC をオンにします\n    master_user_options {\n      master_user_arn = \"<MASTER_USER_ARN>\"  # 重要: IAM プリンシパルを使用して FGAC を有効にするために必要です\n    }\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "`advanced-security-options`で**詳細なアクセス制御**を有効にします。詳細なロールベースの権限（インデックス/ドキュメント/フィールド）を定義し、それらをフェデレーテッドアイデンティティにマッピングします。**最小特権**、デフォルト拒否、および**職務分離**を適用します。公開アクセスを制限し、ロールマッピングを定期的にレビューします。",
+      "Url": "https://hub.prowler.com/check/opensearch_service_domains_access_control_enabled"
+    }
+  },
+  "Categories": [
+    "identity-access"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

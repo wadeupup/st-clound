@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "ecs_task_definitions_no_privileged_containers",
+  "CheckTitle": "ECS タスク定義に特権コンテナがない",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/CIS Host Hardening Benchmarks",
+    "TTPs/Privilege Escalation"
+  ],
+  "ServiceName": "ecs",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsEcsTaskDefinition",
+  "ResourceGroup": "container",
+  "Description": "**Amazon ECS タスク定義** は、**特権モード**（`privileged: true`）で設定されたコンテナについて評価されます。\n\n結果は、コンテナ定義がこの設定を有効にしているかどうかを示します。",
+  "Risk": "**特権コンテナ** はホストレベルの root として動作でき、分離を破ります。足がかりを得ると、攻撃者は **コンテナエスケープ** を達成し、ホストデバイスをマウントし、シークレットを読み取り、設定を変更し、他のワークロードを制御できます - データ窃取、改ざん、サービス中断を通じて機密性、整合性、および可用性に影響を与えます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/config/latest/developerguide/ecs-containers-nonprivileged.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/ecs-controls.html#ecs-4",
+    "https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_definition_parameters.html#container_definition_security"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws ecs deregister-task-definition --task-definition <task-family>:<revision>",
+      "NativeIaC": "```yaml\n# CloudFormation: ECS task definition with non-privileged container\nResources:\n  <example_resource_name>:\n    Type: AWS::ECS::TaskDefinition\n    Properties:\n      Family: <example_resource_name>\n      ContainerDefinitions:\n        - Name: <example_resource_name>\n          Image: <image>\n          Privileged: false  # Critical: ensures container is non-privileged to pass the check\n```",
+      "Other": "1. Amazon ECS コンソールを開き、タスク定義に移動します\n2. 失敗しているタスク定義ファミリーを選択し、失敗しているリビジョンを開きます\n3. 新しいリビジョンを作成をクリックします\n4. 影響を受けるコンテナを編集し、特権のチェックを外します（false に設定）\n5. 作成をクリックして新しいリビジョンを登録します",
+      "Terraform": "```hcl\n# ECS task definition with non-privileged container\nresource \"aws_ecs_task_definition\" \"<example_resource_name>\" {\n  family                = \"<example_resource_name>\"\n  container_definitions = jsonencode([\n    {\n      name       = \"<example_resource_name>\"\n      image      = \"<image>\"\n      privileged = false # Critical: ensures container is non-privileged to pass the check\n    }\n  ])\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "権限を昇格させず（`privileged: false`）にコンテナを実行し、非 root（`user`）として実行します。**最小権限** を適用します：\n- `capDrop`/`capAdd` を通じて必要な Linux 機能のみを付与します\n- `readonlyRootFilesystem: true` を優先します\n- ネットワークを分離し、職務を分離します\n- 多層防御をサポートするためにロギングで監視します",
+      "Url": "https://hub.prowler.com/check/ecs_task_definitions_no_privileged_containers"
+    }
+  },
+  "Categories": [
+    "container-security"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

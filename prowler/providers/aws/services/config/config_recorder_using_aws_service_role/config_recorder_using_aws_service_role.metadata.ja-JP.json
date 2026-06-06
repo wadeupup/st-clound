@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "config_recorder_using_aws_service_role",
+  "CheckTitle": "AWS Config レコーダーが AWSServiceRoleForConfig サービスリンクロールを使用している",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices"
+  ],
+  "ServiceName": "config",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "monitoring",
+  "Description": "**AWS Config レコーダー**が、カスタムロールではなく、`config.amazonaws.com` にリンクされたサービスリンク IAM ロール `AWSServiceRoleForConfig` の使用について評価されます。\n\n評価では、アクティブなレコーダーとそのロール ARN を検査して、AWS 管理のサービスリンクロールが使用されていることを確認します。",
+  "Risk": "カスタムまたは誤ったロールを使用すると、記録が中断されたり、盲点が作成されたりし、設定履歴の**整合性**と**可用性**が損なわれます。過剰な権限を持つロールは**最小権限の原則**を弱め、不正アクセス、ステルス変更、インシデント対応の遅延のリスクを増加させます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/config-controls.html#config-1",
+    "https://docs.aws.amazon.com/config/latest/developerguide/using-service-linked-roles.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws configservice put-configuration-recorder --configuration-recorder name=<RECORDER_NAME>,roleARN=arn:<PARTITION>:iam::<ACCOUNT_ID>:role/aws-service-role/config.amazonaws.com/AWSServiceRoleForConfig",
+      "NativeIaC": "```yaml\nResources:\n  example_resource:\n    Type: AWS::Config::ConfigurationRecorder\n    Properties:\n      Name: example_resource\n      RoleARN: arn:<PARTITION>:iam::<ACCOUNT_ID>:role/aws-service-role/config.amazonaws.com/AWSServiceRoleForConfig  # この行がセキュリティ問題を修正します\n```",
+      "Other": "1. AWS コンソールを開き、AWS Config に移動します\n2. 設定（または記録）を選択し、編集をクリックします\n3. IAM ロールについて、サービスリンクロールを使用（AWSServiceRoleForConfig）を選択します\n4. 変更を保存します",
+      "Terraform": "```hcl\nresource \"aws_config_configuration_recorder\" \"example_resource\" {\n  name     = \"example_resource\"\n  role_arn = \"arn:<PARTITION>:iam::<ACCOUNT_ID>:role/aws-service-role/config.amazonaws.com/AWSServiceRoleForConfig\"  # この行がセキュリティ問題を修正します\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "すべてのレコーダーに AWS 管理のサービスリンクロール `AWSServiceRoleForConfig` を使用して、**最小権限の原則**と一貫した信頼を強制します。\n\nカスタムロールの使用を避けます。レコーダーまたはロールを変更できるユーザーを制限します。ドリフトを監視し、記録が有効なままであることを確認します。これは**多層防御**の一部として。",
+      "Url": "https://hub.prowler.com/check/config_recorder_using_aws_service_role"
+    }
+  },
+  "Categories": [
+    "identity-access"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

@@ -1,0 +1,40 @@
+{
+  "Provider": "aws",
+  "CheckID": "guardduty_no_high_severity_findings",
+  "CheckTitle": "GuardDuty detector 不存在高严重性发现",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices/Runtime Behavior Analysis",
+    "TTPs",
+    "Unusual Behaviors"
+  ],
+  "ServiceName": "guardduty",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsGuardDutyDetector",
+  "ResourceGroup": "security",
+  "Description": "会评估 **GuardDuty detectors** 是否存在**高严重性发现**。该检查用于揭示当前是否有 detector 含有被 GuardDuty 标记为 `High` 的发现。",
+  "Risk": "未处置的**高严重性发现**通常意味着存在进行中的入侵，可能导致：\n- 数据外泄与未授权访问（机密性）\n- 权限提升与篡改（完整性）\n- 恶意软件/挖矿导致的服务中断（可用性）\n\n若未及时遏制，攻击者可横向移动并持续驻留。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/guardduty/latest/ug/guardduty_findings.html",
+    "https://docs.aws.amazon.com/prescriptive-guidance/latest/vulnerability-management/assess-and-prioritize-security-findings.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/GuardDuty/findings.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "1. 登录 AWS console 并打开 Amazon GuardDuty\n2. 使用 Region 选择器切换到已启用 GuardDuty 的 Region\n3. 进入 Findings 并筛选：Severity = High (7-8.9)、Archived status = Not archived\n4. 选中所有结果，点击 Actions > Archive\n5. 对每个启用 GuardDuty 的 Region 重复步骤 2-4\n6. 确认每个 Region 中活动的 High 严重性发现为 0",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "将**高严重性发现**按安全事件处理。\n\n- 优先进行研判与遏制；隔离受影响资源并轮换密钥/凭据\n- 通过剧本自动化告警与响应，并接入 IR 流程\n- 实施**最小权限**、网络分段和加固基线\n- 持续优化检测并移除不再使用的访问权限以防复发",
+      "Url": "https://hub.prowler.com/check/guardduty_no_high_severity_findings"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

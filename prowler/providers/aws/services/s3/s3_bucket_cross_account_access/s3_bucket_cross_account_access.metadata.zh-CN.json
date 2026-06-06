@@ -1,0 +1,33 @@
+{
+  "Provider": "aws",
+  "CheckID": "s3_bucket_cross_account_access",
+  "CheckTitle": "确保通用存储桶策略限制其他 AWS 账户的访问。",
+  "CheckType": [
+    "影响/数据暴露"
+  ],
+  "ServiceName": "s3",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:s3:::bucket_name",
+  "Severity": "high",
+  "ResourceType": "AwsS3Bucket",
+  "ResourceGroup": "storage",
+  "Description": "此检查验证 S3 存储桶策略是否以仅将访问限制为预期的 AWS 账户的方式进行配置，从而防止外部或非预期账户的未授权访问。",
+  "Risk": "允许其他 AWS 账户对您的 S3 存储桶执行敏感操作（例如修改存储桶策略、ACL 或加密设置）可能会导致数据泄露、未经授权的访问或配置错误，从而增加内部威胁或攻击的风险。",
+  "RelatedUrl": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-control-block-public-access.html",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://docs.aws.amazon.com/securityhub/latest/userguide/s3-controls.html#s3-6",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "审查并更新您的 S3 存储桶策略，以移除那些授予外部 AWS 账户访问关键操作权限的条目，并实施最小权限原则，以确保敏感操作仅限受信任的账户访问",
+      "Url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-control-block-public-access.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

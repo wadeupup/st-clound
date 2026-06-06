@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "postgresql_flexible_server_log_connections_on",
+  "CheckTitle": "确保 PostgreSQL 数据库服务器参数“log_connections”设置为“ON”",
+  "CheckType": [],
+  "ServiceName": "postgresql",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "PostgreSQL",
+  "ResourceGroup": "database",
+  "Description": "在 PostgreSQL 服务器上启用 log_connections。",
+  "Risk": "启用 log_connections 可帮助 PostgreSQL 数据库记录对服务器的连接尝试以及客户端身份验证成功完成情况。日志数据可用于识别、排查并修复配置错误和性能不佳问题。",
+  "RelatedUrl": "https://docs.microsoft.com/en-us/rest/api/postgresql/configurations/listbyserver",
+  "Remediation": {
+    "Code": {
+      "CLI": "az postgres server configuration set --resource-group <resourceGroupName> --server-name <serverName> --name log_connections --value on",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity-staging/knowledge-base/azure/PostgreSQL/log-connections.html",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-networking-policies/bc_azr_networking_12#terraform"
+    },
+    "Recommendation": {
+      "Text": "通过 Azure Portal：1. 使用 https://portal.azure.com 登录 Azure Portal。2. 进入 Azure Database for PostgreSQL servers。3. 对每个数据库点击 Server parameters。4. 搜索 log_connections。5. 点击 ON 并保存。通过 Azure CLI：使用以下命令更新 log_connections 配置。az postgres server configuration set --resource-group <resourceGroupName> -- server-name <serverName> --name log_connections --value on。通过 PowerShell：使用以下命令更新 log_connections 配置。Update-AzPostgreSqlConfiguration -ResourceGroupName <ResourceGroupName> - ServerName <ServerName> -Name log_connections -Value on",
+      "Url": "https://learn.microsoft.com/en-us/azure/postgresql/single-server/how-to-configure-server-parameters-using-portal"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

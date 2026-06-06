@@ -1,0 +1,36 @@
+{
+  "Provider": "aws",
+  "CheckID": "ec2_elastic_ip_shodan",
+  "CheckTitle": "Elastic IP またはパブリック IP が Shodan に登録されているか確認（Shodan API キーが必要）",
+  "CheckType": [
+    "Infrastructure Security"
+  ],
+  "ServiceName": "ec2",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "high",
+  "ResourceType": "AwsEc2Eip",
+  "ResourceGroup": "network",
+  "Description": "Elastic IP またはパブリック IP が Shodan に登録されているか確認（Shodan API キーが必要）",
+  "Risk": "Shodan のようなサイトは、露出したシステムをインデックス化し、さらに広範なオーディエンスに露出させ、悪用可能なシステムを迅速に見つける方法として機能します。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "識別された IP を確認し、それらをプライベート IP に変更し、Shodan から削除することを検討してください。",
+      "Url": "https://www.shodan.io/"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

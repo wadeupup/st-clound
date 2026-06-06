@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "neptune_cluster_multi_az",
+  "CheckTitle": "Neptune 集群已启用 Multi-AZ",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践",
+    "软件和配置检查/行业和法规标准/AWS 基础安全最佳实践",
+    "影响/拒绝服务"
+  ],
+  "ServiceName": "neptune",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsRdsDbCluster",
+  "ResourceGroup": "database",
+  "Description": "通过检查集群是否具有分布在多个可用区的只读副本实例，评估 Amazon Neptune 数据库集群的 `Multi-AZ` 部署。\n\n失败结果表明集群部署在单个可用区，并且缺乏能够实现自动提升和跨可用区故障转移的只读副本。",
+  "Risk": "**单可用区部署** 会造成明显的可用性单点故障。\n\n- **可用性**：可用区中断或维护可能导致长时间停机，直到主实例重建。\n- **完整性/恢复**：手动恢复增加了配置错误的风险和更长的恢复时间目标（RTO），影响操作和合规性。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/neptune-controls.html#neptune-9",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/Neptune/multi-az.html#"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\nResources:\n NeptuneCluster:\n Type: AWS::Neptune::DBCluster\n Properties:\n DBClusterIdentifier: \"<DB_CLUSTER_IDENTIFIER>\"\n # 跨多个可用区部署以实现高可用性和故障转移\n AvailabilityZones:\n - \"<AZ_1>\"\n - \"<AZ_2>\"\n - \"<AZ_3>\"\n```",
+      "Terraform": "```hcl\nresource \"aws_neptune_cluster\" \"example\" {\n cluster_identifier = \"<db_cluster_identifier>\"\n availability_zones = [\"<AZ_1>\", \"<AZ_2>\", \"<AZ_3>\"]  # 跨多个可用区部署以实现高可用性\n}\n```",
+      "Other": ""
+    },
+    "Recommendation": {
+      "Text": "通过将只读副本放置在不同的可用区，采用 **高可用性** 部署模型来部署生产 Neptune 集群，以避免单点故障。\n\n定期测试自动故障转移，并将高可用性与强大的备份和恢复实践相结合，作为深度防御策略的一部分。",
+      "Url": "https://hub.prowler.com/check/neptune_cluster_multi_az"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

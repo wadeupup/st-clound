@@ -1,0 +1,44 @@
+{
+  "Provider": "aws",
+  "CheckID": "opensearch_service_domains_node_to_node_encryption_enabled",
+  "CheckTitle": "Amazon OpenSearch Service ドメインはノード間暗号化が有効になっています",
+  "CheckType": [
+    "ソフトウェアと構成のチェック/AWS セキュリティベストプラクティス",
+    "ソフトウェアと構成のチェック/業界および規制基準/AWS 基礎セキュリティベストプラクティス",
+    "ソフトウェアと構成のチェック/業界および規制基準/NIST CSF コントロール (米国)",
+    "ソフトウェアと構成のチェック/業界および規制基準/NIST 800-53 コントロール (米国)",
+    "ソフトウェアと構成のチェック/業界および規制基準/PCI-DSS"
+  ],
+  "ServiceName": "opensearch",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsOpenSearchServiceDomain",
+  "ResourceGroup": "database",
+  "Description": "**Amazon OpenSearch ドメイン**での**ノード間暗号化**は、クラスター ノード間のトラフィックを保護するために TLS を使用します。この検出は、クラスター内通信のためのドメインの`node_to_node_encryption`設定を評価します。",
+  "Risk": "暗号化されていないクラスター内トラフィックは、ネットワークの足場を持つ誰かによって傍受および操作される可能性があります。\n- **機密性**: ドキュメント、資格情報、メタデータの露出\n- **完全性**: クエリやシャードレプリケーションの改ざん\n- **可用性**: なりすまし/MITM により調整が妨げられ、停止が発生する可能性があります",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/ntn.html",
+    "https://docs.aws.amazon.com/opensearch-service/latest/developerguide/ntn.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/Elasticsearch/node-to-node-encryption.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws opensearchservice update-domain-config --domain-name <DOMAIN_NAME> --node-to-node-encryption-options Enabled=true",
+      "NativeIaC": "```yaml\n# CloudFormation: OpenSearch ドメインのノード間暗号化を有効にする\nResources:\n  OpenSearchDomain:\n    Type: AWS::OpenSearchService::Domain\n    Properties:\n      NodeToNodeEncryptionOptions:\n        Enabled: true  # 重要: チェックを通過するためにノード間で TLS を有効にします\n```",
+      "Other": "1. AWS コンソールで、OpenSearch Service > ドメインに移動\n2. 対象のドメインを選択\n3. 編集をクリック (またはアクション > セキュリティ設定の編集)\n4. 暗号化の下で、ノード間暗号化を有効にする\n5. 変更を保存をクリック",
+      "Terraform": "```hcl\n# Terraform: OpenSearch ドメインのノード間暗号化を有効にする\nresource \"aws_opensearch_domain\" \"<example_resource_name>\" {\n  domain_name = \"<example_resource_name>\"\n\n  node_to_node_encryption {\n    enabled = true  # 重要: チェックを通過するためにクラスター内トラフィックを暗号化します\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "**ノード間暗号化** (`node_to_node_encryption: true`) を有効にして、ノード間トラフィックに対して TLS を強制します。**多層防御**を適用: クライアントに HTTPS を要求し、ネットワークの露出を制限し、最小特権を使用します。ステージングでパフォーマンスを検証し、慎重に計画してください。この設定は事実上不可逆です。",
+      "Url": "https://hub.prowler.com/check/opensearch_service_domains_node_to_node_encryption_enabled"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

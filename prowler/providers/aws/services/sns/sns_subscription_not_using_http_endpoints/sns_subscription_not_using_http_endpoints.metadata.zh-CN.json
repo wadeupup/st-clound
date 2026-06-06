@@ -1,0 +1,40 @@
+{
+  "Provider": "aws",
+  "CheckID": "sns_subscription_not_using_http_endpoints",
+  "CheckTitle": "SNS 订阅使用 HTTPS 端点",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践/网络可达性",
+    "影响/数据暴露"
+  ],
+  "ServiceName": "sns",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsSnsTopic",
+  "ResourceGroup": "messaging",
+  "Description": "Amazon SNS 订阅会根据端点协议进行评估。使用 `http` 的订阅会被识别，而 **HTTPS** 端点表示传输过程中进行了加密投递。",
+  "Risk": "使用 **HTTP** 会使 SNS 传输未加密，从而通过窃听危及 **机密性**。MITM 攻击者可以修改负载或标头，破坏 **完整性**，向下游系统注入恶意内容，或捕获订阅数据以进行欺骗和未授权操作。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-sns-subscription.html",
+    "https://docs.aws.amazon.com/sns/latest/dg/sns-security-best-practices.html#enforce-encryption-data-in-transit"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation：确保 SNS 订阅使用 HTTPS\nResources:\n  <example_resource_name>:\n    Type: AWS::SNS::Subscription\n    Properties:\n      TopicArn: <example_resource_id>\n      Protocol: https              # 关键：使用 HTTPS 协议修复 HTTP 的使用\n      Endpoint: https://<example_endpoint>  # 关键：HTTPS 端点 URL\n```",
+      "Other": "1. 打开 Amazon SNS 控制台并转到 Subscriptions\n2. 选择 Protocol 设置为 HTTP 的订阅，然后点击 Delete\n3. 点击 Create subscription\n4. 选择相同的 Topic ARN，将 Protocol 设置为 HTTPS，并输入你的 HTTPS endpoint URL\n5. 创建订阅，并在需要时从你的 endpoint 确认它",
+      "Terraform": "```hcl\n# Terraform：确保 SNS 订阅使用 HTTPS\nresource \"aws_sns_topic_subscription\" \"<example_resource_name>\" {\n  topic_arn = \"<example_resource_id>\"\n  protocol  = \"https\"                      # 关键：强制执行 HTTPS 协议\n  endpoint  = \"https://<example_endpoint>\" # 关键：HTTPS 端点 URL\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "对所有 SNS 订阅端点强制要求使用 **HTTPS**。优先使用基于域名的端点，验证 SNS 消息签名，并应用 **最小权限** 原则。使用如 `aws:SecureTransport` 之类的 IAM 条件来强制执行 TLS，并在可能的情况下使用私有连接（VPC 端点）以实现纵深防御。",
+      "Url": "https://hub.prowler.com/check/sns_subscription_not_using_http_endpoints"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

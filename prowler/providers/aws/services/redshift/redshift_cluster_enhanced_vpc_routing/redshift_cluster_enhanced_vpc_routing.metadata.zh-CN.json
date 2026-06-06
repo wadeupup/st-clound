@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "redshift_cluster_enhanced_vpc_routing",
+  "CheckTitle": "Redshift 集群已启用增强型 VPC 路由",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践/网络可达性",
+    "软件和配置检查/行业和法规标准/AWS 基础安全最佳实践"
+  ],
+  "ServiceName": "redshift",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsRedshiftCluster",
+  "ResourceGroup": "analytics",
+  "Description": "**Amazon Redshift 集群**会评估 `EnhancedVpcRouting` 设置，该设置将集群与数据存储库之间的所有 `COPY` 和 `UNLOAD` 流量通过 VPC 路由，从而启用 VPC 安全控制和日志记录。",
+  "Risk": "**没有增强型 VPC 路由**时，`COPY`/`UNLOAD` 传输可能会离开 VPC 监管，降低控制和可见性。\n- VPC 出口过滤和端点策略可能被绕过（机密性）\n- 流日志遥测有限（可见性）\n- 未经授权的数据泄露或篡改风险更高（机密性，完整性）",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/redshift-controls.html#redshift-7",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/Redshift/enable-enhanced-vpc-routing.html",
+    "https://docs.aws.amazon.com/redshift/latest/mgmt/enhanced-vpc-routing.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws redshift modify-cluster --cluster-identifier <cluster-id> --enhanced-vpc-routing",
+      "NativeIaC": "```yaml\n# CloudFormation：在 Redshift 集群上启用增强型 VPC 路由\nResources:\n  <example_resource_name>:\n    Type: AWS::Redshift::Cluster\n    Properties:\n      ClusterIdentifier: <example_resource_name>\n      ClusterType: single-node\n      NodeType: ra3.xlplus\n      DBName: dev\n      MasterUsername: <USERNAME>\n      MasterUserPassword: <PASSWORD>\n      EnhancedVpcRouting: true  # 关键：强制将 COPY/UNLOAD 流量通过 VPC\n```",
+      "Other": "1. 打开 AWS 控制台并转到 Amazon Redshift\n2. 选择预置集群，选择您的集群\n3. 点击操作 > 修改\n4. 在网络和安全中，打开增强型 VPC 路由\n5. 点击保存更改（如果提示，立即应用）",
+      "Terraform": "```hcl\n# Terraform：在 Redshift 集群上启用增强型 VPC 路由\nresource \"aws_redshift_cluster\" \"<example_resource_name>\" {\n  cluster_identifier  = \"<example_resource_name>\"\n  cluster_type        = \"single-node\"\n  node_type           = \"ra3.xlplus\"\n  master_username     = \"<USERNAME>\"\n  master_password     = \"<PASSWORD>\"\n  enhanced_vpc_routing = true  # 关键：通过 VPC 路由 COPY/UNLOAD\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "启用 `EnhancedVpcRouting` 并实施**最小权限**出口：\n- 优先使用 VPC 端点和限制性策略进行私有访问\n- 通过安全组、NACL 和路由限制出站路径\n- 使用 VPC 流日志监控传输\n\n这加强了数据移动的**深度防御**和**零信任**。",
+      "Url": "https://hub.prowler.com/check/redshift_cluster_enhanced_vpc_routing"
+    }
+  },
+  "Categories": [
+    "trust-boundaries",
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

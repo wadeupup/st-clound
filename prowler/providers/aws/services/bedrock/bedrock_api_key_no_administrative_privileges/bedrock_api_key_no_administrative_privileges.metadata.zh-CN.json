@@ -1,0 +1,38 @@
+{
+  "Provider": "aws",
+  "CheckID": "bedrock_api_key_no_administrative_privileges",
+  "CheckTitle": "确保 Amazon Bedrock API 密钥不具有管理权限或权限提升",
+  "CheckType": [
+    "Software and Configuration Checks",
+    "Industry and Regulatory Standards"
+  ],
+  "ServiceName": "bedrock",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:iam:region:account-id:user/{user-name}/credential/{api-key-id}",
+  "Severity": "high",
+  "ResourceType": "AwsIamServiceSpecificCredential",
+  "ResourceGroup": "IAM",
+  "Description": "确保 Amazon Bedrock API 密钥不具有管理权限或权限提升能力。具有管理权限的 API 密钥可以对 AWS 环境中的任何资源执行任何操作，而权限提升允许用户授予自己额外的权限，两者都构成重大安全风险。",
+  "Risk": "具有管理权限的 Amazon Bedrock API 密钥可以对 AWS 环境中的任何资源执行任何操作。权限提升能力允许用户授予自己超出预期范围的额外权限。这两种违反最小权限原则的情况都可能导致安全漏洞、数据泄露、数据丢失，或者如果 API 密钥被泄露或滥用，可能导致意外费用。",
+  "RelatedUrl": "https://docs.aws.amazon.com/bedrock/latest/userguide/api-keys.html",
+  "Remediation": {
+    "Code": {
+      "CLI": "aws iam delete-service-specific-credential --user-name <username> --service-specific-credential-id <credential-id>",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "对 Amazon Bedrock API 密钥应用最小权限原则。不要授予管理权限或权限提升能力，而是仅分配特定任务所需的权限。根据最小权限原则创建具有最小权限的自定义 IAM 策略。定期审查和审计 API 密钥权限，确保它们不能用于权限提升。",
+      "Url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html#grant-least-privilege"
+    }
+  },
+  "Categories": [
+    "gen-ai",
+    "trust-boundaries"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "此检查验证 Amazon Bedrock API 密钥通过附加的 IAM 策略或内联策略不具有管理权限或权限提升能力。它遵循最小权限原则，确保 API 密钥仅具有最小必要权限，不能用于提升权限。"
+}
+

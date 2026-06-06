@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "monitor_diagnostic_settings_exists",
+  "CheckTitle": "サブスクリプションのアクティビティ ログに対して 'Diagnostic Setting' が存在することを確認する",
+  "CheckType": [],
+  "ServiceName": "monitor",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Monitor",
+  "ResourceGroup": "monitoring",
+  "Description": "アクティビティ ログをエクスポートするための診断設定を有効にします。診断設定は、サブスクリプション内の各リソース単位で利用できます。環境内の適切なすべてのリソースに対して設定を構成する必要があります。",
+  "Risk": "診断設定は診断ログのエクスポート方法を制御します。既定ではログは 90 日間のみ保持されます。Azure サブスクリプション内のセキュリティ アクティビティを分析できるよう、ログをエクスポートしてより長期間保存できるように診断設定を定義する必要があります。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/cli/azure/monitor/diagnostic-settings?view=azure-cli-latest",
+  "Remediation": {
+    "Code": {
+      "CLI": "az monitor diagnostic-settings subscription create --subscription <subscription id> --name <diagnostic settings name> --location <location> <[- -event-hub <event hub ID> --event-hub-auth-rule <event hub auth rule ID>] [-- storage-account <storage account ID>] [--workspace <log analytics workspace ID>] --logs '<JSON encoded categories>' (e.g. [{category:Security,enabled:true},{category:Administrative,enabled:true},{cat egory:Alert,enabled:true},{category:Policy,enabled:true}])",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity-staging/knowledge-base/azure/Monitor/subscription-activity-log-diagnostic-settings.html#trendmicro",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "サブスクリプションで診断設定を有効化するには: 1. Monitor に移動 2. Activity Log をクリック 3. Export Activity Logs をクリック 4. + Add diagnostic setting をクリック 5. Diagnostic setting 名を入力 6. 診断設定の Categories を選択 7. 適切な Destination 詳細を選択（Log Analytics、Storage Account、Event Hub、または Partner solution）8. Save をクリック。特定リソースで診断設定を有効化するには: 1. Monitor に移動 2. Diagnostic settings をクリック 3. diagnostics 状態が disabled のリソースをクリック 4. Add Diagnostic Setting を選択 5. Diagnostic setting 名を入力 6. 適切なログ、メトリック、送信先を選択（Log Analytics、Storage Account、Event Hub、または Partner solution）7. Save をクリック。必要に応じてすべてのリソースでこの手順を繰り返します。",
+      "Url": "https://docs.microsoft.com/en-us/azure/monitoring-and-diagnostics/monitoring-overview-activity-logs#export-the-activity-log-with-a-log-profile"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "既定では診断設定は設定されていません。"
+}

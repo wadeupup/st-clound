@@ -1,0 +1,49 @@
+{
+  "Provider": "aws",
+  "CheckID": "eks_cluster_not_publicly_accessible",
+  "CheckTitle": "EKS 集群端点不允许从 0.0.0.0/0 公开访问",
+  "CheckAliases": [
+    "eks_endpoints_not_publicly_accessible",
+    "eks_control_plane_endpoint_access_restricted"
+  ],
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices/Network Reachability",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "TTPs/Initial Access/Unauthorized Access",
+    "Effects/Data Exposure"
+  ],
+  "ServiceName": "eks",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsEksCluster",
+  "ResourceGroup": "container",
+  "Description": "评估 **Amazon EKS** 集群 API 服务器端点是否允许 **不受限制的互联网访问**，特别是当公共端点允许来自 `0.0.0.0/0` 的连接，而不是私有访问或有限的 CIDR 范围时。",
+  "Risk": "公开可访问的 API 端点使互联网范围内的探测、暴力破解和枚举成为可能，增加了 RBAC 配置错误或 API 缺陷的暴露风险。成功访问可能导致密钥窃取（机密性）、工作负载篡改（完整性）以及控制平面中断或扩展滥用（可用性、成本）。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/eks/latest/eksctl/vpc-cluster-access.html",
+    "https://docs.aws.amazon.com/eks/latest/userguide/config-cluster-endpoint.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/EKS/endpoint-access.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws eks update-cluster-config --region <region_name> --name <cluster_name> --resources-vpc-config endpointPublicAccess=false,endpointPrivateAccess=true",
+      "NativeIaC": "```yaml\n# CloudFormation: Disable public endpoint and enable private endpoint\nResources:\n  <example_resource_name>:\n    Type: AWS::EKS::Cluster\n    Properties:\n      RoleArn: <example_role_arn>\n      ResourcesVpcConfig:\n        SubnetIds:\n          - <example_subnet_id_1>\n          - <example_subnet_id_2>\n        EndpointPublicAccess: false  # critical: disables public API endpoint\n        EndpointPrivateAccess: true  # critical: enables private API endpoint\n```",
+      "Other": "1. 打开 Amazon EKS 控制台\n2. 选择您的集群\n3. 转到网络选项卡并点击管理端点访问\n4. 启用私有访问并禁用公共访问\n5. 点击更新/保存",
+      "Terraform": "```hcl\n# Terraform: Disable public endpoint and enable private endpoint\nresource \"aws_eks_cluster\" \"<example_resource_name>\" {\n  name     = \"<example_resource_name>\"\n  role_arn = \"<example_role_arn>\"\n\n  vpc_config {\n    subnet_ids              = [\"<example_subnet_id_1>\", \"<example_subnet_id_2>\"]\n    endpoint_public_access  = false  # critical: disables public API endpoint\n    endpoint_private_access = true   # critical: enables private API endpoint\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "优先使用 **私有端点访问**，避免广泛暴露。*如果需要公共访问*，请限制为受信任的管理员 CIDR（不是 `0.0.0.0/0`），通过 **VPN/Direct Connect 或堡垒主机**访问 API，并通过 IAM/RBAC 强制执行 **最小权限**。通过网络分段和持续监控应用 **纵深防御**。",
+      "Url": "https://hub.prowler.com/check/eks_cluster_not_publicly_accessible"
+    }
+  },
+  "Categories": [
+    "internet-exposed",
+    "cluster-security"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

@@ -1,0 +1,33 @@
+{
+  "Provider": "aws",
+  "CheckID": "s3_bucket_no_mfa_delete",
+  "CheckTitle": "检查 S3 存储桶是否未启用 MFA Delete。",
+  "CheckType": [
+    "日志记录和监控"
+  ],
+  "ServiceName": "s3",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:s3:::bucket_name",
+  "Severity": "medium",
+  "ResourceType": "AwsS3Bucket",
+  "ResourceGroup": "storage",
+  "Description": "检查 S3 存储桶是否未启用 MFA Delete。",
+  "Risk": "您的安全凭证已被泄露，或已授予未经授权的访问权限。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "aws s3api put-bucket-versioning --profile my-root-profile --bucket my-bucket-name --versioning-configuration Status=Enabled,MFADelete=Enabled --mfa 'arn:aws:iam::00000000:mfa/root-account-mfa-device 123456'",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": "https://docs.prowler.com/checks/aws/s3-policies/bc_aws_s3_24#terraform"
+    },
+    "Recommendation": {
+      "Text": "为 S3 存储桶添加 MFA 删除功能时，当您更改存储桶的版本状态或删除对象版本时，需要额外的身份验证；如果您的安全凭证被泄露或被授予未经授权的访问权限，这会增加另一层安全保护。",
+      "Url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/MultiFactorAuthenticationDelete.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

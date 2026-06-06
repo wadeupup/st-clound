@@ -1,0 +1,40 @@
+{
+  "Provider": "aws",
+  "CheckID": "guardduty_no_high_severity_findings",
+  "CheckTitle": "GuardDuty detector に高重大度の検出結果がないこと",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices/Runtime Behavior Analysis",
+    "TTPs",
+    "Unusual Behaviors"
+  ],
+  "ServiceName": "guardduty",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsGuardDutyDetector",
+  "ResourceGroup": "security",
+  "Description": "**GuardDuty detectors** について、**高重大度の検出結果**の有無を評価します。これにより、GuardDuty が `High` と分類した検出結果を現在保持している detector があるかを把握できます。",
+  "Risk": "未解決の**高重大度検出結果**は、進行中の侵害を示すことが多く、以下を招きます：\n- データ流出と不正アクセス（機密性）\n- 権限昇格と改ざん（完全性）\n- マルウェア/暗号資産マイニングによる障害（可用性）\n\n封じ込めが遅れると、攻撃者は横方向移動して持続化できます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/guardduty/latest/ug/guardduty_findings.html",
+    "https://docs.aws.amazon.com/prescriptive-guidance/latest/vulnerability-management/assess-and-prioritize-security-findings.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/GuardDuty/findings.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "1. AWS console にサインインして Amazon GuardDuty を開きます\n2. Region セレクタで GuardDuty が有効な Region を選択します\n3. Findings に移動し、Severity = High (7-8.9)、Archived status = Not archived でフィルタします\n4. すべて選択して Actions > Archive をクリックします\n5. GuardDuty が有効なすべての Region で手順 2-4 を繰り返します\n6. 各 Region でアクティブな High 重大度の検出結果が 0 件であることを確認します",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "**高重大度検出結果**はインシデントとして扱ってください。\n\n- トリアージと封じ込めを最優先し、影響リソースを隔離して秘密情報をローテーションする\n- プレイブックでアラートと対応を自動化し、IR に統合する\n- **最小権限**、ネットワーク分離、ハードニング済みベースラインを徹底する\n- 検知を継続的にチューニングし、不要なアクセス権を削除して再発を防止する",
+      "Url": "https://hub.prowler.com/check/guardduty_no_high_severity_findings"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

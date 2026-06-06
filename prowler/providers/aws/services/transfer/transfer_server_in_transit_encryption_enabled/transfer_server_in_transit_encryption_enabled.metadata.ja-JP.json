@@ -1,0 +1,45 @@
+{
+  "Provider": "aws",
+  "CheckID": "transfer_server_in_transit_encryption_enabled",
+  "CheckTitle": "Transfer Family サーバーでは転送中の暗号化が有効になっています",
+  "CheckType": [
+    "ソフトウェアと構成チェック/AWSセキュリティのベストプラクティス",
+    "ソフトウェアと設定のチェック/業界および規制基準/AWS 基盤セキュリティのベストプラクティス",
+    "ソフトウェアおよび設定のチェック／業界および規制基準／NIST 800-53 管理策",
+    "ソフトウェアおよび設定チェック／業界および規制基準／PCI-DSS",
+    "ソフトウェアおよび構成チェック/業界および規制基準/HIPAA管理策（米国）",
+    "影響／データ露出"
+  ],
+  "ServiceName": "transfer",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Other",
+  "ResourceGroup": "storage",
+  "Description": "**AWS Transfer Family servers** は、有効化されているプロトコルの中に、SFTP、FTPS、または AS2 のような暗号化されたオプションではなく、暗号化されていない `FTP` プロトコルが含まれているかどうかについて評価されます。",
+  "Risk": "**FTP** を許可すると、認証情報やファイル内容が平文で公開され、機密性が損なわれます。攻撃者は盗聴したり **MITM** を実行したりしてファイルを読み取ったり改ざんしたりでき、完全性が損なわれるほか、より広範な不正アクセスに再利用可能な認証情報の窃取を可能にします。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/config/latest/developerguide/transfer-family-server-no-ftp.html",
+    "https://docs.aws.amazon.com/transfer/latest/userguide/edit-server-config.html#edit-protocols",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/transfer-controls.html#transfer-2"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws transfer update-server --server-id <server-id> --protocols SFTP",
+      "NativeIaC": "```yaml\n# CloudFormation: FTPが有効になっていないことを確認する\nResources:\n  <example_resource_name>:\n    Type: AWS::Transfer::Server\n    Properties:\n      Protocols:\n        - SFTP  # 重要: SFTPのみを使用してください。FTP（暗号化されていない）は除外します\n```",
+      "Other": "1. AWS Console > AWS Transfer Family を開きます\n2. Servers に移動し、サーバー（<example_resource_id>）を選択します\n3. Protocols の横にある Edit をクリックします\n4. FTP のチェックを外し、少なくとも SFTP（または FTPS/AS2）が選択されていることを確認します\n5. 保存します",
+      "Terraform": "```hcl\n# FTP が有効になっていないことを確認する\nresource \"aws_transfer_server\" \"<example_resource_name>\" {\n  protocols = [\"SFTP\"]  # 重大: 転送中の暗号化を強制するためにFTPを除外します\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "`FTP` を削除し、**転送中の暗号化**を徹底するために、**SFTP**、**FTPS**、または **AS2** のみを許可してください。\n\n多層防御を適用してください: ネットワークの場所（allowlists/VPC）によって制限し、強力な暗号ポリシーを強制し、監視とともに最小権限のロールを使用してください。",
+      "Url": "https://hub.prowler.com/check/transfer_server_in_transit_encryption_enabled"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

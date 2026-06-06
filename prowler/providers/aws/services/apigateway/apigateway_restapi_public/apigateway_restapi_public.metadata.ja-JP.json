@@ -1,0 +1,47 @@
+{
+  "Provider": "aws",
+  "CheckID": "apigateway_restapi_public",
+  "CheckTitle": "API Gateway REST API エンドポイントがプライベートです",
+  "CheckType": [
+    "ソフトウェアと設定チェック/AWS セキュリティベストプラクティス/ネットワーク到達可能性",
+    "ソフトウェアと設定チェック/業界および規制基準/AWS 基礎セキュリティベストプラクティス",
+    "TTPs/初期アクセス"
+  ],
+  "ServiceName": "apigateway",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsApiGatewayRestApi",
+  "ResourceGroup": "api_gateway",
+  "Description": "**Amazon API Gateway REST API** は、エンドポイントの露出について評価されます：**インターネットアクセス可能**なエンドポイントと、インターフェース VPC エンドポイント（`AWS PrivateLink`）を介した**プライベート VPC 専用**アクセス。",
+  "Risk": "インターネットへの露出は攻撃面を増加させます：\n- **機密性**：設定ミスまたは匿名メソッドがデータを漏洩する可能性があります\n- **整合性**：不正な呼び出しがバックエンドの状態を変更する可能性があります\n- **可用性/コスト**：ボットまたは DDoS が容量を枯渇させ、支出を急増させる可能性があります",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-private-apis.html",
+    "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-resource-policies-examples.html#apigateway-resource-policies-source-vpc-example",
+    "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-control-access-to-api.html",
+    "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-resource-policies.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws apigateway update-rest-api --rest-api-id <REST_API_ID> --patch-operations op=replace,path=/endpointConfiguration/types/0,value=PRIVATE",
+      "NativeIaC": "```yaml\nResources:\n  <example_resource_name>:\n    Type: AWS::ApiGateway::RestApi\n    Properties:\n      Name: <example_resource_name>\n      EndpointConfiguration:\n        Types:\n          - PRIVATE  # 重要：REST API エンドポイントを Private に設定し、パブリックアクセスを削除します\n```",
+      "Other": "1. AWS コンソールを開き、API Gateway に移動します\n2. REST APIs の下で、API を選択します\n3. 左側のメニューで、Settings をクリックします\n4. Endpoint Type を Private に設定します\n5. Save changes をクリックします",
+      "Terraform": "```hcl\nresource \"aws_api_gateway_rest_api\" \"<example_resource_name>\" {\n  name = \"<example_resource_name>\"\n\n  endpoint_configuration {\n    types = [\"PRIVATE\"]  # 重要：REST API をプライベートにします\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "インターフェース VPC エンドポイント（`PRIVATE`）を介して到達可能な**プライベート** REST API を優先します。\n\n*パブリックアクセスが必要な場合*、**最小権限**と**多層防御**を適用します：\n- リソースポリシー（`aws:SourceVpc`/`aws:SourceVpce`）で制限します\n- 強力な認証（IAM、Cognito、または承認者）を強制します\n- AWS WAF、スロットリング、使用プラン、包括的なログを追加します",
+      "Url": "https://hub.prowler.com/check/apigateway_restapi_public"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "",
+  "CheckAliases": [
+    "apigateway_public"
+  ]
+}
+

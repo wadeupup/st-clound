@@ -1,0 +1,38 @@
+{
+  "Provider": "aws",
+  "CheckID": "elbv2_waf_acl_attached",
+  "CheckTitle": "Application Load Balancer 已关联 WAF Web ACL",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "TTPs/Initial Access"
+  ],
+  "ServiceName": "elbv2",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsElbv2LoadBalancer",
+  "ResourceGroup": "network",
+  "Description": "会评估 Application Load Balancer 是否关联了用于治理 HTTP(S) 请求的 **AWS WAF Web ACL**。该检查可识别缺少 Web ACL 的 ALB，并识别来自 **WAFv2** 或区域级 **WAF Classic** 的关联。",
+  "Risk": "若缺少 **WAF Web ACL**，ALB 将接收未经筛选的七层流量，可能导致：\n- **注入攻击**（SQLi/XSS），危及机密性与完整性\n- **凭证填充**与**机器人滥用**\n- **资源耗尽**导致可用性下降",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/waf/latest/developerguide/web-acl-associating-aws-resource.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws wafv2 associate-web-acl --web-acl-arn <WEB_ACL_ARN> --resource-arn <ALB_ARN>",
+      "NativeIaC": "```yaml\n# CloudFormation: associate an existing WAFv2 Web ACL to an ALB\nResources:\n  <example_resource_name>:\n    Type: AWS::WAFv2::WebACLAssociation\n    Properties:\n      ResourceArn: <example_resource_id>  # CRITICAL: ALB ARN to protect\n      WebACLArn: <example_resource_id>    # CRITICAL: WAFv2 Web ACL ARN to attach\n```",
+      "Other": "1. 在 AWS 控制台打开 **WAF & Shield**\n2. 进入 **Web ACLs** 并选择你的区域级 Web ACL\n3. 点击 **Associated AWS resources** > **Associate resource**\n4. 选择目标 **Application Load Balancer** 并点击 **Associate**",
+      "Terraform": "```hcl\n# Associate WAFv2 Web ACL with an ALB\nresource \"aws_wafv2_web_acl_association\" \"<example_resource_name>\" {\n  resource_arn = \"<example_resource_id>\" # CRITICAL: ALB ARN\n  web_acl_arn  = \"<example_resource_id>\" # CRITICAL: WAFv2 Web ACL ARN\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "为每个 ALB 关联 **WAF Web ACL**，作为**纵深防御**的一部分。使用托管与自定义规则、IP 信誉列表和限速来阻断攻击。持续调优策略并监控日志。*应用最小权限*，将规则范围限定在必要路径、方法与来源上。",
+      "Url": "https://hub.prowler.com/check/elbv2_waf_acl_attached"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

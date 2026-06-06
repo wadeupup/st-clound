@@ -1,0 +1,36 @@
+{
+  "Provider": "aws",
+  "CheckID": "ec2_ebs_snapshots_encrypted",
+  "CheckTitle": "EBS スナップショットが暗号化されているか確認",
+  "CheckType": [
+    "Data Protection"
+  ],
+  "ServiceName": "ec2",
+  "SubServiceName": "snapshot",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "compute",
+  "Description": "EBS スナップショットが暗号化されているか確認",
+  "Risk": "保存時のデータ暗号化により、不正アクセスや盗難が発生した場合にデータの可視化を防ぎます",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "aws ec2 --region <REGION> enable-ebs-encryption-by-default",
+      "NativeIaC": "https://docs.prowler.com/checks/aws/general-policies/general_3-encrypt-ebs-volume#cloudformation",
+      "Other": "https://docs.prowler.com/checks/aws/general-policies/general_3-encrypt-ebs-volume#aws-console",
+      "Terraform": "https://docs.prowler.com/checks/aws/general-policies/general_3-encrypt-ebs-volume#terraform"
+    },
+    "Recommendation": {
+      "Text": "すべての EBS スナップショットを暗号化し、デフォルトで暗号化を有効にします。AWS アカウントを設定して、作成する新しい EBS ボリュームとスナップショットコピーの暗号化を強制できます。たとえば、Amazon EBS は、インスタンスを起動するときに作成される EBS ボリュームと、暗号化されていないスナップショットからコピーするスナップショットを暗号化します。",
+      "Url": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EBSEncryption.html#encryption-by-default"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

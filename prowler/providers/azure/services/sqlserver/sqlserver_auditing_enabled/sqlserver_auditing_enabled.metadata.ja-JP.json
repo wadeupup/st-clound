@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "sqlserver_auditing_enabled",
+  "CheckTitle": "SQL Server に監査ポリシーが構成されていることを確認する",
+  "CheckType": [],
+  "ServiceName": "sqlserver",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "SQLServer",
+  "ResourceGroup": "database",
+  "Description": "監査ポリシーが構成されていることを確認します",
+  "Risk": "監査ポリシーは SQL サーバーに関連するログ（例: ログイン試行の成功/失敗）を保存するために使用されます。これらのログは、異常検知やセキュリティ インシデント発生時の調査に有用です。",
+  "RelatedUrl": "https://docs.microsoft.com/en-us/azure/sql-database/sql-database-auditing",
+  "Remediation": {
+    "Code": {
+      "CLI": "Set-AzureRmSqlServerAuditingPolicy -ResourceGroupName <RESOURCE_GROUP_NAME> -ServerName <SERVER_NAME> -AuditType <AUDIT_TYPE> -StorageAccountName <STORAGE_ACCOUNT_NAME>",
+      "NativeIaC": "",
+      "Other": "https://docs.prowler.com/checks/azure/azure-logging-policies/bc_azr_logging_2",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-logging-policies/bc_azr_logging_2#terraform"
+    },
+    "Recommendation": {
+      "Text": "SQL サーバーの監査ポリシーを作成します",
+      "Url": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/Sql/auditing.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

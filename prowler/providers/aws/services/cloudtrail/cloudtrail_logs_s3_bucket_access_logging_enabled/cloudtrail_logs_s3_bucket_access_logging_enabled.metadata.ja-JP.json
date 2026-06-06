@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "cloudtrail_logs_s3_bucket_access_logging_enabled",
+  "CheckTitle": "CloudTrail トレイルの宛先 S3 バケットでアクセスログが有効になっている",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/CIS AWS Foundations Benchmark"
+  ],
+  "ServiceName": "cloudtrail",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsCloudTrailTrail",
+  "ResourceGroup": "monitoring",
+  "Description": "CloudTrail トレイルはログを S3 バケットに配信します。この評価では、そのバケットで **S3 サーバーアクセスログ** が有効になっているかどうかを評価し、それに対するリクエストを記録します。\n\n*宛先バケットがアカウントまたは監査範囲外にある場合は、手動レビューが必要です。*",
+  "Risk": "CloudTrail ログバケットにアクセスログがない場合、ログファイルへのアクセスと変更には独立した監査証跡がありません。攻撃者は、帰属なしでログを読み取り、削除、または置き換えることができ、**ログの機密性** と **整合性** を損ない、**インシデント対応** を遅らせます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/cloudtrail-controls.html",
+    "https://docs.aws.amazon.com/AmazonS3/latest/dev/security-best-practices.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws s3api put-bucket-logging --bucket <CLOUDTRAIL_BUCKET_NAME> --bucket-logging-status \"{\\\"LoggingEnabled\\\":{\\\"TargetBucket\\\":\\\"<TARGET_BUCKET_NAME>\\\"}}\"",
+      "NativeIaC": "```yaml\n# CloudFormation: enable S3 access logging on the CloudTrail destination bucket\nResources:\n  <example_log_bucket_name>:\n    Type: AWS::S3::Bucket\n\n  <example_cloudtrail_bucket>:\n    Type: AWS::S3::Bucket\n    Properties:\n      LoggingConfiguration:\n        DestinationBucketName: !Ref <example_log_bucket_name>  # Critical: turns on server access logging to this destination bucket\n        # This enables access logging so the check passes\n```",
+      "Other": "1. AWS コンソールで、S3 に移動し、CloudTrail トレイルで使用されるバケットを開きます\n2. プロパティタブを選択します\n3. サーバーアクセスログで、編集をクリックします\n4. ログを有効にし、ログ用に別の宛先 S3 バケットを選択します\n5. 変更を保存をクリックします",
+      "Terraform": "```hcl\n# Enable access logging on the CloudTrail S3 bucket\nresource \"aws_s3_bucket\" \"<example_log_bucket_name>\" {\n  bucket = \"<example_log_bucket_name>\"\n}\n\nresource \"aws_s3_bucket\" \"<example_bucket_name>\" {\n  bucket = \"<example_bucket_name>\"\n}\n\nresource \"aws_s3_bucket_logging\" \"<example_resource_name>\" {\n  bucket        = aws_s3_bucket.<example_bucket_name>.id\n  target_bucket = aws_s3_bucket.<example_log_bucket_name>.id  # Critical: enables server access logging to the target bucket\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "CloudTrail ログバケットで **S3 サーバーアクセスログ** を有効にし、ログを別の、厳密に制御されたバケットに書き込みます。**最小権限の原則** を適用し、**バージョニング** を有効にし、改ざんを防ぐために **オブジェクトロック** を検討します。監視を集中化して、多層防御と迅速な調査をサポートします。",
+      "Url": "https://hub.prowler.com/check/cloudtrail_logs_s3_bucket_access_logging_enabled"
+    }
+  },
+  "Categories": [
+    "logging",
+    "forensics-ready"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

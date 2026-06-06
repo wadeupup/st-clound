@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "storage_default_network_access_rule_is_denied",
+  "CheckTitle": "确保存储账户的默认网络访问规则设置为 Deny",
+  "CheckType": [],
+  "ServiceName": "storage",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AzureStorageAccount",
+  "ResourceGroup": "storage",
+  "Description": "限制默认网络访问可提供额外安全层，因为存储账户默认接受来自任意网络客户端的连接。若要仅允许选定网络访问，必须更改默认操作。",
+  "Risk": "存储账户应配置为拒绝来自所有网络（包括 Internet 流量）的访问。可通过允许来自特定 Azure 虚拟网络的流量，为特定应用构建安全网络边界；也可允许特定公网 IP 段以支持来自特定 Internet 或本地客户端的连接。配置网络规则后，只有来自允许网络的应用可以访问存储账户。即使来自允许网络，应用仍需正确授权（有效访问密钥或 SAS 令牌）才能访问存储账户。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "az storage account update --name <StorageAccountName> --resource-group <resourceGroupName> --default-action Deny",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/StorageAccounts/restrict-default-network-access.html",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-networking-policies/set-default-network-access-rule-for-storage-accounts-to-deny#terraform"
+    },
+    "Recommendation": {
+      "Text": "1. 进入 Storage Accounts。2. 对每个存储账户，点击 Networking 页面。3. 点击 Firewalls and virtual networks。4. 确保选择了允许来自 Selected networks 的访问。5. 添加规则以允许来自特定网络的流量。6. 点击 Save 应用更改。",
+      "Url": ""
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "所有允许网络都需要在各自网络中加入白名单，会带来一定管理开销。这可能导致网络连接中断，因此不要在工作时段对关键资源直接启用。"
+}

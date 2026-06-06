@@ -1,0 +1,45 @@
+{
+  "Provider": "aws",
+  "CheckID": "apigateway_restapi_client_certificate_enabled",
+  "CheckTitle": "API Gateway REST API 阶段已启用客户端证书",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践/传输中加密",
+    "软件和配置检查/行业和监管标准/AWS 基础安全最佳实践",
+    "软件和配置检查/行业和监管标准/PCI-DSS",
+    "软件和配置检查/行业和监管标准/NIST 800-53 控制（美国）"
+  ],
+  "ServiceName": "apigateway",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsApiGatewayStage",
+  "ResourceGroup": "api_gateway",
+  "Description": "**API Gateway 阶段**配置了**客户端证书**，以便 HTTP/S 集成可以执行**相互 TLS** 并向后端验证 API Gateway 的身份",
+  "Risk": "如果没有对后端的客户端身份验证，无法证明请求来自 API Gateway。直接调用后端可能会绕过网关策略，从而启用未授权访问和数据篡改。这会降低**完整性**和**机密性**，并降低可审计性。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://aws.amazon.com/blogs/compute/introducing-mutual-tls-authentication-for-amazon-api-gateway/"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws apigateway update-stage --rest-api-id <REST_API_ID> --stage-name <STAGE_NAME> --patch-operations op=replace,path=/clientCertificateId,value=<CLIENT_CERT_ID>",
+      "NativeIaC": "```yaml\n# CloudFormation: 将客户端证书附加到 REST API 阶段\nResources:\n  ClientCert:\n    Type: AWS::ApiGateway::ClientCertificate\n\n  ApiStage:\n    Type: AWS::ApiGateway::Stage\n    Properties:\n      StageName: <example_resource_name>\n      RestApiId: <example_resource_id>\n      DeploymentId: <example_resource_id>\n      ClientCertificateId: !Ref ClientCert  # 关键：在阶段上启用客户端证书\n```",
+      "Other": "1. 在 AWS 控制台中，转到 API Gateway > REST APIs 并选择您的 API\n2. 在左侧菜单中，单击 Client Certificates 并创建一个（Generate）\n3. 在左侧菜单中，单击 Stages 并选择目标阶段\n4. 在 Settings 中，找到 Client certificate 并选择创建的证书\n5. 单击 Save Changes",
+      "Terraform": "```hcl\n# Terraform: 将客户端证书附加到 REST API 阶段\nresource \"aws_api_gateway_client_certificate\" \"example\" {}\n\nresource \"aws_api_gateway_stage\" \"<example_resource_name>\" {\n  stage_name          = \"<example_resource_name>\"\n  rest_api_id         = \"<example_resource_id>\"\n  deployment_id       = \"<example_resource_id>\"\n  client_certificate_id = aws_api_gateway_client_certificate.example.id  # 关键：在阶段上启用客户端证书\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "使用**客户端证书**从 API Gateway 到后端启用**相互 TLS**，并配置后端仅信任该身份。应用**零信任**和**最小权限**：阻止对后端的公共访问，限制网络，轮换证书，并监控身份验证失败。",
+      "Url": "https://hub.prowler.com/check/apigateway_restapi_client_certificate_enabled"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "",
+  "CheckAliases": [
+    "apigateway_client_certificate_enabled"
+  ]
+}
+

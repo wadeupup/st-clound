@@ -1,0 +1,36 @@
+{
+  "Provider": "aws",
+  "CheckID": "ec2_ebs_default_encryption",
+  "CheckTitle": "EBS デフォルト暗号化が有効になっているか確認",
+  "CheckType": [
+    "Data Protection"
+  ],
+  "ServiceName": "ec2",
+  "SubServiceName": "ebs",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "compute",
+  "Description": "EBS デフォルト暗号化が有効になっているか確認",
+  "Risk": "有効になっていない場合、保存時の機密情報が保護されません",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "aws ec2 enable-ebs-encryption-by-default",
+      "NativeIaC": "",
+      "Other": "https://docs.prowler.com/checks/aws/general-policies/ensure-ebs-default-encryption-is-enabled#aws-console",
+      "Terraform": "https://docs.prowler.com/checks/aws/general-policies/ensure-ebs-default-encryption-is-enabled#terraform"
+    },
+    "Recommendation": {
+      "Text": "暗号化を有効化します。可能な限り CMK を使用してください。これにより、追加の管理とプライバシーの利点が得られます。",
+      "Url": "https://aws.amazon.com/premiumsupport/knowledge-center/ebs-automatic-encryption/"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

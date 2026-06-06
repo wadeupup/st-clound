@@ -1,0 +1,53 @@
+{
+  "Provider": "aws",
+  "CheckID": "accessanalyzer_enabled_without_findings",
+  "CheckTitle": "IAM Access Analyzer 分析器处于活动状态且没有活动发现",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践",
+    "软件和配置检查/行业和监管标准/AWS 基础安全最佳实践",
+    "TTPs/初始访问/未授权访问",
+    "影响/数据暴露"
+  ],
+  "ServiceName": "accessanalyzer",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "low",
+  "ResourceType": "Other",
+  "ResourceGroup": "security",
+  "Description": "**IAM Access Analyzer** 分析器处于 `Active` 状态，当前在其监控资源范围内报告零个 `Active` 发现。",
+  "Risk": "未解决的 `Active` 发现表明存在意外的外部或内部访问路径。\n- **机密性**：数据（存储桶、快照、密钥）的公共/跨账户读取\n- **完整性**：恶意角色假设或 KMS 使用，允许策略/数据更改\n- 跨账户的**横向移动**",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/IAM/latest/UserGuide/access-analyzer-findings-remediate.html",
+    "https://docs.aws.amazon.com/IAM/latest/UserGuide/access-analyzer-findings-view.html",
+    "https://aws.amazon.com/iam/access-analyzer/",
+    "https://docs.aws.amazon.com/IAM/latest/UserGuide/access-analyzer-getting-started.html",
+    "https://docs.aws.amazon.com/IAM/latest/UserGuide/access-analyzer-concepts.html",
+    "https://docs.aws.amazon.com/IAM/latest/UserGuide/access-analyzer-dashboard.html",
+    "https://docs.aws.amazon.com/IAM/latest/UserGuide/access-analyzer-findings.html",
+    "https://aws.amazon.com/blogs/security/automate-resolution-for-iam-access-analyzer-cross-account-access-findings-on-iam-roles/",
+    "https://docs.aws.amazon.com/IAM/latest/UserGuide/what-is-access-analyzer.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/AccessAnalyzer/findings.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\nResources:\n  example_resource:\n    Type: AWS::AccessAnalyzer::Analyzer\n    Properties:\n      AnalyzerName: example_resource\n      Type: ACCOUNT  # 此行修复安全问题\n```",
+      "Other": "1. 在 AWS 控制台中，转到 IAM > Access analyzer\n2. 如果不存在分析器，单击 Create analyzer，选择 Type: Account，将其命名为 example_resource，然后单击 Create\n3. 要清除活动发现：在 Resource analysis 下，选择您的分析器，选择所有 Active 发现，选择 Actions > Archive\n4. 对于意外访问发现，打开发现并按照链接的资源删除违规权限（编辑资源策略或角色信任策略），然后返回发现并选择 Rescan\n5. 确认仪表板显示 0 个 Active 发现",
+      "Terraform": "```hcl\nresource \"aws_accessanalyzer_analyzer\" \"example_resource\" {\n  analyzer_name = \"example_resource\"\n  type          = \"ACCOUNT\" # 此行修复安全问题\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "在所有相关区域和组织/账户范围内启用 **IAM Access Analyzer**。对每个 `Active` 发现进行分类：\n- 通过收紧资源和信任策略来删除意外访问\n- 强制执行**最小权限**和职责分离\n- 仅归档已验证的、预期的访问\n- 持续监控并自动化审查",
+      "Url": "https://hub.prowler.com/check/accessanalyzer_enabled_without_findings"
+    }
+  },
+  "Categories": [
+    "identity-access",
+    "trust-boundaries",
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

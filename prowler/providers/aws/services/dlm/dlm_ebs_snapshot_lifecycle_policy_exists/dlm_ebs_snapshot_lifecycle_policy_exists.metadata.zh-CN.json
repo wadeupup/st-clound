@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "dlm_ebs_snapshot_lifecycle_policy_exists",
+  "CheckTitle": "存在 EBS 快照的区域至少定义了一个 EBS 快照生命周期策略",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices"
+  ],
+  "ServiceName": "dlm",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "storage",
+  "Description": "**EBS 快照**应该由存在快照的每个区域中的**数据生命周期管理器 (DLM) 策略**管理。\n\n评估查找为这些快照自动化快照创建、保留和清理的生命周期策略。",
+  "Risk": "如果没有**自动化生命周期策略**，备份会变得不一致且容易出错，降低可用性并削弱恢复目标。缺少保留规则会导致过早删除或快照蔓延，增加成本并暴露过时数据。缺少跨区域/账户副本会限制对区域中断和恶意删除的恢复能力。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/DLM/ebs-snapshot-automation.html",
+    "https://repost.aws/articles/ARmYgZmA8MRQi89pWd9D7eFw/how-to-create-a-automate-backup-aws-data-lifecycle-management-using-snapshots",
+    "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/snapshot-lifecycle.html#dlm-elements"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws dlm create-lifecycle-policy --region <region> --execution-role-arn <execution-role-arn> --description \"<description>\" --state ENABLED --policy-details '{\"PolicyType\":\"EBS_SNAPSHOT_MANAGEMENT\",\"ResourceTypes\":[\"VOLUME\"],\"TargetTags\":[{\"Key\":\"<tag_key>\",\"Value\":\"<tag_value>\"}],\"Schedules\":[{\"CreateRule\":{\"Interval\":24,\"IntervalUnit\":\"HOURS\"},\"RetainRule\":{\"Count\":1}}]}'",
+      "NativeIaC": "```yaml\n# CloudFormation：最小 EBS 快照生命周期策略\nResources:\n  <example_resource_name>:\n    Type: AWS::DLM::LifecyclePolicy\n    Properties:\n      Description: \"<description>\"\n      ExecutionRoleArn: \"<example_resource_arn>\"\n      State: ENABLED  # 关键：启用策略以便检查可以计数\n      PolicyDetails:\n        PolicyType: EBS_SNAPSHOT_MANAGEMENT  # 关键：创建 EBS 快照生命周期策略\n        ResourceTypes: [VOLUME]\n        TargetTags:\n          - Key: \"<tag_key>\"  # 关键：通过标签选择目标卷\n            Value: \"<tag_value>\"\n        Schedules:\n          - CreateRule:\n              Interval: 24\n              IntervalUnit: HOURS\n            RetainRule:\n              Count: 1\n```",
+      "Other": "1. 在 AWS 控制台中，切换到存在 EBS 快照的区域\n2. 打开 EC2 > Lifecycle Manager (DLM) > Create lifecycle policy\n3. 选择 EBS snapshot policy；Target resource: Volumes\n4. 添加 Target tags：Key = <tag_key>，Value = <tag_value>\n5. 设置 Schedule：每 24 小时创建一次；保留 1 个快照\n6. 确保 State 为 Enabled 并点击 Create policy",
+      "Terraform": "```hcl\n# Terraform：最小 EBS 快照生命周期策略\nresource \"aws_dlm_lifecycle_policy\" \"<example_resource_name>\" {\n  description        = \"<description>\"\n  execution_role_arn = \"<example_resource_arn>\"\n  state              = \"ENABLED\" # 关键：启用策略以便检查可以计数\n\n  policy_details {\n    policy_type    = \"EBS_SNAPSHOT_MANAGEMENT\" # 关键：创建 EBS 快照生命周期策略\n    resource_types = [\"VOLUME\"]\n    target_tags = {\n      \"<tag_key>\" = \"<tag_value>\" # 关键：通过标签选择目标卷\n    }\n    schedule {\n      create_rule {\n        interval      = 24\n        interval_unit = \"HOURS\"\n      }\n      retain_rule {\n        count = 1\n      }\n    }\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "为所有需要备份的卷实施**DLM 生命周期策略**。\n\n- 安排创建以满足 RPO/RTO\n- 定义保留以防止蔓延并强制执行最少数据暴露\n- 使用**最小权限**角色和职责分离\n- 将快照复制到另一个区域/账户以实现**纵深防御**\n- 使用标签监控策略运行状况和覆盖范围",
+      "Url": "https://hub.prowler.com/check/dlm_ebs_snapshot_lifecycle_policy_exists"
+    }
+  },
+  "Categories": [
+    "forensics-ready"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

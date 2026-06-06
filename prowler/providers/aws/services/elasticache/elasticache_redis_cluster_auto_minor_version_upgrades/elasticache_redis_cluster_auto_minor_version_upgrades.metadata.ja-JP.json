@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "elasticache_redis_cluster_auto_minor_version_upgrades",
+  "CheckTitle": "ElastiCache Redis キャッシュクラスターで自動マイナーバージョンアップグレードが有効になっている",
+  "CheckType": [
+    "Software and Configuration Checks/Patch Management",
+    "Software and Configuration Checks/AWS Security Best Practices"
+  ],
+  "ServiceName": "elasticache",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Other",
+  "ResourceGroup": "database",
+  "Description": "**ElastiCache for Redis** レプリケーショングループは、`AutoMinorVersionUpgrade` を使用して **自動マイナーエンジンアップグレード** を適用するように設定されています。",
+  "Risk": "**自動マイナーアップグレード**がない場合、Redis ノードは既知の CVE と安定性のバグがあるバージョンを実行する可能性があり、不正なアクセス、レプリケーションの不整合、またはクラッシュを可能にします。パッチ適用の遅延により、攻撃ウィンドウが拡大し、メンテナンスが長引き、機密性、整合性、可用性が低下します。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/AmazonElastiCache/latest/dg/VersionManagementConsiderations.html",
+    "https://support.icompaas.com/support/solutions/articles/62000233595-ensure-elasticache-redis-cache-clusters-have-automatic-minor-upgrades-enabled",
+    "https://docs.aws.amazon.com/AmazonElastiCache/latest/dg/engine-versions.html",
+    "https://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/VersionManagement.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws elasticache modify-replication-group --replication-group-id <replication_group_id> --auto-minor-version-upgrade --apply-immediately",
+      "NativeIaC": "```yaml\n# CloudFormation: enable auto minor version upgrades on a Replication Group\nResources:\n  <example_resource_name>:\n    Type: AWS::ElastiCache::ReplicationGroup\n    Properties:\n      ReplicationGroupDescription: \"<example_description>\"\n      CacheNodeType: \"<example_node_type>\"\n      NumCacheClusters: 1\n      AutoMinorVersionUpgrade: true  # CRITICAL: turns on automatic minor version upgrades\n      # This ensures new minor engine versions are applied automatically\n```",
+      "Other": "1. AWS コンソールを開き、ElastiCache に移動します\n2. レプリケーショングループを選択し、対象グループを選択します\n3. 変更をクリックします\n4. 自動マイナーバージョンアップグレードを有効化します\n5. すぐに適用にチェックを入れ、変更をクリックして保存します",
+      "Terraform": "```hcl\n# Enable auto minor version upgrades on an ElastiCache replication group\nresource \"aws_elasticache_replication_group\" \"<example_resource_name>\" {\n  replication_group_id       = \"<example_resource_id>\"\n  description                = \"<example_description>\"\n  node_type                  = \"<example_node_type>\"\n  num_cache_clusters         = 1\n  auto_minor_version_upgrade = true  # CRITICAL: automatically applies minor engine upgrades\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "Redis レプリケーショングループで `AutoMinorVersionUpgrade` を有効化し、メンテナンスウィンドウで更新を管理します。**パッチ管理**と**多層防御**を適用します：ステージング環境で検証し、最近のバックアップを保持し、回復力を高めるために Multi-AZ を使用し、リリースノートを監視して、タイムリーで影響の少ない更新を確保します。",
+      "Url": "https://hub.prowler.com/check/elasticache_redis_cluster_auto_minor_version_upgrades"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

@@ -1,0 +1,33 @@
+{
+  "Provider": "azure",
+  "CheckID": "storage_account_key_access_disabled",
+  "CheckTitle": "确保已禁用存储账户密钥访问",
+  "CheckType": [],
+  "ServiceName": "storage",
+  "SubServiceName": "account",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AzureStorageAccount",
+  "ResourceGroup": "storage",
+  "Description": "确保禁用通过账户密钥访问 Azure 存储账户，强制使用 Microsoft Entra ID（原 Azure AD）进行身份验证。",
+  "Risk": "由于存储账户密钥具有高权限且此类访问难以审计，使用 Shared Key 授权存在安全风险。禁用 Shared Key 访问有助于强制通过 Microsoft Entra ID 进行基于身份的认证，从而增强安全性与可追溯性。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/storage/common/shared-key-authorization-prevent",
+  "Remediation": {
+    "Code": {
+      "CLI": "az storage account update --name <storage-account-name> --resource-group <resource-group> --allow-shared-key-access false",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity-staging/knowledge-base/azure/StorageAccounts/disable-shared-key-authorization.html",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "在存储账户上禁用 Shared Key 授权，以强制使用 Microsoft Entra ID 实现安全、可审计的访问。",
+      "Url": "https://learn.microsoft.com/en-us/azure/storage/common/shared-key-authorization-prevent"
+    }
+  },
+  "Categories": [
+    "e3"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

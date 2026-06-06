@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "directoryservice_radius_server_security_protocol",
+  "CheckTitle": "Directory Service 目录 RADIUS 服务器使用 MS-CHAPv2",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "TTPs/Credential Access"
+  ],
+  "ServiceName": "directoryservice",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "IAM",
+  "Description": "AWS Directory Service RADIUS 配置使用为 MFA 集成定义的**身份验证协议**。该发现评估启用 RADIUS 的目录是否设置为 `MS-CHAPv2`，而不是较弱的选项，如 `PAP`、`CHAP` 或 `MS-CHAPv1`。",
+  "Risk": "使用 `PAP`、`CHAP` 或 `MS-CHAPv1` 会削弱基于 RADIUS 的 MFA。\n\n`PAP` 暴露明文凭据，而传统 CHAP 变体允许离线破解和重放，使攻击者能够未授权访问 AD 集成服务并进行横向移动，降低机密性和完整性。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.secureauth.com/0903/en/ms-chapv2-and-radius--sp-initiated--for-cisco-and-netscaler-configuration-guide.html",
+    "https://docs.aws.amazon.com/directoryservice/latest/admin-guide/ms_ad_mfa.html",
+    "https://www.freeradius.org/documentation/freeradius-server/4.0~alpha1/raddb/mods-available/mschap.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws ds update-radius --directory-id <example_resource_id> --radius-settings AuthenticationProtocol=MS-CHAPv2",
+      "NativeIaC": "",
+      "Other": "1. 在 AWS 控制台中，打开 Directory Service 并选择您的目录\n2. 打开 Networking & security 选项卡（Multi-factor authentication 部分）\n3. 点击 Actions > Edit（或 Enable）\n4. 将 Protocol 设置为 MS-CHAPv2\n5. 点击 Save（或 Enable）以应用",
+      "Terraform": "```hcl\nresource \"aws_directory_service_radius_settings\" \"<example_resource_name>\" {\n  directory_id  = \"<example_resource_id>\"\n  radius_servers = [\"<RADIUS_SERVER_IP>\"]\n  shared_secret  = \"<SHARED_SECRET>\"\n\n  authentication_protocol = \"MS-CHAPv2\" # 关键：将 RADIUS 身份验证协议设置为 MS-CHAPv2 以通过检查\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "将 RADIUS 身份验证标准化为 `MS-CHAPv2` 以用于 MFA 提供商。禁用 `PAP`、`CHAP` 和 `MS-CHAPv1` 以防止降级。应用最小权限和纵深防御：使用强共享密钥，限制对 RADIUS 端点的网络访问，并监控身份验证日志中的异常。",
+      "Url": "https://hub.prowler.com/check/directoryservice_radius_server_security_protocol"
+    }
+  },
+  "Categories": [
+    "identity-access"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

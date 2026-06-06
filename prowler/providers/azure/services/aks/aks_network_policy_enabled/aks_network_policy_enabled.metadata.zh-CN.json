@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "aks_network_policy_enabled",
+  "CheckTitle": "确保已启用网络策略并进行适当配置",
+  "CheckType": [],
+  "ServiceName": "aks",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Microsoft.ContainerService/managedClusters",
+  "ResourceGroup": "container",
+  "Description": "当你在 Kubernetes 中运行现代微服务应用时，通常希望控制各组件之间的通信范围。应在 Azure Kubernetes Service (AKS) 集群中按最小权限原则限制 Pod 间流量。例如，你通常会希望阻止直接访问后端应用。Kubernetes 的网络策略功能可让你定义集群内 Pod 之间入站和出站流量规则。",
+  "Risk": "默认情况下，AKS 集群中的所有 Pod 都可以不受限制地收发流量。为提升安全性，你可以定义规则来控制流量。比如后端应用通常只对必要的前端服务开放，数据库组件也仅应允许连接它们的应用层访问。网络策略是 Kubernetes 的一项规范，用于定义 Pod 之间通信的访问策略。通过网络策略，你可以定义一组有序规则来控制流量的发送与接收，并将其应用到匹配一个或多个标签选择器的 Pod 集合。这些网络策略规则以 YAML 清单定义，也可以作为更大清单的一部分，与 deployment 或 service 一起创建。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/security/benchmark/azure/security-controls-v2-network-security#ns-2-connect-private-networks-together",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-kubernetes-policies/bc_azr_kubernetes_4#terraform"
+    },
+    "Recommendation": {
+      "Text": "",
+      "Url": "https://learn.microsoft.com/en-us/azure/aks/use-network-policies"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "网络策略需要网络策略插件支持。创建启用网络策略的集群时会自动包含该插件；但对于现有集群，需要先添加该插件再启用网络策略。启用/禁用网络策略会触发所有集群节点的滚动更新，类似执行集群升级。该操作耗时较长，在完成前会阻塞集群上的其他操作（包括删除）。若使用网络策略，集群至少需要 2 个 n1-standard-1 或更高规格的节点。建议用于网络策略强制执行的最小集群规模为 3 个 n1-standard-1 实例。启用网络策略强制执行会消耗额外节点资源：会将 kube-system 进程的内存占用大约增加 128MB，并额外需要约 300 millicores 的 CPU。"
+}

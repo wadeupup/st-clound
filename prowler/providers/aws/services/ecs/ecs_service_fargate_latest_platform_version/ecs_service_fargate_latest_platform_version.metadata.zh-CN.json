@@ -1,0 +1,45 @@
+{
+  "Provider": "aws",
+  "CheckID": "ecs_service_fargate_latest_platform_version",
+  "CheckTitle": "ECS Fargate 服务使用最新的 Fargate 平台版本",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices"
+  ],
+  "ServiceName": "ecs",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsEcsService",
+  "ResourceGroup": "container",
+  "Description": "**ECS Fargate 服务** 通过 `platformVersion`=`LATEST` 或与其 `platformFamily`（Linux/Windows）的当前版本匹配的显式值使用 **最新的 Fargate 平台版本**。",
+  "Risk": "在过时的平台上运行会使内核/运行时中已知的 CVE 未修补，存在以下风险：\n- **机密性**：通过容器逃逸暴露数据\n- **完整性**：权限提升和篡改\n- **可用性**：崩溃/DoS 和在负载下的不稳定",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://servian.dev/setting-up-fargate-for-ecs-exec-8f5cc8d7d80e",
+    "https://docs.aws.amazon.com/AmazonECS/latest/developerguide/platform-fargate.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/ECS/platform-version.html",
+    "https://docs.aws.amazon.com/config/latest/developerguide/ecs-fargate-latest-platform-version.html",
+    "https://docs.aws.amazon.com/AmazonECS/latest/developerguide/Welcome.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/ecs-controls.html#ecs-10"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws ecs update-service --cluster <cluster-name> --service <service-name> --platform-version LATEST",
+      "NativeIaC": "```yaml\n# CloudFormation: set ECS Fargate service to latest platform version\nResources:\n  <example_resource_name>:\n    Type: AWS::ECS::Service\n    Properties:\n      Cluster: <example_resource_id>\n      TaskDefinition: <example_resource_name>\n      LaunchType: FARGATE\n      PlatformVersion: LATEST  # Critical: use the latest Fargate platform version\n      NetworkConfiguration:\n        AwsvpcConfiguration:\n          Subnets:\n            - <example_resource_id>\n```",
+      "Other": "1. 在 AWS 控制台中，转到 Amazon ECS\n2. 打开您的集群并选择服务\n3. 点击更新\n4. 将平台版本设置为 LATEST\n5. 点击更新服务（或部署）以应用",
+      "Terraform": "```hcl\n# ECS Fargate service using the latest platform version\nresource \"aws_ecs_service\" \"<example_resource_name>\" {\n  name            = \"<example_resource_name>\"\n  cluster         = \"<example_resource_id>\"\n  task_definition = \"<example_resource_name>\"\n  launch_type     = \"FARGATE\"\n  platform_version = \"LATEST\" # Critical: ensures the latest Fargate platform version\n\n  network_configuration {\n    subnets = [\"<example_resource_id>\"]\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "- 优先使用 `platformVersion` `LATEST` 以接收补丁。\n- 如果固定版本，请监控发布并快速重新部署到当前版本。\n- 在 CI/CD 中使用分阶段部署自动化更新。\n- 应用 **纵深防御** 和 **最小权限** 以限制运行时漏洞利用的影响。",
+      "Url": "https://hub.prowler.com/check/ecs_service_fargate_latest_platform_version"
+    }
+  },
+  "Categories": [
+    "vulnerabilities",
+    "container-security"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

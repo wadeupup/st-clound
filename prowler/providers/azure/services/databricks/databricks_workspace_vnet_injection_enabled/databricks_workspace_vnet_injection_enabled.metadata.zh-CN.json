@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "databricks_workspace_vnet_injection_enabled",
+  "CheckTitle": "确保 Azure Databricks 工作区部署在客户管理的 VNet（VNet 注入）中",
+  "CheckType": [],
+  "ServiceName": "databricks",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Databricks/workspaces/{workspaceName}",
+  "Severity": "medium",
+  "ResourceType": "AzureDatabricksWorkspace",
+  "ResourceGroup": "ai_ml",
+  "Description": "检查 Azure Databricks 工作区是否部署在客户管理的虚拟网络（VNet 注入）中，而非 Databricks 管理的 VNet。",
+  "Risk": "使用 Databricks 管理的 VNet 会限制对网络安全策略、防火墙配置和路由的控制，增加未授权访问或数据外泄风险。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/databricks/administration-guide/cloud-configurations/azure/vnet-inject",
+  "Remediation": {
+    "Code": {
+      "CLI": "az databricks workspace create --name <databricks-workspace-name> --resource-group <resource-group-name> --location <region> --managed-resource-group <managed-rg-name> --enable-no-public-ip true --network-security-group-rule \"NoAzureServices\" --public-network-access Disabled --custom-virtual-network-id /subscriptions/<subscription-id>/resourceGroups/<resource-group-name>/providers/Microsoft.Network/virtualNetworks/<vnet-name>",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "将 Databricks 工作区部署到客户管理的 VNet，以确保对网络安全和合规性拥有更好的控制。",
+      "Url": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/Databricks/check-for-vnet-injection.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

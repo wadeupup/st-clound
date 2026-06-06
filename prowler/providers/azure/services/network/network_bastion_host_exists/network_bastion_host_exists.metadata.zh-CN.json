@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "network_bastion_host_exists",
+  "CheckTitle": "确保存在 Azure Bastion 主机",
+  "CheckType": [],
+  "ServiceName": "network",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Network",
+  "ResourceGroup": "network",
+  "Description": "Azure Bastion 服务允许通过 Internet 安全地远程访问 Azure 虚拟机，而无需将远程访问协议端口和服务直接暴露到 Internet。Azure Bastion 通过 443/TCP 上的 TLS 提供此访问，并遵循组织 Azure Active Directory 服务中的加固配置。",
+  "Risk": "Azure Bastion 服务为组织提供了更安全的方式，通过 Internet 访问 Azure 虚拟机，而无需为这些虚拟机分配公共 IP 地址。Azure Bastion 在 Web 浏览器中通过 TLS 提供远程桌面协议（RDP）和安全外壳协议（SSH）访问，从而避免组织在 Azure 虚拟机上向 Internet 开放 3389/TCP 和 22/TCP。Bastion 服务的额外收益还包括多因素认证、条件访问策略，以及通过集中接入点应用在 Azure Active Directory 中配置的其他加固措施。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/bastion/bastion-overview#sku",
+  "Remediation": {
+    "Code": {
+      "CLI": "az network bastion create --location <location> --name <name of bastion host> --public-ip-address <public IP address name or ID> --resource-group <resource group name or ID> --vnet-name <virtual network containing subnet called 'AzureBastionSubnet'> --scale-units <integer> --sku Standard [--disable-copy- paste true|false] [--enable-ip-connect true|false] [--enable-tunneling true|false]",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity-staging/knowledge-base/azure/Network/bastion-host-exists.html",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "通过 Azure Portal*：1. 点击 Bastions。2. 选择 Subscription。3. 选择 Resource group。4. 为新的 Bastion host 输入 Name。5. 选择 Region。6. 在 Tier 旁选择 Standard。7. 使用滑块设置 Instance count。8. 选择 Virtual network 或 Create new。9. 选择名为 AzureBastionSubnet 的 Subnet。如果不存在，请使用 /26 CIDR 范围创建名为 AzureBastionSubnet 的子网。10. 选择适当的 Public IP address 选项。11. 若 Public IP address 选择 Create new，请提供 Public IP address 名称。12. 若 Public IP address 选择 Use existing，请在 Choose public IP address 中选择 IP 地址。13. 点击 Next: Tags >。14. 配置适当的 Tags。15. 点击 Next: Advanced >。16. 选择适当的 Advanced 选项。17. 点击 Next: Review + create >。18. 点击 Create。通过 Azure CLI：az network bastion create --location <location> --name <name of bastion host> --public-ip-address <public IP address name or ID> --resource-group <resource group name or ID> --vnet-name <virtual network containing subnet called 'AzureBastionSubnet'> --scale-units <integer> --sku Standard [--disable-copy- paste true|false] [--enable-ip-connect true|false] [--enable-tunneling true|false]。通过 PowerShell：创建适当的 Virtual network 和 Public IP Address 设置。$subnetName = 'AzureBastionSubnet' $subnet = New-AzVirtualNetworkSubnetConfig -Name $subnetName -AddressPrefix <IP address range in CIDR notation making sure to use a /26> $virtualNet = New-AzVirtualNetwork -Name <virtual network name> - ResourceGroupName <resource group name> -Location <location> -AddressPrefix <IP address range in CIDR notation> -Subnet $subnet $publicip = New-AzPublicIpAddress -ResourceGroupName <resource group name> - Name <public IP address name> -Location <location> -AllocationMethod Dynamic -Sku Standard",
+      "Url": "https://learn.microsoft.com/en-us/powershell/module/az.network/get-azbastion?view=azps-9.2.0"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "Azure Bastion 服务会产生额外成本，并需要特定的虚拟网络配置。Standard 层相比 Basic 层提供更多配置选项，并可能因这些附加功能产生额外费用。"
+}

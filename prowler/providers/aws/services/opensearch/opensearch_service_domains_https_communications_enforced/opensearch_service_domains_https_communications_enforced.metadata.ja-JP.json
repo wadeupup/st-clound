@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "opensearch_service_domains_https_communications_enforced",
+  "CheckTitle": "OpenSearch ドメインには HTTPS の強制が有効になっています",
+  "CheckType": [
+    "ソフトウェアと構成のチェック/AWS セキュリティベストプラクティス",
+    "ソフトウェアと構成のチェック/業界および規制基準/AWS 基礎セキュリティベストプラクティス",
+    "ソフトウェアと構成のチェック/業界および規制基準/NIST 800-53 コントロール (米国)",
+    "ソフトウェアと構成のチェック/業界および規制基準/PCI-DSS"
+  ],
+  "ServiceName": "opensearch",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsOpenSearchServiceDomain",
+  "ResourceGroup": "database",
+  "Description": "Amazon OpenSearch Service ドメインで **HTTPS の強制** を有効にすると、暗号化された接続が必要になります。この評価では、`すべてのトラフィックに対して HTTPS を要求する` が欠落しているドメインを特定し、暗号化されていない HTTP が許可されていることを示します。",
+  "Risk": "HTTP を許可すると、クエリ、資格情報、および結果が平文で公開され、傍受やセッションハイジャックが可能になります。攻撃者はリクエストやレスポンスを変更し、**機密性** と **完全性** を損なう可能性があり、認証データを収集して **横方向の移動** を行うことができます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-createupdatedomains.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws opensearch update-domain-config --domain-name <example_resource_name> --domain-endpoint-options EnforceHTTPS=true",
+      "NativeIaC": "```yaml\n# CloudFormation - OpenSearch ドメインで HTTPS の強制を有効にする\nResources:\n  <example_resource_name>:\n    Type: AWS::OpenSearchService::Domain\n    Properties:\n      DomainEndpointOptions:\n        EnforceHTTPS: true  # 重要: すべてのトラフィックに HTTPS を使用することを要求し、検出結果を修正します\n```",
+      "Other": "1. Amazon OpenSearch Service コンソールを開く\n2. ドメインに移動し、ドメインを選択\n3. アクション > セキュリティ構成の編集をクリック\n4. \"ドメインへのすべてのトラフィックに HTTPS を要求する\" をチェック\n5. 変更を保存をクリック",
+      "Terraform": "```hcl\n# OpenSearch ドメインで HTTPS の強制を有効にする\nresource \"aws_opensearch_domain\" \"<example_resource_name>\" {\n  domain_name = \"<example_resource_name>\"\n\n  domain_endpoint_options {\n    enforce_https = true  # 重要: すべてのリクエストに HTTPS を要求します\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "すべてのドメインで `すべてのトラフィックに対して HTTPS を要求する` を有効にして TLS を強制します。強力なプロトコル (TLS 1.2+) を優先し、ネットワーク制御を通じて HTTP をブロックして多層防御を実現します。**最小特権** アクセスポリシーを適用し、プライベート接続を使用して露出とダウングレードのリスクを最小限に抑えます。",
+      "Url": "https://hub.prowler.com/check/opensearch_service_domains_https_communications_enforced"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

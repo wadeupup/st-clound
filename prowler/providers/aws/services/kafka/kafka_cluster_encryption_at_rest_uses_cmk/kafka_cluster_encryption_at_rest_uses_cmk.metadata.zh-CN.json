@@ -1,0 +1,44 @@
+{
+  "Provider": "aws",
+  "CheckID": "kafka_cluster_encryption_at_rest_uses_cmk",
+  "CheckTitle": "Kafka 集群启用了静态加密，使用客户管理密钥 (CMK) 或是无服务器的",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践/数据加密",
+    "行业和法规标准/AWS 基础安全最佳实践",
+    "行业和法规标准/NIST 800-53 控制（美国）",
+    "行业和法规标准/PCI-DSS",
+    "影响/数据暴露"
+  ],
+  "ServiceName": "kafka",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsMskCluster",
+  "ResourceGroup": "messaging",
+  "Description": "Amazon MSK 集群会检查数据卷的**静态加密**，使用**客户管理的 KMS 密钥**。无服务器集群本质上是加密的。只有当配置的 `DataVolumeKMSKeyId` 对应于客户管理的密钥时，才会识别配置的集群。",
+  "Risk": "依赖于服务管理的密钥会削弱**机密性**和**责任性**：您无法实施细粒度的密钥策略、职责分离或独立轮换。这限制了事件响应（例如，禁用密钥进行加密销毁）并减少了可审计性，增加了凭证滥用或代理妥协的影响。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/msk/latest/developerguide/msk-encryption.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/MSK/msk-encryption-at-rest-with-cmk.html",
+    "https://docs.aws.amazon.com/msk/latest/developerguide/msk-working-with-encryption.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation：MSK 集群使用客户管理的 KMS 密钥进行静态加密\nResources:\n  <example_resource_name>:\n    Type: AWS::MSK::Cluster\n    Properties:\n      ClusterName: <example_resource_name>\n      KafkaVersion: <KAFKA_VERSION>\n      NumberOfBrokerNodes: 2\n      BrokerNodeGroupInfo:\n        InstanceType: kafka.m5.large\n        ClientSubnets:\n          - <example_subnet_id_a>\n          - <example_subnet_id_b>\n        SecurityGroups:\n          - <example_security_group_id>\n      EncryptionInfo:\n        EncryptionAtRest:\n          DataVolumeKMSKeyId: <example_kms_key_arn>  # 关键：使用客户管理的 KMS 密钥 ARN 启用 CMK 静态加密\n```",
+      "Other": "1. 在 AWS 控制台中，转到 Amazon MSK > 集群\n2. 点击创建集群\n3. 选择配置的（或选择无服务器以默认通过）\n4. 在加密设置中，对于静态加密，选择客户管理密钥并选择您的 CMK（不是 alias/aws/kafka）\n5. 创建集群，将客户端迁移到新集群，然后删除使用 AWS 管理密钥的旧集群",
+      "Terraform": "```hcl\n# MSK 集群使用客户管理的 KMS 密钥进行静态加密\nresource \"aws_msk_cluster\" \"<example_resource_name>\" {\n  cluster_name           = \"<example_resource_name>\"\n  kafka_version          = \"<KAFKA_VERSION>\"\n  number_of_broker_nodes = 2\n\n  broker_node_group_info {\n    instance_type  = \"kafka.m5.large\"\n    client_subnets = [\"<example_subnet_id_a>\", \"<example_subnet_id_b>\"]\n    security_groups = [\"<example_security_group_id>\"]\n  }\n\n  encryption_info {\n    encryption_at_rest_kms_key_arn = \"<example_kms_key_arn>\" # 关键：客户管理的 KMS 密钥以通过检查\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "使用**客户管理的 KMS 密钥**进行 MSK 静态加密。应用密钥策略和授权中的**最小权限**，启用**密钥轮换**，并记录密钥使用以进行审计。强制执行 MSK 管理员和 KMS 密钥保管人之间的**职责分离**，并定期审查访问、别名和待删除状态。",
+      "Url": "https://hub.prowler.com/check/kafka_cluster_encryption_at_rest_uses_cmk"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

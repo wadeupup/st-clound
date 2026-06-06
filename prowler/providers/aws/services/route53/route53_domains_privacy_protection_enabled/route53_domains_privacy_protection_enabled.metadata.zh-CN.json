@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "route53_domains_privacy_protection_enabled",
+  "CheckTitle": "Route 53 域名已启用管理员联系人隐私保护",
+  "CheckType": [
+    "软件和配置检查/AWS安全最佳实践",
+    "影响/数据暴露",
+    "敏感数据识别/PII"
+  ],
+  "ServiceName": "route53",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "network",
+  "Description": "**Route 53 域名** 的管理联系人已启用 **隐私保护**，因此 WHOIS 查询会返回经过隐藏处理的信息或代理详情。\n\n评估联系数据是否被隐藏，而不是公开列出。",
+  "Risk": "**公开的 WHOIS 联系数据**会暴露姓名、电子邮件、电话和地址，从而导致：\n- 对注册商进行**网络钓鱼/社会工程攻击**\n- **SIM 卡交换**或账户接管\n- **域名劫持**，影响 DNS 的完整性/可用性\n它还会增加垃圾信息和有针对性的骚扰。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/domain-privacy-protection.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/Route53/privacy-protection.html",
+    "https://support.icompaas.com/support/solutions/articles/62000233459-enable-privacy-protection-for-for-a-route53-domain-"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws route53domains update-domain-contact-privacy --domain-name <DOMAIN_NAME> --admin-privacy",
+      "NativeIaC": "",
+      "Other": "1. 打开 AWS 控制台并进入 Route 53\n2. 点击 Registered domains 并选择 <DOMAIN_NAME>\n3. 在 Contact information 中点击 Edit\n4. 启用 Privacy protection（确保 Admin contact privacy 已开启）\n5. 保存更改",
+      "Terraform": "```hcl\nresource \"aws_route53domains_registered_domain\" \"<example_resource_name>\" {\n  domain_name   = \"<example_resource_name>\"\n  admin_privacy = true # 关键：使管理员联系人隐私能够通过检查\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "为所有联系人（管理员、注册人、技术联系人）启用 **WHOIS 隐私保护** 以尽量减少暴露。应用 **纵深防御**：使用专用且受监控的联系邮箱，对注册商访问强制启用 **转移锁定** 和 **多因素认证（MFA）**，并定期检查设置。*如果某个顶级域名不支持隐私保护*，则提供最少且基于角色的联系信息。",
+      "Url": "https://hub.prowler.com/check/route53_domains_privacy_protection_enabled"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

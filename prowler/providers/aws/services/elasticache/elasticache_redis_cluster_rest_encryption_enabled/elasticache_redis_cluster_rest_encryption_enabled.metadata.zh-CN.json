@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "elasticache_redis_cluster_rest_encryption_enabled",
+  "CheckTitle": "ElastiCache Redis 缓存集群已启用静态加密",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Effects/Data Exposure"
+  ],
+  "ServiceName": "elasticache",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "database",
+  "Description": "**ElastiCache for Redis 复制组**会被评估是否对磁盘缓存数据和备份启用了 **静态加密**。该发现会指出未启用此保护的复制组。",
+  "Risk": "没有静态加密，如果通过泄露或配置错误访问存储或备份，则可以读取缓存文件和快照。可能会暴露密钥、令牌和 PII，破坏 **机密性**，并通过离线分析缓存数据来帮助 **横向移动**。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/ElastiCache/in-transit-and-at-rest-encryption.html",
+    "https://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/at-rest-encryption.html#at-rest-encryption-enable",
+    "https://aws.amazon.com/blogs/security/amazon-elasticache-now-supports-encryption-for-elasticache-for-redis/"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation: enable at-rest encryption for an ElastiCache Redis replication group\nResources:\n  <example_resource_name>:\n    Type: AWS::ElastiCache::ReplicationGroup\n    Properties:\n      ReplicationGroupId: <example_resource_id>\n      ReplicationGroupDescription: Enable at-rest encryption\n      Engine: redis\n      CacheNodeType: cache.t3.micro\n      NumCacheClusters: 1\n      AtRestEncryptionEnabled: true  # CRITICAL: turns on encryption at rest for the replication group\n```",
+      "Other": "1. 在 AWS 控制台中，转到 ElastiCache > Redis\n2. 选择未加密的复制组，点击操作 > 备份并创建手动备份\n3. 备份完成后，点击备份，选择它，然后点击恢复\n4. 在恢复设置中，勾选/启用静态加密（使用默认 KMS 密钥）并创建新的复制组\n5. 更新应用程序以使用新的复制组端点\n6. 验证连接性和数据，然后删除旧的（未加密的）复制组",
+      "Terraform": "```hcl\n# Terraform: enable at-rest encryption for an ElastiCache Redis replication group\nresource \"aws_elasticache_replication_group\" \"<example_resource_name>\" {\n  replication_group_id  = \"<example_resource_id>\"\n  description           = \"Enable at-rest encryption\"\n  node_type             = \"cache.t3.micro\"\n  number_cache_clusters = 1\n  at_rest_encryption_enabled = true  # CRITICAL: turns on encryption at rest for the replication group\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "在所有 Redis 复制组上启用 **静态加密**。使用 **客户管理的 KMS 密钥**，对密钥应用最小权限访问，并审计密钥使用情况。由于静态加密在创建时启用（备份、恢复、替换），因此需要规划受控迁移。与 **传输中加密** 和身份验证配对以实现深度防御。",
+      "Url": "https://hub.prowler.com/check/elasticache_redis_cluster_rest_encryption_enabled"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "neptune_cluster_multi_az",
+  "CheckTitle": "Neptune クラスターは Multi-AZ が有効になっています",
+  "CheckType": [
+    "ソフトウェアと構成のチェック/AWS セキュリティベストプラクティス",
+    "ソフトウェアと構成のチェック/業界および規制基準/AWS 基礎セキュリティベストプラクティス",
+    "影響/サービス拒否"
+  ],
+  "ServiceName": "neptune",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsRdsDbCluster",
+  "ResourceGroup": "database",
+  "Description": "Amazon Neptune DB クラスターは、クラスターが複数のアベイラビリティーゾーンに分散されたリードレプリカインスタンスを持っているかどうかを確認することで `Multi-AZ` デプロイメントとして評価されます。\n\n失敗した結果は、クラスターが単一の AZ にデプロイされており、自動昇格とクロス AZ フェイルオーバーを可能にするリードレプリカが欠如していることを示します。",
+  "Risk": "**単一 AZ デプロイメント** は、明確な可用性の単一障害点を作成します。\n\n- **可用性**: AZ の停止やメンテナンスは、プライマリが再構築されるまで長時間のダウンタイムを引き起こす可能性があります。\n- **整合性/復旧**: 手動復旧は、構成エラーのリスクと長い RTO を増加させ、運用とコンプライアンスに影響を与えます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/neptune-controls.html#neptune-9",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/Neptune/multi-az.html#"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\nResources:\n NeptuneCluster:\n Type: AWS::Neptune::DBCluster\n Properties:\n DBClusterIdentifier: \"<DB_CLUSTER_IDENTIFIER>\"\n # 高可用性とフェイルオーバーのために複数の AZ にデプロイします\n AvailabilityZones:\n - \"<AZ_1>\"\n - \"<AZ_2>\"\n - \"<AZ_3>\"\n```",
+      "Terraform": "```hcl\nresource \"aws_neptune_cluster\" \"example\" {\n cluster_identifier = \"<db_cluster_identifier>\"\n availability_zones = [\"<AZ_1>\", \"<AZ_2>\", \"<AZ_3>\"]  # 高可用性のために複数の AZ にデプロイします\n}\n```",
+      "Other": ""
+    },
+    "Recommendation": {
+      "Text": "本番環境の Neptune クラスターには、単一障害点を避けるためにリードレプリカを別々のアベイラビリティーゾーンに配置する **高可用性** デプロイメントモデルを採用してください。\n\n自動フェイルオーバーを定期的にテストし、HA を堅牢なバックアップと復旧の実践と組み合わせて、防御の深層戦略の一部とします。",
+      "Url": "https://hub.prowler.com/check/neptune_cluster_multi_az"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "appsync_graphql_api_no_api_key_authentication",
+  "CheckTitle": "AWS AppSync GraphQL API が API キー認証を使用していません",
+  "CheckType": [
+    "ソフトウェアと設定チェック/AWS セキュリティベストプラクティス",
+    "TTPs/初期アクセス/不正アクセス"
+  ],
+  "ServiceName": "appsync",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsAppSyncGraphQLApi",
+  "ResourceGroup": "api_gateway",
+  "Description": "**AWS AppSync GraphQL API** は、デフォルトの認証タイプについて検査されます。この調査結果は、IAM、Cognito、OIDC、または Lambda 承認者ではなく `API_KEY` で設定された API を示します。",
+  "Risk": "静的**API キー**は漏洩または再利用される可能性があり、不正なクエリとミューテーションを可能にします。\n- **機密性**：制限のないデータ読み取り\n- **整合性**：不正な書き込みとスキーマの悪用\n- **説明責任**：監査用のユーザー ID がなく、取り消しとスコープ設定が困難",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://aws.amazon.com/blogs/mobile/graphql-security-appsync-amplify/",
+    "https://docs.aws.amazon.com/appsync/latest/devguide/security-authz.html",
+    "https://support.icompaas.com/support/solutions/articles/62000233666-ensure-aws-appsync-graphql-apis-should-not-be-authenticated-with-api-keys",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/appsync-controls.html#appsync-5"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws appsync update-graphql-api --api-id <api-id> --name <api-name> --authentication-type AWS_IAM",
+      "NativeIaC": "```yaml\n# CloudFormation: デフォルト認証を非 API キーに設定します\nResources:\n  <example_resource_name>:\n    Type: AWS::AppSync::GraphQLApi\n    Properties:\n      Name: <example_resource_name>\n      AuthenticationType: AWS_IAM  # 重要：デフォルト認証を API_KEY から切り替えます\n```",
+      "Other": "1. AWS コンソールで、AppSync > APIs に移動し、GraphQL API を選択します\n2. Settings (Authorization) を開きます\n3. Default authorization mode を AWS IAM（または Cognito/OIDC/Lambda）に変更します\n4. Save をクリックします",
+      "Terraform": "```hcl\n# 非 API キー認証を使用する AppSync GraphQL API\nresource \"aws_appsync_graphql_api\" \"<example_resource_name>\" {\n  name                = \"<example_resource_name>\"\n  authentication_type = \"AWS_IAM\"  # 重要：API_KEY デフォルト認証を回避します\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "`API_KEY` をより強力なモードに置き換え、最小権限を適用します：\n- **AWS_IAM** をサービス間で使用\n- **Cognito User Pools** または **OIDC** をエンドユーザーに使用\n- **Lambda 承認者**をカスタムロジックに使用\n*ゲストアクセスが避けられない場合*、読み取り専用フィールドに制限し、スロットリングを強制し、短いキーライフタイムを使用し、スキーマレベルの承認を適用します。",
+      "Url": "https://hub.prowler.com/check/appsync_graphql_api_no_api_key_authentication"
+    }
+  },
+  "Categories": [
+    "identity-access"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

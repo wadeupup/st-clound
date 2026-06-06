@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "sagemaker_training_jobs_vpc_settings_configured",
+  "CheckTitle": "Amazon SageMaker のトレーニングジョブで VPC 設定が有効になっています",
+  "CheckType": [
+    "ソフトウェアおよび設定のチェック/AWS セキュリティのベストプラクティス/ネットワーク到達可能性",
+    "ソフトウェアと設定のチェック/業界および規制基準/AWS 基盤セキュリティのベストプラクティス",
+    "影響／データ露出"
+  ],
+  "ServiceName": "sagemaker",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Other",
+  "ResourceGroup": "ai_ml",
+  "Description": "**SageMaker のトレーニングジョブ**は、ジョブ設定で定義された`subnets`を検出することにより、**VPC 設定**について評価されます。VPC 設定を使用すると、ENI によってジョブがあなたの VPC 内に配置されるため、トレーニングボリュームおよび出力のトラフィックはプライベートネットワーキングを使用します。",
+  "Risk": "VPC設定がない場合、トレーニングコンテナはパブリックネットワークと広範な外向き通信に依存します。これにより**機密性**と**完全性**が弱まり、データセットやモデルアーティファクトのデータ流出、マルウェアのダウンロード、きめ細かなセキュリティグループ制御やVPCベースの監視の回避が可能になります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/sagemaker/latest/dg/interface-vpc-endpoint.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation: VPC が有効な SageMaker TrainingJob\nResources:\n  <example_resource_name>:\n    Type: AWS::SageMaker::TrainingJob\n    Properties:\n      TrainingJobName: <example_resource_name>\n      RoleArn: <example_resource_id>\n      AlgorithmSpecification:\n        TrainingImage: <example_resource_id>\n        TrainingInputMode: File\n      OutputDataConfig:\n        S3OutputPath: s3://<example_resource_name>/\n      ResourceConfig:\n        InstanceType: ml.m5.large\n        InstanceCount: 1\n        VolumeSizeInGB: 10\n      StoppingCondition:\n        MaxRuntimeInSeconds: 3600\n      VpcConfig:\n        Subnets:\n          - <example_resource_id>  # 重要: ジョブがVPC設定を持つようにVPCサブネットを追加します\n        SecurityGroupIds:\n          - <example_resource_id>  # VPC を使用する際に SageMaker によって必要とされる\n```",
+      "Other": "1. AWS コンソールで、SageMaker > Training > Training jobs に移動します\n2. Create training job をクリックします（またはジョブを選択して Create copy を選びます）\n3. Networking で、VPC を選択し、次に少なくとも 1 つの Subnet と 1 つの Security group を選びます\n4. 必須項目を入力してジョブを作成します\n5. 新しいトレーニングジョブの詳細に VPC サブネットが表示されることを確認します",
+      "Terraform": "```hcl\n# VPC 設定を使用した SageMaker トレーニングジョブ\nresource \"aws_sagemaker_training_job\" \"<example_resource_name>\" {\n  name     = \"<example_resource_name>\"\n  role_arn = \"<example_resource_id>\"\n\n  algorithm_specification {\n    training_image     = \"<example_resource_id>\"\n    training_input_mode = \"File\"\n  }\n\n  output_data_config {\n    s3_output_path = \"s3://<example_resource_name>/\"\n  }\n\n  resource_config {\n    instance_type  = \"ml.m5.large\"\n    instance_count = 1\n    volume_size_gb = 10\n  }\n\n  stopping_condition {\n    max_runtime_in_seconds = 3600\n  }\n\n  vpc_config {\n    subnets            = [\"<example_resource_id>\"]     # 重大：トレーニングジョブでVPCを有効にする\n    security_group_ids = [\"<example_resource_id>\"]     # VPC で必須\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "特定の`subnets`と厳しく限定された`security groups`を使用して、VPC内でトレーニングを実行します。\n- トラフィックをプライベートに保つために、S3、ECR、SageMakerに`VPC endpoints`を使用する\n- デフォルトでインターネットへの送信をブロックし、必要な宛先のみを許可する\n- ネットワークセグメンテーションを適用し、可能であれば`network isolation`を有効にする",
+      "Url": "https://hub.prowler.com/check/sagemaker_training_jobs_vpc_settings_configured"
+    }
+  },
+  "Categories": [
+    "trust-boundaries",
+    "gen-ai"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

@@ -1,0 +1,37 @@
+{
+  "Provider": "azure",
+  "CheckID": "postgresql_flexible_server_entra_id_authentication_enabled",
+  "CheckTitle": "PostgreSQL Flexible Server 通过管理员强制启用 Microsoft Entra ID 身份验证",
+  "CheckType": [],
+  "ServiceName": "postgresql",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "PostgreSQL",
+  "ResourceGroup": "database",
+  "Description": "**PostgreSQL Flexible Servers** 必须将 `authConfig.activeDirectoryAuth` 设置为 `Enabled`，并至少保留一个已分配的 **Microsoft Entra 管理员**，以确保数据库会话继承集中治理的身份，而不是使用未受管控的 PostgreSQL 本地账户。",
+  "Risk": "若未启用 Entra ID 身份验证，被盗取的本地密码可绕过 **MFA** 与条件访问，从而实现持续数据库登录。若缺少管理员，该功能将无法使用，导致安全团队无法轮换职责，并可能引发未授权访问或**权限提升**。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://learn.microsoft.com/en-us/azure/postgresql/flexible-server/security-entra-concepts",
+    "https://learn.microsoft.com/en-us/azure/postgresql/flexible-server/security-entra-configure"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "az postgres flexible-server update --resource-group <resourceGroupName> --name <serverName> --active-directory-auth Enabled\naz postgres flexible-server microsoft-entra-admin create --resource-group <resourceGroupName> --server-name <serverName> --object-id <objectId> --display-name <displayName>",
+      "NativeIaC": "",
+      "Other": "1. 在 Azure Portal 中打开 Azure Database for PostgreSQL flexible server，并选择目标服务器。\n2. 在 Security > Authentication 下，将 Microsoft Entra ID authentication（或组合模式）设置为 Enabled，并保存更改。\n3. 在 Security > Microsoft Entra ID 下，至少添加一个管理员（用户或组），并将其关联到 Entra 对象 ID，然后确认分配。",
+      "Terraform": "```hcl\ndata \"azurerm_client_config\" \"current\" {}\n\nresource \"azurerm_postgresql_flexible_server\" \"example\" {\n  name                = \"pg-flex\"\n  resource_group_name = azurerm_resource_group.example.name\n  location            = azurerm_resource_group.example.location\n  sku_name            = \"GP_Standard_D4s_v3\"\n  administrator_login = \"pgadmin\"\n  administrator_password = \"<complexPassword>\"\n  storage_mb          = 131072\n  version             = \"16\"\n\n  authentication {\n    active_directory_auth_enabled = true\n    tenant_id                     = data.azurerm_client_config.current.tenant_id\n  }\n}\n\nresource \"azurerm_postgresql_flexible_server_active_directory_administrator\" \"entra_admin\" {\n  server_id     = azurerm_postgresql_flexible_server.example.id\n  object_id     = var.entra_object_id\n  principal_name = var.entra_principal_name\n  principal_type = \"User\"\n  tenant_id     = data.azurerm_client_config.current.tenant_id\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "通过 **Microsoft Entra ID** 联合管理 PostgreSQL Flexible Server 访问，使 MFA、条件访问与集中式 RBAC 统一管控登录。至少维护一个委派管理员组，并通过身份治理流程轮换成员。",
+      "Url": "https://hub.prowler.com/check/postgresql_flexible_server_entra_id_authentication_enabled"
+    }
+  },
+  "Categories": [
+    "identity-access"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "当 Microsoft Entra ID 身份验证被禁用，或 flexible server microsoft-entra-admin API 未返回任何管理员时，此检查将失败。"
+}

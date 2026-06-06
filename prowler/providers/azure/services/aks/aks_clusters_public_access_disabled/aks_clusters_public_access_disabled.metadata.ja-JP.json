@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "aks_clusters_public_access_disabled",
+  "CheckTitle": "クラスターでプライベート エンドポイントを有効化し、パブリックアクセスを無効化することを確認する",
+  "CheckType": [],
+  "ServiceName": "aks",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Microsoft.ContainerService/ManagedClusters",
+  "ResourceGroup": "container",
+  "Description": "不要であれば、ノードネットワーク外部から Kubernetes API へのアクセスを無効化します。",
+  "Risk": "プライベート クラスターでは、マスターノードにプライベート エンドポイントとパブリック エンドポイントの 2 つがあります。プライベート エンドポイントは、マスターの仮想ネットワーク内の内部ロードバランサーの背後にあるマスターノードの内部 IP アドレスです。ノードはプライベート エンドポイントを使用してマスターと通信します。パブリック エンドポイントにより、マスターの仮想ネットワーク外部から Kubernetes API にアクセスできます。Kubernetes API では機密操作の実行に認可トークンが必要ですが、脆弱性によって Kubernetes が公開され、無制限アクセスにつながる可能性があります。さらに、攻撃者は現在のクラスターおよび Kubernetes API のバージョンを特定し、攻撃に対して脆弱かどうかを判断できる可能性があります。必要がない限りパブリック エンドポイントを無効化することで、このような脅威の防止に役立ち、Kubernetes API への攻撃を行うには攻撃者がマスターの仮想ネットワーク内にいる必要があります。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/aks/private-clusters?tabs=azure-portal",
+  "Remediation": {
+    "Code": {
+      "CLI": "az aks update -n <cluster_name> -g <resource_group> --disable-public-fqdn",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "プライベート エンドポイントを使用するには、仮想ネットワークに新しいプライベート エンドポイントを作成し、仮想ネットワークと新しいプライベート DNS ゾーンの間にリンクを作成してください",
+      "Url": "https://learn.microsoft.com/en-us/azure/aks/access-private-cluster?tabs=azure-cli"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

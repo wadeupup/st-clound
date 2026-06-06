@@ -1,0 +1,35 @@
+{
+  "Provider": "aws",
+  "CheckID": "iam_securityaudit_role_created",
+  "CheckTitle": "确保已创建安全审核角色以进行安全审核",
+  "CheckType": [
+    "软件和配置检查",
+    "行业和监管标准",
+    "CIS AWS 基础基准"
+  ],
+  "ServiceName": "iam",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "low",
+  "ResourceType": "AwsIamRole",
+  "ResourceGroup": "IAM",
+  "Description": "确保已创建安全审核角色以进行安全审核",
+  "Risk": "创建具有安全审核策略的IAM角色可以在安全团队和组织内的其他团队之间提供明确的职责分离。这有助于确保安全相关活动由具有适当专业知识和访问权限的授权人员执行。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "创建一个IAM角色以使用AWS进行安全审核。",
+      "Url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_job-functions.html#jf_security-auditor"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

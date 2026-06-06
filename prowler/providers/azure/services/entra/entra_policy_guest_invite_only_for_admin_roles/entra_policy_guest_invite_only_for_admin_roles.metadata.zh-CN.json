@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "entra_policy_guest_invite_only_for_admin_roles",
+  "CheckTitle": "确保“来宾邀请限制”设置为“仅分配到特定管理员角色的用户可邀请来宾用户”",
+  "CheckType": [],
+  "ServiceName": "entra",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "#microsoft.graph.authorizationPolicy",
+  "ResourceGroup": "IAM",
+  "Description": "仅允许具有特定管理角色的用户发出邀请。",
+  "Risk": "将邀请权限限制为特定管理员角色用户，可确保只有授权账户可访问云资源。这有助于维持“按需知悉”权限并防止对数据的无意访问。默认情况下，“Guest invite restrictions”设置为“组织内任何人都可邀请来宾用户，包括来宾和非管理员”。这会允许组织内任何人将来宾和非管理员邀请到租户中，带来安全风险。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/entra/external-id/external-collaboration-settings-configure",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "1. 在 Azure Home 中选择 Portal Menu 2. 选择 Microsoft Entra ID 3. 然后选择 External Identities 4. 选择 External collaboration settings 5. 在 Guest invite settings 下的 Guest invite restrictions 中，确保选择“Only users assigned to specific admin roles can invite guest users”",
+      "Url": "https://learn.microsoft.com/en-us/answers/questions/685101/how-to-allow-only-admins-to-add-guests"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "当选择“Only users assigned to specific admin roles can invite guest users”后，具备特定管理员角色的用户将负责向外部用户发送邀请，这会增加其账户管理开销。这也意味着在新用户入职时需要与其他部门进行协同。"
+}

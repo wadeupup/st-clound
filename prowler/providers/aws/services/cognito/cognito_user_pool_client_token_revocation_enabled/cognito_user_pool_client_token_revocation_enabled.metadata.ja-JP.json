@@ -1,0 +1,32 @@
+{
+  "Provider": "aws",
+  "CheckID": "cognito_user_pool_client_token_revocation_enabled",
+  "CheckTitle": "Amazon Cognito ユーザープールでトークン取り消しが有効になっていることを確認する",
+  "CheckType": [],
+  "ServiceName": "cognito",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:aws:cognito-idp:region:account:userpool/userpool-id",
+  "Severity": "medium",
+  "ResourceType": "AwsCognitoUserPoolClient",
+  "ResourceGroup": "IAM",
+  "Description": "トークン取り消しは、ユーザーのトークンを取り消し、セッションを終了できるセキュリティ機能です。トークン取り消しを有効にすると、Amazon Cognito はサインアウトまたは削除されたユーザーのトークンを自動的に取り消します。これにより、ユーザーのデータを保護し、リソースへの不正アクセスを防ぐのに役立ちます。",
+  "Risk": "トークン取り消しが有効になっていない場合、ユーザーがサインアウトまたは削除されても、ユーザーのトークンは取り消されません。これにより、リソースへの不正アクセスが発生する可能性があります。",
+  "RelatedUrl": "https://docs.aws.amazon.com/cognito/latest/developerguide/token-revocation.html",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "Amazon Cognito ユーザープールでトークン取り消しを有効にするには、Amazon Cognito コンソールまたは AWS CLI を使用します。詳細については、Amazon Cognito のドキュメントを参照してください。",
+      "Url": "https://docs.aws.amazon.com/cognito/latest/developerguide/token-revocation.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

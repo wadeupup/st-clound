@@ -1,0 +1,45 @@
+{
+  "Provider": "aws",
+  "CheckID": "elb_insecure_ssl_ciphers",
+  "CheckTitle": "Elastic Load Balancer 的 HTTPS 监听器（如存在）使用 ELBSecurityPolicy-TLS-1-2-2017-01 策略",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/CIS AWS Foundations Benchmark",
+    "Software and Configuration Checks/Industry and Regulatory Standards/PCI-DSS",
+    "Software and Configuration Checks/Industry and Regulatory Standards/NIST 800-53 Controls (USA)"
+  ],
+  "ServiceName": "elb",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsElbLoadBalancer",
+  "ResourceGroup": "network",
+  "Description": "评估 Elastic Load Balancer 的 HTTPS 监听器是否使用**强 TLS 策略**。关联 `ELBSecurityPolicy-TLS-1-2-2017-01` 的监听器被视为仅协商现代协议与密码套件，避免使用旧版 SSL/TLS 及弱套件。",
+  "Risk": "旧版 TLS 或弱密码套件会导致降级攻击、中间人解密或篡改。攻击者可窃取凭证、注入响应并横向移动，破坏传输中数据的**机密性**与**完整性**，并因握手失败而影响**可用性**。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/ELB/elb-security-policy.html",
+    "https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html#describe-ssl-policies",
+    "https://docs.aws.amazon.com/elasticloadbalancing/latest/classic/ssl-config-update.html",
+    "https://docs.aws.amazon.com/elasticloadbalancing/latest/classic/elb-security-policy-table.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws elb set-load-balancer-policies-of-listener --load-balancer-name <lb_name> --load-balancer-port 443 --policy-names ELBSecurityPolicy-TLS-1-2-2017-01",
+      "NativeIaC": "```yaml\n# CloudFormation: Classic ELB with TLS 1.2-only security policy on HTTPS listener\nResources:\n  <example_resource_name>:\n    Type: AWS::ElasticLoadBalancing::LoadBalancer\n    Properties:\n      AvailabilityZones:\n        - <example_az>\n      Listeners:\n        - LoadBalancerPort: 443\n          InstancePort: 443\n          Protocol: HTTPS\n          InstanceProtocol: HTTPS\n          SSLCertificateId: <example_certificate_arn>\n          PolicyNames:\n            - ELBSecurityPolicy-TLS-1-2-2017-01  # Critical: attach TLS 1.2-only policy to the HTTPS listener\n      Policies:\n        - PolicyName: ELBSecurityPolicy-TLS-1-2-2017-01  # Critical: create policy referencing the predefined TLS 1.2 policy\n          PolicyType: SSLNegotiationPolicyType\n          Attributes:\n            - Name: Reference-Security-Policy\n              Value: ELBSecurityPolicy-TLS-1-2-2017-01  # Critical: enforce TLS 1.2-only\n```",
+      "Other": "1. 打开 AWS 管理控制台并进入 EC2\n2. 在左侧菜单 Load Balancing 下点击 Load Balancers\n3. 选择你的 Classic Load Balancer\n4. 在 Listeners 标签页点击 Manage listeners（或 Edit）\n5. 选择 HTTPS（443）监听器，并在 Security policy 中选择 ELBSecurityPolicy-TLS-1-2-2017-01\n6. 点击 Save changes",
+      "Terraform": "```hcl\n# Create and attach TLS 1.2-only policy to a Classic ELB HTTPS listener\nresource \"aws_load_balancer_policy\" \"<example_resource_name>\" {\n  load_balancer_name = \"<example_resource_name>\"\n  policy_name        = \"ELBSecurityPolicy-TLS-1-2-2017-01\"  # Critical: policy named as required by the check\n  policy_type_name   = \"SSLNegotiationPolicyType\"\n\n  policy_attributes {\n    name  = \"Reference-Security-Policy\"\n    value = \"ELBSecurityPolicy-TLS-1-2-2017-01\"  # Critical: reference the predefined TLS 1.2 policy\n  }\n}\n\nresource \"aws_load_balancer_listener_policy\" \"<example_resource_name>\" {\n  load_balancer_name = \"<example_resource_name>\"\n  load_balancer_port = 443\n  policy_names       = [aws_load_balancer_policy.<example_resource_name>.policy_name]  # Critical: attach policy to HTTPS listener\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "统一采用强制 **TLS 1.2+** 与现代 AEAD 密码套件的 ELB 策略；禁用旧协议和弱套件。启用服务器密码优先级，淘汰过时策略，并定期审查以保持密码敏捷性。验证客户端兼容性，使用强证书，并监控协商结果。",
+      "Url": "https://hub.prowler.com/check/elb_insecure_ssl_ciphers"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

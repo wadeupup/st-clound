@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "network_udp_internet_access_restricted",
+  "CheckTitle": "インターネットからの UDP アクセスが評価され、制限されていることを確認する",
+  "CheckType": [],
+  "ServiceName": "network",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Network",
+  "ResourceGroup": "network",
+  "Description": "ネットワーク セキュリティ グループは、ポート設定ミスがないか定期的に評価する必要があります。特定のポートやプロトコルがインターネットに公開され得る場合、必要性を評価し、明確に必要でない場合は制限すべきです。",
+  "Risk": "インターネットに UDP サービスを広範に公開する潜在的なセキュリティ問題は、攻撃者が DDoS 増幅手法を用いて Azure Virtual Machines から偽装 UDP トラフィックを反射できることです。これらの攻撃では、公開された DNS、NTP、SSDP、SNMP、CLDAP などの UDP ベース サービスが増幅源として悪用され、Azure Virtual Network 内の他マシンのサービス妨害や、Azure 外部のネットワーク接続デバイスへの攻撃につながる可能性があります。",
+  "RelatedUrl": "https://docs.microsoft.com/en-us/azure/security/fundamentals/network-best-practices#secure-your-critical-azure-service-resources-to-only-your-virtual-networks",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity-staging/knowledge-base/azure/Network/unrestricted-udp-access.html#",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-networking-policies/ensure-that-udp-services-are-restricted-from-the-internet#terraform"
+    },
+    "Recommendation": {
+      "Text": "ネットワーク セキュリティ グループに接続されたリソースで、UDP が明確に必要かつ最小限に構成されていない場合、Azure リソースへのインターネット レベルのアクセスは制限または排除すべきです。関連リソースへの内部アクセスには、次のような暗号化ネットワーク トンネルを構成します: ExpressRoute、Site-to-site VPN、Point-to-site VPN。",
+      "Url": "https://docs.microsoft.com/en-us/azure/security/fundamentals/ddos-best-practices"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

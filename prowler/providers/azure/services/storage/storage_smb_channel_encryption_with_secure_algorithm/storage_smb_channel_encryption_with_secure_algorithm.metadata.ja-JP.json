@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "storage_smb_channel_encryption_with_secure_algorithm",
+  "CheckTitle": "SMB ファイル共有で SMB チャネル暗号化に安全なアルゴリズムが使用されていることを確認する",
+  "CheckType": [],
+  "ServiceName": "storage",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "/subscriptions/{subscription_id}/resourceGroups/{resource_group}/providers/Microsoft.Storage/storageAccounts/{storageAccountName}/fileServices/default",
+  "Severity": "medium",
+  "ResourceType": "AzureStorageAccount",
+  "ResourceGroup": "storage",
+  "Description": "転送中データの機密性と完全性を確保するため、SMB ファイル共有に対して安全なアルゴリズムによる SMB チャネル暗号化を実装します。",
+  "Risk": "推奨される SMB チャネル暗号化を使用しない場合、SMB チャネルで送信されるデータが不正な傍受や改ざんにさらされる可能性があります。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/well-architected/service-guides/azure-files#recommendations-for-smb-file-shares",
+  "Remediation": {
+    "Code": {
+      "CLI": "az storage account file-service-properties update --resource-group <resource-group> --account-name <storage-account> --channel-encryption AES-256-GCM",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "ポータル、CLI、または PowerShell を使用して SMB チャネル暗号化を安全なアルゴリズムに設定します。",
+      "Url": "https://learn.microsoft.com/en-us/azure/storage/files/files-smb-protocol?tabs=azure-portal#smb-security-settings"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "SMB チャネル暗号化が安全なアルゴリズムに設定されている場合、このチェックは PASS となります。"
+}

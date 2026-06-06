@@ -1,0 +1,35 @@
+{
+  "Provider": "aws",
+  "CheckID": "iam_support_role_created",
+  "CheckTitle": "确保已创建支持角色以管理与 AWS Support 的事件",
+  "CheckType": [
+    "软件和配置检查",
+    "行业和监管标准",
+    "CIS AWS 基础基准"
+  ],
+  "ServiceName": "iam",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "medium",
+  "ResourceType": "AwsIamRole",
+  "ResourceGroup": "IAM",
+  "Description": "确保已创建支持角色以管理与 AWS Support 的事件",
+  "Risk": "AWS 提供了一个支持中心，可用于事件通知和响应，以及技术支持和客户服务。创建一个 IAM 角色以允许授权用户管理与 AWS Support 的事件。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "创建一个 IAM 角色以管理与 AWS 的事件。",
+      "Url": "https://docs.aws.amazon.com/awssupport/latest/user/using-service-linked-roles-sup.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "CAF 安全史诗：IAM"
+}

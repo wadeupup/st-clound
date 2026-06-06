@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "workspaces_volume_encryption_enabled",
+  "CheckTitle": "Amazon WorkSpaces のルートボリュームおよびユーザーボリュームは暗号化されています。",
+  "CheckType": [
+    "ソフトウェアおよび設定チェック / AWS セキュリティベストプラクティス",
+    "ソフトウェアおよび設定チェック / 業界および規制標準 / AWS 基盤セキュリティベストプラクティス",
+    "影響 / データ露出"
+  ],
+  "ServiceName": "workspaces",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsEc2Volume",
+  "ResourceGroup": "compute",
+  "Description": "**Amazon WorkSpaces** は、各ワークスペースの EBS ボリュームに対する **保存時暗号化（encryption at rest）** を評価します。   **ルートボリューム** および **ユーザーボリューム** が KMS キーで暗号化されているかを確認し、いずれかのボリュームが暗号化されていないワークスペースを特定します。",
+  "Risk": "暗号化されていないボリュームでは、スナップショットまたは基盤ストレージを通じて、ファイル、キャッシュされた認証情報、プロファイルデータへオフラインアクセスが可能となり、**機密性（confidentiality）** が損なわれます。   また、ストレージレベルでのアクセスによりデータ改ざんが可能となり、**完全性（integrity）** に影響を与えるほか、トークンの再利用による横展開（lateral movement）を助長する可能性があります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/workspaces/latest/adminguide/encrypt-workspaces.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/WorkSpaces/storage-encryption.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation: ルートボリュームとユーザーボリュームの両方を暗号化した WorkSpace を作成\nResources:\n  ExampleWorkspace:\n    Type: AWS::WorkSpaces::Workspace\n    Properties:\n      BundleId: <example_bundle_id>\n      DirectoryId: <example_directory_id>\n      UserName: <example_user_name>\n      RootVolumeEncryptionEnabled: true  # Critical: チェックを通過するためにルートボリュームを暗号化\n      UserVolumeEncryptionEnabled: true  # Critical: チェックを通過するためにユーザーボリュームを暗号化\n```",
+      "Other": "1. AWS コンソールで WorkSpaces > WorkSpaces に移動し、［Launch WorkSpaces］をクリックします\n2. ディレクトリとユーザーを選択し、WorkSpaces Configuration ステップへ進みます\n3. ［Encryption］で［Root volume］および［User volume］を有効化します\n4. デフォルトの AWS マネージドキー（aws/workspaces）を使用するか、必要に応じて CMK を選択します\n5. WorkSpace を起動し、その後ユーザーを移行して暗号化されていない WorkSpace を終了します\n6. ［Volume Encryption］列で両方のボリュームが Enabled と表示されていることを確認します",
+      "Terraform": "```hcl\n# Terraform: ルートボリュームとユーザーボリュームの両方を暗号化した WorkSpace を作成\nresource \"aws_workspaces_workspace\" \"example\" {\n  bundle_id    = \"<example_bundle_id>\"\n  directory_id = \"<example_directory_id>\"\n  user_name    = \"<example_user_name>\"\n\n  root_volume_encryption_enabled = true  # Critical: ルートボリュームを暗号化\n  user_volume_encryption_enabled = true  # Critical: ユーザーボリュームを暗号化\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "すべての WorkSpaces において、**ルートボリューム** および **ユーザーボリューム** の両方で KMS ベースの暗号化を有効化します。   可能であれば **カスタマー管理キー（customer-managed keys）** を使用し、キーの利用には **最小権限（least privilege）** を適用し、ローテーションを有効化してください。   暗号化設定をプロビジョニングテンプレートおよびポリシーに組み込み、暗号化されていない WorkSpace の起動を防止します。   *再構築および復元に必要なキーは有効な状態で維持してください。*",
+      "Url": "https://hub.prowler.com/check/workspaces_volume_encryption_enabled"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

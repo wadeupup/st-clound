@@ -1,0 +1,32 @@
+{
+  "Provider": "azure",
+  "CheckID": "app_function_ftps_deployment_disabled",
+  "CheckTitle": "确保已为 Azure Functions 禁用 FTP 和 FTPS 部署，以防止未授权访问和数据泄露。",
+  "CheckType": [],
+  "ServiceName": "app",
+  "SubServiceName": "function",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Microsoft.Web/sites",
+  "ResourceGroup": "serverless",
+  "Description": "Azure FTP 部署端点是未加密且公开的，因此容易受到攻击。禁用 FTP 和 FTPS 部署可通过防止登录凭据和敏感代码库被未授权访问来增强安全性。",
+  "Risk": "如果保持启用，攻击者可能拦截网络流量并获得对应用或服务的完全控制，进而导致潜在数据泄露和未授权修改。",
+  "RelatedUrl": "https://docs.microsoft.com/en-us/azure/app-service/deploy-ftp",
+  "Remediation": {
+    "Code": {
+      "CLI": "az webapp config set --resource-group <resource-group> --name <app-name> --ftps-state Disabled",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": "",
+      "Arm": ""
+    },
+    "Recommendation": {
+      "Text": "建议为 Azure Functions 禁用 FTP 和 FTPS 部署以降低安全风险。可改用更安全的部署方式，例如 Docker 容器，或启用 GitHub Actions 持续部署。",
+      "Url": "https://learn.microsoft.com/en-us/azure/azure-functions/functions-deployment-technologies?tabs=windows#trigger-syncing"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "此检查可确保 Azure Functions 以更安全方式部署，从而减少攻击面并保护敏感信息。"
+}

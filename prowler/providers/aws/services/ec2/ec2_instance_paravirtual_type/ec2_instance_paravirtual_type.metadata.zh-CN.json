@@ -1,0 +1,32 @@
+{
+  "Provider": "aws",
+  "CheckID": "ec2_instance_paravirtual_type",
+  "CheckTitle": "不应使用 Amazon EC2 半虚拟化类型",
+  "CheckType": [],
+  "ServiceName": "ec2",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "medium",
+  "ResourceType": "AwsEc2Instance",
+  "ResourceGroup": "compute",
+  "Description": "确保 EC2 实例的虚拟化类型不是半虚拟化。如果 EC2 实例的 virtualizationType 设置为 paravirtual，则控制失败。",
+  "Risk": "使用半虚拟化实例可能会限制硬件虚拟机 (HVM) 实例提供的性能和安全性优势，例如改进的 CPU、网络和存储效率。",
+  "RelatedUrl": "https://docs.aws.amazon.com/config/latest/developerguide/ec2-paravirtual-instance-check.html",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://docs.aws.amazon.com/securityhub/latest/userguide/ec2-controls.html#ec2-24",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "要将 EC2 实例更新为新的实例类型，请参阅 Amazon EC2 用户指南中的更改实例类型。",
+      "Url": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-resize.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

@@ -1,0 +1,46 @@
+{
+  "Provider": "aws",
+  "CheckID": "eventbridge_global_endpoint_event_replication_enabled",
+  "CheckTitle": "EventBridge グローバルエンドポイントでイベントレプリケーションが有効化されていること",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices"
+  ],
+  "ServiceName": "eventbridge",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsEventsEndpoint",
+  "ResourceGroup": "messaging",
+  "Description": "**EventBridge グローバルエンドポイント**で **イベントレプリケーション** が `ENABLED`（`DISABLED` ではない）に設定され、カスタムイベントがプライマリとセカンダリの両リージョンへ複製されることを確認します。",
+  "Risk": "**イベントレプリケーションなし** は **可用性** を低下させ、リージョン障害時の **RPO** を悪化させます。\n- プライマリリージョン障害時にイベント喪失または遅延が発生\n- プライマリへの自動復旧が行われずフェイルオーバーが長期化する可能性\n- リージョン間不整合がデータ完全性に影響",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/eventbridge-controls.html#eventbridge-4",
+    "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-global-endpoints.html",
+    "https://docs.aws.amazon.com/eventbridge/latest/APIReference/API_Endpoint.html",
+    "https://docs.aws.amazon.com/config/latest/developerguide/global-endpoint-event-replication-enabled.html",
+    "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-ge-create-endpoint.html",
+    "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-ge-best-practices.html",
+    "https://docs.aws.amazon.com/eventbridge/latest/APIReference/API_CreateEndpoint.html",
+    "https://aws.amazon.com/blogs/compute/introducing-global-endpoints-for-amazon-eventbridge/"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws events update-endpoint --name <endpoint-name> --replication-config State=ENABLED --role-arn <role-arn>",
+      "NativeIaC": "```yaml\n# CloudFormation: Enable event replication on an EventBridge global endpoint\nResources:\n  Endpoint:\n    Type: AWS::Events::Endpoint\n    Properties:\n      Name: <example_resource_name>\n      EventBuses:\n        - EventBusArn: arn:aws:events:us-east-1:<example_resource_id>:event-bus/<example_resource_name>\n        - EventBusArn: arn:aws:events:us-west-2:<example_resource_id>:event-bus/<example_resource_name>\n      RoutingConfig:\n        FailoverConfig:\n          Primary:\n            HealthCheck: arn:aws:route53:::healthcheck/<example_resource_id>\n          Secondary:\n            Route: us-west-2\n      ReplicationConfig:\n        State: ENABLED  # Critical: enables event replication\n      RoleArn: arn:aws:iam::<example_resource_id>:role/<example_resource_name>  # Critical: role used by replication\n```",
+      "Other": "1. AWS コンソールで Amazon EventBridge を開き、Global endpoints に移動します\n2. 対象エンドポイントを選択し Edit をクリックします\n3. Event replication で Event replication enabled を有効化します\n4. Execution role に既存ロールを選択するか新規作成します\n5. 変更を保存します",
+      "Terraform": "```hcl\n# Terraform (awscc): Enable event replication on an EventBridge global endpoint\nresource \"awscc_events_endpoint\" \"example\" {\n  name = \"<example_resource_name>\"\n\n  event_buses = [\n    { event_bus_arn = \"arn:aws:events:us-east-1:<example_resource_id>:event-bus/<example_resource_name>\" },\n    { event_bus_arn = \"arn:aws:events:us-west-2:<example_resource_id>:event-bus/<example_resource_name>\" }\n  ]\n\n  routing_config = {\n    failover_config = {\n      primary   = { health_check = \"arn:aws:route53:::healthcheck/<example_resource_id>\" }\n      secondary = { route        = \"us-west-2\" }\n    }\n  }\n\n  replication_config = { state = \"ENABLED\" }  # Critical: enables event replication\n  role_arn           = \"arn:aws:iam::<example_resource_id>:role/<example_resource_name>\"  # Critical: role used by replication\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "リージョン耐障害性を確保するため、グローバルエンドポイントで **イベントレプリケーション** を有効化してください。イベントバス、ルール、ターゲットはリージョン間で整合を維持します。レプリケーションには **最小権限** の専用 IAM ロールを使用し、コンシューマーは一意 ID による **冪等性** を前提に設計します。**多層防御** の一環として、定期的なフェイルオーバーテストとヘルス監視を実施してください。",
+      "Url": "https://hub.prowler.com/check/eventbridge_global_endpoint_event_replication_enabled"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

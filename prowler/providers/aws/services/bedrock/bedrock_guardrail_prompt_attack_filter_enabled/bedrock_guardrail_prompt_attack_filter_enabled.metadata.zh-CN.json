@@ -1,0 +1,34 @@
+{
+  "Provider": "aws",
+  "CheckID": "bedrock_guardrail_prompt_attack_filter_enabled",
+  "CheckTitle": "为 Amazon Bedrock 防护栏配置最高强度的提示攻击过滤器",
+  "CheckType": [],
+  "ServiceName": "bedrock",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:bedrock:region:account-id:guardrails/resource-id",
+  "Severity": "high",
+  "ResourceType": "Other",
+  "ResourceGroup": "ai_ml",
+  "Description": "确保 Amazon Bedrock 防护栏的提示攻击过滤器强度设置为 HIGH，以减轻提示注入和绕过技术。",
+  "Risk": "如果提示攻击过滤器强度未设置为 HIGH，Bedrock 模型可能更容易受到提示注入攻击或越狱尝试的影响，这可能允许有害或敏感内容绕过过滤器并到达最终用户。",
+  "RelatedUrl": "https://docs.aws.amazon.com/bedrock/latest/userguide/guardrails.html",
+  "Remediation": {
+    "Code": {
+      "CLI": "aws bedrock put-guardrails-configuration --guardrails-config 'promptAttackStrength=HIGH'",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/Bedrock/prompt-attack-strength.html",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "将 Amazon Bedrock 防护栏的提示攻击过滤器强度设置为 HIGH，以防止提示注入攻击并确保对内容操作的强大保护。",
+      "Url": "https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-injection.html"
+    }
+  },
+  "Categories": [
+    "gen-ai"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "确保将提示攻击保护设置为最高强度，以最大程度降低提示注入攻击的风险。"
+}
+

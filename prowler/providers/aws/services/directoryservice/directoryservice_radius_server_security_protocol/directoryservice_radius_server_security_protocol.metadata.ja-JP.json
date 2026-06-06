@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "directoryservice_radius_server_security_protocol",
+  "CheckTitle": "Directory Service ディレクトリ RADIUS サーバーが MS-CHAPv2 を使用している",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "TTPs/Credential Access"
+  ],
+  "ServiceName": "directoryservice",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "IAM",
+  "Description": "AWS Directory Service RADIUS 設定は、MFA 統合用に定義された**認証プロトコル**を使用します。この検出結果は、RADIUS が有効なディレクトリが `PAP`、`CHAP`、または `MS-CHAPv1` などの弱いオプションではなく、`MS-CHAPv2` に設定されているかどうかを評価します。",
+  "Risk": "`PAP`、`CHAP`、または `MS-CHAPv1` を使用すると、RADIUS ベースの MFA が弱くなります。\n\n`PAP` は平文の資格情報を公開し、レガシー CHAP バリアントはオフラインクラッキングとリプレイを許可し、AD 統合サービスへの不正アクセスと横方向の移動を可能にし、機密性と整合性を低下させます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.secureauth.com/0903/en/ms-chapv2-and-radius--sp-initiated--for-cisco-and-netscaler-configuration-guide.html",
+    "https://docs.aws.amazon.com/directoryservice/latest/admin-guide/ms_ad_mfa.html",
+    "https://www.freeradius.org/documentation/freeradius-server/4.0~alpha1/raddb/mods-available/mschap.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws ds update-radius --directory-id <example_resource_id> --radius-settings AuthenticationProtocol=MS-CHAPv2",
+      "NativeIaC": "",
+      "Other": "1. AWS コンソールで、Directory Service を開き、ディレクトリを選択します\n2. Networking & security タブ（Multi-factor authentication セクション）を開きます\n3. Actions > Edit（または Enable）をクリックします\n4. Protocol を MS-CHAPv2 に設定します\n5. Save（または Enable）をクリックして適用します",
+      "Terraform": "```hcl\nresource \"aws_directory_service_radius_settings\" \"<example_resource_name>\" {\n  directory_id  = \"<example_resource_id>\"\n  radius_servers = [\"<RADIUS_SERVER_IP>\"]\n  shared_secret  = \"<SHARED_SECRET>\"\n\n  authentication_protocol = \"MS-CHAPv2\" # 重要：RADIUS 認証プロトコルを MS-CHAPv2 に設定してチェックをパスします\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "MFA プロバイダーへの RADIUS 認証を `MS-CHAPv2` に標準化します。`PAP`、`CHAP`、`MS-CHAPv1` を無効にして、ダウングレードを防ぎます。最小権限と多層防御を適用します：強力な共有シークレットを使用し、RADIUS エンドポイントへのネットワークアクセスを制限し、認証ログの異常を監視します。",
+      "Url": "https://hub.prowler.com/check/directoryservice_radius_server_security_protocol"
+    }
+  },
+  "Categories": [
+    "identity-access"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

@@ -1,0 +1,32 @@
+{
+  "Provider": "aws",
+  "CheckID": "cognito_user_pool_blocks_potential_malicious_sign_in_attempts",
+  "CheckTitle": "Amazon Cognito ユーザープールが潜在的な悪意のあるサインイン試行をブロックしていることを確認する",
+  "CheckType": [],
+  "ServiceName": "cognito",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:aws:cognito-idp:region:account:userpool/userpool-id",
+  "Severity": "medium",
+  "ResourceType": "AwsCognitoUserPool",
+  "ResourceGroup": "IAM",
+  "Description": "Amazon Cognito は適応認証を提供し、各ユーザーログインに関連するリスクを評価し、そのリスクを軽減するための適切なレベルのセキュリティを提供することで、アプリケーションを悪意のある行為者や侵害された認証情報から保護するのに役立ちます。適応認証は、ユーザープールで有効にできる高度なセキュリティの機能です。適応認証が有効になっている場合、Amazon Cognito は各ユーザーログインに関連するリスクを評価し、そのリスクを軽減するための適切なレベルのセキュリティを提供します。適応認証を設定して、悪意のある可能性のあるサインイン試行をブロックできます。",
+  "Risk": "自動リスク応答をサインインブロックとして設定した適応認証が有効になっていない場合、ユーザープールは悪意のある可能性のあるサインイン試行をブロックできない可能性があります。",
+  "RelatedUrl": "https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pool-settings-advanced-security.html",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "自動リスク応答をサインインブロックとして設定した適応認証を有効にするには、以下のアクションを実行してください：",
+      "Url": "https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pool-settings-advanced-security.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

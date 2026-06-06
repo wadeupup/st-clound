@@ -1,0 +1,40 @@
+{
+  "Provider": "aws",
+  "CheckID": "opensearch_service_domains_fault_tolerant_data_nodes",
+  "CheckTitle": "OpenSearch ドメインには少なくとも 3 つのデータノードがあり、ゾーンアウェアネスが有効になっています",
+  "CheckType": [
+    "ソフトウェアと構成のチェック/AWS セキュリティベストプラクティス",
+    "影響/サービス拒否"
+  ],
+  "ServiceName": "opensearch",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsOpenSearchServiceDomain",
+  "ResourceGroup": "database",
+  "Description": "**Amazon OpenSearch ドメイン**はフォールトトレランスのために評価されます: **>= 3 データノード** (`instance_count >= 3`) および **ゾーンアウェアネス** (`zone_awareness_enabled = true`) により、データをアベイラビリティゾーンに分散します。",
+  "Risk": "**データノードが不十分**または**ゾーンアウェアネスが無効**の場合、可用性と耐久性が低下します。ノードまたは AZ の障害は、シャードの利用不可、書き込み失敗、またはクラスターの停止を引き起こし、リバランス中のデータ不整合のリスクを高め、回復まで読み取り/書き込みをブロックします。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/opensearch-service/latest/developerguide/managedomains-multiaz.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/es-controls.html#es-6"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws opensearch update-domain-config --domain-name <example_resource_name> --cluster-config InstanceCount=3,ZoneAwarenessEnabled=true",
+      "NativeIaC": "```yaml\n# CloudFormation: 少なくとも 3 つのデータノードを確保し、ゾーンアウェアネスを有効にします\nResources:\n  <example_resource_name>:\n    Type: AWS::OpenSearchService::Domain\n    Properties:\n      DomainName: <example_resource_name>\n      ClusterConfig:\n        InstanceType: m5.large.search\n        InstanceCount: 3            # 重要: フォールトトレランスのために少なくとも 3 つのデータノードを設定します\n        ZoneAwarenessEnabled: true  # 重要: クロス AZ (ゾーンアウェアネス) を有効にします\n```",
+      "Other": "1. AWS コンソールを開き、Amazon OpenSearch Service に移動します\n2. ドメインを選択し、「Edit domain」をクリックします\n3. クラスター構成の下で:\n   - データノードの数を 3 (またはそれ以上) に設定します\n   - ゾーンアウェアネスを有効にします\n4. 「Submit」をクリックして変更を適用します",
+      "Terraform": "```hcl\n# Terraform: 少なくとも 3 つのデータノードを確保し、ゾーンアウェアネスを有効にします\nresource \"aws_opensearch_domain\" \"<example_resource_name>\" {\n  domain_name = \"<example_resource_name>\"\n\n  cluster_config {\n    instance_type          = \"m5.large.search\"\n    instance_count         = 3     # 重要: フォールトトレランスのために少なくとも 3 つのデータノードを設定します\n    zone_awareness_enabled = true  # 重要: クロス AZ (ゾーンアウェアネス) を有効にします\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "OpenSearch を **>= 3 データノード**で構成し、**ゾーンアウェアネス**を有効にしてノードを AZ に分散させます。\n\n- レジリエントなフェイルオーバーのためにスタンバイ付きのマルチ AZ を推奨\n- ノード数を 3 の倍数にし、インデックスレプリカを設定 (`>= 1`)\n- **多層防御**としてキャパシティプランニングと障害テストを実施",
+      "Url": "https://hub.prowler.com/check/opensearch_service_domains_fault_tolerant_data_nodes"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

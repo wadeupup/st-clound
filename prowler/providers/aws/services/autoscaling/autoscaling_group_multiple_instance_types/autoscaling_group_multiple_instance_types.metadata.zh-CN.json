@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "autoscaling_group_multiple_instance_types",
+  "CheckTitle": "Auto Scaling 组跨越多个可用区，并且每个可用区有多个实例类型",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践",
+    "影响/拒绝服务"
+  ],
+  "ServiceName": "autoscaling",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsAutoScalingAutoScalingGroup",
+  "ResourceGroup": "compute",
+  "Description": "**EC2 Auto Scaling 组**会评估是否在每个**可用区**中使用**多个实例类型**并跨越多个 AZ。\n\n当每个 AZ 定义至少两个实例类型时，组会被识别；任何 AZ 使用单个或无类型，或仅限于一个 AZ 的组会被标记。",
+  "Risk": "每个 AZ 仅限于一个实例类型或单个 AZ，在**容量短缺**期间扩展可能会停滞，阻碍**故障转移**并降低**可用性**（超时、积压增长）。如果只有昂贵的容量可用，成本可能会激增。多样性的减少增加了在区域或市场中断期间长时间中断的可能性。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/AutoScaling/asg-multiple-instance-type-az.html",
+    "https://docs.aws.amazon.com/autoscaling/ec2/userguide/ec2-auto-scaling-mixed-instances-groups.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/autoscaling-controls.html#autoscaling-6"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws autoscaling update-auto-scaling-group --auto-scaling-group-name <example_resource_name> --mixed-instances-policy '{\"LaunchTemplate\":{\"LaunchTemplateSpecification\":{\"LaunchTemplateName\":\"<example_resource_name>\",\"Version\":\"$Latest\"},\"Overrides\":[{\"InstanceType\":\"<INSTANCE_TYPE_1>\"},{\"InstanceType\":\"<INSTANCE_TYPE_2>\"}]}}' --vpc-zone-identifier \"<subnet_id_1>,<subnet_id_2>\"",
+      "NativeIaC": "```yaml\n# CloudFormation: 确保 ASG 在多个 AZ 中使用多个实例类型\nResources:\n  <example_resource_name>:\n    Type: AWS::AutoScaling::AutoScalingGroup\n    Properties:\n      MinSize: \"1\"\n      MaxSize: \"1\"\n      VPCZoneIdentifier:\n        - <subnet_id_1>  # 关键：在不同 AZ 中使用子网以跨越多个 AZ\n        - <subnet_id_2>  # 关键：确保至少两个可用区\n      MixedInstancesPolicy:\n        LaunchTemplate:\n          LaunchTemplateSpecification:\n            LaunchTemplateName: <example_resource_name>\n            Version: $Latest\n          Overrides:\n            - InstanceType: <INSTANCE_TYPE_1>  # 关键：每个 AZ 多个实例类型\n            - InstanceType: <INSTANCE_TYPE_2>  # 关键：每个 AZ 多个实例类型\n```",
+      "Other": "1. 在 AWS 控制台中，转到 EC2 > Auto Scaling Groups 并选择 <example_resource_name>\n2. 单击 Edit\n3. 在 Network 下，在不同可用区中添加至少两个子网\n4. 在 Launch options 下，选择 Mixed instance types\n5. 选择您的 Launch template 并将 Version 设置为 $Latest\n6. 在 Overrides 中添加至少两个 Instance types\n7. 单击 Update 保存",
+      "Terraform": "```hcl\n# Terraform: 确保 ASG 在多个 AZ 中使用多个实例类型\nresource \"aws_autoscaling_group\" \"<example_resource_name>\" {\n  name               = \"<example_resource_name>\"\n  min_size           = 1\n  max_size           = 1\n  vpc_zone_identifier = [\"<subnet_id_1>\", \"<subnet_id_2>\"] # 关键：不同 AZ 中的子网\n\n  mixed_instances_policy {\n    launch_template {\n      launch_template_specification {\n        launch_template_name = \"<example_resource_name>\"\n        version              = \"$Latest\"\n      }\n      override { instance_type = \"<INSTANCE_TYPE_1>\" } # 关键：每个 AZ 多个实例类型\n      override { instance_type = \"<INSTANCE_TYPE_2>\" } # 关键：每个 AZ 多个实例类型\n    }\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "采用**混合实例**策略以提高弹性：\n- 每个 AZ 使用不同的实例系列和大小\n- 将容量分布在多个 AZ 中\n- 优先采用能够容忍 Spot/按需稀缺性的分配方法\n应用**冗余**和**容错**原则，并验证扩展策略以避免容量故障的单点。",
+      "Url": "https://hub.prowler.com/check/autoscaling_group_multiple_instance_types"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

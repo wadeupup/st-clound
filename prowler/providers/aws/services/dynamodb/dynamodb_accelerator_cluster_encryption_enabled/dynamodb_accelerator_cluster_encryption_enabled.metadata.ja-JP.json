@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "dynamodb_accelerator_cluster_encryption_enabled",
+  "CheckTitle": "DynamoDB DAX クラスターで保存時暗号化が有効になっているか",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/CIS AWS Foundations Benchmark"
+  ],
+  "ServiceName": "dynamodb",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "database",
+  "Description": "**Amazon DynamoDB Accelerator (DAX) クラスター**について、**サーバー側の保存時暗号化**が有効になっているかを評価します。検出結果は、クラスターのディスクキャッシュ、設定、ログがサービス管理キーを使用して暗号化されているかを示します。",
+  "Risk": "**保存時暗号化**がない場合、DAX のディスクキャッシュとログは、低レベルのアクセス権を持つ者によって基盤ストレージから抽出される可能性があり、**機密性**が損なわれ、オフラインでのデータマイニングが可能になります。\n\n脅威には以下が含まれます：\n- 侵害されたホストまたは管理者\n- 紛失/廃棄されたメディア\n- 不正なバックアップまたはスナップショット",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DAXEncryptionAtRest.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/DAX/encryption-enabled.html",
+    "https://docs.aws.amazon.com/prescriptive-guidance/latest/encryption-best-practices/dynamodb.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws dax create-cluster --cluster-name <example_resource_name> --node-type <NODE_TYPE> --replication-factor 1 --iam-role-arn <example_resource_id> --sse-specification Enabled=true",
+      "NativeIaC": "```yaml\nResources:\n  DaxCluster:\n    Type: AWS::DAX::Cluster\n    Properties:\n      ClusterName: <example_resource_name>\n      NodeType: <NODE_TYPE>\n      ReplicationFactor: 1\n      IAMRoleARN: <example_resource_id>\n      SSESpecification:           # Critical: enables encryption at rest\n        SSEEnabled: true          # Encrypts DAX cluster data at rest\n```",
+      "Other": "1. AWS コンソールで、**DynamoDB** を開き、**DAX** の下で **Clusters** > **Create cluster** を選択します\n2. 名前を入力し、ノードタイプを選択します\n3. **Encryption** で、**Enable encryption** を選択します\n4. IAM ロールと必要なネットワーク設定を選択し、**Launch cluster** をクリックします\n5. 既存の暗号化されていないクラスターを置き換える場合：アプリケーションを新しいクラスターエンドポイントにポイントし、古いクラスターを削除します",
+      "Terraform": "```hcl\nresource \"aws_dax_cluster\" \"example\" {\n  cluster_name       = \"<example_resource_name>\"\n  node_type          = \"<NODE_TYPE>\"\n  replication_factor = 1\n  iam_role_arn       = \"<example_resource_id>\"\n\n  # Critical: enables encryption at rest\n  server_side_encryption {\n    enabled = true  # Encrypts DAX cluster data at rest\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "**保存時暗号化**を有効にして DAX クラスターをプロビジョニングします。DAX 管理とデータアクセスに**最小権限**を適用し、ログ記録で監視します。\n\n**多層防御**を採用します：転送時の暗号化を有効化し、ネットワークの露出を制限し、高度に機密性の高いデータのキャッシュを避けます。暗号化されていないクラスターを再作成して、この設定を強制します。",
+      "Url": "https://hub.prowler.com/check/dynamodb_accelerator_cluster_encryption_enabled"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "Data Protection"
+}
+

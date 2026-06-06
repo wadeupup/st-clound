@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "efs_have_backup_enabled",
+  "CheckTitle": "EFS ファイルシステムでバックアップが有効になっている",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Effects/Data Destruction"
+  ],
+  "ServiceName": "efs",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsEfsFileSystem",
+  "ResourceGroup": "storage",
+  "Description": "**Amazon EFS ファイルシステム** は、`backup policy` を通じて設定された自動バックアップについて評価されます。この検出結果は、バックアップが有効になっていない、または無効にされているファイルシステムを強調表示します。",
+  "Risk": "EFS バックアップがないと、**可用性** と **整合性** が低下します。誤削除、ランサムウェア、または設定ミスにより、データが削除または破損し、回復パスがなくなります。ポイントインタイムコピーがないと、RPO/RTO が影響を受け、ローカルインシデントが長期の中断と不可逆的な損失になる可能性があります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/efs/latest/ug/awsbackup.html",
+    "https://docs.aws.amazon.com/efs/latest/ug/automatic-backups.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws efs put-backup-policy --file-system-id <FILE_SYSTEM_ID> --backup-policy Status=ENABLED",
+      "NativeIaC": "```yaml\n# CloudFormation: Enable automatic backups for EFS\nResources:\n  <example_resource_name>:\n    Type: AWS::EFS::FileSystem\n    Properties:\n      BackupPolicy:\n        Status: ENABLED  # Critical: turns on EFS automatic backups via AWS Backup\n```",
+      "Other": "1. AWS コンソールで、Amazon EFS > ファイルシステムに移動します\n2. ターゲットファイルシステムを選択します\n3. 編集（または更新）をクリックします\n4. 自動バックアップを有効に設定します\n5. 変更を保存します",
+      "Terraform": "```hcl\n# Enable automatic backups for EFS\nresource \"aws_efs_file_system\" \"<example_resource_name>\" {\n  backup_policy {\n    status = \"ENABLED\"  # Critical: turns on EFS automatic backups\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "ファイルシステム `backup policy` を `ENABLED` に設定して自動 EFS バックアップを有効にし、多層防御を適用します：\n- 階層的な保持ポリシーで頻繁なバックアップジョブをスケジュールします\n- 不変の保管庫とクロスリージョンコピーを使用します\n- **最小権限** と **職務の分離** を通じて削除/復元を制限します\n- 定期的に復元をテストし、災害復旧目標を文書化します",
+      "Url": "https://hub.prowler.com/check/efs_have_backup_enabled"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

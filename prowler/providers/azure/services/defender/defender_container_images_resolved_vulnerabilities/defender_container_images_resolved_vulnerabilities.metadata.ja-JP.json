@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "defender_container_images_resolved_vulnerabilities",
+  "CheckTitle": "コンテナーで使用されるイメージの脆弱性が解消されていること",
+  "CheckType": [],
+  "ServiceName": "defender",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Microsoft.Security/assessments",
+  "ResourceGroup": "security",
+  "Description": "コンテナーで使用されるイメージの脆弱性は解消されている必要があります。Azure Defender for Container Registries は、コンテナー イメージ内の脆弱性の特定と解消に役立ちます。コンテナー イメージに対する脆弱性スキャンと優先順位付きのセキュリティ推奨事項を提供します。Azure Defender for Container Registries を使用してコンテナー イメージの脆弱性をスキャンし、解消のための優先順位付きセキュリティ推奨事項を取得できます。また、コンテナー レジストリのセキュリティ脅威を監視し、解消のための優先順位付きセキュリティ推奨事項を取得することもできます。Azure Defender for Container Registries は Azure Security Center と統合され、コンテナー レジストリおよび他の Azure リソース全体のセキュリティを統合的に可視化します。Azure Defender for Container Registries は Azure Defender の一部であり、ハイブリッド ワークロード向けの高度な脅威保護を提供します。Azure Defender は高度な分析とグローバルな脅威インテリジェンスを使用して、見逃される可能性のある攻撃を検出します。",
+  "Risk": "脆弱性が解消されない場合、攻撃者がそれを悪用してコンテナー化されたアプリケーションやデータへ不正アクセスする可能性があります。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/container-registry/container-registry-check-health",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "",
+      "Url": "https://learn.microsoft.com/en-us/azure/container-registry/scan-images-defender"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

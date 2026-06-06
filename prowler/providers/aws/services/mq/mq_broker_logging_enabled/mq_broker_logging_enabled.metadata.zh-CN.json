@@ -1,0 +1,44 @@
+{
+  "Provider": "aws",
+  "CheckID": "mq_broker_logging_enabled",
+  "CheckTitle": "MQ broker启用了常规日志记录，对于ActiveMQ，启用了审计日志记录",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践",
+    "软件和配置检查/行业和监管标准/NIST 800-53 控制",
+    "软件和配置检查/行业和法规标准/AWS 基础安全最佳实践"
+  ],
+  "ServiceName": "mq",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "low",
+  "ResourceType": "AwsAmazonMQBroker",
+  "ResourceGroup": "messaging",
+  "Description": "**Amazon MQ brokers**根据引擎类型启用了到**CloudWatch Logs**的日志记录：**ActiveMQ**需要同时启用`general`和`audit`日志；**RabbitMQ**需要`general`日志。",
+  "Risk": "缺少broker日志会在身份验证事件、管理更改和broker故障中产生盲点。对手可以在不被检测的情况下行动，从而实现未经授权的访问和消息篡改（机密性/完整性），并阻碍事件响应和根本原因分析（可用性）。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/amazon-mq/latest/developer-guide/configure-logging-monitoring-activemq.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/mq-controls.html#mq-2",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/MQ/log-exports.html",
+    "https://docs.aws.amazon.com/cli/latest/reference/mq/create-broker.html",
+    "https://docs.aws.amazon.com/amazon-mq/latest/developer-guide/security-logging-monitoring.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws mq update-broker --broker-id <example_resource_id> --logs Audit=true,General=true",
+      "NativeIaC": "```yaml\n# CloudFormation：启用Amazon MQ日志记录\nResources:\n  <example_resource_name>:\n    Type: AWS::AmazonMQ::Broker\n    Properties:\n      BrokerName: <example_resource_name>\n      EngineType: ACTIVEMQ\n      HostInstanceType: mq.t3.micro\n      DeploymentMode: SINGLE_INSTANCE\n      PubliclyAccessible: true\n      Users:\n        - Username: <example_user>\n          Password: <example_password>\n      Logs:\n        General: true  # 关键：启用到CloudWatch的常规日志\n        Audit: true    # 关键：启用审计日志（ActiveMQ所需）\n```",
+      "Other": "1. 在AWS控制台中，转到Amazon MQ > Brokers\n2. 选择<example_resource_name>并选择编辑\n3. 在日志设置中：\n   - 对于ActiveMQ：启用常规日志和审计日志\n   - 对于RabbitMQ：仅启用常规日志\n4. 保存更改并在提示时重新启动",
+      "Terraform": "```hcl\n# Terraform：启用Amazon MQ日志记录\nresource \"aws_mq_broker\" \"<example_resource_name>\" {\n  broker_name         = \"<example_resource_name>\"\n  engine_type         = \"ActiveMQ\"\n  host_instance_type  = \"mq.t3.micro\"\n  deployment_mode     = \"SINGLE_INSTANCE\"\n  publicly_accessible = true\n\n  user {\n    username = \"<example_user>\"\n    password = \"<example_password>\"\n  }\n\n  logs {\n    general = true  # 关键：启用常规日志\n    audit   = true  # 关键：启用审计日志（ActiveMQ）\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "为brokers启用集中式**CloudWatch Logs**。对于**ActiveMQ**，开启`general`和`audit`日志；对于**RabbitMQ**，启用`general`日志。\n\n对日志访问应用**最小权限**，设置保留策略，并为异常事件创建警报以加强**深度防御**。",
+      "Url": "https://hub.prowler.com/check/mq_broker_logging_enabled"
+    }
+  },
+  "Categories": [
+    "logging"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

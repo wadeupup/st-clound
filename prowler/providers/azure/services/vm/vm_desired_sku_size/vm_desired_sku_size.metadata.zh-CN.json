@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "vm_desired_sku_size",
+  "CheckTitle": "确保虚拟机实例使用组织批准的 SKU 规格",
+  "CheckType": [],
+  "ServiceName": "vm",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Microsoft.Compute/virtualMachines",
+  "ResourceGroup": "compute",
+  "Description": "确保虚拟机实例使用组织批准的 SKU 规格。此检查需要在 Prowler 配置文件中配置期望的 VM SKU 规格。",
+  "Risk": "为 Microsoft Azure 账户中部署的虚拟机实例设置 SKU 规格限制，有助于更好地管理云计算能力、满足内部合规要求并避免 Azure 月账单中的意外费用。若缺少适当的 SKU 规格控制，组织可能面临成本超支和合规违规。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/virtual-machines/sizes/overview",
+  "Remediation": {
+    "Code": {
+      "CLI": "az policy assignment create --display-name 'Allowed VM SKU Sizes' --policy cccc23c7-8427-4f53-ad12-b6a63eb452b3 -p '{\"listOfAllowedSKUs\": {\"value\": [\"<desired-sku-1>\", \"<desired-sku-2>\"]}}' --scope /subscriptions/<subscription-id>",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "1. 根据工作负载需求、成本约束和合规要求，定义并记录组织批准的 VM SKU 规格。2. 实施 Azure Policy，在订阅范围内强制执行 VM 规格限制。3. 使用内置策略“Allowed virtual machine size SKUs”将 VM 创建限制为已批准规格。4. 基于不断变化的业务需求和成本优化目标，定期审查并更新批准的 SKU 列表。5. 监控 VM 使用情况和成本，确保符合 SKU 规格策略。",
+      "Url": "https://learn.microsoft.com/en-us/azure/virtual-machines/sizes/resize-vm"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "此检查需要在 Prowler 配置文件中配置期望的 VM SKU 规格。请在 Prowler 配置文件中设置 azure.desired_vm_sku_sizes 列表（参见 https://docs.prowler.com/projects/prowler-open-source/en/latest/tutorials/configuration_file/），填入组织批准的 SKU 规格。"
+}

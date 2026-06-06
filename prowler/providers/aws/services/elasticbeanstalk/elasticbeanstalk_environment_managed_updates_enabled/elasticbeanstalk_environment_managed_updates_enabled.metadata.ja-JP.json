@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "elasticbeanstalk_environment_managed_updates_enabled",
+  "CheckTitle": "Elastic Beanstalk 環境でマネージドプラットフォーム更新が有効化されていること",
+  "CheckType": [
+    "Software and Configuration Checks/Patch Management",
+    "Software and Configuration Checks/AWS Security Best Practices"
+  ],
+  "ServiceName": "elasticbeanstalk",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsElasticBeanstalkEnvironment",
+  "ResourceGroup": "compute",
+  "Description": "**Elastic Beanstalk 環境**で **マネージドプラットフォーム更新**（`ManagedActionsEnabled: true`）を有効化すると、スケジュールされたメンテナンスウィンドウ内でプラットフォームのパッチ/マイナー更新が自動適用されます。",
+  "Risk": "自動プラットフォーム更新がない場合、環境は **脆弱な OS/ランタイムバージョン** で稼働し続け、既知 CVE、RCE、権限昇格の悪用を受ける可能性があります。\n\nパッチドリフトは不安定性も高め、**可用性** を損ない、アプリケーションの **完全性** を低下させます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/elasticbeanstalk-controls.html#elasticbeanstalk-2",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/ElasticBeanstalk/managed-platform-updates.html",
+    "https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/environment-platform-update-managed.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws elasticbeanstalk update-environment --environment-name <environment-name> --option-settings Namespace=aws:elasticbeanstalk:managedactions,OptionName=ManagedActionsEnabled,Value=true",
+      "NativeIaC": "```yaml\nResources:\n  <example_resource_name>:\n    Type: AWS::ElasticBeanstalk::Environment\n    Properties:\n      ApplicationName: <example_resource_name>\n      SolutionStackName: <example_resource_name>\n      OptionSettings:\n        - Namespace: aws:elasticbeanstalk:managedactions\n          OptionName: ManagedActionsEnabled  # Critical: enables managed platform updates\n          Value: \"true\"                      # Critical: set to true to pass the check\n```",
+      "Other": "1. AWS マネジメントコンソールを開き Elastic Beanstalk に移動します\n2. 対象の環境を選択します\n3. Configuration を選択します\n4. Managed updates で Edit をクリックします\n5. Managed updates を Enabled に設定します\n6. Apply/Save をクリックします",
+      "Terraform": "```hcl\nresource \"aws_elastic_beanstalk_environment\" \"<example_resource_name>\" {\n  name                = \"<example_resource_name>\"\n  application         = \"<example_resource_name>\"\n  solution_stack_name = \"<example_resource_name>\"\n\n  setting {\n    namespace = \"aws:elasticbeanstalk:managedactions\"\n    name      = \"ManagedActionsEnabled\"   # Critical: enables managed platform updates\n    value     = \"true\"                    # Critical: set to true to pass the check\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "**マネージドプラットフォーム更新**を有効化し、メンテナンスウィンドウを設定したうえで更新レベル（`patch` または `minor`）を選択してください。**Enhanced health** を有効にし、更新用ロールには **最小権限** を適用します。ステージングで検証し段階的に展開し、環境ごとにウィンドウをずらして **多層防御** とレジリエンスを高めてください。",
+      "Url": "https://hub.prowler.com/check/elasticbeanstalk_environment_managed_updates_enabled"
+    }
+  },
+  "Categories": [
+    "vulnerabilities"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "glue_data_catalogs_not_publicly_accessible",
+  "CheckTitle": "Glue Data Catalog 不应通过其资源策略对公网开放",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices/Network Reachability",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "TTPs/Initial Access",
+    "Effects/Data Exposure"
+  ],
+  "ServiceName": "glue",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Other",
+  "ResourceGroup": "analytics",
+  "Description": "会评估 **AWS Glue Data Catalog** 资源策略是否存在将目录暴露给任意主体的配置，例如 `Principal: *`、过宽的资源范围或过于宽松的条件。\n\n该检查会标识因资源策略权限过宽而导致公开访问的目录。",
+  "Risk": "公开的目录访问会让未授权主体枚举 schema、S3 位置和连接元数据，削弱**机密性**。若写权限也被暴露，攻击者可篡改数据库/表、破坏数据血缘并中断作业与查询，损害**完整性**和**可用性**，并可进一步横向进入数据存储。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/glue/latest/dg/security_iam_service-with-iam.html?icmpid=docs_console_unmapped#security_iam_service-with-iam-resource-based-policies",
+    "https://docs.aws.amazon.com/glue/latest/dg/cross-account-access.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws glue delete-resource-policy",
+      "NativeIaC": "",
+      "Other": "1. 登录 AWS 控制台并打开 Glue 服务\n2. 在左侧菜单点击 Settings\n3. 在 Data catalog settings > Permissions 下点击 Edit resource policy\n4. 删除所有 Principal 为 *（公开）或 AWS: \"*\" 的策略语句；或直接删除整份策略\n5. 点击 Save",
+      "Terraform": "```hcl\nresource \"aws_glue_resource_policy\" \"<example_resource_name>\" {\n  policy = jsonencode({\n    Version   = \"2012-10-17\",\n    Statement = [\n      {\n        Effect    = \"Allow\",\n        Principal = { AWS = \"arn:aws:iam::<ACCOUNT_ID>:root\" } # Critical: restricts to your account, removing any public (*) access\n        Action    = \"glue:*\",\n        Resource  = \"arn:aws:glue:<REGION>:<ACCOUNT_ID>:catalog\"\n      }\n    ]\n  })\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "对目录资源策略实施**最小权限**：\n- 避免 `Principal: *` 和通配符\n- 仅向显式主体授予必需动作\n- 共享场景优先使用基于身份的访问或 Lake Formation\n- 通过精确 ARN/条件收敛范围，并监控变更以落实**纵深防御**",
+      "Url": "https://hub.prowler.com/check/glue_data_catalogs_not_publicly_accessible"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

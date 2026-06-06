@@ -1,0 +1,37 @@
+{
+  "Provider": "aws",
+  "CheckID": "appstream_fleet_maximum_session_duration",
+  "CheckTitle": "AppStream 队列最大用户会话持续时间少于 10 小时",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践"
+  ],
+  "ServiceName": "appstream",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "compute",
+  "Description": "**AppStream 队列**强制执行**最大用户会话持续时间**。此检查根据阈值（默认 `10 小时`（`36000` 秒））评估每个队列的配置限制，并识别会话持续时间超过该限制的队列。",
+  "Risk": "过长的会话会扩大**会话劫持**、**横向移动**和**数据泄露**的时间窗口（如果端点或令牌被泄露）。减少重新身份验证会削弱**机密性**和**完整性**，延长访问时间可能会增加**成本**和资源争用。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/appstream2/latest/developerguide/set-up-stacks-fleets.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws appstream update-fleet --name <example_resource_name> --max-user-duration-in-seconds 3600",
+      "NativeIaC": "```yaml\n# CloudFormation: 将 AppStream 队列会话持续时间设置为少于 10 小时\nResources:\n  AppStreamFleet:\n    Type: AWS::AppStream::Fleet\n    Properties:\n      Name: \"<example_resource_name>\"\n      MaxUserDurationInSeconds: 3600  # 关键：确保最大会话持续时间 < 10 小时以通过检查\n```",
+      "Other": "1. 打开 AWS 控制台并转到 Amazon AppStream 2.0\n2. 单击 Fleets 并选择 <example_resource_name>\n3. 单击 Edit\n4. 将 Maximum session duration 设置为小于 10 小时的值（例如，3600 秒）\n5. 保存更改",
+      "Terraform": "```hcl\n# Terraform: 将 AppStream 队列会话持续时间设置为少于 10 小时\nresource \"aws_appstream_fleet\" \"<example_resource_name>\" {\n  name                         = \"<example_resource_name>\"\n  max_user_duration_in_seconds = 3600 # 关键：确保最大会话持续时间 < 10 小时以通过检查\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "将**最大会话持续时间**配置为 `<= 10 小时`（例如，`600` 分钟）或更少，具体取决于数据敏感性。优先使用较短的限制，在续订时强制执行**重新身份验证**，应用**最小权限**，并启用**空闲超时**。将会话活动监控作为**纵深防御**的一部分。",
+      "Url": "https://hub.prowler.com/check/appstream_fleet_maximum_session_duration"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "Infrastructure Security"
+}
+

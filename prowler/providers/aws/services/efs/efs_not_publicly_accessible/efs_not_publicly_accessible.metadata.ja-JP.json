@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "efs_not_publicly_accessible",
+  "CheckTitle": "EFS ファイルシステムポリシーが VPC 内の任意のクライアントへのアクセスを許可していない",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices/Network Reachability",
+    "Effects/Data Exposure"
+  ],
+  "ServiceName": "efs",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsEfsFileSystem",
+  "ResourceGroup": "storage",
+  "Description": "**Amazon EFS** ファイルシステムポリシーは、**パブリックまたは VPC 全体のアクセス** について評価されます。広範な `Principal` 値を持つ、または `elasticfilesystem:AccessedViaMountTarget` 条件なしで VPC 内の任意のクライアントを許可するポリシーが識別されます。\n\n*欠落または空のポリシーは、VPC クライアントに開放されているものとして扱われます。*",
+  "Risk": "広範な EFS アクセスにより、任意の VPC クライアントまたは侵害されたワークロードが共有をマウントでき、CIA に影響を与えます：\n- 機密性：大量のデータ窃取\n- 整合性：不正な書き込みまたはランサムウェア\n- 可用性：昇格されたクライアントアクセスによる削除またはロックアウト\nまた、VPC 内での横方向の移動を促進します。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/efs/latest/ug/access-control-block-public-access.html",
+    "https://support.icompaas.com/support/solutions/articles/62000233324-efs-should-not-have-policies-allowing-unrestricted-access-within-vpc"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws efs put-file-system-policy --file-system-id <example_resource_id> --policy '{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"elasticfilesystem:ClientMount\",\"Condition\":{\"Bool\":{\"elasticfilesystem:AccessedViaMountTarget\":\"true\"}}}]}'",
+      "NativeIaC": "```yaml\n# CloudFormation: attach a non-public EFS file system policy\nResources:\n  EFSFileSystemPolicy:\n    Type: AWS::EFS::FileSystemPolicy\n    Properties:\n      FileSystemId: <example_resource_id>\n      Policy:\n        Version: \"2012-10-17\"\n        Statement:\n          - Effect: Allow\n            Principal: \"*\"\n            Action: elasticfilesystem:ClientMount\n            Condition:\n              Bool:\n                elasticfilesystem:AccessedViaMountTarget: \"true\"  # Critical: restrict access to mount targets only to avoid public access\n```",
+      "Other": "1. AWS コンソールで、EFS > ファイルシステムに移動し、<example_resource_id> を選択します\n2. ファイルシステムポリシータブを開き、編集をクリックします\n3. ポリシーを、マウントターゲット経由でのみアクセスを許可するポリシーに置き換えます：\n   ```json\n   {\n     \"Version\": \"2012-10-17\",\n     \"Statement\": [\n       {\n         \"Effect\": \"Allow\",\n         \"Principal\": \"*\",\n         \"Action\": \"elasticfilesystem:ClientMount\",\n         \"Condition\": {\"Bool\": {\"elasticfilesystem:AccessedViaMountTarget\": \"true\"}}\n       }\n     ]\n   }\n   ```\n4. 変更を保存します",
+      "Terraform": "```hcl\n# Attach a non-public EFS file system policy\nresource \"aws_efs_file_system_policy\" \"<example_resource_name>\" {\n  file_system_id = \"<example_resource_id>\"\n  policy = jsonencode({\n    Version   = \"2012-10-17\"\n    Statement = [{\n      Effect    = \"Allow\"\n      Principal = \"*\"\n      Action    = \"elasticfilesystem:ClientMount\"\n      Condition = {\n        Bool = {\n          \"elasticfilesystem:AccessedViaMountTarget\" = \"true\" # Critical: require mount target to make policy non-public\n        }\n      }\n    }]\n  })\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "EFS リソースポリシーに **最小権限** を適用します：\n- ワイルドカード `Principal` または `*` を避けます\n- `elasticfilesystem:AccessedViaMountTarget=true` を要求します\n- `aws:SourceVpc`、`aws:SourceAccount`、または組織 ID で制約します\n- アプリ/ロールごとに EFS アクセスポイントを使用します\n- 多層防御のために EFS **パブリックアクセスのブロック** を有効にします",
+      "Url": "https://hub.prowler.com/check/efs_not_publicly_accessible"
+    }
+  },
+  "Categories": [
+    "identity-access"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

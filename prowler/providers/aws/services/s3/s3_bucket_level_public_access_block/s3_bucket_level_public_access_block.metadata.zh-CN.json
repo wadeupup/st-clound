@@ -1,0 +1,37 @@
+{
+  "Provider": "aws",
+  "CheckID": "s3_bucket_level_public_access_block",
+  "CheckTitle": "检查 S3 存储桶级别的公共访问阻止。",
+  "CheckType": [
+    "数据保护"
+  ],
+  "ServiceName": "s3",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:s3:::bucket_name",
+  "Severity": "medium",
+  "ResourceType": "AwsS3Bucket",
+  "ResourceGroup": "storage",
+  "Description": "检查 S3 存储桶级别的公共访问阻止。",
+  "Risk": "公共访问策略可能会应用于敏感数据存储桶。",
+  "RelatedUrl": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-control-block-public-access.html",
+  "Remediation": {
+    "Code": {
+      "CLI": "aws s3api put-public-access-block --region <REGION_NAME> --public-access-block-configuration BlockPublicAcls=true,IgnorePublicAcls=true,BlockPublicPolicy=true,RestrictPublicBuckets=true --bucket <BUCKET_NAME>",
+      "NativeIaC": "",
+      "Other": "https://github.com/cloudmatos/matos/tree/master/remediations/aws/s3/s3/block-public-access",
+      "Terraform": "https://docs.prowler.com/checks/aws/s3-policies/bc_aws_s3_20#terraform"
+    },
+    "Recommendation": {
+      "Text": "您可以在存储桶级别启用公共访问阻止，以防止存储在 S3 中的数据被暴露。",
+      "Url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-control-block-public-access.html"
+    }
+  },
+  "Categories": [],
+  "Tags": {
+    "Tag1Key": "value",
+    "Tag2Key": "value"
+  },
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

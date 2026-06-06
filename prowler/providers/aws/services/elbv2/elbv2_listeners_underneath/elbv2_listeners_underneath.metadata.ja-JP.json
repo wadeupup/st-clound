@@ -1,0 +1,39 @@
+{
+  "Provider": "aws",
+  "CheckID": "elbv2_listeners_underneath",
+  "CheckTitle": "ELBv2 ロードバランサーに少なくとも 1 つのリスナーがあること",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices/Network Reachability",
+    "Effects/Denial of Service"
+  ],
+  "ServiceName": "elbv2",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsElbv2LoadBalancer",
+  "ResourceGroup": "network",
+  "Description": "**ELBv2 ロードバランサー** には、クライアント接続を受け付けターゲットグループへルーティングするために、少なくとも 1 つの **リスナー**（プロトコルとポート）が必要です。この検出は、ロードバランサーにリスナーが定義されているかを示します。",
+  "Risk": "リスナーがないと、ロードバランサーは接続を受け付けられず、バックエンドサービスに到達できません。これは **可用性** を損ない、クライアントのタイムアウトやエラーを引き起こし、ロードバランサーの DNS エンドポイントに依存する連携を中断させます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-listeners.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws elbv2 create-listener --load-balancer-arn <LOAD_BALANCER_ARN> --protocol HTTP --port 80 --default-actions 'Type=fixed-response,FixedResponseConfig={StatusCode=200}'",
+      "NativeIaC": "```yaml\n# CloudFormation: add a minimal listener to the ELBv2\nResources:\n  <example_resource_name>:\n    Type: AWS::ElasticLoadBalancingV2::Listener\n    Properties:\n      LoadBalancerArn: <example_load_balancer_arn>  # Critical: attaches the listener to the load balancer\n      Port: 80                                      # Critical: defines the listener port\n      Protocol: HTTP                                # Critical: defines the listener protocol\n      DefaultActions:\n        - Type: fixed-response                       # Critical: minimal required default action so the listener is valid\n          FixedResponseConfig:\n            StatusCode: '200'                       # Critical: required for fixed-response action\n```",
+      "Other": "1. AWS コンソールで EC2 > Load Balancing > Load Balancers に移動します\n2. 検出対象のロードバランサーを選択します\n3. Listeners タブを開き Add listener をクリックします\n4. Protocol を HTTP、Port を 80 に設定します\n5. Default action で Return fixed response を選択し、Status code を 200 に設定します\n6. Create/Save をクリックしてリスナーを追加します",
+      "Terraform": "```hcl\n# Terraform: add a minimal listener to the ELBv2\nresource \"aws_lb_listener\" \"<example_resource_name>\" {\n  load_balancer_arn = \"<example_load_balancer_arn>\"  # Critical: attaches the listener to the load balancer\n  port              = 80                               # Critical: defines the listener port\n  protocol          = \"HTTP\"                          # Critical: defines the listener protocol\n\n  default_action {                                     # Critical: required default action so the listener is valid\n    type = \"fixed-response\"\n    fixed_response {\n      status_code = \"200\"                             # Critical: required for fixed-response action\n    }\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "ロードバランサーごとに少なくとも 1 つのリスナーを定義してください。転送中データ保護のため `443` の **HTTPS** を優先し、必要なポートのみ公開します。想定トラフィックに必要なプロトコルとルールに限定して **最小権限** を適用し、意図しないルーティングを避けるため明示的なデフォルトアクションを設定してください。",
+      "Url": "https://hub.prowler.com/check/elbv2_listeners_underneath"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

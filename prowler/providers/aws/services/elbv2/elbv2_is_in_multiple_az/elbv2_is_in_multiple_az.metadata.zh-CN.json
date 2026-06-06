@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "elbv2_is_in_multiple_az",
+  "CheckTitle": "ELBv2 负载均衡器已配置为跨多个可用区",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Effects/Denial of Service"
+  ],
+  "ServiceName": "elbv2",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsElbv2LoadBalancer",
+  "ResourceGroup": "network",
+  "Description": "会评估 ELBv2 负载均衡器（Application、Network 或 Gateway）是否分布在多个 **Availability Zones**。检查结果表明每个负载均衡器是否至少跨越配置的最小 AZ 数量（默认 `2`）。",
+  "Risk": "将负载均衡器限制在单一 AZ 会引入单点故障。AZ 故障、可用区级退化或目标容量不均衡都可能导致停机、连接丢失和部署风险，削弱服务**可用性**与韧性。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/elasticloadbalancing/latest/network/availability-zones.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/ELBv2/enable-multi-az.html",
+    "https://docs.aws.amazon.com/elasticloadbalancing/latest/userguide/how-elastic-load-balancing-works.html#availability-zones"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws elbv2 set-subnets --load-balancer-arn <LOAD_BALANCER_ARN> --subnets <SUBNET_ID_A> <SUBNET_ID_B>",
+      "NativeIaC": "```yaml\n# CloudFormation: ensure the ELBv2 spans at least two AZs by specifying two subnets\nResources:\n  <example_resource_name>:\n    Type: AWS::ElasticLoadBalancingV2::LoadBalancer\n    Properties:\n      Subnets:\n        - <subnet_id_a>  # critical: add a second AZ/subnet\n        - <subnet_id_b>  # critical: ensures the load balancer spans >=2 AZs\n```",
+      "Other": "1. 打开 AWS 控制台 > EC2 > Load Balancers\n2. 选择目标负载均衡器\n3. 进入 Network mapping 标签并点击 Edit subnets\n4. 通过在两个 AZ 中各选择一个子网来启用至少两个 Availability Zones\n5. 点击 Save changes",
+      "Terraform": "```hcl\n# Ensure ELBv2 spans at least two Availability Zones\nresource \"aws_lb\" \"<example_resource_name>\" {\n  subnets = [\n    \"<subnet_id_a>\",  # critical: add a second AZ/subnet\n    \"<subnet_id_b>\"   # critical: ensures the load balancer spans >=2 AZs\n  ]\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "每个负载均衡器至少跨**两个 AZ**运行，并确保每个已启用 AZ 都有健康且可扩展的目标。\n- 按 AZ 分配容量；使用自动扩缩容\n- 保持健康检查有效\n- 考虑启用跨可用区负载均衡以吸收突发流量\n- 定期进行故障切换演练",
+      "Url": "https://hub.prowler.com/check/elbv2_is_in_multiple_az"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

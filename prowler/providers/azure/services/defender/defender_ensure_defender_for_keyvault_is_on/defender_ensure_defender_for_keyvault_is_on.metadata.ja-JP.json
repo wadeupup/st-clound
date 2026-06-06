@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "defender_ensure_defender_for_keyvault_is_on",
+  "CheckTitle": "Microsoft Defender for KeyVault が「オン」に設定されていることを確認する",
+  "CheckType": [],
+  "ServiceName": "defender",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AzureDefenderPlan",
+  "ResourceGroup": "security",
+  "Description": "Microsoft Defender for KeyVault が「オン」に設定されていることを確認する",
+  "Risk": "既定では、Microsoft Defender for Cloud は Azure Key Vault で無効化されています。Defender for Cloud は、Azure Key Vault データへの異常かつ潜在的に有害なアクセスまたは悪用の試みを検出します。この保護レイヤーにより、セキュリティの専門家でなくても、またサードパーティ製のセキュリティ監視ツールやサービスを使用・管理しなくても、脅威に対処できます。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/SecurityCenter/defender-key-vault.html",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-general-policies/ensure-that-azure-defender-is-set-to-on-for-key-vault#terraform"
+    },
+    "Recommendation": {
+      "Text": "Azure Key Vault で Microsoft Defender for Cloud が有効化されていることを確認してください。Key Vault は、暗号化キーや証明書、接続文字列、パスワードなどのシークレットを保護する Azure のクラウド サービスです。",
+      "Url": ""
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

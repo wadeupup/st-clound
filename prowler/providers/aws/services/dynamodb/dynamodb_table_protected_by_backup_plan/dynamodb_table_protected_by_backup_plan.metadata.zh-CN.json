@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "dynamodb_table_protected_by_backup_plan",
+  "CheckTitle": "DynamoDB 表受备份计划保护",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices"
+  ],
+  "ServiceName": "dynamodb",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsDynamoDbTable",
+  "ResourceGroup": "database",
+  "Description": "**DynamoDB 表**会被评估是否通过资源分配包含在**AWS Backup 备份计划**中，包括显式表、资源类型通配符或全资源覆盖。\n\n结果指示表是否受计划定义的计划备份和保留策略管理。",
+  "Risk": "如果没有备份计划，表数据缺乏受管理的副本，会损害**可用性**和**完整性**。意外删除、损坏的写入或恶意操作可能变得不可恢复，RPO/RTO 会恶化。您还会失去跨区域/账户副本和不可变性功能，增加停机时间和数据丢失。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/aws-backup/latest/devguide/assigning-resources.html",
+    "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/CreateBackupAWS.html",
+    "https://aws.amazon.com/blogs/database/set-up-scheduled-backups-for-amazon-dynamodb-using-aws-backup/"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation: Add DynamoDB tables to an AWS Backup plan\nResources:\n  BackupPlan:\n    Type: AWS::Backup::BackupPlan\n    Properties:\n      BackupPlan:\n        BackupPlanName: <example_resource_name>\n        BackupPlanRule:\n          - RuleName: r\n            TargetBackupVault: Default\n\n  BackupSelection:\n    Type: AWS::Backup::BackupSelection\n    Properties:\n      BackupPlanId: !Ref BackupPlan\n      BackupSelection:\n        SelectionName: <example_resource_name>\n        IamRoleArn: <example_role_arn>\n        Resources:\n          - arn:aws:dynamodb:*:*:table/*  # CRITICAL: adds all DynamoDB tables to the backup plan, making them protected\n```",
+      "Other": "1. 在 AWS Backup 控制台中，前往 Settings > Configure resources，启用 DynamoDB，然后确认\n2. 前往 Backup plans > Create backup plan > Build a new plan\n3. 输入计划名称，将 Rule name 设置为任意值，将 Backup vault 设置为 Default，然后创建计划\n4. 在计划页面上，选择 Assign resources\n5. 输入资源分配名称，将 IAM role 设置为 Default role，选择您的 DynamoDB 表，然后选择 Assign resources",
+      "Terraform": "```hcl\n# Terraform: Add DynamoDB tables to an AWS Backup plan\nresource \"aws_backup_plan\" \"<example_resource_name>\" {\n  name = \"<example_resource_name>\"\n  rule {\n    rule_name         = \"r\"\n    target_vault_name = \"Default\"\n  }\n}\n\ndata \"aws_iam_role\" \"<example_resource_name>\" {\n  name = \"AWSServiceRoleForBackup\"\n}\n\nresource \"aws_backup_selection\" \"<example_resource_name>\" {\n  name         = \"<example_resource_name>\"\n  plan_id      = aws_backup_plan.<example_resource_name>.id\n  iam_role_arn = data.aws_iam_role.<example_resource_name>.arn\n  resources    = [\n    \"arn:aws:dynamodb:*:*:table/*\" # CRITICAL: adds all DynamoDB tables to the backup plan, making them protected\n  ]\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "将所有关键表置于**AWS Backup 备份计划**下，遵循**纵深防御**和**最小权限**原则：\n- 使用基于标签的分配以实现大规模覆盖\n- 定义计划、保留和跨区域/账户副本\n- 启用**Vault Lock**以实现不可变性\n- 定期测试恢复并限制备份删除",
+      "Url": "https://hub.prowler.com/check/dynamodb_table_protected_by_backup_plan"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

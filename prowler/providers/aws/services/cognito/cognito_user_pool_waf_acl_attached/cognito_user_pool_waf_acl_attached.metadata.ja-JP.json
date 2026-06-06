@@ -1,0 +1,32 @@
+{
+  "Provider": "aws",
+  "CheckID": "cognito_user_pool_waf_acl_attached",
+  "CheckTitle": "Amazon Cognito ユーザープールが WAF Web ACL に関連付けられていることを確認する",
+  "CheckType": [],
+  "ServiceName": "cognito",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:aws:cognito-idp:region:account:userpool/userpool-id",
+  "Severity": "medium",
+  "ResourceType": "AwsCognitoUserPool",
+  "ResourceGroup": "IAM",
+  "Description": "Web ACL は、コンテンツへのアクセスを制御するために使用されます。Web ACL を使用して、コンテンツにアクセスできるユーザーを制御できます。また、Web ACL を使用して、IP アドレス、HTTP ヘッダー、HTTP ボディ、URI、または URI クエリ文字列パラメータに基づいてリクエストをブロックすることもできます。Web ACL を Cognito ユーザープールに関連付けて、コンテンツへのアクセスを制御できます。",
+  "Risk": "Web ACL が Cognito ユーザープールに関連付けられていない場合、コンテンツは Web ACL によって保護されません。これにより、コンテンツへの不正アクセスが発生する可能性があります。",
+  "RelatedUrl": "https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-waf.html",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "Web ACL を Cognito ユーザープールに関連付ける必要があります。Web ACL を Cognito ユーザープールに関連付けるには、AWS マネジメントコンソールを使用してください。",
+      "Url": "https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-waf.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

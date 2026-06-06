@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "mysql_flexible_server_minimum_tls_version_12",
+  "CheckTitle": "确保 MySQL 灵活数据库服务器的“TLS Version”设置为“TLSV1.2”",
+  "CheckType": [],
+  "ServiceName": "mysql",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Microsoft.DBforMySQL/flexibleServers",
+  "ResourceGroup": "database",
+  "Description": "确保 MySQL 灵活服务器上的 TLS 版本设置为默认值。",
+  "Risk": "TLS 连接通过使用传输层安全（TLS）将数据库服务器与客户端应用连接起来，提供了额外的安全层。通过加密服务器与应用之间的数据流，强制数据库服务器与客户端应用之间使用 TLS 连接，有助于防御“中间人”攻击。",
+  "RelatedUrl": "https://docs.microsoft.com/en-us/azure/mysql/concepts-ssl-connection-security",
+  "Remediation": {
+    "Code": {
+      "CLI": "az mysql flexible-server parameter set --name tls_version --resource-group <resourceGroupName> --server-name <serverName> --value TLSV1.2",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/MySQL/mysql-flexible-server-tls-version.html",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-general-policies/ensure-mysql-is-using-the-latest-version-of-tls-encryption#terraform"
+    },
+    "Recommendation": {
+      "Text": "1. 使用 https://portal.azure.com 登录 Azure Portal。2. 进入 Azure Database for MySQL flexible servers。3. 对每个数据库，在 Settings 下点击 Server parameters。4. 在搜索框中输入 tls_version。5. 点击 VALUE 下拉框，确保 tls_version 仅选择 TLSV1.2。",
+      "Url": "https://docs.microsoft.com/en-us/azure/mysql/howto-configure-ssl"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

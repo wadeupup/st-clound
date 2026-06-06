@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "ecs_task_definitions_no_privileged_containers",
+  "CheckTitle": "ECS 任务定义没有特权容器",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/CIS Host Hardening Benchmarks",
+    "TTPs/Privilege Escalation"
+  ],
+  "ServiceName": "ecs",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsEcsTaskDefinition",
+  "ResourceGroup": "container",
+  "Description": "评估 **Amazon ECS 任务定义** 中是否配置了 **特权模式**（`privileged: true`）的容器。\n\n结果指示是否有任何容器定义启用了此设置。",
+  "Risk": "**特权容器** 可以以主机级别的 root 权限运行，从而破坏隔离性。一旦获得立足点，攻击者可以实现 **容器逃逸**、挂载主机设备、读取密钥、更改配置并控制其他工作负载 - 通过数据窃取、篡改和服务中断影响机密性、完整性和可用性。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/config/latest/developerguide/ecs-containers-nonprivileged.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/ecs-controls.html#ecs-4",
+    "https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_definition_parameters.html#container_definition_security"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws ecs deregister-task-definition --task-definition <task-family>:<revision>",
+      "NativeIaC": "```yaml\n# CloudFormation: ECS task definition with non-privileged container\nResources:\n  <example_resource_name>:\n    Type: AWS::ECS::TaskDefinition\n    Properties:\n      Family: <example_resource_name>\n      ContainerDefinitions:\n        - Name: <example_resource_name>\n          Image: <image>\n          Privileged: false  # Critical: ensures container is non-privileged to pass the check\n```",
+      "Other": "1. 打开 Amazon ECS 控制台并转到任务定义\n2. 选择失败的任务定义系列并打开失败的修订版\n3. 点击创建新修订版\n4. 编辑受影响的容器并取消选中特权（将其设置为 false）\n5. 点击创建以注册新修订版",
+      "Terraform": "```hcl\n# ECS task definition with non-privileged container\nresource \"aws_ecs_task_definition\" \"<example_resource_name>\" {\n  family                = \"<example_resource_name>\"\n  container_definitions = jsonencode([\n    {\n      name       = \"<example_resource_name>\"\n      image      = \"<image>\"\n      privileged = false # Critical: ensures container is non-privileged to pass the check\n    }\n  ])\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "在没有提升权限（`privileged: false`）的情况下运行容器，并以非 root（`user`）运行。应用 **最小权限**：\n- 仅通过 `capDrop`/`capAdd` 授予所需的 Linux 功能\n- 优先使用 `readonlyRootFilesystem: true`\n- 隔离网络并分离职责\n- 通过日志记录进行监控以支持纵深防御",
+      "Url": "https://hub.prowler.com/check/ecs_task_definitions_no_privileged_containers"
+    }
+  },
+  "Categories": [
+    "container-security"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

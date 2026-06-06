@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "networkfirewall_policy_default_action_full_packets",
+  "CheckTitle": "Network Firewall ファイアウォールポリシーのデフォルトのステートレスアクションは、フルパケットをドロップまたはフォワードします",
+  "CheckType": [
+    "ソフトウェアと構成のチェック/AWS セキュリティベストプラクティス/ネットワーク到達可能性",
+    "ソフトウェアと構成のチェック/業界および規制基準/AWS 基礎セキュリティベストプラクティス",
+    "ソフトウェアと構成のチェック/業界および規制基準/NIST 800-53 コントロール"
+  ],
+  "ServiceName": "networkfirewall",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsNetworkFirewallFirewall",
+  "ResourceGroup": "network",
+  "Description": "**AWS Network Firewall ポリシー**は、フルパケットに対する**ステートレスデフォルトアクション**を定義します。これは、マッチしないパケットが `aws:drop` または `aws:forward_to_sfe` によって処理されるかどうかを評価し、破棄されるか、ステートフルエンジンに送信されるかを意味します。",
+  "Risk": "デフォルトとして `Pass` を使用すると、マッチしないフルパケットがステートレスフィルタリングとステートフルインスペクションをバイパスし、偵察、マルウェア配信、秘密裏のデータ流出を可能にします。これにより、**機密性**と**完全性**が損なわれ、フィルタリングされていない攻撃によって**可用性**が脅かされる可能性があります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/networkfirewall-controls.html#networkfirewall-4",
+    "https://docs.aws.amazon.com/network-firewall/latest/developerguide/stateless-default-actions.html",
+    "https://docs.aws.amazon.com/network-firewall/latest/developerguide/firewall-policy-updating.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation: フルパケットのデフォルトステートレスアクションをドロップに設定します\nResources:\n  <example_resource_name>:\n    Type: AWS::NetworkFirewall::FirewallPolicy\n    Properties:\n      FirewallPolicyName: <example_resource_name>\n      FirewallPolicy:\n        StatelessDefaultActions:\n          - aws:drop  # 重要: フルパケットのデフォルトはドロップに設定されています（チェックを修正）\n        StatelessFragmentDefaultActions:\n          - aws:drop  # 有効なポリシーに必要です\n```",
+      "Other": "1. AWS コンソールで Amazon VPC を開きます\n2. Network Firewall の下で、Firewall ポリシーを選択します\n3. 対象のファイアウォールポリシーを開き、編集を選択します\n4. ステートレスデフォルトアクション（フルパケット）で、ドロップ（またはステートフルルールグループにフォワード）を選択します\n5. 保存を選択します",
+      "Terraform": "```hcl\n# Terraform: フルパケットのデフォルトステートレスアクションをドロップに設定します\nresource \"aws_networkfirewall_firewall_policy\" \"<example_resource_name>\" {\n  name = \"<example_resource_name>\"\n\n  firewall_policy {\n    stateless_default_actions          = [\"aws:drop\"]  # 重要: フルパケットのデフォルトはドロップに設定されています（チェックを修正）\n    stateless_fragment_default_actions = [\"aws:drop\"]  # 有効なポリシーに必要です\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "**デフォルト拒否**の姿勢を強制します: フルパケットのステートレスデフォルトを `aws:drop` または `aws:forward_to_sfe` に設定します。明示的な許可ルールを使用し、**ステートフルインスペクション**をレイヤー化し、**多層防御**と**最小特権**をサポートするためにログとレビューを維持します。",
+      "Url": "https://hub.prowler.com/check/networkfirewall_policy_default_action_full_packets"
+    }
+  },
+  "Categories": [
+    "trust-boundaries"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

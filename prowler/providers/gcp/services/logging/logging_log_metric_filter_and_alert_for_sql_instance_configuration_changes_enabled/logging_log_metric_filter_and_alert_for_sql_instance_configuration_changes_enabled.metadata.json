@@ -1,0 +1,31 @@
+{
+  "Provider": "gcp",
+  "CheckID": "logging_log_metric_filter_and_alert_for_sql_instance_configuration_changes_enabled",
+  "CheckTitle": "Ensure that the log metric filter and alerts exist for SQL instance configuration changes.",
+  "CheckType": [],
+  "ServiceName": "logging",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "MetricFilter",
+  "ResourceGroup": "monitoring",
+  "Description": "Ensure that the log metric filter and alerts exist for SQL instance configuration changes.",
+  "Risk": "SQL instance configuration changes can affect availability, security and data protection. Alerting on these changes helps detect unauthorized or unexpected modifications.",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "Create a log metric filter for Cloud SQL instance update events and associate it with a monitoring alert policy.",
+      "Url": "https://cloud.google.com/monitoring/alerts"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

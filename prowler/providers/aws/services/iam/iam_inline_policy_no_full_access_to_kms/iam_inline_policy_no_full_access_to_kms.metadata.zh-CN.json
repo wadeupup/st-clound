@@ -1,0 +1,33 @@
+{
+  "Provider": "aws",
+  "CheckID": "iam_inline_policy_no_full_access_to_kms",
+  "CheckTitle": "确保不会创建允许完整 \"kms:*\" 权限的 IAM 内联策略",
+  "CheckType": [
+    "Software and Configuration Checks"
+  ],
+  "ServiceName": "iam",
+  "SubServiceName": "inline_policy",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "medium",
+  "ResourceType": "AwsIamPolicy",
+  "ResourceGroup": "IAM",
+  "Description": "确保不会创建允许完整 \"kms:*\" 权限的 IAM 内联策略",
+  "Risk": "KMS 是关键服务，针对该服务的 IAM 策略尤其应遵循最小权限模型",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "与其一开始授予过于宽松的权限再尝试后续收紧，不如从最小权限集开始，并在必要时逐步增加权限会更安全。请列出相关策略并分析其权限是否已最小化到满足业务活动所需。",
+      "Url": "http://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

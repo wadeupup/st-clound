@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "app_function_latest_runtime_version",
+  "CheckTitle": "Azure Functions が最新のサポート対象ランタイムを使用していることを確認する",
+  "CheckType": [],
+  "ServiceName": "app",
+  "SubServiceName": "function",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Microsoft.Web/sites",
+  "ResourceGroup": "serverless",
+  "Description": "Azure Functions を最新のサポート対象ランタイム バージョンに保つことは、セキュリティとパフォーマンスの観点で重要です。更新にはセキュリティ パッチや機能強化が含まれることが多く、既知の脆弱性や潜在的なエクスプロイトから保護するのに役立ちます。さらに、新しいランタイム バージョンでは機能改善やリソース利用の最適化が提供される場合があります。",
+  "Risk": "古いランタイム バージョンの使用は、セキュリティ リスクや性能低下を招く可能性があります。古いランタイムには未修正の脆弱性が残っている場合があり、攻撃を受けやすくなります。",
+  "RelatedUrl": "https://docs.microsoft.com/en-us/azure/azure-functions/functions-versions",
+  "Remediation": {
+    "Code": {
+      "CLI": "az functionapp config appsettings set --name <function_app_name> --resource-group <resource_group_name> --settings FUNCTIONS_EXTENSION_VERSION=~4",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/Functions/azure-function-runtime-version.html",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "",
+      "Url": "https://learn.microsoft.com/en-us/azure/azure-functions/migrate-version-3-version-4?tabs=net8%2Cazure-cli%2Cwindows&pivots=programming-language-python"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "Azure Functions の最新セキュリティ更新およびパッチ リリースについて継続的に把握し、安全で最新の環境を維持してください。"
+}

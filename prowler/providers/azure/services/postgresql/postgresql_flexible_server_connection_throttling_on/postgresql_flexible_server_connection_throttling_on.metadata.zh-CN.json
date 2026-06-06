@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "postgresql_flexible_server_connection_throttling_on",
+  "CheckTitle": "确保 PostgreSQL 数据库服务器的参数“connection_throttling”设置为“ON”",
+  "CheckType": [],
+  "ServiceName": "postgresql",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "PostgreSQL",
+  "ResourceGroup": "database",
+  "Description": "在 PostgreSQL 服务器上启用 connection_throttling。",
+  "Risk": "启用 connection_throttling 有助于 PostgreSQL 数据库设置日志消息详细级别。这样可生成与并发连接相关的查询和错误日志，帮助识别可能通过耗尽连接资源而导致拒绝服务（DoS）攻击成功的风险。系统也可能因合法用户过载而失败或性能下降。查询和错误日志可用于识别、排查并修复配置错误及性能不佳问题。",
+  "RelatedUrl": " https://docs.microsoft.com/en-us/rest/api/postgresql/configurations/listbyserver",
+  "Remediation": {
+    "Code": {
+      "CLI": "az postgres server configuration set --resource-group <resourceGroupName> --server-name <serverName> --name connection_throttling --value on",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity-staging/knowledge-base/azure/PostgreSQL/connection-throttling.html",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-networking-policies/bc_azr_networking_13#terraform"
+    },
+    "Recommendation": {
+      "Text": "通过 Azure Portal：1. 使用 https://portal.azure.com 登录 Azure Portal。2. 进入 Azure Database for PostgreSQL servers。3. 对每个数据库，点击 Server parameters。4. 搜索 connection_throttling。5. 点击 ON 并保存。通过 Azure CLI：使用以下命令更新 connection_throttling 配置。az postgres server configuration set --resource-group <resourceGroupName> -- server-name <serverName> --name connection_throttling --value on。通过 PowerShell：使用以下命令更新 connection_throttling 配置。Update-AzPostgreSqlConfiguration -ResourceGroupName <ResourceGroupName> - ServerName <ServerName> -Name connection_throttling -Value on",
+      "Url": "https://learn.microsoft.com/en-us/azure/postgresql/single-server/how-to-configure-server-parameters-using-portal"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

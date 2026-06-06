@@ -1,0 +1,33 @@
+{
+  "Provider": "aws",
+  "CheckID": "s3_access_point_public_access_block",
+  "CheckTitle": "阻止接入点上启用的公共访问设置。",
+  "CheckType": [
+    "数据保护"
+  ],
+  "ServiceName": "s3",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:s3:::bucket_name",
+  "Severity": "critical",
+  "ResourceType": "AwsS3AccessPoint",
+  "ResourceGroup": "storage",
+  "Description": "确保S3接入点上的公共访问被阻止。",
+  "Risk": "在AWS中向公众开放S3访问点可能会导致数据泄露、违规、合规违规、未经授权的访问和数据完整性问题。",
+  "RelatedUrl": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-points.html#access-points-policies",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://docs.aws.amazon.com/securityhub/latest/userguide/s3-controls.html#s3-19",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "确保S3访问点默认为私有，应用严格的访问控制，并定期审核权限以防止未经授权的公共访问。",
+      "Url": "https://docs.aws.amazon.com/config/latest/developerguide/s3-access-point-public-access-blocks.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

@@ -1,0 +1,33 @@
+{
+  "Provider": "azure",
+  "CheckID": "storage_ensure_soft_delete_is_enabled",
+  "CheckTitle": "Azure コンテナーと Blob Storage で soft delete が有効化されていることを確認する",
+  "CheckType": [],
+  "ServiceName": "storage",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AzureStorageAccount",
+  "ResourceGroup": "storage",
+  "Description": "Azure Storage Blob には、ePHI や財務データなどの機密情報または個人情報が含まれる場合があります。アプリケーションや他のストレージアカウントユーザーによってデータが誤って変更または削除されると、データ損失や可用性低下が発生します。",
+  "Risk": "コンテナーおよび Blob Storage のデータが誤って削除される可能性があります。攻撃者または悪意のあるユーザーが意図的に削除し、障害を引き起こすこともあります。Azure Storage Blob を削除すると即時にデータ損失が発生します。この設定を Azure Storage で有効化すると、Blob/データがストレージアカウントから削除された場合でも、保持ポリシーで設定した期間（7 日から 365 日）内で復旧できます。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/storage/blobs/soft-delete-blob-enable?tabs=azure-portal",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity-staging/knowledge-base/azure/StorageAccounts/enable-soft-delete.html#",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "Azure ホームページで左上のハンバーガーメニューを開くか、右向き矢印の下にある「More services」をクリックします。2. Storage を選択します。3. Storage Accounts を選択します。4. 各 Storage Account について、左側スクロール列の Data protection に移動します。5. blobs と containers の両方で soft delete を有効化します。保持期間は組織に十分な長さに設定します。",
+      "Url": "https://docs.microsoft.com/en-us/azure/storage/blobs/storage-blob-soft-delete"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "スナップショットが保持されるため、追加のストレージコストが発生する可能性があります。"
+}

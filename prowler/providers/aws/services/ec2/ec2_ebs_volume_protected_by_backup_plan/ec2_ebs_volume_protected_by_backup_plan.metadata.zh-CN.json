@@ -1,0 +1,36 @@
+{
+  "Provider": "aws",
+  "CheckID": "ec2_ebs_volume_protected_by_backup_plan",
+  "CheckTitle": "Amazon EBS 卷应受备份计划保护",
+  "CheckType": [
+    "Software and Configuration Checks, AWS Security Best Practices"
+  ],
+  "ServiceName": "ec2",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:volume/volume-id",
+  "Severity": "low",
+  "ResourceType": "AwsEc2Volume",
+  "ResourceGroup": "storage",
+  "Description": "评估处于使用状态的 Amazon EBS 卷是否受备份计划保护。如果 EBS 卷未受备份计划保护，则检查失败。如果您将 backupVaultLockCheck 参数设置为 true，则仅当 EBS 卷在 AWS Backup 锁定保管库中备份时，控制才会通过。",
+  "Risk": "如果没有备份保护，Amazon EBS 卷容易遭受数据丢失或删除，降低系统的弹性，并使从事件中恢复变得更加困难。",
+  "RelatedUrl": "https://docs.aws.amazon.com/config/latest/developerguide/ebs-resources-protected-by-backup-plan.html",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://docs.aws.amazon.com/securityhub/latest/userguide/ec2-controls.html#ec2-28",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "确保所有使用中的 Amazon EBS 卷都包含在备份计划中，并考虑使用 AWS Backup Vault Lock 以获得额外保护。",
+      "Url": "https://docs.aws.amazon.com/aws-backup/latest/devguide/assigning-resources.html"
+    }
+  },
+  "Categories": [
+    "redundancy"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "network_rdp_internet_access_restricted",
+  "CheckTitle": "インターネットからの RDP アクセスが評価され、制限されていることを確認する",
+  "CheckType": [],
+  "ServiceName": "network",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Network",
+  "ResourceGroup": "network",
+  "Description": "ネットワーク セキュリティ グループは、ポート設定ミスがないか定期的に評価する必要があります。特定のポートやプロトコルがインターネットに公開され得る場合、必要性を評価し、明確に必要でない場合は制限すべきです。",
+  "Risk": "インターネット経由で RDP を使用する潜在的なセキュリティ問題は、攻撃者がさまざまなブルートフォース手法で Azure Virtual Machines へのアクセスを取得できることです。攻撃者がアクセスを取得すると、その仮想マシンを踏み台として Azure Virtual Network 内の他マシンを侵害したり、Azure 外部のネットワーク接続デバイスを攻撃したりする可能性があります。",
+  "RelatedUrl": "https://docs.microsoft.com/en-us/azure/security/azure-security-network-security-best-practices#disable-rdpssh-access-to-azure-virtual-machines",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity-staging/knowledge-base/azure/Network/unrestricted-rdp-access.html#",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-networking-policies/bc_azr_networking_2#terraform"
+    },
+    "Recommendation": {
+      "Text": "ネットワーク セキュリティ グループに接続されたリソースで、RDP が明確に必要かつ最小限に構成されていない場合、Azure リソースへのインターネット レベルのアクセスは制限または排除すべきです。関連リソースへの内部アクセスには、次のような暗号化ネットワーク トンネルを構成します: ExpressRoute、Site-to-site VPN、Point-to-site VPN。",
+      "Url": "https://docs.microsoft.com/en-us/security/benchmark/azure/security-controls-v3-network-security#ns-1-establish-network-segmentation-boundaries"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

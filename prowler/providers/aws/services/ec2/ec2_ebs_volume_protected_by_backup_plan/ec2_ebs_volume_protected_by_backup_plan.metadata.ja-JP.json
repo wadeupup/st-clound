@@ -1,0 +1,36 @@
+{
+  "Provider": "aws",
+  "CheckID": "ec2_ebs_volume_protected_by_backup_plan",
+  "CheckTitle": "Amazon EBS ボリュームはバックアッププランで保護されている必要がある",
+  "CheckType": [
+    "Software and Configuration Checks, AWS Security Best Practices"
+  ],
+  "ServiceName": "ec2",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:volume/volume-id",
+  "Severity": "low",
+  "ResourceType": "AwsEc2Volume",
+  "ResourceGroup": "storage",
+  "Description": "使用中の Amazon EBS ボリュームがバックアッププランで保護されているかを評価します。EBS ボリュームがバックアッププランで保護されていない場合、チェックは失敗します。backupVaultLockCheck パラメータを true に設定した場合、EBS ボリュームが AWS Backup ロックされたボルトでバックアップされている場合にのみ、コントロールはパスします。",
+  "Risk": "バックアップ保護がない場合、Amazon EBS ボリュームはデータ損失や削除に対して脆弱になり、システムの回復力が低下し、インシデントからの回復がより困難になります。",
+  "RelatedUrl": "https://docs.aws.amazon.com/config/latest/developerguide/ebs-resources-protected-by-backup-plan.html",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://docs.aws.amazon.com/securityhub/latest/userguide/ec2-controls.html#ec2-28",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "使用中のすべての Amazon EBS ボリュームがバックアッププランに含まれていることを確認し、追加の保護のために AWS Backup Vault Lock の使用を検討してください。",
+      "Url": "https://docs.aws.amazon.com/aws-backup/latest/devguide/assigning-resources.html"
+    }
+  },
+  "Categories": [
+    "redundancy"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

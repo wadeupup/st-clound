@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "defender_ensure_defender_for_storage_is_on",
+  "CheckTitle": "确保 Microsoft Defender for Storage 设置为“开启”",
+  "CheckType": [],
+  "ServiceName": "defender",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AzureDefenderPlan",
+  "ResourceGroup": "security",
+  "Description": "确保 Microsoft Defender for Storage 设置为“开启”",
+  "Risk": "确保已为你的 Microsoft Azure 存储账户启用 Microsoft Defender for Cloud。Defender for storage accounts 是 Azure 原生的安全情报层，可检测对 Azure 云存储账户的异常和潜在恶意访问或利用尝试。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/SecurityCenter/defender-storage.html",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-general-policies/ensure-that-azure-defender-is-set-to-on-for-storage#terraform"
+    },
+    "Recommendation": {
+      "Text": "默认情况下，Microsoft Defender for Cloud 对你的存储账户处于禁用状态。为 Azure 存储账户启用 Defender 安全服务，可借助 Microsoft Security Response Center (MSRC) 提供的威胁检测能力实现高级安全防护。MSRC 会调查影响 Microsoft 产品与服务（包括 Azure 云服务）的所有安全漏洞报告。",
+      "Url": ""
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

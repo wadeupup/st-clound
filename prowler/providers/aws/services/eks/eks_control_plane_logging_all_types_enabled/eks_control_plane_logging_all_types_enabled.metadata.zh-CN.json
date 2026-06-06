@@ -1,0 +1,44 @@
+{
+  "Provider": "aws",
+  "CheckID": "eks_control_plane_logging_all_types_enabled",
+  "CheckTitle": "EKS 集群已为 api、audit、authenticator、controllerManager 和 scheduler 启用控制平面日志记录",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices"
+  ],
+  "ServiceName": "eks",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsEksCluster",
+  "ResourceGroup": "container",
+  "Description": "评估 **Amazon EKS 集群**的 **控制平面日志记录**是否覆盖所需类型：`api`、`audit`、`authenticator`、`controllerManager`、`scheduler`。\n\n该检查结果会识别未配置这些日志类型中任何一种的集群。",
+  "Risk": "**控制平面日志记录**的缺失会降低整个集群的可见性。\n- 机密性：未检测到的 API 访问、RBAC 滥用、令牌误用\n- 完整性：无法追踪的配置更改和政策编辑\n- 可用性：调度器/控制器问题缺乏证据，延迟恢复并掩盖攻击者的持久性",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/eks/latest/userguide/logging-monitoring.html",
+    "https://support.icompaas.com/support/solutions/articles/62000233623-ensure-eks-control-plane-logging-is-enabled-for-all-required-log-types",
+    "https://docs.aws.amazon.com/eks/latest/userguide/control-plane-logs.html",
+    "https://docs.aws.amazon.com/prescriptive-guidance/latest/implementing-logging-monitoring-cloudwatch/kubernetes-eks-logging.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws eks update-cluster-config --name <cluster_name> --logging '{\"clusterLogging\":[{\"types\":[\"api\",\"audit\",\"authenticator\",\"controllerManager\",\"scheduler\"],\"enabled\":true}]}'",
+      "NativeIaC": "```yaml\n# CloudFormation: enable all EKS control plane log types\nResources:\n  <example_resource_name>:\n    Type: AWS::EKS::Cluster\n    Properties:\n      RoleArn: <example_role_arn>\n      ResourcesVpcConfig:\n        SubnetIds: [<example_subnet_id>]\n      Logging:\n        ClusterLogging:\n          - EnabledTypes:\n              - Type: api            # Critical: enable required control plane log types\n              - Type: audit          # Critical: enable required control plane log types\n              - Type: authenticator  # Critical: enable required control plane log types\n              - Type: controllerManager  # Critical: enable required control plane log types\n              - Type: scheduler      # Critical: enable required control plane log types\n```",
+      "Other": "1. 在 AWS 控制台中，转到 Amazon EKS 并打开您的集群\n2. 打开可观测性（或日志记录）选项卡并点击管理日志记录\n3. 开启：api、audit、authenticator、controllerManager、scheduler\n4. 点击保存更改",
+      "Terraform": "```hcl\n# Enable all required EKS control plane log types\nresource \"aws_eks_cluster\" \"<example_resource_name>\" {\n  enabled_cluster_log_types = [\n    \"api\",            # Critical: required control plane log types\n    \"audit\",          # Critical: required control plane log types\n    \"authenticator\",  # Critical: required control plane log types\n    \"controllerManager\", # Critical: required control plane log types\n    \"scheduler\"       # Critical: required control plane log types\n  ]\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "为所有必需类型 `[\"api\",\"audit\",\"authenticator\",\"controllerManager\",\"scheduler\"]` 启用并标准化 **EKS 控制平面日志记录**。\n\n对日志访问应用最小权限，设置保留和警报，并集中分析以支持纵深防御、快速检测和可靠的取证。",
+      "Url": "https://hub.prowler.com/check/eks_control_plane_logging_all_types_enabled"
+    }
+  },
+  "Categories": [
+    "logging",
+    "forensics-ready"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

@@ -1,0 +1,31 @@
+{
+  "Provider": "aws",
+  "CheckID": "iam_user_administrator_access_policy",
+  "CheckTitle": "IAMユーザーに管理者アクセス権限ポリシーが付与されていないことを確認する",
+  "CheckType": [],
+  "ServiceName": "iam",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "high",
+  "ResourceType": "AwsIamUser",
+  "ResourceGroup": "IAM",
+  "Description": "このチェックは、AWSアカウント内のIAMユーザーに「AdministratorAccess」ポリシーが付与されていないことを確認します。このポリシーを持つIAMユーザーは、すべてのAWSサービスとリソースに無制限のアクセス権を持ち、誤用された場合には重大なセキュリティリスクを引き起こす可能性があります。",
+  "Risk": "管理者レベルの権限を持つIAMユーザーは、AWS環境内の任意のリソースに対して任意のアクションを実行できます。これらの権限が不必要にユーザーに付与されたり、十分な知識を持たない個人に付与されたりすると、セキュリティの脆弱性、データ漏洩、データ損失、予期しない料金の発生につながる可能性があります。",
+  "RelatedUrl": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_users.html",
+  "Remediation": {
+    "Code": {
+      "CLI": "aws iam detach-user-policy --user-name <username> --policy-arn arn:aws:iam::aws:policy/AdministratorAccess",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/IAM/admin-permissions.html",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "「AdministratorAccess」ポリシーを、最小権限の原則に従ったより具体的な権限に置き換えてください。「IAM Master」や「IAM Manager」などのIAMロールを実装して、より安全に権限を管理することを検討してください。",
+      "Url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

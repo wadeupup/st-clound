@@ -1,0 +1,45 @@
+{
+  "Provider": "aws",
+  "CheckID": "appsync_field_level_logging_enabled",
+  "CheckTitle": "AWS AppSync API 的字段级日志记录设置为 ALL 或 ERROR",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践",
+    "软件和配置检查/行业和监管标准/AWS 基础安全最佳实践"
+  ],
+  "ServiceName": "appsync",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsAppSyncGraphQLApi",
+  "ResourceGroup": "api_gateway",
+  "Description": "**AWS AppSync GraphQL API** 在解析器级别配置了**字段级日志记录**。该检查查找 `ERROR` 或 `ALL` 的日志级别，以确认字段解析事件被记录。",
+  "Risk": "没有**字段级日志**，解析器访问和变更缺乏**可审计性**，降低了数据泄露和篡改的检测能力（**机密性和完整性**）。有限的跟踪阻碍了事件响应和根本原因分析，增加了恢复时间。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://theburningmonk.com/2020/09/how-to-sample-appsync-resolver-logs/",
+    "https://lumigo.io/blog/how-to-monitor-and-debug-appsync-apis/",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/appsync-controls.html#appsync-2",
+    "https://docs.aws.amazon.com/appsync/latest/APIReference/API_LogConfig.html",
+    "https://blog.graphbolt.dev/debugging-aws-appsync-apis-with-cloudwatch",
+    "https://support.icompaas.com/support/solutions/articles/62000233678-ensure-aws-appsync-should-have-field-level-logging-enabled"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws appsync update-graphql-api --api-id <example_resource_id> --name <api-name> --authentication-type AWS_IAM --log-config fieldLogLevel=ERROR,cloudWatchLogsRoleArn=<cloudwatch_logs_role_arn>",
+      "NativeIaC": "```yaml\n# CloudFormation - 为 AppSync API 启用字段级日志记录\nResources:\n  <example_resource_name>:\n    Type: AWS::AppSync::GraphQLApi\n    Properties:\n      Name: <example_resource_name>\n      AuthenticationType: AWS_IAM\n      LogConfig:\n        CloudWatchLogsRoleArn: arn:aws:iam::<account-id>:role/<example_resource_name>  # 关键：允许 AppSync 写入日志\n        FieldLogLevel: ERROR  # 关键：将字段级日志记录设置为合规级别\n```",
+      "Other": "1. 在 AWS 控制台中，转到 AppSync 并打开您的 GraphQL API\n2. 转到 Settings > Logging\n3. 打开 Enable logs\n4. 将 Field resolver log level 设置为 ERROR（或 ALL）\n5. 选择一个允许 AppSync 写入 CloudWatch Logs 的 IAM 角色\n6. 单击 Save",
+      "Terraform": "```hcl\n# Terraform - 为 AppSync API 启用字段级日志记录\nresource \"aws_appsync_graphql_api\" \"<example_resource_name>\" {\n  name                = \"<example_resource_name>\"\n  authentication_type = \"AWS_IAM\"\n\n  log_config {\n    cloudwatch_logs_role_arn = \"<cloudwatch_logs_role_arn>\" # 关键：允许记录到 CloudWatch\n    field_log_level          = \"ERROR\"                        # 关键：合规的字段级日志记录\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "- 至少启用 `ERROR` 级别的字段级日志记录；仅在故障排除时提高到 `INFO`/`DEBUG`/`ALL`。\n- 对日志记录角色强制执行**最小权限**。\n- 避免在日志中包含敏感数据；限制详细内容。\n- 设置保留期并考虑日志**采样**以平衡可见性和成本。",
+      "Url": "https://hub.prowler.com/check/appsync_field_level_logging_enabled"
+    }
+  },
+  "Categories": [
+    "logging"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

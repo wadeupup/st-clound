@@ -1,0 +1,44 @@
+{
+  "Provider": "aws",
+  "CheckID": "mq_broker_cluster_deployment_mode",
+  "CheckTitle": "MQ RabbitMQ broker 具有集群（多可用区）部署模式",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践",
+    "软件和配置检查/行业和监管标准/NIST 800-53 控制",
+    "影响/拒绝服务"
+  ],
+  "ServiceName": "mq",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsAmazonMQBroker",
+  "ResourceGroup": "messaging",
+  "Description": "**Amazon MQ RabbitMQ brokers** 被评估为 **集群部署模式** (`CLUSTER_MULTI_AZ`)，节点分布在多个可用区并共享状态。\n\n配置不同的代理将被识别出来。",
+  "Risk": "没有 **集群化的 RabbitMQ**，代理是一个 **单点故障**。实例或可用区中断可能会导致队列停止、消息丢失或重复，并破坏顺序，降低依赖于代理的工作负载的 **可用性** 和 **完整性**。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/amazon-mq/latest/developer-guide/rabbitmq-basic-elements.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/mq-controls.html#mq-6",
+    "https://docs.aws.amazon.com/amazon-mq/latest/developer-guide/rabbitmq-broker-architecture.html#rabbitmq-broker-architecture-cluster",
+    "https://docs.amazonaws.cn/en_us/AWSCloudFormation/latest/TemplateReference/aws-resource-amazonmq-broker.html",
+    "https://docs.aws.amazon.com/controltower/latest/controlreference/mq-rules.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws mq create-broker --broker-name <example_resource_name> --engine-type RABBITMQ --deployment-mode CLUSTER_MULTI_AZ --host-instance-type mq.m5.large --publicly-accessible --auto-minor-version-upgrade --users '[{\"Username\":\"<example_username>\",\"Password\":\"<example_password>\"}]'",
+      "NativeIaC": "```yaml\n# CloudFormation：以集群（多可用区）模式创建 RabbitMQ 代理\nResources:\n  ExampleBroker:\n    Type: AWS::AmazonMQ::Broker\n    Properties:\n      BrokerName: \"<example_resource_name>\"\n      EngineType: RABBITMQ            # 关键：确保代理是 RabbitMQ\n      DeploymentMode: CLUSTER_MULTI_AZ # 关键：设置集群（多可用区）以通过检查\n      HostInstanceType: mq.m5.large\n      PubliclyAccessible: true\n      Users:\n        - Username: \"<example_username>\"\n          Password: \"<example_password>\"\n```",
+      "Other": "1. 打开 AWS 控制台并进入 Amazon MQ\n2. 点击 Brokers > Create broker\n3. 选择 RabbitMQ 作为引擎\n4. 将部署模式设置为集群（多可用区）\n5. 输入代理名称，选择实例类型，根据需要设置公共访问，并创建一个管理员用户\n6. 点击 Create broker\n7. 将应用程序迁移到新的代理端点，然后删除旧的单实例代理\n\n注意：现有代理的部署模式无法更改；您必须创建一个新的集群代理。",
+      "Terraform": "```hcl\n# Terraform：以集群（多可用区）模式创建 RabbitMQ 代理\nresource \"aws_mq_broker\" \"example\" {\n  broker_name         = \"<example_resource_name>\"\n  engine_type         = \"RabbitMQ\"         # 关键：RabbitMQ 引擎\n  deployment_mode     = \"CLUSTER_MULTI_AZ\" # 关键：集群（多可用区）以通过检查\n  host_instance_type  = \"mq.m5.large\"\n  publicly_accessible = true\n\n  user {\n    username = \"<example_username>\"\n    password = \"<example_password>\"\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "使用 **集群部署** (`CLUSTER_MULTI_AZ`) 为 RabbitMQ 消除单实例风险。\n\n应用 **设计上的弹性**：客户端自动重连，带退避的重试和幂等处理；测试故障转移，针对节点丢失进行大小调整，并通过监控实施 **最小特权** 以实现深度防御。",
+      "Url": "https://hub.prowler.com/check/mq_broker_cluster_deployment_mode"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

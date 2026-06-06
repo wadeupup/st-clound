@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "vm_jit_access_enabled",
+  "CheckTitle": "为虚拟机启用实时（JIT）访问",
+  "CheckType": [],
+  "ServiceName": "vm",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/{vmName}",
+  "Severity": "high",
+  "ResourceType": "Microsoft.Compute/virtualMachines",
+  "ResourceGroup": "compute",
+  "Description": "确保 Microsoft Azure 虚拟机已配置为使用实时（JIT）访问。",
+  "Risk": "如果未启用 JIT 访问，22（SSH）和 3389（RDP）等管理端口可能暴露，从而增加暴力破解和 DDoS 攻击风险。",
+  "RelatedUrl": "https://docs.microsoft.com/en-us/azure/security-center/security-center-just-in-time?tabs=jit-config-asc%2Cjit-request-asc",
+  "Remediation": {
+    "Code": {
+      "CLI": "az security jit-policy list --query '[*].virtualMachines[*].id | []'",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "在 Azure 门户的 Security Center > Just-in-time VM access 下，为 Microsoft Azure 虚拟机启用实时（JIT）网络访问。",
+      "Url": "https://docs.microsoft.com/en-us/azure/security-center/security-center-just-in-time?tabs=jit-config-asc%2Cjit-request-asc"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "JIT 访问只能通过 Azure 门户启用。请确保已启用 Security Center 的服务器标准定价层。"
+}

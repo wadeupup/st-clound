@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "defender_ensure_wdatp_is_enabled",
+  "CheckTitle": "Microsoft Defender for Endpoint と Microsoft Defender for Cloud の統合が選択されていることを確認する",
+  "CheckType": [],
+  "ServiceName": "defender",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "DefenderSettings",
+  "ResourceGroup": "security",
+  "Description": "この統合設定により、Microsoft Defender for Endpoint（旧称「Advanced Threat Protection」または「ATP」または「WDATP」）が Microsoft Defender for Cloud と連携できるようになります。",
+  "Risk": "Microsoft Defender for Endpoint の統合により、Microsoft Defender for Cloud 内で包括的な Endpoint Detection and Response（EDR）機能が提供されます。この統合は、異常の検出に加え、Microsoft Defender for Cloud が監視するエンドポイント上の高度な攻撃の検知と対応に役立ちます。MDE は Standard ティアのサブスクリプションでのみ利用できます。",
+  "RelatedUrl": "https://learn.microsoft.com/en-in/azure/defender-for-cloud/integration-defender-for-endpoint?tabs=windows",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/SecurityCenter/defender-endpoint-integration.html",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "",
+      "Url": "https://learn.microsoft.com/en-us/microsoft-365/security/defender-endpoint/azure-server-integration?view=o365-worldwide"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "Microsoft Defender for Endpoint は Standard 料金ティアのサブスクリプションで動作します。Microsoft Defender for Cloud の Standard 料金ティアを選択すると、リソースごとに追加費用が発生します。"
+}

@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "elasticache_redis_cluster_multi_az_enabled",
+  "CheckTitle": "ElastiCache Redis レプリケーショングループで多可用区が有効になっている",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Effects/Denial of Service"
+  ],
+  "ServiceName": "elasticache",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "database",
+  "Description": "**ElastiCache for Redis レプリケーショングループ**は、**多可用区自動フェイルオーバー**が有効になっており、プライマリとレプリカを異なる可用性ゾーンに分散しています。",
+  "Risk": "**多可用区フェイルオーバー**がない場合、ノードまたは AZ の停止により、Redis エンドポイントにアクセスできなくなり、**可用性**が低下します。コールドキャッシュの再構築により、負荷がデータベースにシフトし、飽和と連鎖的なタイムアウトのリスクがあります。障害中に最近の書き込みが失われる可能性があり、**整合性**に影響を与えます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/AmazonElastiCache/latest/dg/AutoFailover.html",
+    "https://repost.aws/knowledge-center/multi-az-replication-redis",
+    "https://www.trendmicro.com/cloudoneconformity-staging/knowledge-base/aws/ElastiCache/elasticache-multi-az.html#"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws elasticache modify-replication-group --replication-group-id <example_resource_id> --multi-az-enabled --automatic-failover-enabled --apply-immediately",
+      "NativeIaC": "```yaml\n# CloudFormation: Enable Multi-AZ on an ElastiCache Redis replication group\nResources:\n  <example_resource_name>:\n    Type: AWS::ElastiCache::ReplicationGroup\n    Properties:\n      ReplicationGroupDescription: \"<description>\"\n      Engine: redis\n      CacheNodeType: cache.t4g.small\n      NumCacheClusters: 2\n      MultiAZEnabled: true  # CRITICAL: Enables Multi-AZ for the replication group\n```",
+      "Other": "1. AWS コンソールで、ElastiCache > Redis に移動します\n2. 対象のレプリケーショングループを選択します\n3. 変更をクリックします\n4. 多可用区を有効化します（プロンプトが表示された場合は自動フェイルオーバーも有効化）\n5. すぐに適用にチェックを入れ、変更をクリックします",
+      "Terraform": "```hcl\n# Enable Multi-AZ on an ElastiCache Redis replication group\nresource \"aws_elasticache_replication_group\" \"<example_resource_name>\" {\n  replication_group_id  = \"<example_resource_id>\"\n  description           = \"<description>\"\n  engine                = \"redis\"\n  node_type             = \"cache.t4g.small\"\n  number_cache_clusters = 2\n\n  multi_az_enabled           = true  # CRITICAL: Enables Multi-AZ\n  automatic_failover_enabled = true  # Required for Multi-AZ failover\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "Redis レプリケーショングループで**自動フェイルオーバー付きの多可用区**（`MultiAZ: enabled`）を有効化し、レプリカを別々の AZ に配置します。プライマリ/リーダーエンドポイントに従うクライアントを使用し、レプリケーションラグを監視し、定期的にフェイルオーバーをテストします。回復のためにスナップショットと組み合わせます。これにより、高い**可用性**と**回復力**が確保されます。",
+      "Url": "https://hub.prowler.com/check/elasticache_redis_cluster_multi_az_enabled"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

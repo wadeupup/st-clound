@@ -1,0 +1,71 @@
+services:
+  api:
+    image: cspm-backend-main-api:latest
+    hostname: prowler-api
+    environment:
+      DJANGO_SETTINGS_MODULE: config.django.devel
+      PYTHONPATH: /home/prowler
+    env_file:
+      - path: .env
+        required: false
+    ports:
+      - "127.0.0.1:9090:8080"
+    volumes:
+      - ./api/src/backend:/home/prowler/backend
+      - ./api/pyproject.toml:/home/prowler/pyproject.toml
+      - ./api/docker-entrypoint.sh:/home/prowler/docker-entrypoint.sh
+      - ./prowler:/home/prowler/prowler
+      - ./_data/api:/home/prowler/.config/prowler-api
+      - cspm_backend_output:/tmp/prowler_api_output
+    depends_on:
+      postgres:
+        condition: service_healthy
+      valkey:
+        condition: service_healthy
+    entrypoint:
+      - /home/prowler/docker-entrypoint.sh
+      - dev
+
+  postgres:
+    image: postgres:16.3-alpine3.20
+    hostname: postgres-db
+    volumes:
+      - cspm_postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: ${POSTGRES_ADMIN_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_ADMIN_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    env_file:
+      - path: .env
+        required: false
+    ports:
+      - "127.0.0.1:5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_ADMIN_USER}\" -d \"$${POSTGRES_DB}\""]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  valkey:
+    image: valkey/valkey:7-alpine3.19
+    hostname: valkey
+    volumes:
+      - ./_data/valkey:/data
+    env_file:
+      - path: .env
+        required: false
+    ports:
+      - "127.0.0.1:6380:6379"
+    healthcheck:
+      test: ["CMD-SHELL", "valkey-cli ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  cspm_postgres_data:
+    external: true
+    name: cspm-backend-main_postgres-data
+  cspm_backend_output:
+    external: true
+    name: cspm-backend-main_output

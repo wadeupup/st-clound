@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "mysql_flexible_server_audit_log_enabled",
+  "CheckTitle": "确保 MySQL 数据库服务器的参数“audit_log_enabled”设置为“ON”",
+  "CheckType": [],
+  "ServiceName": "mysql",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Microsoft.DBforMySQL/flexibleServers",
+  "ResourceGroup": "database",
+  "Description": "在 MySQL 服务器上启用 audit_log_enabled。",
+  "Risk": "启用 audit_log_enabled 可帮助 MySQL 数据库记录服务器连接尝试、DDL/DML 访问等项目。日志数据可用于识别、排查并修复配置错误和性能不佳问题。",
+  "RelatedUrl": "https://docs.microsoft.com/en-us/azure/mysql/single-server/how-to-configure-audit-logs-portal",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.tenable.com/audits/items/CIS_Microsoft_Azure_Foundations_v1.5.0_L2.audit:c073639a1ce546b535ba73afbf6542aa",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "1. 使用 https://portal.azure.com 登录 Azure Portal。2. 选择 Azure Database for MySQL Servers。3. 选择一个数据库。4. 在 Settings 下选择 Server parameters。5. 将 audit_log_enabled 参数更新为 ON。6. 在 Monitoring 下选择 Diagnostic settings。7. 选择 + Add diagnostic setting。8. 提供诊断设置名称。9. 在 Categories 下选择 MySQL Audit Logs。10. 指定目标详细信息。11. 点击 Save。",
+      "Url": "https://docs.microsoft.com/en-us/security/benchmark/azure/security-controls-v3-logging-threat-detection#lt-3-enable-logging-for-security-investigation"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

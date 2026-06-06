@@ -1,0 +1,36 @@
+{
+  "Provider": "aws",
+  "CheckID": "ec2_instance_port_redis_exposed_to_internet",
+  "CheckTitle": "确保没有 EC2 实例允许从互联网入站访问 TCP 端口 6379 (Redis)",
+  "CheckType": [
+    "Infrastructure Security"
+  ],
+  "ServiceName": "ec2",
+  "SubServiceName": "instance",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "critical",
+  "ResourceType": "AwsEc2Instance",
+  "ResourceGroup": "compute",
+  "Description": "确保没有 EC2 实例允许从互联网入站访问 TCP 端口 6379 (Redis)",
+  "Risk": "Redis 是一个开源的内存数据结构存储，用作数据库、缓存和消息代理。Redis 通常用于存储敏感数据，如会话令牌、用户凭据和其他敏感信息。允许从互联网入站访问 TCP 端口 6379 (Redis) 可能会将敏感数据暴露给未经授权的用户。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "修改与 EC2 实例关联的安全组，删除允许从互联网入站访问 TCP 端口 6379 (Redis) 的规则。",
+      "Url": "https://docs.aws.amazon.com/vpc/latest/userguide/VPC_SecurityGroups.html"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

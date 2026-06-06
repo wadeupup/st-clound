@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "sagemaker_notebook_instance_encryption_enabled",
+  "CheckTitle": "SageMaker 笔记本实例已使用 KMS 密钥加密",
+  "CheckType": [
+    "软件和配置检查/AWS安全最佳实践",
+    "软件和配置检查/行业和监管标准/AWS 基础安全最佳实践",
+    "影响/数据暴露"
+  ],
+  "ServiceName": "sagemaker",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsSageMakerNotebookInstance",
+  "ResourceGroup": "ai_ml",
+  "Description": "**Amazon SageMaker 笔记本实例**会使用 AWS KMS 密钥评估**静态加密**。该发现反映是否为笔记本的 ML 卷加密配置了 `KmsKeyId`。",
+  "Risk": "如果不使用由客户管理的 KMS 密钥进行**静态加密**，笔记本 EBS 卷和快照中的数据可能会因存储访问、复制的备份或主机被入侵而暴露，从而降低**机密性**，并限制**密钥轮换**和**吊销**控制。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/sagemaker/latest/dg/key-management.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/SageMaker/notebook-data-encrypted.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation：使用 KMS 加密的 SageMaker 笔记本\nResources:\n  <example_resource_name>:\n    Type: AWS::SageMaker::NotebookInstance\n    Properties:\n      InstanceType: ml.t3.medium\n      RoleArn: <example_resource_arn>\n      KmsKeyId: <example_resource_id>  # 关键：使用指定的 KMS 密钥加密该笔记本的 EBS 卷\n```",
+      "Other": "1. 打开 AWS 控制台 > Amazon SageMaker > Notebook 实例\n2. 选择失败的 notebook 实例并点击停止\n3. 点击创建 notebook 实例\n4. 输入名称，选择实例类型和 IAM 角色\n5. 在加密密钥中，选择您的 KMS 密钥\n6. 创建实例并验证其已启动\n7. 根据需要迁移 notebook/数据（例如，通过 S3）\n8. 删除旧的未加密 notebook 实例",
+      "Terraform": "```hcl\n# 使用 KMS 加密的 SageMaker notebook\nresource \"aws_sagemaker_notebook_instance\" \"<example_resource_name>\" {\n  name          = \"<example_resource_name>\"\n  role_arn      = \"<example_resource_arn>\"\n  instance_type = \"ml.t3.medium\"\n  kms_key_id    = \"<example_resource_id>\"  # 关键：使用此 KMS 密钥启用 EBS 加密\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "通过设置 `KmsKeyId` 为笔记本 ML 卷使用**客户管理的 KMS 密钥**，并将 KMS 应用于相关的 S3 输入/输出。对密钥使用实施**最小权限**，启用**轮换**，并使密钥访问与**纵深防御**保持一致，以保护静态数据。",
+      "Url": "https://hub.prowler.com/check/sagemaker_notebook_instance_encryption_enabled"
+    }
+  },
+  "Categories": [
+    "encryption",
+    "gen-ai"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

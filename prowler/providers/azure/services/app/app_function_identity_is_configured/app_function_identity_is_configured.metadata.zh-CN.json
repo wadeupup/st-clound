@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "app_function_identity_is_configured",
+  "CheckTitle": "确保 Azure Function 已配置系统分配或用户分配的托管标识",
+  "CheckType": [],
+  "ServiceName": "app",
+  "SubServiceName": "function",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Microsoft.Web/sites",
+  "ResourceGroup": "serverless",
+  "Description": "应为 Azure Functions 配置托管标识，以增强安全性和访问控制。",
+  "Risk": "不使用托管标识可能导致较不安全的身份验证和授权实践，从而可能暴露敏感数据。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/entra/identity/managed-identities-azure-resources/overview",
+  "Remediation": {
+    "Code": {
+      "CLI": "az functionapp identity assign --name <function_name> --resource-group <resource_group> --identities [system]",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/Functions/azure-function-system-assigned-identity.html",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "建议为 Azure Functions 启用托管标识，以增强安全性和访问控制。这样可让函数应用以安全方式并在适当权限下轻松访问其他 Azure 资源。",
+      "Url": "https://learn.microsoft.com/en-us/azure/app-service/overview-managed-identity"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

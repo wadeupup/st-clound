@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "autoscaling_group_multiple_az",
+  "CheckTitle": "Auto Scaling 组使用多个可用区",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践",
+    "影响/拒绝服务"
+  ],
+  "ServiceName": "autoscaling",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsAutoScalingAutoScalingGroup",
+  "ResourceGroup": "compute",
+  "Description": "**EC2 Auto Scaling 组**在区域内使用**多个可用区**，实例分布在多个区域，而不是仅限于单个区域。",
+  "Risk": "依赖单个区域会集中故障风险并损害**可用性**。可用区中断或容量不足可能会阻止替换和扩展，导致停机、流量丢失和更大的爆炸半径。由于工作负载无法转移到健康的区域，恢复可能会滞后。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/autoscaling/ec2/userguide/as-add-az-console.html",
+    "https://docs.aws.amazon.com/autoscaling/ec2/userguide/ec2-auto-scaling-availability-zone-balanced.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/AutoScaling/multiple-availability-zones.html",
+    "https://docs.aws.amazon.com/autoscaling/ec2/userguide/disaster-recovery-resiliency.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws autoscaling update-auto-scaling-group --auto-scaling-group-name <example_resource_name> --vpc-zone-identifier \"<subnet_id_az1>,<subnet_id_az2>\"",
+      "NativeIaC": "```yaml\n# CloudFormation: 确保 ASG 跨越多个 AZ\nResources:\n  <example_resource_name>:\n    Type: AWS::AutoScaling::AutoScalingGroup\n    Properties:\n      MinSize: '1'\n      MaxSize: '1'\n      LaunchTemplate:\n        LaunchTemplateId: <example_resource_id>\n        Version: '$Latest'\n      VPCZoneIdentifier:\n        - <subnet_id_az1>\n        - <subnet_id_az2>  # 关键：添加不同 AZ 中的第二个子网以确保多个 AZ\n```",
+      "Other": "1. 在 AWS 控制台中，转到 EC2 > Auto Scaling Groups\n2. 选择组并打开 Details 选项卡\n3. 单击 Network > Edit\n4. 在 Subnets 中，从不同的可用区添加另一个子网\n5. 单击 Update 保存",
+      "Terraform": "```hcl\n# Terraform: 确保 ASG 跨越多个 AZ\nresource \"aws_autoscaling_group\" \"<example_resource_name>\" {\n  min_size = 1\n  max_size = 1\n\n  launch_template {\n    id      = \"<example_resource_id>\"\n    version = \"$Latest\"\n  }\n\n  vpc_zone_identifier = [\n    \"<subnet_id_az1>\",\n    \"<subnet_id_az2>\" # 关键：不同 AZ 中的两个子网以通过检查\n  ]\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "将每个组分布在至少两个**可用区**中，以设计容错能力。使用负载均衡器来分散流量，并使用基于健康的替换来维持容量。应用**弹性**和**故障隔离**原则，以便在区域降级期间服务能够继续。",
+      "Url": "https://hub.prowler.com/check/autoscaling_group_multiple_az"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

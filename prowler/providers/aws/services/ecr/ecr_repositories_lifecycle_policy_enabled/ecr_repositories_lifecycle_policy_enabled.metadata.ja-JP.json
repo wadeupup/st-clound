@@ -1,0 +1,44 @@
+{
+  "Provider": "aws",
+  "CheckID": "ecr_repositories_lifecycle_policy_enabled",
+  "CheckTitle": "ECR リポジトリにライフサイクルポリシーが設定されている",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Effects/Resource Consumption"
+  ],
+  "ServiceName": "ecr",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "low",
+  "ResourceType": "AwsEcrRepository",
+  "ResourceGroup": "container",
+  "Description": "Amazon ECR リポジトリには、イメージの年齢、数、またはタグに基づいてコンテナイメージを自動的に期限切れにする **ライフサイクルポリシー** が設定されています。",
+  "Risk": "**ライフサイクルポリシー** がないと、イメージが無期限に蓄積され、以下が発生します：\n- **可用性** の問題：クォータがプッシュと CI/CD をブロックする場合\n- **整合性** のリスク：古くて脆弱なイメージを再デプロイすることから\n- **コスト** の増加：不要なストレージから",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/AmazonECR/latest/userguide/LifecyclePolicies.html",
+    "https://docs.aws.amazon.com/AmazonECR/latest/userguide/lp_creation.html",
+    "https://aws.plainenglish.io/automation-deletion-untagged-container-image-in-amazon-ecr-using-ecr-lifecycle-policy-995eae2f5b8d",
+    "https://blog.stackademic.com/title-implementing-lifecycle-policies-in-aws-ecr-a-practical-guide-3860b612b477",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/ECR/lifecycle-policy-in-use.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws ecr put-lifecycle-policy --repository-name <REPOSITORY_NAME> --lifecycle-policy-text '{\"rules\":[{\"rulePriority\":1,\"selection\":{\"tagStatus\":\"untagged\",\"countType\":\"imageCountMoreThan\",\"countNumber\":1},\"action\":{\"type\":\"expire\"}}]}'",
+      "NativeIaC": "```yaml\nResources:\n  <example_resource_name>:\n    Type: AWS::ECR::Repository\n    Properties:\n      # Critical: Adding a lifecycle policy makes the repo PASS this check\n      LifecyclePolicy:\n        # Critical: The policy content; any valid rule satisfies the requirement\n        LifecyclePolicyText: >-\n          {\"rules\":[{\"rulePriority\":1,\"selection\":{\"tagStatus\":\"untagged\",\"countType\":\"imageCountMoreThan\",\"countNumber\":1},\"action\":{\"type\":\"expire\"}}]}\n```",
+      "Other": "1. AWS コンソールを開き、Amazon ECR > リポジトリに移動します\n2. ターゲットリポジトリを選択します\n3. 操作から \"ライフサイクルポリシー\" を選択します\n4. \"ルールを作成\" をクリックします\n5. イメージステータス：タグなし、一致条件：イメージ数が = 1 より多い、アクション：期限切れを設定します\n6. \"保存\" をクリックしてライフサイクルポリシーを適用します",
+      "Terraform": "```hcl\nresource \"aws_ecr_lifecycle_policy\" \"<example_resource_name>\" {\n  repository = \"<example_resource_name>\"\n  # Critical: The policy ensures a lifecycle policy is configured for the repo\n  policy = <<POLICY\n{\"rules\":[{\"rulePriority\":1,\"selection\":{\"tagStatus\":\"untagged\",\"countType\":\"imageCountMoreThan\",\"countNumber\":1},\"action\":{\"type\":\"expire\"}}]}\nPOLICY\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "リポジトリごとに **ライフサイクルポリシー** を実装して、タグなし、古い、または過剰なイメージを期限切れにし、信頼できるリリースの小さなセットを保持します。適用前に結果を検証し、ルールを定期的に確認し、レプリケート時にリージョン間で一貫して適用します。これにより、イメージの攻撃面と運用リスクを減らすことで **多層防御** をサポートします。",
+      "Url": "https://hub.prowler.com/check/ecr_repositories_lifecycle_policy_enabled"
+    }
+  },
+  "Categories": [
+    "container-security"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

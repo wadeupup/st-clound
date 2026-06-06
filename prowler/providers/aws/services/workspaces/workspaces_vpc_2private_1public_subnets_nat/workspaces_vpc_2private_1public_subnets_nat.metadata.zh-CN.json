@@ -1,0 +1,39 @@
+{
+  "Provider": "aws",
+  "CheckID": "workspaces_vpc_2private_1public_subnets_nat",
+  "CheckTitle": "工作区位于私有子网中，且其 VPC 至少拥有 1 个公有子网、2 个私有子网以及一个 NAT 网关。",
+  "CheckType": [
+    "软件与配置检查 / AWS 安全最佳实践 / 网络可达性"
+  ],
+  "ServiceName": "workspaces",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Other",
+  "ResourceGroup": "compute",
+  "Description": "Amazon WorkSpaces 部署在一个包含 2 个私有子网和 1 个公有子网的 VPC 中；其中 WorkSpace 启动于私有子网内，且该 VPC 通过 NAT 网关提供出站流量访问。",
+  "Risk": "将 WorkSpaces 放置在公有子网中或缺乏 NAT 网关，会使桌面直接暴露在互联网的可达范围内，从而导致凭据攻击和会话劫持风险，损害数据的“机密性”与“完整性”。若缺乏受控的出站流量通道，补丁更新和目录连接可能会失败，进而影响“可用性”，并迫使团队采取不安全的操作绕过限制。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/workspaces/latest/adminguide/amazon-workspaces-vpc.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# 最简 VPC 配置：1 个公有子网、2 个私有子网以及一个 NAT 网关\nResources:\n  VPC:\n    Type: AWS::EC2::VPC\n    Properties:\n      CidrBlock: 10.0.0.0/16\n\n  IGW:\n    Type: AWS::EC2::InternetGateway\n\n  AttachIGW:\n    Type: AWS::EC2::VPCGatewayAttachment\n    Properties:\n      VpcId: !Ref VPC\n      InternetGatewayId: !Ref IGW\n\n  PublicSubnet:\n    Type: AWS::EC2::Subnet\n    Properties:\n      VpcId: !Ref VPC\n      CidrBlock: 10.0.0.0/24\n\n  PrivateSubnetA:\n    Type: AWS::EC2::Subnet\n    Properties:\n      VpcId: !Ref VPC\n      CidrBlock: 10.0.1.0/24   # 私有子网 1（必填/必需）\n\n  PrivateSubnetB:\n    Type: AWS::EC2::Subnet\n    Properties:\n      VpcId: !Ref VPC\n      CidrBlock: 10.0.2.0/24   # 私有子网 2（必填/必需）\n\n  NatEip:\n    Type: AWS::EC2::EIP\n    Properties:\n      Domain: vpc\n\n  NatGw:\n    Type: AWS::EC2::NatGateway\n    Properties:\n      AllocationId: !GetAtt NatEip.AllocationId  # 关键要点：为私有子网的出站流量配置 NAT (NAT for private subnets' egress)\n      SubnetId: !Ref PublicSubnet                # 关键要点：NAT 必须位于公有子网中 (NAT must be in a public subnet)\n\n  PublicRt:\n    Type: AWS::EC2::RouteTable\n    Properties:\n      VpcId: !Ref VPC\n\n  PublicDefaultRoute:\n    Type: AWS::EC2::Route\n    Properties:\n      RouteTableId: !Ref PublicRt\n      DestinationCidrBlock: 0.0.0.0/0\n      GatewayId: !Ref IGW                       # 关键要点：此操作会将该子网变为“公有”子网 (makes this a PUBLIC subnet)\n\n  AssocPublic:\n    Type: AWS::EC2::SubnetRouteTableAssociation\n    Properties:\n      SubnetId: !Ref PublicSubnet\n      RouteTableId: !Ref PublicRt\n\n  PrivateRt:\n    Type: AWS::EC2::RouteTable\n    Properties:\n      VpcId: !Ref VPC\n\n  PrivateDefaultRoute:\n    Type: AWS::EC2::Route\n    Properties:\n      RouteTableId: !Ref PrivateRt\n      DestinationCidrBlock: 0.0.0.0/0\n      NatGatewayId: !Ref NatGw                  # 关键要点：私有子网必须使用 NAT 访问互联网 \n\n  AssocPrivateA:\n    Type: AWS::EC2::SubnetRouteTableAssociation\n    Properties:\n      SubnetId: !Ref PrivateSubnetA\n      RouteTableId: !Ref PrivateRt              # 至关重要：工作区子网必须关联到私有路由表。\n\n  AssocPrivateB:\n    Type: AWS::EC2::SubnetRouteTableAssociation\n    Properties:\n      SubnetId: !Ref PrivateSubnetB\n      RouteTableId: !Ref PrivateRt              # 至关重要：确保至少有两个私有子网。\n```",
+      "Other": "1. 在 AWS 控制台中，进入 VPC > Internet 网关，并确保已为该 VPC 附加了一个 Internet 网关 (IGW)。\n2. 进入 VPC > 子网，确保该 VPC 至少拥有一个子网用作“公有”子网，两个子网用作“私有”子网（建议位于不同的可用区）。如果缺失，请根据需要创建子网。\n3. 进入 VPC > NAT 网关，在公有子网中创建 NAT 网关，并分配一个弹性 IP (EIP)。\n4. 进入 VPC > 路由表：\n   - 公有子网路由表：添加或确保有一条 0.0.0.0/0 的路由指向 Internet 网关（这会将其标记为公有）。\n   - 私有子网路由表：添加或确保有一条 0.0.0.0/0 的路由指向 NAT 网关，并移除任何指向 Internet 网关的 0.0.0.0/0 路由。这使它们成为具备 NAT 出站能力的私有子网。\n\n5. 通过将 WorkSpace 所属子网与私有路由表（路由规则：0.0.0.0/0 -> NAT 网关）关联，确保该子网是私有子网之一。\n6. 验证：该 VPC 目前拥有至少 1 个公有子网、至少 2 个私有子网、至少一个 NAT 网关，且 WorkSpace 所属子网已被设为私有。",
+      "Terraform": "```hcl\n# 最简 VPC 配置：1 个公有子网、2 个私有子网以及一个 NAT 网关\nresource \"aws_vpc\" \"main\" {\n  cidr_block = \"10.0.0.0/16\"\n}\n\nresource \"aws_internet_gateway\" \"main\" {\n  vpc_id = aws_vpc.main.id\n}\n\nresource \"aws_subnet\" \"public\" {\n  vpc_id     = aws_vpc.main.id\n  cidr_block = \"10.0.0.0/24\"\n}\n\nresource \"aws_subnet\" \"private_a\" {\n  vpc_id     = aws_vpc.main.id\n  cidr_block = \"10.0.1.0/24\"  # 私有子网 1（必填/必需）\n}\n\nresource \"aws_subnet\" \"private_b\" {\n  vpc_id     = aws_vpc.main.id\n  cidr_block = \"10.0.2.0/24\"  # 私有子网 2（必填/必需）\n}\n\nresource \"aws_eip\" \"nat\" {\n  domain = \"vpc\"\n}\n\nresource \"aws_nat_gateway\" \"nat\" {\n  allocation_id = aws_eip.nat.id               # 关键要点：为私有子网的出站流量配置 NAT \n  subnet_id     = aws_subnet.public.id         # 关键要点：NAT 必须位于公有子网中\n}\n\nresource \"aws_route_table\" \"public\" {\n  vpc_id = aws_vpc.main.id\n  route {                                      # 关键要点：此操作会将该子网变为“公有”子网\n    cidr_block = \"0.0.0.0/0\"\n    gateway_id = aws_internet_gateway.main.id\n  }\n}\n\nresource \"aws_route_table_association\" \"public\" {\n  subnet_id      = aws_subnet.public.id\n  route_table_id = aws_route_table.public.id\n}\n\nresource \"aws_route_table\" \"private\" {\n  vpc_id = aws_vpc.main.id\n  route {                                      # 关键要点：私有子网必须使用 NAT 访问互联网\n    cidr_block     = \"0.0.0.0/0\"\n    nat_gateway_id = aws_nat_gateway.nat.id\n  }\n}\n\nresource \"aws_route_table_association\" \"private_a\" {\n  subnet_id      = aws_subnet.private_a.id     # 至关重要：工作区子网必须关联到私有路由表。\n  route_table_id = aws_route_table.private.id\n}\n\nresource \"aws_route_table_association\" \"private_b\" {\n  subnet_id      = aws_subnet.private_b.id\n  route_table_id = aws_route_table.private.id  # 至关重要：确保至少有两个私有子网。 \n}\n```"
+    },
+    "Recommendation": {
+      "Text": "在“私有子网”中启动 WorkSpaces，并按照“1 个公有子网”和“2 个私有子网”的规格设计 VPC。通过“NAT 网关”提供出站访问，并根据“网络分段”和“最小特权原则”限制入站暴露。将子网分布在不同的可用区 (AZ)，且避免为 WorkSpaces 分配公网 IP，以实现“分层防御”。",
+      "Url": "https://hub.prowler.com/check/workspaces_vpc_2private_1public_subnets_nat"
+    }
+  },
+  "Categories": [
+    "trust-boundaries",
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

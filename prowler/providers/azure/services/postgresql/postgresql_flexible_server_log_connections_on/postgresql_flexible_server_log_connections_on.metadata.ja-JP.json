@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "postgresql_flexible_server_log_connections_on",
+  "CheckTitle": "PostgreSQL Database Server のサーバー パラメーター 'log_connections' が 'ON' に設定されていることを確認する",
+  "CheckType": [],
+  "ServiceName": "postgresql",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "PostgreSQL",
+  "ResourceGroup": "database",
+  "Description": "PostgreSQL サーバーで log_connections を有効化します。",
+  "Risk": "log_connections を有効化すると、PostgreSQL Database はサーバーへの接続試行およびクライアント認証の成功完了を記録できます。ログ データは、構成エラーや最適でないパフォーマンスの特定、トラブルシュート、修復に利用できます。",
+  "RelatedUrl": "https://docs.microsoft.com/en-us/rest/api/postgresql/configurations/listbyserver",
+  "Remediation": {
+    "Code": {
+      "CLI": "az postgres server configuration set --resource-group <resourceGroupName> --server-name <serverName> --name log_connections --value on",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity-staging/knowledge-base/azure/PostgreSQL/log-connections.html",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-networking-policies/bc_azr_networking_12#terraform"
+    },
+    "Recommendation": {
+      "Text": "Azure Portal から 1. https://portal.azure.com で Azure Portal にログインします。2. Azure Database for PostgreSQL servers に移動します。3. 各データベースで Server parameters をクリックします。4. log_connections を検索します。5. ON をクリックして保存します。Azure CLI から log_connections 設定を更新するには次のコマンドを使用します。az postgres server configuration set --resource-group <resourceGroupName> -- server-name <serverName> --name log_connections --value on。PowerShell から log_connections 設定を更新するには次のコマンドを使用します。Update-AzPostgreSqlConfiguration -ResourceGroupName <ResourceGroupName> - ServerName <ServerName> -Name log_connections -Value on",
+      "Url": "https://learn.microsoft.com/en-us/azure/postgresql/single-server/how-to-configure-server-parameters-using-portal"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

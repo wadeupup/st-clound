@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "elb_internet_facing",
+  "CheckTitle": "Elastic Load Balancer 不是 internet-facing",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices/Network Reachability",
+    "Effects/Data Exposure",
+    "TTPs/Initial Access"
+  ],
+  "ServiceName": "elb",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsElbLoadBalancer",
+  "ResourceGroup": "network",
+  "Description": "通过评估 Elastic Load Balancer 的 `scheme` 判断其是**internet-facing** 还是 internal，从而识别该端点是否可通过公网 DNS 名称被公开访问。",
+  "Risk": "非预期的**internet-facing** 负载均衡器会将后端暴露到互联网，使攻击者能够进行侦察、凭证填充和应用漏洞利用。这可能导致数据泄露（机密性）、未授权更改（完整性）以及 **DDoS** 或资源耗尽（可用性）。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/waf/latest/developerguide/web-acl-associating-aws-resource.html",
+    "https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-elasticloadbalancingv2-loadbalancer.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/ELB/internet-facing-load-balancers.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation: create an internal load balancer\nResources:\n  <example_resource_name>:\n    Type: AWS::ElasticLoadBalancingV2::LoadBalancer\n    Properties:\n      Scheme: internal  # CRITICAL: makes the load balancer internal (not internet-facing)\n      Subnets:\n        - <example_resource_id>\n        - <example_resource_id>\n      SecurityGroups:\n        - <example_resource_id>\n```",
+      "Other": "1. 在 AWS 控制台进入 EC2 > Load Balancers\n2. 点击 Create load balancer（Application 或 Network）\n3. 将 Scheme 设置为 Internal\n4. 选择至少两个子网和一个安全组；按需重建监听器/目标组\n5. 创建新负载均衡器并将 DNS 更新到其 DNS 名称\n6. 删除旧的 internet-facing 负载均衡器",
+      "Terraform": "```hcl\nresource \"aws_lb\" \"<example_resource_name>\" {\n  internal        = true  # CRITICAL: sets scheme to internal so it's not internet-facing\n  subnets         = [\"<example_resource_id>\", \"<example_resource_id>\"]\n  security_groups = [\"<example_resource_id>\"]\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "私有服务使用 `internal` 负载均衡器，并通过**安全组**、子网和允许列表限制暴露。对于公网端点，采用**纵深防御**：关联 **AWS WAF** Web ACL（*在支持时*）、强制 **TLS**、最小权限网络规则，并考虑 **Shield** 或限流。定期审查公网暴露的必要性。",
+      "Url": "https://hub.prowler.com/check/elb_internet_facing"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

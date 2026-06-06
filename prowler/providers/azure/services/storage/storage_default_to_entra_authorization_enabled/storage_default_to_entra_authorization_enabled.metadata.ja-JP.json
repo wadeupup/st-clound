@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "storage_default_to_entra_authorization_enabled",
+  "CheckTitle": "Azure Storage Accounts で Microsoft Entra 認可が既定で有効化されていることを確認する",
+  "CheckType": [],
+  "ServiceName": "storage",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AzureStorageAccount",
+  "ResourceGroup": "storage",
+  "Description": "Azure Storage Account の設定 'Default to Microsoft Entra authorization in the Azure portal' が有効であり、blob、files、queues、tables へのアクセスで Microsoft Entra ID の利用が強制されていることを確認します。",
+  "Risk": "この設定が有効でない場合、Azure portal は Shared Key などのより安全性の低い方式でアクセスを認可する可能性があり、不正データ アクセスのリスクが高まります。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/storage/blobs/authorize-access-azure-active-directory",
+  "Remediation": {
+    "Code": {
+      "CLI": "az storage account update --name <storage-account-name> --resource-group <resource-group-name> --default-to-AzAd-auth true",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity-staging/knowledge-base/azure/StorageAccounts/enable-microsoft-entra-authorization-by-default.html",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "Azure portal で既定の Microsoft Entra 認可を有効化し、セキュリティを強化して Shared Key 認証への依存を避けます。",
+      "Url": "https://learn.microsoft.com/en-us/azure/storage/blobs/authorize-access-azure-active-directory"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "elb_ssl_listeners",
+  "CheckTitle": "Elastic Load Balancer 仅使用 HTTPS 或 SSL 监听器",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices/Network Reachability",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/PCI-DSS",
+    "Effects/Data Exposure"
+  ],
+  "ServiceName": "elb",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsElbLoadBalancer",
+  "ResourceGroup": "network",
+  "Description": "评估 **Elastic Load Balancer** 面向客户端的监听器协议。仅 `HTTPS` 或 `SSL` 视为加密；任何 `HTTP` 或 `TCP` 监听器都表示客户端与负载均衡器之间存在明文传输。",
+  "Risk": "明文监听器会导致网络窃听与内容注入，破坏**机密性**和**完整性**。位于公网或不可信链路上的攻击者可通过 MITM 窃取凭证和会话令牌，或篡改流量，进而造成数据泄露和未授权访问。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/ELB/elb-listener-security.html",
+    "https://docs.aws.amazon.com/elasticloadbalancing/latest/classic/elb-security-policy-table.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws elb delete-load-balancer-listeners --load-balancer-name <lb_name> --load-balancer-ports 80",
+      "NativeIaC": "```yaml\n# CloudFormation: Classic ELB with only encrypted (HTTPS) listener\nResources:\n  <example_resource_name>:\n    Type: AWS::ElasticLoadBalancing::LoadBalancer\n    Properties:\n      AvailabilityZones:\n        - <example_az>\n      Listeners:\n        - Protocol: HTTPS           # CRITICAL: enforce encrypted listener\n          LoadBalancerPort: 443\n          InstanceProtocol: HTTP\n          InstancePort: 80\n          SSLCertificateId: <certificate_arn>  # CRITICAL: required for HTTPS termination\n```",
+      "Other": "1. 在 AWS 控制台进入 EC2 > Load Balancers（Classic）\n2. 选择负载均衡器并打开 Listeners 标签\n3. 点击 Edit 并删除协议为 HTTP 或 TCP 的监听器\n4. 新增协议为 HTTPS（443 端口）的监听器并选择 SSL 证书\n5. 保存更改",
+      "Terraform": "```hcl\n# Classic ELB with only encrypted (HTTPS) listener\nresource \"aws_elb\" \"<example_resource_name>\" {\n  availability_zones = [\"<example_az>\"]\n\n  listener {\n    lb_port            = 443\n    lb_protocol        = \"https\"   # CRITICAL: enforce encrypted listener\n    instance_port      = 80\n    instance_protocol  = \"http\"\n    ssl_certificate_id = \"<certificate_arn>\"  # CRITICAL: required for HTTPS/SSL\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "通过仅使用 `HTTPS`/`TLS` 监听器来强制**传输加密**。将 `HTTP` 重定向到 `HTTPS`，并下线明文监听器。使用可信证书（如 ACM）和现代 TLS 策略；与**零信任**和**纵深防御**保持一致。*如有需要*，可对目标启用端到端 TLS 并监控证书健康状态。",
+      "Url": "https://hub.prowler.com/check/elb_ssl_listeners"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

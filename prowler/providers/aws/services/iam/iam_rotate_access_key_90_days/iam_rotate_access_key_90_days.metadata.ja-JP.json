@@ -1,0 +1,35 @@
+{
+  "Provider": "aws",
+  "CheckID": "iam_rotate_access_key_90_days",
+  "CheckTitle": "アクセスキーは90日以内にローテーションされることを確認してください",
+  "CheckType": [
+    "ソフトウェアと構成のチェック",
+    "業界および規制の標準",
+    "CIS AWS Foundations ベンチマーク"
+  ],
+  "ServiceName": "iam",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "medium",
+  "ResourceType": "AwsIamAccessKey",
+  "ResourceGroup": "IAM",
+  "Description": "アクセスキーは90日以内にローテーションされることを確認してください",
+  "Risk": "アクセスキーは、AWSへのプログラムによるリクエストに署名するために使用されるアクセスキーIDとシークレットアクセスキーで構成されています。AWSユーザーは、AWS Command Line Interface (AWS CLI)、Tools for Windows PowerShell、AWS SDK、または個々のAWSサービスのAPIを使用した直接HTTP呼び出しからAWSにプログラムによる呼び出しを行うために独自のアクセスキーが必要です。すべてのアクセスキーは定期的にローテーションされることが推奨されます。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "資格情報レポートを使用して、access_key_X_last_rotatedが90日以内であることを確認してください。",
+      "Url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_getting-report.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

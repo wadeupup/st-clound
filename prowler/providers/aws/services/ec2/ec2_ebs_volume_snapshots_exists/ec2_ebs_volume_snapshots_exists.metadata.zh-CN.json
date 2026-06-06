@@ -1,0 +1,36 @@
+{
+  "Provider": "aws",
+  "CheckID": "ec2_ebs_volume_snapshots_exists",
+  "CheckTitle": "检查是否存在 EBS 快照",
+  "CheckType": [
+    "Data Protection"
+  ],
+  "ServiceName": "ec2",
+  "SubServiceName": "volume",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "medium",
+  "ResourceType": "AwsEc2Volume",
+  "ResourceGroup": "storage",
+  "Description": "检查是否存在 EBS 快照",
+  "Risk": "确保您的 EBS 卷（可用或使用中）有最近的快照（每周拍摄）可用于时间点恢复，以实现更好、更可靠的数据备份策略。",
+  "RelatedUrl": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EBSSnapshots.html",
+  "Remediation": {
+    "Code": {
+      "CLI": "aws ec2 --region <REGION> create-snapshot --volume-id <VOLUME-ID>",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity-staging/knowledge-base/aws/EBS/ebs-volumes-recent-snapshots.html",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "定期创建时间点 EBS 快照将使您能够在发生故障时高效处理数据恢复过程，在关闭 EC2 实例之前保存数据，为地理扩展备份数据，并保持灾难恢复堆栈最新。",
+      "Url": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EBSSnapshots.html"
+    }
+  },
+  "Categories": [
+    "forensics-ready"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

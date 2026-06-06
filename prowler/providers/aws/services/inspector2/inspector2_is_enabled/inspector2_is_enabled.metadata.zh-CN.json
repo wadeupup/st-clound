@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "inspector2_is_enabled",
+  "CheckTitle": "Inspector2 已启用用于 Amazon EC2 实例、ECR 容器镜像、Lambda 函数和 Lambda 代码",
+  "CheckAliases": [
+    "inspector2_findings_exist"
+  ],
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践",
+    "软件和配置检查/行业和法规标准/AWS 基础安全最佳实践"
+  ],
+  "ServiceName": "inspector2",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "security",
+  "Description": "**Amazon Inspector 2** 在各个区域的激活和覆盖，验证 **EC2**、**ECR**、**Lambda 函数** 和 **Lambda 代码** 的扫描是否处于活动状态（如适用）。\n\n它会标记缺少账户激活或任何扫描类型的漏洞。",
+  "Risk": "缺失或部分覆盖会导致 **未修补的漏洞**、风险 **代码依赖** 和 **意外的网络暴露** 未被检测到。\n\n攻击者可以利用已知的 CVE 进行 **远程代码执行**、**横向移动** 和 **数据泄露**，从而降低 **机密性**、**完整性** 和 **可用性**。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/Inspector2/enable-amazon-inspector2.html",
+    "https://docs.aws.amazon.com/inspector/latest/user/findings-understanding.html",
+    "https://docs.aws.amazon.com/inspector/latest/user/getting_started_tutorial.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws inspector2 enable --resource-types EC2 ECR LAMBDA LAMBDA_CODE",
+      "NativeIaC": "",
+      "Other": "1. 登录 AWS 控制台并打开 Amazon Inspector (v2)\n2. 如果尚未激活：点击开始使用 > 激活 Amazon Inspector\n3. 如果已激活：转到设置 > 扫描并确保 EC2、ECR、Lambda 函数和 Lambda 代码均已启用，然后保存",
+      "Terraform": "```hcl\nresource \"aws_inspector2_enabler\" \"<example_resource_name>\" {\n  resource_types = [\"EC2\", \"ECR\", \"LAMBDA\", \"LAMBDA_CODE\"] # 为所有必需的资源类型启用 Inspector2 扫描\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "在所有区域启用 **Amazon Inspector 2** 并激活 **EC2**、**ECR**、**Lambda** 和 **Lambda 代码** 的扫描。\n\n应用 **深度防御**：自动启用新工作负载的覆盖，将发现结果与修补和 CI/CD 门集成，强制执行修复 SLA，并仅授予 **最低权限** 以处理和执行发现结果。",
+      "Url": "https://hub.prowler.com/check/inspector2_is_enabled"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

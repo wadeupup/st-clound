@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "ses_identity_not_publicly_accessible",
+  "CheckTitle": "SES identity リソースポリシーではパブリックアクセスは許可されていません",
+  "CheckType": [
+    "ソフトウェアおよび設定のチェック/AWS セキュリティのベストプラクティス/ネットワーク到達可能性",
+    "TTPs/初期アクセス",
+    "影響／データ露出"
+  ],
+  "ServiceName": "ses",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsIamPolicy",
+  "ResourceGroup": "messaging",
+  "Description": "**Amazon SES identities** は、**一般公開されたリソースポリシー**について評価されます。たとえば、`Principal:\"*\"` を含むステートメントや、ID に対するアクションを許可する広く信頼されたプリンシパルなどです。",
+  "Risk": "パブリックなSES IDポリシーにより、権限のないメール送信や設定変更が許可されます。\n- 完全性: なりすましメールとブランドの偽装\n- 機密性: IDの詳細の露出\n- 可用性: 評判の低下によるスロットリングまたは停止",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/ses/latest/dg/policy-anatomy.html",
+    "https://docs.aws.amazon.com/ses/latest/dg/identity-authorization-policies.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws sesv2 delete-email-identity-policy --email-identity <IDENTITY-NAME> --policy-name <POLICY-NAME>",
+      "NativeIaC": "",
+      "Other": "1. AWS コンソールで、Simple Email Service (SES) に移動します\n2. Verified identities を開き、影響を受けている ID を選択します\n3. Resource policies をクリックします\n4. パブリックポリシーを削除するか、または編集して `Principal` の `\"*\"` を削除し、特定の AWS アカウントのみに制限します\n5. 変更を保存します",
+      "Terraform": "```hcl\nresource \"aws_ses_identity_policy\" \"<example_resource_name>\" {\n  identity = \"<example_resource_name>\"\n  name     = \"<example_resource_name>\"\n\n  policy = jsonencode({\n    Version   = \"2012-10-17\"\n    Statement = [{\n      Effect    = \"Allow\"\n      Principal = { AWS = [\"<account_id>\"] } # 重要: \"*\" ではなく、特定のAWSアカウントに制限してください\n      Action    = [\"ses:SendEmail\"]\n      Resource  = \"arn:aws:ses:<region>:<account_id>:identity/<example_resource_name>\"\n    }]\n  })\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "SES の identity ポリシーは、**最小権限**の原則に従って、既知のプリンシパルとアクションに制限してください。送信権限の付与には明示的なアカウント ARN を優先し、`aws:SourceIp` や `aws:SecureTransport` のような条件を追加してください。付与を定期的に見直し、**多層防御**の一環として未使用のアクセスを削除してください。",
+      "Url": "https://hub.prowler.com/check/ses_identity_not_publicly_accessible"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

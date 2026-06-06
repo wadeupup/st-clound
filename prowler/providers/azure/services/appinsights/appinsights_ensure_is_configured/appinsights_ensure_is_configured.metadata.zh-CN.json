@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "appinsights_ensure_is_configured",
+  "CheckTitle": "确保已配置 Application Insights。",
+  "CheckType": [],
+  "ServiceName": "appinsights",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "low",
+  "ResourceType": "Microsoft.Insights/components",
+  "ResourceGroup": "monitoring",
+  "Description": "Azure 中的 Application Insights 作为应用性能监控解决方案，可提供有关应用运行状况的重要数据，并在进行事件响应时提供额外信息。收集的日志数据类型包括应用指标、遥测数据和应用跟踪日志数据，这些数据可为组织提供有关应用活动和应用事务的详细信息。这两类数据集可帮助组织以主动和事后两种方式处理其现代应用中的安全与性能相关指标。",
+  "Risk": "配置 Application Insights 可提供 Azure 其他位置难以获得的额外数据，并可作为组织信息安全实践中更大规模日志与监控计划的一部分。这些日志的类型和内容既可作为潜在的成本节约手段（应用性能），也可用于潜在事件源确认（跟踪日志）。指标与遥测数据通过监控应用性能，为组织提供主动的成本优化手段；而跟踪日志数据则在被动事件响应场景中提供必要细节，帮助组织识别应用内潜在事件来源。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/azure-monitor/app/app-insights-overview",
+  "Remediation": {
+    "Code": {
+      "CLI": "az monitor app-insights component create --app <app name> --resource-group <resource group name> --location <location> --kind 'web' --retention-time <INT days to retain logs> --workspace <log analytics workspace ID> -- subscription <subscription ID>",
+      "NativeIaC": "",
+      "Other": "https://www.tenable.com/audits/items/CIS_Microsoft_Azure_Foundations_v2.0.0_L2.audit:8a7a608d180042689ad9d3f16aa359f1",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "1. 导航到 Application Insights 2. 在 Basics 选项卡的 PROJECT DETAILS 部分选择 Subscription 3. 选择 Resource group 4. 在 INSTANCE DETAILS 中输入 Name 5. 选择 Region 6. 在 Resource Mode 旁选择 Workspace-based 7. 在 WORKSPACE DETAILS 中选择日志分析工作区的 Subscription 8. 选择合适的 Log Analytics Workspace 9. 点击 Next:Tags > 10. 以 Name、Value 键值对输入相应 Tags 11. 点击 Next:Review+Create 12. 点击 Create。",
+      "Url": ""
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "由于 Application Insights 依赖 Log Analytics Workspace，组织在使用该服务时会产生额外费用。"
+}

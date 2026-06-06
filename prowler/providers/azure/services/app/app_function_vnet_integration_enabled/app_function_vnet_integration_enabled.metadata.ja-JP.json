@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "app_function_vnet_integration_enabled",
+  "CheckTitle": "Azure Functions で仮想ネットワーク統合が有効化されていることを確認する",
+  "CheckType": [],
+  "ServiceName": "app",
+  "SubServiceName": "function",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Microsoft.Web/sites",
+  "ResourceGroup": "serverless",
+  "Description": "Azure Functions で仮想ネットワーク統合を有効化すると、選択した仮想ネットワーク サブネットへのアクセスに制限することで追加のセキュリティ層を提供できます。これにより、Function App を不正アクセスや潜在的な脅威から保護できます。",
+  "Risk": "仮想ネットワーク統合がない場合、Function App がパブリック インターネットに公開され、不正アクセスや潜在的なセキュリティ侵害のリスクが高まる可能性があります。",
+  "RelatedUrl": "https://docs.microsoft.com/en-us/azure/azure-functions/functions-networking-options#virtual-network-integration",
+  "Remediation": {
+    "Code": {
+      "CLI": "az functionapp vnet-integration update --name <function_app_name> --resource-group <resource_group_name> --vnet <vnet_name> --subnet <subnet_name>",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/Functions/azure-function-vnet-integration-on.html",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "セキュリティを強化し不正アクセスから保護するため、Azure Functions で仮想ネットワーク統合を有効化することを推奨します。",
+      "Url": "https://docs.microsoft.com/en-us/azure/azure-functions/functions-networking-options#enable-virtual-network-integration"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

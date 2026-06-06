@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "networkfirewall_logging_enabled",
+  "CheckTitle": "Network Firewall 已启用日志记录",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践",
+    "软件和配置检查/行业和法规标准/AWS 基础安全最佳实践",
+    "软件和配置检查/行业和监管标准/NIST 800-53 控制（美国）"
+  ],
+  "ServiceName": "networkfirewall",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsNetworkFirewallFirewall",
+  "ResourceGroup": "network",
+  "Description": "**AWS Network Firewall** 已配置有状态引擎日志，至少包含一种日志类型（`FLOW`、`ALERT` 或 `TLS`）和一个活动的日志目标",
+  "Risk": "缺少 Network Firewall 日志会降低**可见性**和**取证能力**。恶意流量、C2 流量和数据泄露可能会**未被检测到**，影响：\n- 机密性（泄漏）\n- 完整性（允许未经授权的流量）\n- 可用性（DDoS 模式未被注意到）",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/network-firewall/latest/developerguide/firewall-logging.html",
+    "https://docs.aws.amazon.com/network-firewall/latest/developerguide/firewall-update-logging-configuration.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/networkfirewall-controls.html#networkfirewall-2"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws network-firewall update-logging-configuration --firewall-arn <FIREWALL_ARN> --logging-configuration 'LogDestinationConfigs=[{LogType=FLOW,LogDestinationType=CLOUDWATCH_LOGS,LogDestination={LogGroup=<LOG_GROUP_NAME>}}]'",
+      "NativeIaC": "```yaml\nResources:\n  <example_resource_name>:\n    Type: AWS::NetworkFirewall::LoggingConfiguration\n    Properties:\n      FirewallArn: <example_resource_id>  # 关键：定位防火墙以启用日志记录\n      LoggingConfiguration:\n        LogDestinationConfigs:\n          - LogType: FLOW                  # 关键：启用至少一种日志类型\n            LogDestinationType: CloudWatchLogs  # 关键：选择有效的目标类型\n            LogDestination:\n              logGroup: <example_log_group_name>  # 关键：现有的 CloudWatch Logs 组以接收日志\n```",
+      "Other": "1. 打开 AWS 控制台并转到 VPC > Network Firewall > Firewalls\n2. 选择您的防火墙并打开防火墙详情选项卡\n3. 在日志记录部分，点击编辑\n4. 启用至少一种日志类型（例如，Flow）\n5. 选择目标类型：CloudWatch Logs 并选择一个现有的日志组\n6. 点击保存",
+      "Terraform": "```hcl\nresource \"aws_networkfirewall_logging_configuration\" \"<example_resource_name>\" {\n  firewall_arn = \"<example_resource_id>\"  # 关键：定位防火墙以启用日志记录\n\n  logging_configuration {\n    log_destination_config {\n      log_type             = \"FLOW\"              # 关键：启用至少一种日志类型\n      log_destination_type = \"CloudWatchLogs\"   # 关键：选择有效的目标类型\n      log_destination = {\n        logGroup = \"<example_log_group_name>\"   # 关键：现有的 CloudWatch Logs 组以接收日志\n      }\n    }\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "启用全面的防火墙日志记录，并将 `FLOW`、`ALERT` 和*适用时* `TLS` 事件发送到集中、不可篡改的目标。对写入者/读取者应用**最小权限**，强制执行**加密**和**保留**，并将警报与监控集成以实现**深度防御**。",
+      "Url": "https://hub.prowler.com/check/networkfirewall_logging_enabled"
+    }
+  },
+  "Categories": [
+    "logging"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

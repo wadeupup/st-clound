@@ -1,0 +1,35 @@
+{
+  "Provider": "aws",
+  "CheckID": "iam_policy_attached_only_to_group_or_roles",
+  "CheckTitle": "IAM ポリシーはグループまたはロールにのみアタッチされていることを確認します",
+  "CheckType": [
+    "ソフトウェアと構成のチェック",
+    "業界および規制の標準",
+    "CIS AWS Foundations ベンチマーク"
+  ],
+  "ServiceName": "iam",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "low",
+  "ResourceType": "AwsIamPolicy",
+  "ResourceGroup": "IAM",
+  "Description": "IAM ポリシーはグループまたはロールにのみアタッチされていることを確認します",
+  "Risk": "デフォルトでは、IAM ユーザー、グループ、およびロールは AWS リソースへのアクセス権を持っていません。IAM ポリシーは、ユーザー、グループ、またはロールに特権を付与する手段です。IAM ポリシーはユーザーではなく、グループおよびロールに直接適用することを推奨します。グループまたはロールレベルで特権を割り当てることで、ユーザー数が増加するにつれてアクセス管理の複雑さを軽減できます。アクセス管理の複雑さを軽減することで、プリンシパルが過剰な特権を誤って受け取ったり保持したりする機会を減らすことができます。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "ユーザーに直接アタッチされたポリシーを削除します。代わりにグループまたはロールを使用してください。",
+      "Url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "CAF セキュリティエピック: IAM"
+}

@@ -1,0 +1,34 @@
+{
+  "Provider": "aws",
+  "CheckID": "ec2_instance_older_than_specific_days",
+  "CheckTitle": "特定の日数より古い EC2 インスタンスを確認",
+  "CheckType": [
+    "Infrastructure Security"
+  ],
+  "ServiceName": "ec2",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "medium",
+  "ResourceType": "AwsEc2Instance",
+  "ResourceGroup": "compute",
+  "Description": "特定の日数より古い EC2 インスタンスを確認",
+  "Risk": "AWS アカウント内に古いインスタンスがあると、脆弱なソフトウェアが存在するリスクが高まる可能性があります",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/EC2/ec2-instance-too-old.html",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "インスタンスで実行されているソフトウェアが最新で、適切にパッチが適用されているか確認してください。AWS Systems Manager を使用してインスタンスにパッチを適用し、パッチコンプライアンス情報を表示します。",
+      "Url": "https://docs.aws.amazon.com/systems-manager/latest/userguide/viewing-patch-compliance-results.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

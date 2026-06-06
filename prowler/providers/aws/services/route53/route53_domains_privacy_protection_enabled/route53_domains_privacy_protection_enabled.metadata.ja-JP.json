@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "route53_domains_privacy_protection_enabled",
+  "CheckTitle": "Route 53 ドメインでは管理者連絡先のプライバシー保護が有効になっています",
+  "CheckType": [
+    "ソフトウェアと構成チェック/AWSセキュリティのベストプラクティス",
+    "影響／データ露出",
+    "機密データの識別／PII"
+  ],
+  "ServiceName": "route53",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "network",
+  "Description": "**Route 53 ドメイン**の管理連絡先では**プライバシー保護**が有効になっているため、WHOIS クエリはマスクされた情報または代理情報を返します。\n\n連絡先データが公開されている代わりに非表示になっているかどうかを評価します。",
+  "Risk": "**公開WHOIS連絡先データ**は氏名、メールアドレス、電話番号、住所を露出させ、以下を可能にします：\n- レジストラに対する**フィッシング／ソーシャルエンジニアリング**\n- **SIMスワップ**またはアカウント乗っ取り\n- DNSの完全性／可用性に影響する**ドメイン乗っ取り**\nまた、スパムや標的型嫌がらせも増加させます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/domain-privacy-protection.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/Route53/privacy-protection.html",
+    "https://support.icompaas.com/support/solutions/articles/62000233459-enable-privacy-protection-for-for-a-route53-domain-"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws route53domains update-domain-contact-privacy --domain-name <DOMAIN_NAME> --admin-privacy",
+      "NativeIaC": "",
+      "Other": "1. AWSコンソールを開き、Route 53 に移動します\n2. Registered domains をクリックし、<DOMAIN_NAME> を選択します\n3. Contact information の Edit をクリックします\n4. Privacy protection を有効にします（Admin contact privacy がオンになっていることを確認します）\n5. 変更を保存します",
+      "Terraform": "```hcl\nresource \"aws_route53domains_registered_domain\" \"<example_resource_name>\" {\n  domain_name   = \"<example_resource_name>\"\n  admin_privacy = true # 重大: 管理者の連絡先プライバシーがチェックに合格できるようにする\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "すべての連絡先（管理者、登録者、技術担当）に対して**WHOISプライバシー**を有効にし、露出を最小限に抑えてください。**多層防御**を適用してください：専用で監視された連絡先メールアドレスを使用し、レジストラへのアクセスに**移管ロック**と**MFA**を強制し、設定を定期的に見直してください。*TLDがプライバシーに対応していない場合*は、最小限の役割ベースの連絡先情報を提供してください。",
+      "Url": "https://hub.prowler.com/check/route53_domains_privacy_protection_enabled"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

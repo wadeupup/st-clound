@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "sqlserver_va_scan_reports_configured",
+  "CheckTitle": "确保 SQL 服务器已配置漏洞评估（VA）设置“Send scan reports to”",
+  "CheckType": [],
+  "ServiceName": "sqlserver",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "SQLServer",
+  "ResourceGroup": "database",
+  "Description": "为关键 SQL 服务器配置“Send scan reports to”，填写相关数据所有者/干系人的邮箱地址。",
+  "Risk": "漏洞评估（VA）扫描报告和告警会发送到“Send scan reports to”中配置的邮箱。这有助于缩短风险识别和采取纠正措施所需时间。",
+  "RelatedUrl": "https://docs.microsoft.com/en-us/azure/sql-database/sql-vulnerability-assessment",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-general-policies/ensure-that-va-setting-send-scan-reports-to-is-configured-for-a-sql-server#terraform"
+    },
+    "Recommendation": {
+      "Text": "1. 进入 SQL servers。2. 选择一个服务器实例。3. 选择 Microsoft Defender for Cloud。4. 在 Enablement status 旁选择 Configure。5. 将 Microsoft Defender for SQL 设为 On。6. 在 Vulnerability Assessment Settings 下选择一个 Storage Account。7. 将 Periodic recurring scans 设为 On。8. 在 Send scan reports to 下填写数据所有者与干系人的邮箱地址。9. 点击 Save。",
+      "Url": "https://learn.microsoft.com/en-us/azure/defender-for-cloud/sql-azure-vulnerability-assessment-enable"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "启用 Microsoft Defender for SQL 功能会对每个 SQL 服务器产生额外费用。"
+}

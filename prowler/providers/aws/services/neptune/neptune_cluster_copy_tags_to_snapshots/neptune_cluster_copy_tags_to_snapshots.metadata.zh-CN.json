@@ -1,0 +1,39 @@
+{
+  "Provider": "aws",
+  "CheckID": "neptune_cluster_copy_tags_to_snapshots",
+  "CheckTitle": "Neptune DB 集群配置为将标签复制到快照。",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践"
+  ],
+  "ServiceName": "neptune",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "low",
+  "ResourceType": "AwsRdsDbCluster",
+  "ResourceGroup": "database",
+  "Description": "Neptune DB 集群配置为在创建快照时将所有标签复制到快照。",
+  "Risk": "**缺少快照标签** 会削弱在保密性、完整性和可用性方面的治理。\n\n- **访问控制**：基于标签的 IAM 条件可能不适用于快照，从而允许未经授权的恢复或复制\n- **操作**：由于无法识别或孤立的快照，恢复、保留和成本跟踪可能会失败",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/neptune/latest/userguide/tagging.html#tagging-overview",
+    "https://www.cloudanix.com/docs/aws/audit/rdsmonitoring/rules/neptune_cluster_copy_tags_to_snapshot_enabled",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/neptune-controls.html#neptune-8",
+    "https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/aws-general-policies/bc-aws-2-60"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws neptune modify-db-cluster --db-cluster-identifier <DB_CLUSTER_ID> --copy-tags-to-snapshot --apply-immediately",
+      "NativeIaC": "```yaml\nResources:\n  NeptuneCluster:\n    Type: AWS::RDS::DBCluster\n    Properties:\n      DBClusterIdentifier: <DB_CLUSTER_ID>\n      EngineVersion: neptune\n      CopyTagsToSnapshot: true  # 继承标签以进行快照治理和访问控制\n```",
+      "Terraform": "```hcl\nresource \"aws_neptune_cluster\" \"example_resource\" {\n  cluster_identifier     = \"<DB_CLUSTER_ID>\"\n  copy_tags_to_snapshot  = true  # 继承标签以进行快照治理和访问控制\n}\n```",
+      "Other": "1. 登录 AWS 管理控制台并打开 Amazon Neptune\n2. 点击集群并选择集群\n3. 点击修改\n4. 在备份中，启用“将标签复制到快照”\n5. 勾选“立即应用”\n6. 点击修改集群"
+    },
+    "Recommendation": {
+      "Text": "通过启用快照的标签继承和实施一致的标签策略来保留元数据。\n\n- 采用标准化的标签分类法\n- 使用基于标签的访问控制并应用最小权限\n- 在供应中自动化标签和策略检查以防止未标记的快照",
+      "Url": "https://hub.prowler.com/check/neptune_cluster_copy_tags_to_snapshots"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

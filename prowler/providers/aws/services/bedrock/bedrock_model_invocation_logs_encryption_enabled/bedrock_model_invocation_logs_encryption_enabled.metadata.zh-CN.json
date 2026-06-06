@@ -1,0 +1,36 @@
+{
+  "Provider": "aws",
+  "CheckID": "bedrock_model_invocation_logs_encryption_enabled",
+  "CheckTitle": "确保 Amazon Bedrock 模型调用日志使用 KMS 加密",
+  "CheckType": [],
+  "ServiceName": "bedrock",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:bedrock:region:account-id:model/resource-id",
+  "Severity": "high",
+  "ResourceType": "Other",
+  "ResourceGroup": "ai_ml",
+  "Description": "确保 Amazon Bedrock 模型调用日志使用 AWS KMS 加密，以保护所有模型调用的请求和响应日志中的敏感数据。",
+  "Risk": "如果 Amazon Bedrock 模型调用日志未加密，敏感数据（如提示、响应和令牌使用情况）可能暴露给未经授权的方。这可能导致数据泄露、安全漏洞或敏感信息的意外使用。",
+  "RelatedUrl": "https://docs.aws.amazon.com/bedrock/latest/userguide/data-protection.html",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "确保 Amazon Bedrock 的模型调用日志使用 AWS KMS 加密，以防止未经授权访问敏感的日志数据。",
+      "Url": "hhttps://docs.aws.amazon.com/bedrock/latest/userguide/data-protection.html"
+    }
+  },
+  "Categories": [
+    "encryption",
+    "logging",
+    "gen-ai"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

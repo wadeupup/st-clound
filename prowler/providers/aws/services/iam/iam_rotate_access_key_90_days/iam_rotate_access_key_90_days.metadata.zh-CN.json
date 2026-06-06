@@ -1,0 +1,35 @@
+{
+  "Provider": "aws",
+  "CheckID": "iam_rotate_access_key_90_days",
+  "CheckTitle": "确保访问密钥每90天或更短时间内轮换一次",
+  "CheckType": [
+    "软件和配置检查",
+    "行业和监管标准",
+    "CIS AWS 基础基准"
+  ],
+  "ServiceName": "iam",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "medium",
+  "ResourceType": "AwsIamAccessKey",
+  "ResourceGroup": "IAM",
+  "Description": "确保访问密钥每90天或更短时间内轮换一次",
+  "Risk": "访问密钥由访问密钥 ID 和秘密访问密钥组成，用于对您向 AWS 发出的编程请求进行签名。AWS 用户需要自己的访问密钥才能通过 AWS 命令行界面 (AWS CLI)、Windows PowerShell 工具、AWS SDK 或使用单个 AWS 服务的 API 进行直接 HTTP 调用来进行编程调用。建议定期轮换所有访问密钥。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "使用凭证报告确保 access_key_X_last_rotated 在90天以内。",
+      "Url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_getting-report.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

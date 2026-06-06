@@ -1,0 +1,40 @@
+{
+  "Provider": "aws",
+  "CheckID": "guardduty_rds_protection_enabled",
+  "CheckTitle": "GuardDuty detector で RDS Protection が有効化されていること",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices/Runtime Behavior Analysis",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "TTPs/Credential Access"
+  ],
+  "ServiceName": "guardduty",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsGuardDutyDetector",
+  "ResourceGroup": "security",
+  "Description": "有効な **Amazon GuardDuty detectors** に対して **RDS Protection** が有効かを評価し、RDS および Aurora のログインアクティビティを分析して異常なアクセスパターンをプロファイル・検出できる状態かを確認します。",
+  "Risk": "**RDS Protection** がない場合、異常なデータベースログインを見逃す可能性があります。攻撃者は**窃取**または**総当たり**した認証情報を使ってデータへアクセスし、スキーマ改ざんや DB 経由の横展開を行い、**機密性**と**完全性**に影響し、場合によっては**可用性**も損ないます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/guardduty-controls.html#guardduty-9",
+    "https://docs.aws.amazon.com/guardduty/latest/ug/rds-protection.html",
+    "https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/guard-duty-rds-protection.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws guardduty update-detector --detector-id <detector-id> --features Name=RDS_LOGIN_EVENTS,Status=ENABLED",
+      "NativeIaC": "```yaml\nResources:\n  <example_resource_name>:\n    Type: AWS::GuardDuty::Detector\n    Properties:\n      Enable: true\n      Features:\n        - Name: RDS_LOGIN_EVENTS  # critical: selects GuardDuty RDS Protection feature\n          Status: ENABLED         # critical: turns RDS Protection on\n```",
+      "Other": "1. AWS Console で Amazon GuardDuty を開きます\n2. Settings（または Protection plans/Features）に移動します\n3. RDS Protection（RDS login events）を見つけて Enable をクリックします\n4. 変更を保存します\n5. Organizations 利用時は、委任された GuardDuty 管理者アカウントで実施します",
+      "Terraform": "```hcl\nresource \"aws_guardduty_detector\" \"<example_resource_name>\" {\n  enable = true\n  features {\n    name   = \"RDS_LOGIN_EVENTS\"  # critical: GuardDuty RDS Protection feature\n    status = \"ENABLED\"            # critical: enable the feature\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "すべてのアカウントと Region で **GuardDuty RDS Protection** を有効化してください。\n- DB ユーザーには**最小権限**を適用し、認証情報をローテーションする\n- データベースのネットワーク露出を制限する\n- 検出結果をアラートとインシデント対応に統合し、迅速に封じ込める",
+      "Url": "https://hub.prowler.com/check/guardduty_rds_protection_enabled"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

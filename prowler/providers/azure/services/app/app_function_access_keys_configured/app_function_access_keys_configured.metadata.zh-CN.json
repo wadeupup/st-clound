@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "app_function_access_keys_configured",
+  "CheckTitle": "确保 Azure Functions 使用访问密钥以增强安全性",
+  "CheckType": [],
+  "ServiceName": "app",
+  "SubServiceName": "function",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Microsoft.Web/sites",
+  "ResourceGroup": "serverless",
+  "Description": "Azure Functions 提供了在开发和生产阶段保护 HTTP 函数端点的方法。使用访问密钥可增加一层额外防护，确保只有授权用户或系统能够访问函数。在处理公开应用或敏感数据时，这一点尤为重要。",
+  "Risk": "未受保护的函数端点可能遭受未授权访问，导致潜在的数据泄露或恶意活动。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/azure-functions/functions-bindings-http-webhook-trigger?tabs=python-v2%2Cisolated-process%2Cnodejs-v4%2Cfunctionsv2&pivots=programming-language-csharp#authorization-keys",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/Functions/azure-function-anonymous-access.html",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "使用访问密钥保护 Azure Functions。你可以在 Azure 门户或使用 Azure CLI 创建和管理密钥。更多信息请参阅官方文档。",
+      "Url": "https://learn.microsoft.com/en-us/azure/azure-functions/security-concepts?tabs=v4#function-access-keys"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "为获得更高安全性，可结合访问密钥使用托管标识和密钥保管库（Key Vault）。这可对资源访问提供更细粒度控制，并提升可审计性。"
+}

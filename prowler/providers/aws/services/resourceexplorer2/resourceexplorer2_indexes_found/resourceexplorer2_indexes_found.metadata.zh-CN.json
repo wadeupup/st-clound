@@ -1,0 +1,38 @@
+{
+  "Provider": "aws",
+  "CheckID": "resourceexplorer2_indexes_found",
+  "CheckTitle": "资源资源管理器索引存在",
+  "CheckType": [
+    "软件和配置检查/AWS安全最佳实践"
+  ],
+  "ServiceName": "resourceexplorer2",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "low",
+  "ResourceType": "Other",
+  "ResourceGroup": "governance",
+  "Description": "**AWS Resource Explorer** 在该账户中存在用户拥有的 **索引**。该评估用于确定是否至少在任一已启用的区域中存在一个用于资源编目和搜索的索引。",
+  "Risk": "缺失索引会降低资产可见性，形成盲点，使配置错误或孤立的资源无法被发现。这会削弱**机密性**（未被发现的公开暴露）、**完整性**（未检测到的未授权更改）和**可用性**（遏制和恢复更慢），延长事件响应时间并助长横向移动。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/resource-explorer/latest/userguide/manage-service-turn-on-region.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws resource-explorer-2 create-index --region <REGION>",
+      "NativeIaC": "```yaml\nResources:\n  <example_resource_name>:\n    Type: AWS::ResourceExplorer2::Index\n    Properties:\n      Type: LOCAL  # 严重：在此区域中创建一个本地索引，以便检查至少找到一个索引\n```",
+      "Other": "1. 登录 AWS 管理控制台并打开 **AWS Resource Explorer**\n2. 转到 **Settings** > **Indexes**\n3. 点击 **Create indexes**\n4. 选择当前区域并点击 **Create indexes**\n5. 等待索引状态变为 ACTIVE",
+      "Terraform": "```hcl\nresource \"aws_resourceexplorer2_index\" \"<example_resource_name>\" {\n  type = \"LOCAL\"  # 严重：创建一个本地索引以使检查通过\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "在所有活跃区域中创建**Resource Explorer 索引**，并指定一个**聚合器索引**以进行跨区域搜索。对视图应用最小权限访问，使其符合标签标准，并定期验证索引状态。这可提高清单准确性，支持纵深防御，并加快检测和修复速度。",
+      "Url": "https://hub.prowler.com/check/resourceexplorer2_indexes_found"
+    }
+  },
+  "Categories": [
+    "forensics-ready"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

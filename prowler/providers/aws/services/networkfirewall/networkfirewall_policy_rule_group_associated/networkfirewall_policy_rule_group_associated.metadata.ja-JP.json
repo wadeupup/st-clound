@@ -1,0 +1,44 @@
+{
+  "Provider": "aws",
+  "CheckID": "networkfirewall_policy_rule_group_associated",
+  "CheckTitle": "Network Firewallポリシーには少なくとも1つのルールグループが関連付けられています",
+  "CheckType": [
+    "ソフトウェアと構成のチェック/AWS セキュリティベストプラクティス/ネットワーク到達可能性",
+    "ソフトウェアと構成のチェック/業界および規制基準/AWS 基礎セキュリティベストプラクティス",
+    "ソフトウェアと構成のチェック/業界および規制基準/NIST 800-53 コントロール (米国)"
+  ],
+  "ServiceName": "networkfirewall",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsNetworkFirewallFirewall",
+  "ResourceGroup": "network",
+  "Description": "Network Firewallポリシーには、パケットの検査と処理を定義するために、1つ以上の**ステートフル**または**ステートレスルールグループ**が関連付けられています。\n\nルールグループがないポリシーが特定されます。",
+  "Risk": "ルールグループがないと、トラフィックが意味のある検査を受けず、VPC境界を越えて不正なフローが許可されます。\n\n影響:\n- 機密性: データの流出\n- 完全性: 露出したサービスを介した不正な変更\n- 可用性: C2、スキャン、またはDoSトラフィックが通過し、横方向の移動を可能にする",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/network-firewall/latest/developerguide/rule-groups.html",
+    "https://docs.aws.amazon.com/network-firewall/latest/developerguide/firewall-policy-updating.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/networkfirewall-controls.html#networkfirewall-3",
+    "https://medium.com/slalom-blog/secure-internet-access-egress-filtering-with-aws-network-firewall-ddf52ae121f9",
+    "https://docs.aws.amazon.com/de_de/network-firewall/latest/developerguide/nwfw-using-managed-rule-groups-add-to-policy.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation: Network Firewallポリシーに少なくとも1つのルールグループを添付\nResources:\n  FirewallPolicy:\n    Type: AWS::NetworkFirewall::FirewallPolicy\n    Properties:\n      FirewallPolicyName: <example_resource_name>\n      FirewallPolicy:\n        StatelessDefaultActions:\n          - aws:forward_to_sfe\n        StatelessFragmentDefaultActions:\n          - aws:forward_to_sfe\n        # 重要: チェックを通過するために、ポリシーに少なくとも1つのルールグループを関連付ける\n        StatefulRuleGroupReferences:\n          - ResourceArn: <example_resource_arn>  # 重要な行: 既存のルールグループARNを参照\n```",
+      "Other": "1. AWSコンソールを開き、VPC > Network Firewall > Firewallポリシーに移動\n2. 対象のファイアウォールポリシーを選択\n3. ステートフルルールグループ（またはステートレスルールグループ）で、ルールグループの追加（または管理されたステートフル/ステートレスルールグループの追加）を選択\n4. 少なくとも1つの既存のルールグループを選択し、ポリシーに追加を選択\n5. 保存をクリック",
+      "Terraform": "```hcl\n# Network Firewallポリシーに少なくとも1つのルールグループを添付\nresource \"aws_networkfirewall_firewall_policy\" \"<example_resource_name>\" {\n  name = \"<example_resource_name>\"\n\n  firewall_policy {\n    stateless_default_actions          = [\"aws:forward_to_sfe\"]\n    stateless_fragment_default_actions = [\"aws:forward_to_sfe\"]\n\n    # 重要: チェックを通過するために、ポリシーに少なくとも1つのルールグループを関連付ける\n    stateful_rule_group_reference {\n      resource_arn = \"<example_resource_arn>\"  # 重要な行: 既存のルールグループARNを参照\n    }\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "適切な**ステートフル**および**ステートレスルールグループ**をすべてのポリシーに関連付けます。\n- **デフォルト拒否**の姿勢を強制（最小特権）\n- ベースラインとして精査された管理ルールグループを使用し、ワークロードに合わせて調整\n- 定期的にレビューとテストを行い、ルールをバージョン管理し、ログを監視し、変更管理を要求",
+      "Url": "https://hub.prowler.com/check/networkfirewall_policy_rule_group_associated"
+    }
+  },
+  "Categories": [
+    "trust-boundaries"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

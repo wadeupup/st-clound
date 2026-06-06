@@ -1,0 +1,40 @@
+{
+  "Provider": "aws",
+  "CheckID": "ecr_registry_scan_images_on_push_enabled",
+  "CheckTitle": "ECR レジストリはすべてのリポジトリに対してプッシュ時のイメージスキャンが有効になっている",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices"
+  ],
+  "ServiceName": "ecr",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "container",
+  "Description": "リポジトリを持つ Amazon ECR レジストリは、レジストリレベルで `プッシュ時スキャン` として設定されたイメージスキャンについて評価され、すべてのリポジトリをカバーするスキャンルール（制限フィルターなし）が **基本** または **強化** スキャンのいずれかで設定されている必要があります。",
+  "Risk": "`プッシュ時スキャン` が欠落しているかフィルターされていると、**脆弱なイメージ** がタイムリーに検出されずにプッシュおよびデプロイされ、既知の CVE（リモートコード実行、権限昇格）、サプライチェーン侵害、および横方向の移動を悪用される可能性があり、ワークロードの整合性とデータの機密性を脅かします。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/AmazonECR/latest/userguide/image-scanning.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws ecr put-registry-scanning-configuration --rules 'scanFrequency=SCAN_ON_PUSH,repositoryFilters=[{filter=string,filterType=WILDCARD}]'",
+      "NativeIaC": "",
+      "Other": "1. AWS マネジメントコンソールを開き、Amazon ECR に移動します\n2. 左側のメニューで、アカウント設定（または設定）をクリックし、レジストリスキャンを見つけます\n3. 編集をクリックします\n4. スキャンタイプを強化スキャンに設定します\n5. プッシュ時スキャンを有効にします\n6. リポジトリフィルターで、フィルタータイプを WILDCARD に設定し、フィルターを * に設定します\n7. 保存をクリックします",
+      "Terraform": "```hcl\nresource \"aws_ecr_registry_scanning_configuration\" \"<example_resource_name>\" {\n  scan_type = \"ENHANCED\"\n\n  rule {\n    scan_frequency = \"SCAN_ON_PUSH\"  # Ensures scan on push\n    repository_filter {\n      filter      = \"*\"               # Applies to all repositories\n      filter_type = \"WILDCARD\"\n    }\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "レジストリ全体の `プッシュ時スキャン` を有効にし、ルールがすべてのリポジトリに適用されるようにします（フィルターなし）。より広範なカバレッジのために **強化スキャン** を優先し、利用可能な場合は継続的なスキャンと組み合わせます。検出結果を CI/CD ゲートとアラートに統合して、**多層防御** を実施し、リスクのあるイメージのプロモーションをブロックします。",
+      "Url": "https://hub.prowler.com/check/ecr_registry_scan_images_on_push_enabled"
+    }
+  },
+  "Categories": [
+    "container-security"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

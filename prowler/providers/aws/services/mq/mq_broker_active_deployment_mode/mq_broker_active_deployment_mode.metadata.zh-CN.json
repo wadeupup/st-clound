@@ -1,0 +1,44 @@
+{
+  "Provider": "aws",
+  "CheckID": "mq_broker_active_deployment_mode",
+  "CheckTitle": "Apache ActiveMQ broker 配置为 active/standby 多可用区部署模式",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践",
+    "软件和配置检查/行业和法规标准/AWS 基础安全最佳实践",
+    "软件和配置检查/行业和监管标准/NIST 800-53 控制",
+    "影响/拒绝服务"
+  ],
+  "ServiceName": "mq",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "low",
+  "ResourceType": "AwsAmazonMQBroker",
+  "ResourceGroup": "messaging",
+  "Description": "**ActiveMQ broker 部署模式** 配置为 **active/standby** (`ACTIVE_STANDBY_MULTI_AZ`)，表示在可用区之间运行的冗余对",
+  "Risk": "没有 **active/standby**，单实例 broker 成为 **单点故障**，降低 **可用性** 并在中断或维护期间有 **消息丢失或重复** 的风险。这可能会阻塞消息流，增加积压，并导致依赖服务之间的不一致处理。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/MQ/deployment-mode.html",
+    "https://docs.aws.amazon.com/amazon-mq/latest/developer-guide/amazon-mq-basic-elements.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/mq-controls.html#mq-5",
+    "https://docs.aws.amazon.com/amazon-mq/latest/developer-guide/amazon-mq-broker-architecture.html#active-standby-broker-deployment"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation：在 active/standby 多可用区中创建一个 ActiveMQ broker\nResources:\n  <example_resource_name>:\n    Type: AWS::AmazonMQ::Broker\n    Properties:\n      BrokerName: <example_resource_name>\n      EngineType: ACTIVEMQ\n      EngineVersion: <example_resource_name>\n      HostInstanceType: mq.t3.micro\n      PubliclyAccessible: false\n      DeploymentMode: ACTIVE_STANDBY_MULTI_AZ  # 关键：设置 active/standby 多可用区以通过检查\n      SubnetIds:\n        - <example_resource_id>\n        - <example_resource_id>  # 关键：active/standby 需要在不同可用区的两个子网\n      SecurityGroups:\n        - <example_resource_id>\n      Users:\n        - Username: <example_resource_name>\n          Password: <example_resource_id>\n```",
+      "Other": "1. 在 AWS 控制台中，转到 Amazon MQ > Brokers > Create broker\n2. 选择引擎：ActiveMQ\n3. 将部署模式设置为 Active/standby broker (Multi-AZ)\n4. 选择不同可用区的两个子网和一个安全组\n5. 输入 broker 名称、实例类型，并创建一个用户（用户名/密码）\n6. 创建 broker，更新客户端以使用新端点，然后删除旧的单实例 broker",
+      "Terraform": "```hcl\n# 在 active/standby 多可用区中创建一个 ActiveMQ broker\nresource \"aws_mq_broker\" \"<example_resource_name>\" {\n  broker_name         = \"<example_resource_name>\"\n  engine_type         = \"ActiveMQ\"\n  engine_version      = \"<example_resource_name>\"\n  host_instance_type  = \"mq.t3.micro\"\n  publicly_accessible = false\n  deployment_mode     = \"ACTIVE_STANDBY_MULTI_AZ\"  # 关键：启用 active/standby 多可用区以通过检查\n\n  subnet_ids      = [\"<example_resource_id>\", \"<example_resource_id>\"]  # 关键：在不同可用区的两个子网\n  security_groups = [\"<example_resource_id>\"]\n\n  user {\n    username = \"<example_resource_name>\"\n    password = \"<example_resource_id>\"\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "采用 **active/standby 部署** 为 ActiveMQ brokers 提供多可用区的弹性。\n\n设计客户端以支持 **故障转移**，包括重试和幂等处理，通过定期的 **故障转移测试** 验证恢复，监控 broker 健康，并应用 **最小权限** 以限制影响范围。",
+      "Url": "https://hub.prowler.com/check/mq_broker_active_deployment_mode"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

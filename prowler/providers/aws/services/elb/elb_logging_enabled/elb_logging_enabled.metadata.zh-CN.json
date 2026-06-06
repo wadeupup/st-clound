@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "elb_logging_enabled",
+  "CheckTitle": "Elastic Load Balancer 已配置访问日志到 S3",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/CIS AWS Foundations Benchmark"
+  ],
+  "ServiceName": "elb",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsElbLoadBalancer",
+  "ResourceGroup": "network",
+  "Description": "**Elastic Load Balancer** 已配置**访问日志**，将请求元数据（客户端 IP、路径、状态码、TLS 详情）传送到 **Amazon S3**",
+  "Risk": "如果没有 **ELB 访问日志**，你将失去对边缘流量的**可见性**，降低对侦察、暴力破解和漏洞利用尝试的检测能力。这会妨碍取证和事件时间线还原，带来数据外泄未被发现（机密性）、变更无法追溯（完整性）以及对中断或 DDoS 响应延迟（可用性）等风险。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/elasticloadbalancing/latest/network/enable-access-logs.html",
+    "https://docs.aws.amazon.com/elasticloadbalancing/latest/classic/access-log-collection.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/ElasticBeanstalk/enable-access-logs.html",
+    "https://docs.aws.amazon.com/elasticloadbalancing/latest/application/enable-access-logging.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws elb modify-load-balancer-attributes --load-balancer-name <lb_name> --load-balancer-attributes AccessLog={Enabled=true,S3BucketName=<bucket_name>}",
+      "NativeIaC": "```yaml\n# CloudFormation: Enable access logs for a Classic Load Balancer (CLB)\nResources:\n  <example_resource_name>:\n    Type: AWS::ElasticLoadBalancing::LoadBalancer\n    Properties:\n      Listeners:\n        - LoadBalancerPort: 80\n          InstancePort: 80\n          Protocol: HTTP\n      AvailabilityZones:\n        - <example_resource_id>\n      AccessLoggingPolicy:               # CRITICAL: Enables S3 access logs\n        Enabled: true                    # CRITICAL: Turn on access logging\n        S3BucketName: <example_resource_name>  # CRITICAL: S3 bucket to store logs\n```",
+      "Other": "1. 在 AWS 控制台进入 EC2 > Load Balancers\n2. 选择负载均衡器并点击 Edit attributes（或进入 Attributes 标签）\n3. 打开 Access logs\n4. 输入 S3 URI（例如 s3://<bucket_name>）\n5. 点击 Save",
+      "Terraform": "```hcl\n# Enable access logs for an ELBv2 load balancer (minimal)\nresource \"aws_lb\" \"<example_resource_name>\" {\n  load_balancer_type = \"network\"\n  subnets            = [\"<example_resource_id>\", \"<example_resource_id>\"]\n\n  access_logs {                   # CRITICAL: Enables S3 access logs\n    bucket  = \"<example_resource_name>\"  # CRITICAL: S3 bucket for logs\n    enabled = true                 # CRITICAL: Turn on access logging\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "启用到 Amazon S3 的**访问日志**（`access_logs.s3.enabled=true`）。对存储桶应用**最小权限**策略、加密对象并限制读取访问。定义生命周期保留策略并集中分析。监控投递失败并对异常告警。通过 IaC 在所有负载均衡器上标准化落实，作为**纵深防御**的一部分。",
+      "Url": "https://hub.prowler.com/check/elb_logging_enabled"
+    }
+  },
+  "Categories": [
+    "logging"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

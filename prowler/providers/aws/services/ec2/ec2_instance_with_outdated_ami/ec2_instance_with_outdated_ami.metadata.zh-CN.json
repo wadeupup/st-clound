@@ -1,0 +1,32 @@
+{
+  "Provider": "aws",
+  "CheckID": "ec2_instance_with_outdated_ami",
+  "CheckTitle": "检查使用过时 AMI 的 EC2 实例",
+  "CheckType": [],
+  "ServiceName": "ec2",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:instance/resource-id",
+  "Severity": "high",
+  "ResourceType": "AwsEc2Instance",
+  "ResourceGroup": "compute",
+  "Description": "此检查通过审计实例以收集 AMI ID，将它们与最新可用版本进行比较，验证支持和安全更新状态，并检查是否已弃用，来识别使用过时 Amazon Machine Images (AMI) 的 EC2 实例。",
+  "Risk": "使用过时的 AMI 可能使 EC2 实例面临安全漏洞、缺乏支持和缺少关键更新，从而增加被利用的风险。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "aws ec2 describe-images --image-ids <ami-id>",
+      "NativeIaC": "",
+      "Other": "https://repost.aws/knowledge-center/ec2-find-deprecated-ami",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "定期更新您的 EC2 实例以使用最新的 AMI，以确保它们获得最新的安全补丁和更新。",
+      "Url": "https://repost.aws/knowledge-center/ec2-find-deprecated-ami"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

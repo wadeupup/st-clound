@@ -1,0 +1,47 @@
+{
+  "Provider": "aws",
+  "CheckID": "apigateway_restapi_public",
+  "CheckTitle": "API Gateway REST API 端点是私有的",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践/网络可达性",
+    "软件和配置检查/行业和监管标准/AWS 基础安全最佳实践",
+    "TTPs/初始访问"
+  ],
+  "ServiceName": "apigateway",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsApiGatewayRestApi",
+  "ResourceGroup": "api_gateway",
+  "Description": "**Amazon API Gateway REST API** 根据端点暴露情况进行评估：**互联网可访问**的端点与通过接口 VPC 端点（`AWS PrivateLink`）的**私有 VPC 专用**访问。",
+  "Risk": "互联网暴露增加了攻击面：\n- **机密性**：配置错误或匿名方法可能泄露数据\n- **完整性**：未授权的调用可能更改后端状态\n- **可用性/成本**：机器人或 DDoS 可能耗尽容量并导致支出激增",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-private-apis.html",
+    "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-resource-policies-examples.html#apigateway-resource-policies-source-vpc-example",
+    "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-control-access-to-api.html",
+    "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-resource-policies.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws apigateway update-rest-api --rest-api-id <REST_API_ID> --patch-operations op=replace,path=/endpointConfiguration/types/0,value=PRIVATE",
+      "NativeIaC": "```yaml\nResources:\n  <example_resource_name>:\n    Type: AWS::ApiGateway::RestApi\n    Properties:\n      Name: <example_resource_name>\n      EndpointConfiguration:\n        Types:\n          - PRIVATE  # 关键：将 REST API 端点设置为 Private，移除公共访问\n```",
+      "Other": "1. 打开 AWS 控制台并转到 API Gateway\n2. 在 REST APIs 下，选择您的 API\n3. 在左侧菜单中，单击 Settings\n4. 将 Endpoint Type 设置为 Private\n5. 单击 Save changes",
+      "Terraform": "```hcl\nresource \"aws_api_gateway_rest_api\" \"<example_resource_name>\" {\n  name = \"<example_resource_name>\"\n\n  endpoint_configuration {\n    types = [\"PRIVATE\"]  # 关键：使 REST API 变为私有\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "优先使用可通过接口 VPC 端点访问的**私有** REST API（`PRIVATE`）。\n\n*如果需要公共访问*，应用**最小权限**和**纵深防御**：\n- 使用资源策略限制（`aws:SourceVpc`/`aws:SourceVpce`）\n- 强制执行强身份验证（IAM、Cognito 或授权器）\n- 添加 AWS WAF、节流、使用计划和全面的日志记录",
+      "Url": "https://hub.prowler.com/check/apigateway_restapi_public"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "",
+  "CheckAliases": [
+    "apigateway_public"
+  ]
+}
+

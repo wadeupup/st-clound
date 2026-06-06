@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "directoryservice_ldap_certificate_expiration",
+  "CheckTitle": "Directory Service LDAP 証明書が90日以上後に期限切れになる",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices"
+  ],
+  "ServiceName": "directoryservice",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "IAM",
+  "Description": "**AWS Directory Service** セキュア LDAP (LDAPS) 証明書の期限切れを評価します。各ディレクトリの証明書の有効期限を現在時刻と比較し、残り時間が `<= 90` 日の証明書を識別します。",
+  "Risk": "期限切れの LDAPS 証明書により、TLS ハンドシェイクが失敗し、ディレクトリバインディングとクエリがブロックされ、認証とアプリ統合が中断されます（可用性）。クライアントがプレーン LDAP にフォールバックした場合、資格情報とディレクトリデータが傍受または変更される可能性があります（機密性と整合性）。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/directoryservice/latest/admin-guide/ms_ad_ldap.html",
+    "https://support.icompaas.com/support/solutions/articles/62000229587-ensure-to-monitor-directory-service-ldap-certificates-expiration"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws ds register-certificate --directory-id <DIRECTORY_ID> --certificate-data file://certificate.pem",
+      "NativeIaC": "",
+      "Other": "1. AWS コンソールで、Directory Service を開き、AWS Managed Microsoft AD (<example_resource_id>) を選択します\n2. Networking & security > Secure LDAP に移動します\n3. Edit（Manage certificate）をクリックします\n4. Replace certificate（または Upload certificate）を選択します\n5. 信頼できる CA からの新しい LDAPS サーバー証明書（秘密鍵付き、有効期限 >90 日）をアップロードします。.pfx を使用する場合は、パスワードを入力します\n6. 保存し、証明書のステータスが Active になるまで待ちます",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "証明書ライフサイクル管理を採用します：LDAPS 証明書をインベントリし、期限切れの前にアラートを送信し、段階的なロールアウトと重複で自動更新を実現します。TLS のみの LDAP を強制し、プレーンテキストのフォールバックを無効にします。証明書の発行とデプロイに**最小権限**と**職務の分離**を適用します。",
+      "Url": "https://hub.prowler.com/check/directoryservice_ldap_certificate_expiration"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

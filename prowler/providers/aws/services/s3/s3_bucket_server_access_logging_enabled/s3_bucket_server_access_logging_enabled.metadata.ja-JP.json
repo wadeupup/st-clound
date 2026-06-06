@@ -1,0 +1,35 @@
+{
+  "Provider": "aws",
+  "CheckID": "s3_bucket_server_access_logging_enabled",
+  "CheckTitle": "S3 バケットでサーバーアクセスログが有効になっているか確認してください",
+  "CheckType": [
+    "ログ記録と監視"
+  ],
+  "ServiceName": "s3",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:s3:::bucket_name",
+  "Severity": "medium",
+  "ResourceType": "AwsS3Bucket",
+  "ResourceGroup": "storage",
+  "Description": "S3 バケットでサーバーアクセスログが有効になっているか確認してください",
+  "Risk": "サーバーアクセスログは、セキュリティ監査やアクセス監査に役立ち、顧客基盤について知る助けとなり、Amazon S3 の請求内容を理解するのに役立ちます。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "aws s3api put-bucket-logging --bucket <BUCKET_NAME> --bucket-logging-status <LOGGING_FILE_JSON>",
+      "NativeIaC": "",
+      "Other": "https://docs.prowler.com/checks/aws/s3-policies/s3_13-enable-logging",
+      "Terraform": "https://docs.prowler.com/checks/aws/s3-policies/s3_13-enable-logging#terraform"
+    },
+    "Recommendation": {
+      "Text": "S3 バケットでログ記録が有効になっていることを確認してください。CloudTrail データイベントは、S3 バケットのログ記録の代わりに使用できます。その場合、この検出結果は誤検知と見なすことができます。",
+      "Url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/security-best-practices.html"
+    }
+  },
+  "Categories": [
+    "forensics-ready"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

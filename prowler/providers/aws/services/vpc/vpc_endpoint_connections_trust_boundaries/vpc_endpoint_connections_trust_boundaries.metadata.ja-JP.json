@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "vpc_endpoint_connections_trust_boundaries",
+  "CheckTitle": "VPC エンドポイントポリシーは、信頼された AWS アカウントからのアクセスのみを許可します",
+  "CheckType": [
+    "ソフトウェアと構成チェック/AWSセキュリティのベストプラクティス",
+    "業界および規制基準/AWS基盤セキュリティのベストプラクティス",
+    "TTPs/初期アクセス"
+  ],
+  "ServiceName": "vpc",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsEc2VpcEndpointService",
+  "ResourceGroup": "network",
+  "Description": "**VPC エンドポイントポリシー**は、設定された**信頼済み AWS アカウント**への制限について評価されます。`Principal` の値（`*` を含む）またはアカウント ARN が信頼されていないプリンシパルを許可している場合、または条件が十分に制限的でない場合、そのエンドポイントが特定されます。*編集可能なポリシーを持たないエンドポイントは除外されます。*",
+  "Risk": "あなたのエンドポイントを使用する非信頼のプリンシパルは、あたかもあなたのVPCからであるかのようにAWSサービスへアクセスでき、セグメンテーションを弱体化させます。これにより、不正な読み取り/書き込みや、エンドポイントに関連付けられたリソースからのデータ流出が可能になり、**機密性**と**完全性**を損ない、さらに**コスト**が増加する可能性があります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/vpc/latest/privatelink/vpc-endpoints-access.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws ec2 modify-vpc-endpoint --vpc-endpoint-id <example_resource_id> --policy-document '{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"*\",\"Resource\":\"*\",\"Condition\":{\"StringEquals\":{\"aws:PrincipalAccount\":[\"<TRUSTED_ACCOUNT_ID_1>\",\"<TRUSTED_ACCOUNT_ID_2>\"]}}}]}'",
+      "NativeIaC": "```yaml\n#CloudFormation：VPC エンドポイントへのアクセスを信頼できるアカウントのみに制限する\nResources:\n  <example_resource_name>:\n    Type: AWS::EC2::VPCEndpoint\n    Properties:\n      VpcId: <example_resource_id>\n      ServiceName: com.amazonaws.<region>.<service>\n      PolicyDocument:\n        Version: '2012-10-17'\n        Statement:\n          - Effect: Allow\n            Principal: \"*\"\n            Action: \"*\"\n            Resource: \"*\"\n            Condition:                  #重大: 信頼できるアカウントに制限する\n              StringEquals:             #重大：指定されたアカウントのみを許可する\n                \"aws:PrincipalAccount\":   #重大: 使用をこれらのアカウントに制限します\n                  - \"<TRUSTED_ACCOUNT_ID_1>\"\n                  - \"<TRUSTED_ACCOUNT_ID_2>\"\n```",
+      "Other": "1. AWS Console を開き、VPC > Endpoints に移動します\n2. エンドポイントを選択し、Actions > Manage policy を選びます\n3. Custom を選択し、この最小ポリシーを貼り付けて、信頼するアカウント ID に置き換えます:\n   ```json\n   {\n     \"Version\": \"2012-10-17\",\n     \"Statement\": [\n       {\n         \"Effect\": \"Allow\",\n         \"Principal\": \"*\",\n         \"Action\": \"*\",\n         \"Resource\": \"*\",\n         \"Condition\": {\n           \"StringEquals\": {\n             \"aws:PrincipalAccount\": [\n               \"<TRUSTED_ACCOUNT_ID_1>\",\n               \"<TRUSTED_ACCOUNT_ID_2>\"\n             ]\n           }\n         }\n       }\n     ]\n   }\n   ```\n4. Save をクリックします",
+      "Terraform": "```hcl\n#既存のVPCエンドポイントリソースにこれを追加して、アクセスを制限してください\nresource \"aws_vpc_endpoint\" \"<example_resource_name>\" {\n  #...エンドポイントに既に存在する必須引数...\n\n  policy = jsonencode({\n    Version = \"2012-10-17\"\n    Statement = [{\n      Effect    = \"Allow\"\n      Principal = \"*\"\n      Action    = \"*\"\n      Resource  = \"*\"\n      Condition = {                       #重大: 信頼できるアカウントに制限する\n        StringEquals = {\n          \"aws:PrincipalAccount\" = [      #重要: このアカウントのみがそのエンドポイントを使用できます\n            \"<TRUSTED_ACCOUNT_ID_1>\",\n            \"<TRUSTED_ACCOUNT_ID_2>\"\n          ]\n        }\n      }\n    }]\n  })\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "**最小権限**を適用してください: エンドポイントポリシーを自分のアカウントおよび**信頼できるアカウント**の明示的な許可リストに制限します。厳格な条件と組み合わせる場合を除き、`*` プリンシパルは避けてください。ネットワークリンクを介した推移的信頼を防ぎ、エンドポイントの使用を制限するための**多層防御**として、リソースポリシーとモニタリングを使用してください。",
+      "Url": "https://hub.prowler.com/check/vpc_endpoint_connections_trust_boundaries"
+    }
+  },
+  "Categories": [
+    "trust-boundaries",
+    "identity-access"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

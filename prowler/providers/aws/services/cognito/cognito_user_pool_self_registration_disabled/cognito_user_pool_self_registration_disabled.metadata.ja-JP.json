@@ -1,0 +1,32 @@
+{
+  "Provider": "aws",
+  "CheckID": "cognito_user_pool_self_registration_disabled",
+  "CheckTitle": "Amazon Cognito ユーザープールでセルフ登録が無効になっていることを確認する",
+  "CheckType": [],
+  "ServiceName": "cognito",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:aws:cognito-idp:region:account:userpool/userpool-id",
+  "Severity": "medium",
+  "ResourceType": "AwsCognitoUserPool",
+  "ResourceGroup": "IAM",
+  "Description": "Amazon Cognito ユーザープールでセルフ登録が無効になっているかどうかを確認します。セルフ登録により、ユーザーはユーザープールにアカウントを登録できます。セルフ登録が有効になっている場合、ユーザーは管理者の介入なしでユーザープールにアカウントを登録できます。これにより、アプリケーションへの不正アクセスが発生する可能性があります。",
+  "Risk": "セルフ登録が有効になっている場合、ユーザーは管理者の介入なしでユーザープールにアカウントを登録できます。これにより、アプリケーションへの不正アクセスが発生する可能性があります。",
+  "RelatedUrl": "https://docs.aws.amazon.com/cognito-user-identity-pools/latest/APIReference/API_SignUp.html",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "Amazon Cognito ユーザープールのセルフ登録を無効にするには、次の操作を実行してください：",
+      "Url": "https://docs.aws.amazon.com/cognito/latest/developerguide/signing-up-users-in-your-app.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

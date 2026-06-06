@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "redshift_cluster_enhanced_vpc_routing",
+  "CheckTitle": "Redshift クラスターは Enhanced VPC Routing が有効になっています",
+  "CheckType": [
+    "ソフトウェアと構成のチェック/AWS セキュリティベストプラクティス/ネットワーク到達可能性",
+    "ソフトウェアと構成のチェック/業界および規制基準/AWS 基礎セキュリティベストプラクティス"
+  ],
+  "ServiceName": "redshift",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsRedshiftCluster",
+  "ResourceGroup": "analytics",
+  "Description": "**Amazon Redshift クラスター**は、`EnhancedVpcRouting` 設定が評価されます。これにより、クラスターとデータリポジトリ間のすべての `COPY` および `UNLOAD` トラフィックが VPC を通じてルーティングされ、VPC セキュリティコントロールとログの使用が可能になります。",
+  "Risk": "**Enhanced VPC Routing がない場合**、`COPY`/`UNLOAD` 転送は VPC の監視を離れる可能性があり、制御と可視性が低下します。\n- VPC のイグレスフィルタリングとエンドポイントポリシーをバイパス可能（機密性）\n- フローログのテレメトリが制限される（可視性）\n- 不正なデータ流出や改ざんのリスクが高まる（機密性、完全性）",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/redshift-controls.html#redshift-7",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/Redshift/enable-enhanced-vpc-routing.html",
+    "https://docs.aws.amazon.com/redshift/latest/mgmt/enhanced-vpc-routing.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws redshift modify-cluster --cluster-identifier <cluster-id> --enhanced-vpc-routing",
+      "NativeIaC": "```yaml\n# CloudFormation: Redshift クラスターで Enhanced VPC Routing を有効にする\nResources:\n  <example_resource_name>:\n    Type: AWS::Redshift::Cluster\n    Properties:\n      ClusterIdentifier: <example_resource_name>\n      ClusterType: single-node\n      NodeType: ra3.xlplus\n      DBName: dev\n      MasterUsername: <USERNAME>\n      MasterUserPassword: <PASSWORD>\n      EnhancedVpcRouting: true  # 重要: COPY/UNLOAD トラフィックを VPC 経由で強制します\n```",
+      "Other": "1. AWS コンソールを開き、Amazon Redshift に移動\n2. プロビジョニングされたクラスターを選択し、クラスターを選択\n3. アクション > 修正をクリック\n4. ネットワークとセキュリティで Enhanced VPC Routing をオンにする\n5. 変更を保存をクリック（プロンプトが表示された場合は即時適用）",
+      "Terraform": "```hcl\n# Terraform: Redshift クラスターで Enhanced VPC Routing を有効にする\nresource \"aws_redshift_cluster\" \"<example_resource_name>\" {\n  cluster_identifier  = \"<example_resource_name>\"\n  cluster_type        = \"single-node\"\n  node_type           = \"ra3.xlplus\"\n  master_username     = \"<USERNAME>\"\n  master_password     = \"<PASSWORD>\"\n  enhanced_vpc_routing = true  # 重要: COPY/UNLOAD を VPC 経由でルーティング\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "`EnhancedVpcRouting` を有効にし、**最小特権**のイグレスを強制します:\n- VPC エンドポイントと制限付きポリシーを使用してプライベートアクセスを優先\n- セキュリティグループ、NACL、およびルーティングを介してアウトバウンドパスを制限\n- VPC フローログで転送を監視\n\nこれにより、データ移動のための**多層防御**と**ゼロトラスト**が強化されます。",
+      "Url": "https://hub.prowler.com/check/redshift_cluster_enhanced_vpc_routing"
+    }
+  },
+  "Categories": [
+    "trust-boundaries",
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

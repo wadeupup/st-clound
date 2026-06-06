@@ -1,0 +1,33 @@
+{
+  "Provider": "azure",
+  "CheckID": "network_public_ip_shodan",
+  "CheckTitle": "检查 Azure 公网 IP 是否暴露在 Shodan（需要 Shodan API KEY）。",
+  "CheckType": [],
+  "ServiceName": "network",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Network",
+  "ResourceGroup": "network",
+  "Description": "检查 Azure 公网 IP 是否暴露在 Shodan（需要 Shodan API KEY）。",
+  "Risk": "如果 Azure 公网 IP 暴露在 Shodan 上，互联网上任何人都可能访问它。这可能导致对资源的未授权访问。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "检查已识别的 IP，考虑将其改为私有 IP，并将其从 Shodan 中移除。",
+      "Url": "https://www.shodan.io/"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

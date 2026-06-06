@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "cloudtrail_bucket_requires_mfa_delete",
+  "CheckTitle": "CloudTrail トレイルの S3 バケットで MFA 削除が有効になっている",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/CIS AWS Foundations Benchmark"
+  ],
+  "ServiceName": "cloudtrail",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsCloudTrailTrail",
+  "ResourceGroup": "monitoring",
+  "Description": "アクティブにログを記録しているトレイルの **CloudTrail ログバケット** について、関連する S3 バケットの **MFA Delete** が評価されます。評価では、アカウント内のログバケットに `MFA Delete` が設定されているかどうかを判定します。*バケットが別のアカウントにある場合は、その設定を個別に確認する必要があります*。",
+  "Risk": "**MFA Delete** がない場合、盗まれた資格情報や過剰な権限を持つ資格情報がログバージョンを永続的に削除したり、バージョニングを変更したりして、ログの **整合性** と **可用性** を損なう可能性があります。これにより、攻撃者が痕跡を隠蔽し、**フォレンジック** を妨げ、調査の証拠を弱めることができます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/AmazonS3/latest/userguide/MultiFactorAuthenticationDelete.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/CloudTrail/cloudtrail-bucket-mfa-delete-enabled.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws s3api put-bucket-versioning --bucket <CLOUDTRAIL_BUCKET_NAME> --versioning-configuration Status=Enabled,MFADelete=Enabled --mfa \"<MFA_SERIAL> <MFA_CODE>\"",
+      "NativeIaC": "",
+      "Other": "1. MFA が有効な root ユーザーとして AWS マネジメントコンソールにサインインします\n2. AWS CloudShell を開きます（上部のナビゲーションバーから）\n3. 次を実行します：\n   ```bash\n   aws s3api put-bucket-versioning --bucket <CLOUDTRAIL_BUCKET_NAME> --versioning-configuration Status=Enabled,MFADelete=Enabled --mfa \"<MFA_SERIAL> <MFA_CODE>\"\n   ```",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "バージョニングが有効な CloudTrail ログバケットで `MFA Delete` を有効にします。**最小権限の原則** を適用して、厳密に制御された ID のみがログを削除または変更できるようにし、そのような操作には MFA を要求します。専用のログアカウントとログファイルの整合性検証を使用して **多層防御** を適用します。",
+      "Url": "https://hub.prowler.com/check/cloudtrail_bucket_requires_mfa_delete"
+    }
+  },
+  "Categories": [
+    "identity-access",
+    "forensics-ready"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

@@ -1,0 +1,47 @@
+{
+  "Provider": "aws",
+  "CheckID": "cloudtrail_logs_s3_bucket_is_not_publicly_accessible",
+  "CheckTitle": "CloudTrail トレイルの S3 バケットが公開アクセス可能ではない",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices/Network Reachability",
+    "Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Industry and Regulatory Standards/CIS AWS Foundations Benchmark",
+    "Effects/Data Exposure"
+  ],
+  "ServiceName": "cloudtrail",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "critical",
+  "ResourceType": "AwsS3Bucket",
+  "ResourceGroup": "storage",
+  "Description": "CloudTrail ログの宛先 **S3 バケット** が、データをパブリック `AllUsers` グループに公開する ACL 付与について検査されます。\n\n他のアカウントでホストされているバケットは、範囲外のレビューとしてフラグが付けられます。",
+  "Risk": "露出した CloudTrail ログは **機密性** と **整合性** を損ないます。\n\n攻撃者は API アクティビティを収集してアカウント、ロール、キーをマッピングし、**偵察** と回避を可能にします。書き込みが許可されている場合、ログが **汚染** または削除され、調査を妨げ、インシデントのタイムラインを損なう可能性があります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/CloudTrail/cloudtrail-bucket-publicly-accessible.html",
+    "https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-control-block-public-access.html",
+    "https://docs.aws.amazon.com/config/latest/developerguide/cloudtrail-s3-bucket-public-access-prohibited.html",
+    "https://docs.panther.com/alerts/alert-runbooks/built-in-policies/aws-cloudtrail-logs-s3-bucket-not-publicly-accessible"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws s3api put-bucket-acl --bucket <example_resource_name> --acl private",
+      "NativeIaC": "```yaml\n# CloudFormation: ensure the CloudTrail S3 bucket ACL is not public\nResources:\n  CloudTrailLogsBucket:\n    Type: AWS::S3::Bucket\n    Properties:\n      BucketName: <example_resource_name>\n      AccessControl: Private  # CRITICAL: sets bucket ACL to private, removing any AllUsers (public) grants\n```",
+      "Other": "1. AWS S3 コンソールを開きます\n2. CloudTrail で使用されるバケットを選択します\n3. 権限 > アクセス制御リスト (ACL) に移動します\n4. パブリックアクセスの下で編集をクリックし、「すべての人（パブリックアクセス）」への付与を削除します（読み取り/書き込みのチェックを外す）\n5. 変更を保存します",
+      "Terraform": "```hcl\n# Ensure the CloudTrail S3 bucket ACL is private\nresource \"aws_s3_bucket_acl\" \"fix_cloudtrail_logs_bucket\" {\n  bucket = \"<example_resource_name>\"\n  acl    = \"private\"  # CRITICAL: removes any public (AllUsers) ACL grants\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "ログバケットに **最小権限の原則** を適用します：\n- S3 `パブリックアクセスをブロック` を有効にします（アカウントとバケットレベル）\n- `AllUsers`/`AuthenticatedUsers` ACL を削除します。ワイルドカードプリンシパルを避けます\n- CloudTrail のみを許可し、`aws:SourceArn` で制約します\n\n専用のプライベートバケットを使用し、権限の変更を監視します。",
+      "Url": "https://hub.prowler.com/check/cloudtrail_logs_s3_bucket_is_not_publicly_accessible"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [
+    "s3_bucket_public_access"
+  ],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

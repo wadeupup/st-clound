@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "elasticbeanstalk_environment_cloudwatch_logging_enabled",
+  "CheckTitle": "Elastic Beanstalk 環境が CloudWatch Logs にログをストリーミングしていること",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices/Runtime Behavior Analysis",
+    "TTPs/Defense Evasion"
+  ],
+  "ServiceName": "elasticbeanstalk",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsElasticBeanstalkEnvironment",
+  "ResourceGroup": "compute",
+  "Description": "**Elastic Beanstalk 環境**が `StreamLogs` 設定により、インスタンスおよびプロキシログを **Amazon CloudWatch Logs** にストリーミングするよう構成されていることを確認します",
+  "Risk": "CloudWatch への **集中ログ管理** がない場合、ログローテーションやインスタンス終了時にログが失われ、検知と対応が遅れる可能性があります。攻撃者は監査回避のためローカルログを削除でき、Web 攻撃や設定改ざんの証拠を隠すことで **機密性**、**完全性**、**可用性** を損ないます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/AWSHowTo.cloudwatchlogs.html",
+    "https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/environments-cfg-logging.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/elasticbeanstalk-controls.html#elasticbeanstalk-3"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws elasticbeanstalk update-environment --environment-name <example_resource_name> --option-settings Namespace=aws:elasticbeanstalk:cloudwatch:logs,OptionName=StreamLogs,Value=true",
+      "NativeIaC": "```yaml\nResources:\n  <example_resource_name>:\n    Type: AWS::ElasticBeanstalk::Environment\n    Properties:\n      ApplicationName: \"<example_resource_name>\"\n      PlatformArn: \"<platform_arn>\"\n      OptionSettings:\n        - Namespace: aws:elasticbeanstalk:cloudwatch:logs\n          OptionName: StreamLogs\n          Value: \"true\"  # Critical: Enables instance log streaming to CloudWatch Logs\n```",
+      "Other": "1. AWS Elastic Beanstalk コンソールを開き、対象環境を選択します\n2. Configuration > Updates, monitoring, and logging > Edit に移動します\n3. \"Instance log streaming to CloudWatch Logs\" で Log streaming を Activated に設定します\n4. Apply をクリックして保存します",
+      "Terraform": "```hcl\nresource \"aws_elastic_beanstalk_environment\" \"<example_resource_name>\" {\n  name         = \"<example_resource_name>\"\n  application  = \"<example_resource_name>\"\n  platform_arn = \"<platform_arn>\"\n\n  # Critical: Enables instance log streaming to CloudWatch Logs\n  setting {\n    namespace = \"aws:elasticbeanstalk:cloudwatch:logs\"\n    name      = \"StreamLogs\"\n    value     = \"true\"\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "**CloudWatch Logs** へのストリーミングを有効化してください。適切な保持期間を設定し、終了時削除を避け、最小権限 IAM でアクセスを制限します。早期検知のためメトリクスフィルタとアラートを追加し、**フォレンジック**、**説明責任**、**多層防御** を支えるためアーカイブを保持します。",
+      "Url": "https://hub.prowler.com/check/elasticbeanstalk_environment_cloudwatch_logging_enabled"
+    }
+  },
+  "Categories": [
+    "logging"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

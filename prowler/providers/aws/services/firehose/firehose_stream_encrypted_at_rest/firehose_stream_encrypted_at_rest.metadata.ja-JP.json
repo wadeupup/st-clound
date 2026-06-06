@@ -1,0 +1,44 @@
+{
+  "Provider": "aws",
+  "CheckID": "firehose_stream_encrypted_at_rest",
+  "CheckTitle": "Kinesis Data Firehose 配信ストリームが保存時に暗号化されていること",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/NIST 800-53 Controls",
+    "Software and Configuration Checks/Industry and Regulatory Standards/NIST CSF Controls (USA)"
+  ],
+  "ServiceName": "firehose",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsKinesisStream",
+  "ResourceGroup": "messaging",
+  "Description": "**Amazon Data Firehose** 配信ストリームでは、ソース種別に関係なく AWS KMS による **保存時サーバーサイド暗号化** を有効にする必要があります。上流の **Kinesis Data Streams** や **MSK** が暗号化されていても、配信ストリーム自体の保護は代替できません。",
+  "Risk": "Firehose の保存データが未暗号化だと、ストレージやバックアップにアクセスされた際に読み取られ、**機密性** と **完全性** が損なわれます。ディスクレベルアクセス、スナップショット、誤設定された送信先によりデータ流出や改ざんが可能になります。KMS ベース制御がないと、キー ローテーション、職務分離、監査性も低下します。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/Firehose/delivery-stream-encrypted-with-kms-customer-master-keys.html",
+    "https://docs.aws.amazon.com/firehose/latest/dev/encryption.html",
+    "https://docs.aws.amazon.com/AmazonS3/latest/userguide/UsingKMSEncryption.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/datafirehose-controls.html#datafirehose-1"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws firehose start-delivery-stream-encryption --delivery-stream-name <delivery-stream-name> --delivery-stream-encryption-configuration-input KeyType=AWS_OWNED_CMK",
+      "NativeIaC": "```yaml\n# CloudFormation: Enable at-rest encryption for a Firehose delivery stream\nResources:\n  <example_resource_name>:\n    Type: AWS::KinesisFirehose::DeliveryStream\n    Properties:\n      DeliveryStreamEncryptionConfigurationInput:\n        KeyType: AWS_OWNED_CMK  # critical: enables SSE at rest using AWS owned KMS key\n      ExtendedS3DestinationConfiguration:\n        BucketARN: arn:aws:s3:::<example_resource_name>\n        RoleARN: arn:aws:iam::<example_account_id>:role/<example_resource_name>\n```",
+      "Other": "1. AWS コンソールで Amazon Data Firehose に移動します\n2. 対象の配信ストリームを選択して Edit をクリックします\n3. Server-side encryption を Enabled（AWS owned key）に設定します\n4. Save changes をクリックします",
+      "Terraform": "```hcl\n# Terraform: Enable at-rest encryption for a Firehose delivery stream\nresource \"aws_kinesis_firehose_delivery_stream\" \"<example_resource_name>\" {\n  name        = \"<example_resource_name>\"\n  destination = \"extended_s3\"\n\n  server_side_encryption {\n    enabled = true  # critical: turns on SSE at rest (uses AWS owned KMS key by default)\n  }\n\n  extended_s3_configuration {\n    role_arn   = \"arn:aws:iam::<example_account_id>:role/<example_resource_name>\"\n    bucket_arn = \"arn:aws:s3:::<example_resource_name>\"\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "Firehose で AWS KMS による **サーバーサイド暗号化** を有効化してください。**カスタマーマネージドキー**（`CMEK`）を優先し、**最小権限**、ローテーション、監査を実現します。上流 **Kinesis** ソースの暗号化を確認し、MSK 既定値がポリシーに適合することを確認します。KMS ヘルスを監視し、未暗号化書き込みを拒否してください。送信先側でも **多層防御** を適用します。",
+      "Url": "https://hub.prowler.com/check/firehose_stream_encrypted_at_rest"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

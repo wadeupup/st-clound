@@ -1,0 +1,40 @@
+{
+  "Provider": "aws",
+  "CheckID": "cloudwatch_changes_to_vpcs_alarm_configured",
+  "CheckTitle": "AWS アカウントで VPC の変更に対する CloudWatch Logs メトリクスフィルターとアラームが構成されている",
+  "CheckType": [
+    "Software and Configuration Checks/Industry and Regulatory Standards/CIS AWS Foundations Benchmark"
+  ],
+  "ServiceName": "cloudwatch",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsCloudWatchAlarm",
+  "ResourceGroup": "monitoring",
+  "Description": "**VPC 構成変更** に対する **CloudTrail イベント** は、CloudWatch Logs のメトリクスフィルターと関連付けられたアラームによってキャプチャされます。フィルターは `CreateVpc`、`DeleteVpc`、`ModifyVpcAttribute` および VPC ピアリング操作などのアクションを対象とし、ネットワークトポロジが変更された場合に可視化します。",
+  "Risk": "VPC 変更に対するアラートがない場合、ルート、ピアリング、属性に対する不正または誤った編集が気付かれず、プライベートネットワークの露出やデータ外部流出（C）、横方向の移動やトラフィック改ざん（I）、誤ルーティングやブリッジネットワークによる障害（A）を招く可能性があります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudwatch-alarms-for-cloudtrail.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation: Create a metric filter and alarm for VPC changes\nResources:\n  VPCChangesMetricFilter:\n    Type: AWS::Logs::MetricFilter\n    Properties:\n      LogGroupName: <example_log_group_name>\n      FilterPattern: '{ ($.eventName = CreateVpc) || ($.eventName = DeleteVpc) || ($.eventName = ModifyVpcAttribute) || ($.eventName = AcceptVpcPeeringConnection) || ($.eventName = CreateVpcPeeringConnection) || ($.eventName = DeleteVpcPeeringConnection) || ($.eventName = RejectVpcPeeringConnection) || ($.eventName = AttachClassicLinkVpc) || ($.eventName = DetachClassicLinkVpc) || ($.eventName = DisableVpcClassicLink) || ($.eventName = EnableVpcClassicLink) }' # Critical: matches VPC change events\n      MetricTransformations:\n        - MetricName: vpc_changes_metric\n          MetricNamespace: CISBenchmark\n          MetricValue: \"1\"  # Critical: emits a metric on matching events\n\n  VPCChangesAlarm:\n    Type: AWS::CloudWatch::Alarm\n    Properties:\n      MetricName: vpc_changes_metric  # Critical: alarm monitors the metric above\n      Namespace: CISBenchmark\n      Statistic: Sum\n      Period: 300\n      EvaluationPeriods: 1\n      Threshold: 1\n      ComparisonOperator: GreaterThanOrEqualToThreshold\n```",
+      "Other": "1. AWS コンソールで CloudWatch > ロググループに移動し、CloudTrail ロググループを開きます\n2. [メトリクスフィルターの作成] を選択します\n3. フィルターパターンに次を貼り付けます：\n   { ($.eventName = CreateVpc) || ($.eventName = DeleteVpc) || ($.eventName = ModifyVpcAttribute) || ($.eventName = AcceptVpcPeeringConnection) || ($.eventName = CreateVpcPeeringConnection) || ($.eventName = DeleteVpcPeeringConnection) || ($.eventName = RejectVpcPeeringConnection) || ($.eventName = AttachClassicLinkVpc) || ($.eventName = DetachClassicLinkVpc) || ($.eventName = DisableVpcClassicLink) || ($.eventName = EnableVpcClassicLink) }\n4. フィルターに名前を付け、メトリクス名前空間を CISBenchmark、メトリクス名を vpc_changes_metric、メトリクス値を 1 に設定してフィルターを作成します\n5. 新しいフィルターを選択し、[アラームの作成] をクリックします\n6. 統計を Sum、期間を 5 分、しきい値タイプを Static、しきい値を 1、条件を Greater/Equal、評価期間を 1 に設定します\n7. アラームを作成します（アクション/通知はオプションであり、チェックをパスするための必須条件ではありません）\n",
+      "Terraform": "```hcl\n# Metric filter for VPC changes\nresource \"aws_cloudwatch_log_metric_filter\" \"<example_resource_name>\" {\n  name           = \"<example_resource_name>\"\n  log_group_name = \"<example_log_group_name>\"\n  pattern        = \"{ ($.eventName = CreateVpc) || ($.eventName = DeleteVpc) || ($.eventName = ModifyVpcAttribute) || ($.eventName = AcceptVpcPeeringConnection) || ($.eventName = CreateVpcPeeringConnection) || ($.eventName = DeleteVpcPeeringConnection) || ($.eventName = RejectVpcPeeringConnection) || ($.eventName = AttachClassicLinkVpc) || ($.eventName = DetachClassicLinkVpc) || ($.eventName = DisableVpcClassicLink) || ($.eventName = EnableVpcClassicLink) }\" # Critical: matches VPC change events\n\n  metric_transformation {\n    name      = \"<example_resource_name>\"   # Critical: metric created by the filter\n    namespace = \"CISBenchmark\"\n    value     = \"1\"\n  }\n}\n\n# Alarm on the VPC changes metric\nresource \"aws_cloudwatch_metric_alarm\" \"<example_resource_name>\" {\n  metric_name        = \"<example_resource_name>\"  # Critical: alarm monitors the filter's metric\n  namespace          = \"CISBenchmark\"\n  statistic          = \"Sum\"\n  period             = 300\n  evaluation_periods = 1\n  threshold          = 1\n  comparison_operator = \"GreaterThanOrEqualToThreshold\"\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "重要な **VPC 変更イベント** に対して CloudTrail 上に CloudWatch Logs メトリクスフィルターとアラームを作成し、インシデント対応者に通知します。ネットワーク変更に **最小権限の原則** を適用し、変更承認を必須とし、セグメンテーションやルート制御などと組み合わせた **多層防御** によって、不正な変更を防止し素早く封じ込めます。",
+      "Url": "https://hub.prowler.com/check/cloudwatch_changes_to_vpcs_alarm_configured"
+    }
+  },
+  "Categories": [
+    "logging"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "Logging and Monitoring"
+}
+
+

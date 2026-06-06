@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "defender_ensure_defender_for_sql_servers_is_on",
+  "CheckTitle": "Microsoft Defender for SQL Servers on Machines が「オン」に設定されていることを確認する",
+  "CheckType": [],
+  "ServiceName": "defender",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AzureDefenderPlan",
+  "ResourceGroup": "security",
+  "Description": "Microsoft Defender for SQL Servers on Machines が「オン」に設定されていることを確認する",
+  "Risk": "Microsoft Defender for SQL servers on machines を有効化すると、マシン上の SQL サーバー向け脅威検知が有効になり、Microsoft Defender for Cloud において脅威インテリジェンス、異常検知、振る舞い分析を提供します。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/SecurityCenter/defender-sql-server-virtual-machines.html",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-general-policies/ensure-that-azure-defender-is-set-to-on-for-sql-servers-on-machines#terraform"
+    },
+    "Recommendation": {
+      "Text": "既定では、Microsoft Defender for Cloud は仮想マシン上で実行される Microsoft SQL サーバーで無効化されています。SQL Server 仮想マシン向け Defender for Cloud は、SQL インジェクション、ブルートフォース攻撃、権限乱用などの脅威を継続的に監視します。このセキュリティ サービスは、不審なアクティビティの詳細と脅威を緩和する方法を含むセキュリティ アラートを提供します。",
+      "Url": ""
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

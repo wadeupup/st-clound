@@ -1,0 +1,34 @@
+{
+  "Provider": "aws",
+  "CheckID": "bedrock_agent_guardrail_enabled",
+  "CheckTitle": "Amazon Bedrockエージェントセッションに対してガードレールが有効になっていることを確認",
+  "CheckType": [],
+  "ServiceName": "bedrock",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:bedrock:region:account-id:agent/resource-id",
+  "Severity": "high",
+  "ResourceType": "Other",
+  "ResourceGroup": "ai_ml",
+  "Description": "このチェックは、Amazon Bedrockエージェントセッションを保護するためにガードレールが有効になっていることを確認します。ガードレールは、AIモデルとの対話中に有害または機密コンテンツをフィルタリングおよびブロックすることで、セキュリティリスクを軽減するのに役立ちます。",
+  "Risk": "ガードレールが有効になっていない場合、Amazon Bedrockエージェントセッションは、機密情報を暴露したり不適切なコンテンツを生成したりする可能性のある有害なプロンプトや入力に対して脆弱です。これにより、プライバシー侵害、データ漏洩、またはその他のセキュリティリスクが発生する可能性があります。",
+  "RelatedUrl": "https://docs.aws.amazon.com/bedrock/latest/userguide/guardrails.html",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/Bedrock/protect-agent-sessions-with-guardrails.html",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "Amazon Bedrockエージェントセッションに対してガードレールを有効にして、対話中に有害な入力と出力から保護します。",
+      "Url": "https://docs.aws.amazon.com/bedrock/latest/userguide/guardrails-create.html"
+    }
+  },
+  "Categories": [
+    "gen-ai"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "cloudfront_distributions_https_enabled",
+  "CheckTitle": "CloudFrontディストリビューションのビューアープロトコルポリシーがHTTPSのみまたはHTTPSへのリダイレクトに設定されている",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices/Network Reachability",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Effects/Data Exposure"
+  ],
+  "ServiceName": "cloudfront",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsCloudFrontDistribution",
+  "ResourceGroup": "network",
+  "Description": "デフォルトキャッシュ動作の`viewer_protocol_policy`が`https-only`または`redirect-to-https`の場合、CloudFrontディストリビューションはビューアー接続に**HTTPS**を要求します。`allow-all`を使用する設定はHTTPを許可します。",
+  "Risk": "HTTPを許可すると、トラフィックが**中間者**インターセプトと**セッションハイジャック**にさらされ、Cookie、トークン、またはPIIの窃取を可能にします。攻撃者は応答を**改ざん**したり、マルウェアを注入したり、**ダウングレード/ストリップ**攻撃を実行したりして、機密性と整合性を弱める可能性があります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/CloudFront/security-policy.html",
+    "https://docs.aws.amazon.com/IAM/latest/UserGuide/what-is-access-analyzer.html",
+    "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/using-https.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws cloudfront get-distribution-config --id <DISTRIBUTION_ID> --output json > current-config.json && echo 'Manually edit current-config.json to change DefaultCacheBehavior.ViewerProtocolPolicy to \"redirect-to-https\" or \"https-only\", then run:' && echo 'aws cloudfront update-distribution --id <DISTRIBUTION_ID> --distribution-config file://current-config.json --if-match $(aws cloudfront get-distribution-config --id <DISTRIBUTION_ID> --query \"ETag\" --output text)'",
+      "NativeIaC": "```yaml\n# CloudFormation：ViewerProtocolPolicyをHTTPSを要求するように設定\nResources:\n  <example_resource_name>:\n    Type: AWS::CloudFront::Distribution\n    Properties:\n      DistributionConfig:\n        DefaultCacheBehavior:\n          ViewerProtocolPolicy: https-only  # 重要：ビューアーにHTTPSを要求\n```",
+      "Other": "1. AWSコンソールで、CloudFront > ディストリビューションに移動\n2. ターゲットディストリビューションを選択し、動作タブを開く\n3. デフォルト (*) 動作を選択し、編集をクリック\n4. ビューアープロトコルポリシーをHTTPをHTTPSにリダイレクト（またはHTTPSのみ）に設定\n5. 変更を保存してデプロイ",
+      "Terraform": "```hcl\n# Terraform：viewer_protocol_policyをHTTPSを強制するように設定\nresource \"aws_cloudfront_distribution\" \"<example_resource_name>\" {\n  default_cache_behavior {\n    target_origin_id       = \"<example_origin_id>\"\n    viewer_protocol_policy = \"redirect-to-https\" # 重要：HTTPをHTTPSに強制\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "`viewer_protocol_policy`を`https-only`または`redirect-to-https`に設定して、ビューアーの**HTTPSのみ**アクセスを強制します。`allow-all`を避けます。暗号化をエンドツーエンドでオリジンに拡張し、**HSTS**を有効化し、モダンなTLSと暗号を優先し、Cookieを`Secure`としてマークします。これは**多層防御**をサポートし、ダウングレードを防止します。",
+      "Url": "https://hub.prowler.com/check/cloudfront_distributions_https_enabled"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

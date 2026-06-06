@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "entra_trusted_named_locations_exists",
+  "CheckTitle": "确保已定义受信任位置",
+  "CheckType": [],
+  "ServiceName": "entra",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "#microsoft.graph.ipNamedLocation",
+  "ResourceGroup": "network",
+  "Description": "Microsoft Entra ID 条件访问允许组织配置命名位置，并设置这些位置是受信任还是不受信任。这些设置可让组织为条件访问策略指定地理位置，或定义实际 IP 地址与 IP 范围，以及这些 IP 地址/范围是否被组织信任。",
+  "Risk": "定义受信任源 IP 地址或范围有助于组织围绕受信任或不受信任 IP 地址与范围创建并实施条件访问策略。与从不受信任位置或不受信任源 IP 地址/范围尝试进行 Microsoft Entra ID 身份验证的用户相比，从受信任 IP 地址/范围进行身份验证的用户可能面临更少的访问限制或访问要求。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/entra/identity/conditional-access/location-condition",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "1. 导航到 Microsoft Entra ID Conditional Access 边栏 2. 点击 Named locations 边栏 3. 在 Named locations 中点击 IP ranges location 4. 在 Name 文本框中输入该位置设置名称 5. 点击 + 号 6. 在出现的文本框中以 CIDR 记法添加 IP 地址范围 7. 点击 Add 按钮 8. 对每个需要添加的 IP 范围重复步骤 5 至 7 9. 如果输入信息属于受信任范围，勾选 Mark as trusted location 复选框 10. 完成后点击 Create",
+      "Url": "https://learn.microsoft.com/en-us/security/benchmark/azure/mcsb-identity-management#im-7-restrict-resource-access-based-on--conditions"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "配置命名位置时，组织可使用地理位置数据创建位置，或通过定义源 IP 地址/范围创建位置。使用国家/地区位置配置命名位置时，组织无法将该位置标记为受信任，且依赖该国家/地区位置设置的条件访问策略将无法使用 All trusted locations 设置，而必须使用 Select locations 设置。这可能增加配置所需资源，并需要充分的组织级测试。通常，条件访问策略可能会完全阻止用户向 Microsoft Entra ID 进行身份验证，因此强烈建议进行全面测试。为避免完全锁定，建议准备一个拥有完整全局管理员权限的“Break Glass”账户，以便在其他管理员均无法进行 Microsoft Entra ID 身份验证时应急使用。该“Break Glass”账户应从条件访问策略中排除，并配置尽可能长的口令短语。该账户仅应在紧急情况和管理员完全锁定时使用。"
+}

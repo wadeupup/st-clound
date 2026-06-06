@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "defender_ensure_defender_for_sql_servers_is_on",
+  "CheckTitle": "确保 Microsoft Defender for SQL Servers on Machines 设置为“开启”",
+  "CheckType": [],
+  "ServiceName": "defender",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AzureDefenderPlan",
+  "ResourceGroup": "security",
+  "Description": "确保 Microsoft Defender for SQL Servers on Machines 设置为“开启”",
+  "Risk": "开启 Microsoft Defender for SQL servers on machines 可为运行在机器上的 SQL 服务器启用威胁检测，并在 Microsoft Defender for Cloud 中提供威胁情报、异常检测和行为分析能力。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/SecurityCenter/defender-sql-server-virtual-machines.html",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-general-policies/ensure-that-azure-defender-is-set-to-on-for-sql-servers-on-machines#terraform"
+    },
+    "Recommendation": {
+      "Text": "默认情况下，Microsoft Defender for Cloud 对运行在虚拟机上的 Microsoft SQL 服务器处于禁用状态。适用于 SQL Server 虚拟机的 Defender for Cloud 会持续监控 SQL 数据库服务器中的 SQL 注入、暴力破解和权限滥用等威胁。该安全服务会提供安全告警，并包含可疑活动详情以及如何缓解安全威胁的指导。",
+      "Url": ""
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

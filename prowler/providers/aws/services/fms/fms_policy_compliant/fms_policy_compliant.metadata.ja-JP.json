@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "fms_policy_compliant",
+  "CheckTitle": "管理者アカウント内のすべての AWS FMS ポリシーが全アカウントで準拠していること",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices/Network Reachability",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices"
+  ],
+  "ServiceName": "fms",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "security",
+  "Description": "管理者アカウント内の **Firewall Manager** ポリシーについて、組織全体の準拠状態を評価します。各ポリシーのアカウント単位ステータスを確認し、`NON_COMPLIANT` または未設定のエントリを特定します。さらに、管理者スコープ内に有効ポリシーが存在しない場合も検出します。",
+  "Risk": "ポリシードリフトやポリシー欠如により、対象リソースで統制が強制されず、**機密性**、**完全性**、**可用性** が低下します。WAF、Shield、security group、network firewall のベースライン欠如は、DDoS 露出、不安全ルート、過剰公開アクセスを招き、不正侵入やデータ流出につながります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://aws.amazon.com/firewall-manager/faqs/",
+    "https://docs.aws.amazon.com/waf/latest/developerguide/getting-started-fms-intro.html",
+    "https://www.amazonaws.cn/en/firewall-manager/faqs/",
+    "https://docs.aws.amazon.com/waf/latest/developerguide/fms-compliance.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "1. Firewall Manager 管理者アカウントで AWS コンソールにサインインします\n2. Firewall Manager > Security policies を開きます\n3. ポリシーがない場合: Create policy をクリックし、使用するポリシータイプを選択、スコープを All accounts に設定し、Automatic remediation を有効化して作成します\n4. Noncompliant アカウントを含むポリシーがある場合: ポリシーを開く > Edit > Automatic remediation を有効化し、スコープに All accounts を含める > Save\n5. AWS Config（組織管理アカウント）で: Settings > Organization settings > Enable recording for all accounts and all regions > Save\n6. 各 Firewall Manager ポリシーに戻り、Accounts within policy scope が Compliant であることを確認します",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "**Firewall Manager** による集中統制を維持してください。対象アカウント/リソースに必須ポリシーを定義し、適切な場合は自動修復を有効化し、継続的に準拠状況を監視します。Web・ネットワーク・DNS 防御を標準化し、ドリフトをアラート化して、**最小権限** と **多層防御** を実装してください。",
+      "Url": "https://hub.prowler.com/check/fms_policy_compliant"
+    }
+  },
+  "Categories": [
+    "internet-exposed",
+    "trust-boundaries"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

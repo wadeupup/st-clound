@@ -1,0 +1,40 @@
+{
+  "Provider": "aws",
+  "CheckID": "codebuild_project_older_90_days",
+  "CheckTitle": "CodeBuild プロジェクトが過去 90 日以内に呼び出されている",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices"
+  ],
+  "ServiceName": "codebuild",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsCodeBuildProject",
+  "ResourceGroup": "devops",
+  "Description": "**AWS CodeBuild プロジェクト**の最近のアクティビティを評価し、最後のビルド呼び出しタイムスタンプを使用します。`90 日`以内に呼び出されていない、またはビルドされたことがないプロジェクトは**非アクティブ**として扱われます。",
+  "Risk": "**非アクティブなプロジェクト**は**攻撃面**を増加させます。休眠中の webhook や**ソース認証情報**が悪用される可能性があり、アタッチされた **IAM ロール**は過剰な権限を保持している可能性があります。古い設定は環境変数やログで**シークレット**を公開する可能性があり、ビルドの**整合性**とデータの**機密性**を脅かし、回避可能なコストと運用の拡散を追加します。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/codebuild/latest/userguide/delete-project.html",
+    "https://support.icompaas.com/support/solutions/articles/62000233684-ensure-codebuild-project-has-been-invoked-in-the-last-90-days"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "1. AWS コンソールを開き、CodeBuild に移動します\n2. ビルドプロジェクトで、プロジェクトを選択します\n3. ビルド開始をクリックし、ビルド開始を確認します\n4. ビルドが開始されるのを待って、最後の呼び出し時間を更新します",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "ライフサイクル管理を実施します：`90 日`以上アイドル状態のプロジェクトを確認し、所有権と必要性を確認してから、削除またはアーカイブします。未使用の webhook、トークン、サービスロールを無効にします；シークレットをローテーションします。**最小権限**、タグ付け、定期的な監査を実施して、**攻撃面**を減らし、ビルド環境を整理し、防御可能に保ちます。",
+      "Url": "https://hub.prowler.com/check/codebuild_project_older_90_days"
+    }
+  },
+  "Categories": [
+    "ci-cd"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

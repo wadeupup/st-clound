@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "storage_geo_redundant_enabled",
+  "CheckTitle": "重要な Azure Storage Account で geo-redundant storage（GRS）が有効化されていることを確認する",
+  "CheckType": [],
+  "ServiceName": "storage",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AzureStorageAccount",
+  "ResourceGroup": "storage",
+  "Description": "リージョン障害発生時のデータ耐久性と可用性を確保するため、重要な Azure Storage Account では geo-redundant storage（GRS）を有効化する必要があります。GRS はプライマリリージョン内でデータを複製し、さらにセカンダリリージョンへ非同期で複製することで、レジリエンスを高め、ディザスタリカバリ戦略を支援します。",
+  "Risk": "GRS がない場合、リージョン障害時に重要データが失われる、または利用不能になる可能性があり、データ耐久性およびディザスタリカバリの取り組みに悪影響を及ぼします。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/storage/common/storage-redundancy",
+  "Remediation": {
+    "Code": {
+      "CLI": "az storage account update --name <storage-account-name> --resource-group <resource-group-name> --sku Standard_GRS",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/StorageAccounts/enable-geo-redundant-storage.html",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "重要な Azure Storage Account で geo-redundant storage（GRS）を有効化し、リージョン障害時にもデータ耐久性と可用性を確保します。",
+      "Url": "https://learn.microsoft.com/en-us/azure/storage/common/storage-redundancy"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

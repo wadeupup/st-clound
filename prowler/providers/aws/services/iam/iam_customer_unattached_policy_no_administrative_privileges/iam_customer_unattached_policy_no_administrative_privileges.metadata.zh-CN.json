@@ -1,0 +1,35 @@
+{
+  "Provider": "aws",
+  "CheckID": "iam_customer_unattached_policy_no_administrative_privileges",
+  "CheckTitle": "确保不会创建允许完整 \"*:*\" 管理权限的 IAM 策略",
+  "CheckType": [
+    "Software and Configuration Checks",
+    "Industry and Regulatory Standards",
+    "CIS AWS Foundations Benchmark"
+  ],
+  "ServiceName": "iam",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "low",
+  "ResourceType": "AwsIamPolicy",
+  "ResourceGroup": "IAM",
+  "Description": "确保不会创建允许完整 \"*:*\" 管理权限的 IAM 策略；如果短生命周期资源正在使用该策略，结果可能受最终一致性影响",
+  "Risk": "IAM 策略是向用户、组或角色授予权限的方式。按照安全最佳实践，建议实施最小权限原则——即仅授予完成任务所必需的权限。应先明确用户需要执行的操作，再为其制定仅允许执行这些操作的策略，而不是授予完整管理权限。若授予完整管理权限而不限制到用户实际所需的最小权限集合，可能使资源暴露于不必要且潜在有害的操作。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://docs.prowler.com/checks/aws/iam-policies/iam_47",
+      "Terraform": "https://docs.prowler.com/checks/aws/iam-policies/iam_47#terraform"
+    },
+    "Recommendation": {
+      "Text": "与其一开始授予过于宽松的权限再尝试后续收紧，不如从最小权限集开始，并在必要时逐步增加权限会更安全。请列出相关策略并分析其权限是否已最小化到满足业务活动所需。",
+      "Url": "http://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "CAF Security Epic: IAM"
+}

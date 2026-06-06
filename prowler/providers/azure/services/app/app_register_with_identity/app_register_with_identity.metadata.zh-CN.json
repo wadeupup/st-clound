@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "app_register_with_identity",
+  "CheckTitle": "确保 App Service 已启用向 Azure Active Directory 注册",
+  "CheckType": [],
+  "ServiceName": "app",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Microsoft.Web/sites",
+  "ResourceGroup": "serverless",
+  "Description": "App Service 中的托管服务标识通过消除应用中的机密信息（如连接字符串中的凭据）来提升安全性。在 App Service 中向 Azure Active Directory 注册后，应用可无需用户名和密码即可安全连接到其他 Azure 服务。",
+  "Risk": "App Service 在 Azure 中提供高可扩展、可自动修补的 Web 托管服务。同时它还为应用提供托管标识，这是保护对 Azure SQL 数据库及其他 Azure 服务访问的开箱即用方案。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/app-service/configure-authentication-provider-aad?tabs=workforce-tenant",
+  "Remediation": {
+    "Code": {
+      "CLI": "az webapp identity assign --resource-group <RESOURCE_GROUP_NAME> --name <APP_NAME>",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/AppService/enable-registration-with-microsoft-entra-id.html",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-iam-policies/bc_azr_iam_1#terraform"
+    },
+    "Recommendation": {
+      "Text": "1. 使用 https://portal.azure.com 登录 Azure 门户 2. 进入 App Services 3. 点击每个应用 4. 在 Setting 部分点击 Identity 5. 在 System assigned 面板下将 Status 设置为 On",
+      "Url": "https://learn.microsoft.com/en-us/azure/app-service/scenario-secure-app-authentication-app-service"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "默认情况下，通过 Azure AD 的托管服务标识处于禁用状态。"
+}

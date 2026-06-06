@@ -1,0 +1,36 @@
+{
+  "Provider": "aws",
+  "CheckID": "ec2_ebs_volume_snapshots_exists",
+  "CheckTitle": "EBS スナップショットが存在するか確認",
+  "CheckType": [
+    "Data Protection"
+  ],
+  "ServiceName": "ec2",
+  "SubServiceName": "volume",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "medium",
+  "ResourceType": "AwsEc2Volume",
+  "ResourceGroup": "storage",
+  "Description": "EBS スナップショットが存在するか確認",
+  "Risk": "EBS ボリューム（利用可能または使用中）に、より良い、より信頼性の高いデータバックアップ戦略のために、ポイントインタイムリカバリに使用できる最近のスナップショット（週次で取得）があることを確認してください。",
+  "RelatedUrl": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EBSSnapshots.html",
+  "Remediation": {
+    "Code": {
+      "CLI": "aws ec2 --region <REGION> create-snapshot --volume-id <VOLUME-ID>",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity-staging/knowledge-base/aws/EBS/ebs-volumes-recent-snapshots.html",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "定期的にポイントインタイム EBS スナップショットを作成することで、障害発生時にデータ回復プロセスを効率的に処理し、EC2 インスタンスをシャットダウンする前にデータを保存し、地理的拡張のためにデータをバックアップし、災害回復スタックを最新の状態に保つことができます。",
+      "Url": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EBSSnapshots.html"
+    }
+  },
+  "Categories": [
+    "forensics-ready"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

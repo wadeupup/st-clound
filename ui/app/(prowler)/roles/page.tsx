@@ -1,0 +1,66 @@
+import { Spacer } from "@heroui/spacer";
+import Link from "next/link";
+import { Suspense } from "react";
+
+import { getRoles } from "@/actions/roles";
+import { FilterControls } from "@/components/filters";
+import { SkeletonTableRoles } from "@/components/roles/table";
+import { ContentLayout } from "@/components/ui";
+import { SearchParamsProps } from "@/types";
+import { RolesTitle } from "./roles-title";
+import { RolesAddButton } from "./roles-add-button";
+import { RolesFilters } from "./roles-filters";
+import { RolesTable } from "./roles-table";
+
+export default async function Roles({
+  searchParams,
+}: {
+  searchParams: Promise<SearchParamsProps>;
+}) {
+  const resolvedSearchParams = await searchParams;
+  const searchParamsKey = JSON.stringify(resolvedSearchParams || {});
+
+  return (
+    <ContentLayout title={<RolesTitle />} icon="lucide:user-cog">
+      <FilterControls search />
+
+      <div className="flex flex-row items-center justify-between">
+        <RolesFilters />
+
+        <RolesAddButton />
+      </div>
+      <Spacer y={8} />
+
+      <Suspense key={searchParamsKey} fallback={<SkeletonTableRoles />}>
+        <SSRDataTable searchParams={resolvedSearchParams} />
+      </Suspense>
+    </ContentLayout>
+  );
+}
+
+const SSRDataTable = async ({
+  searchParams,
+}: {
+  searchParams: SearchParamsProps;
+}) => {
+  const page = parseInt(searchParams.page?.toString() || "1", 10);
+  const sort = searchParams.sort?.toString();
+  const pageSize = parseInt(searchParams.pageSize?.toString() || "10", 10);
+
+  // Extract all filter parameters
+  const filters = Object.fromEntries(
+    Object.entries(searchParams).filter(([key]) => key.startsWith("filter[")),
+  );
+
+  // Extract query from filters
+  const query = (filters["filter[search]"] as string) || "";
+
+  const rolesData = await getRoles({ query, page, sort, filters, pageSize });
+
+  return (
+    <RolesTable
+      data={rolesData?.data || []}
+      metadata={rolesData?.meta}
+    />
+  );
+};

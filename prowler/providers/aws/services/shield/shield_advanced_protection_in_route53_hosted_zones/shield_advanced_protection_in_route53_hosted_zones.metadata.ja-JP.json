@@ -1,0 +1,40 @@
+{
+  "Provider": "aws",
+  "CheckID": "shield_advanced_protection_in_route53_hosted_zones",
+  "CheckTitle": "Route53 ホストゾーンは AWS Shield Advanced によって保護されています",
+  "CheckType": [
+    "ソフトウェアおよび設定のチェック/AWS セキュリティのベストプラクティス/ネットワーク到達可能性",
+    "ソフトウェアと設定のチェック/業界および規制基準/AWS 基盤セキュリティのベストプラクティス",
+    "サービスへの影響/拒否"
+  ],
+  "ServiceName": "shield",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsRoute53HostedZone",
+  "ResourceGroup": "network",
+  "Description": "**Route 53 hosted zones** には、そのゾーンの `ARN` に登録された有効な **AWS Shield Advanced** 保護があります。",
+  "Risk": "**Shield Advanced** がない場合、権威 DNS は次の攻撃に対して脆弱です:\n- **大規模/リフレクション** フラッド\n- **クエリ/アプリケーション** レイヤー攻撃\n\n影響: 名前解決の中断とアプリの停止（**可用性**）、レイテンシの急増、そして攻撃トラフィックによる予期しないコスト。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/waf/latest/developerguide/configure-new-protection.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws shield create-protection --name <example_resource_name> --resource-arn arn:aws:route53:::hostedzone/<example_resource_id>",
+      "NativeIaC": "```yaml\n# CloudFormation: Route53 ホストゾーンに Shield Advanced 保護を追加する\nResources:\n  <example_resource_name>:\n    Type: AWS::Shield::Protection\n    Properties:\n      ResourceArn: arn:aws:route53:::hostedzone/<example_resource_id>  # 重要: ホストゾーンをShield Advancedで保護します\n```",
+      "Other": "1. AWS WAF & Shield コンソールを開きます\n2. AWS Shield > Protected resources に移動します\n3. Add resources to protect をクリックします\n4. Scope を Global に設定し、resource type: Amazon Route 53 Hosted Zone を選択します\n5. ホストゾーンを選択し、Protect with Shield Advanced をクリックします",
+      "Terraform": "```hcl\n# Route53 ホストゾーンに Shield Advanced 保護を追加する\nresource \"aws_shield_protection\" \"<example_resource_name>\" {\n  name         = \"<example_resource_name>\"\n  resource_arn = \"arn:aws:route53:::hostedzone/<example_resource_id>\"  # 重要: ホストゾーンをShield Advancedで保護します\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "重要な**Route 53 ホストゾーン**を**Shield Advanced の保護対象リソース**として追加し、マネージド DDoS 保護を適用します。**多層防御**に従い、DNS の公開を制限し、保護変更に対して最小権限を強制し、トラフィックのベースラインを監視し、対応を迅速化するために明確なエスカレーションを含むインシデント対応手順書を準備します。",
+      "Url": "https://hub.prowler.com/check/shield_advanced_protection_in_route53_hosted_zones"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

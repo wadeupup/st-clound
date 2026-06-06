@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "efs_access_point_enforce_root_directory",
+  "CheckTitle": "EFS ファイルシステムにルートディレクトリへのアクセスを許可するアクセスポイントがない",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Effects/Data Exposure"
+  ],
+  "ServiceName": "efs",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsEfsAccessPoint",
+  "ResourceGroup": "storage",
+  "Description": "**Amazon EFS アクセスポイント** は、非ルートディレクトリを強制することを確認するために評価されます。このチェックは、設定されたルートディレクトリ `Path` が `/` であるアクセスポイントを識別します。これは、クライアントがスコープされたサブディレクトリではなく、ファイルシステムのルートをマウントすることを意味します。",
+  "Risk": "アクセスポイントを通じてファイルシステムルートを公開すると、意図されたデータセットを超えたトラバーサルを許可することで **機密性** と **整合性** を損ないます。攻撃者または設定ミスのアプリケーションは以下を実行できる可能性があります：\n- 機密ディレクトリを読み取る\n- 共有データを変更または削除する\n- テナント間でピボットし、**可用性** に影響を与える",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/efs/latest/ug/enforce-root-directory-access-point.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/efs-controls.html#efs-3"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws efs delete-access-point --access-point-id <access-point-id>",
+      "NativeIaC": "```yaml\n# CloudFormation: EFS access point enforcing a non-root directory\nResources:\n  <example_resource_name>:\n    Type: AWS::EFS::AccessPoint\n    Properties:\n      FileSystemId: <example_resource_id>\n      RootDirectory:\n        Path: /data  # Critical: set to a non-root path to avoid \"/\" and pass the check\n        # This enforces the access point root to /data instead of the file system root\n```",
+      "Other": "1. AWS コンソールで、EFS > アクセスポイントに移動します\n2. ルートディレクトリが / として表示されているアクセスポイントを選択します\n3. 削除をクリックして確認します\n4. アクセスポイントを作成をクリックします\n5. ファイルシステムを選択し、ルートディレクトリパスを非ルートパス（例：/data）に設定します\n6. アクセスポイントを作成をクリックします",
+      "Terraform": "```hcl\n# Terraform: EFS access point enforcing a non-root directory\nresource \"aws_efs_access_point\" \"<example_resource_name>\" {\n  file_system_id = \"<example_resource_id>\"\n\n  root_directory {\n    path = \"/data\"  # Critical: not \"/\"; enforces a subdirectory as root to pass the check\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "**最小権限** を適用します：各アクセスポイントの `Path` を専用のサブディレクトリに設定し、`/` を避けます。\n- アプリケーションごとのアクセスポイントを使用します\n- POSIX アイデンティティとディレクトリ権限を強制します\n- **多層防御** のために制御を階層化します（ネットワークセグメンテーション、監視）",
+      "Url": "https://hub.prowler.com/check/efs_access_point_enforce_root_directory"
+    }
+  },
+  "Categories": [
+    "vulnerabilities"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

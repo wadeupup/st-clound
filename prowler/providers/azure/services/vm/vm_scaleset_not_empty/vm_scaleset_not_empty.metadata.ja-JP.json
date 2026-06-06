@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "vm_scaleset_not_empty",
+  "CheckTitle": "空の Virtual Machine Scale Sets を確認する",
+  "CheckType": [],
+  "ServiceName": "vm",
+  "SubServiceName": "scaleset",
+  "ResourceIdTemplate": "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachineScaleSets/{vmScaleSetName}",
+  "Severity": "low",
+  "ResourceType": "Microsoft.Compute/virtualMachineScaleSets",
+  "ResourceGroup": "compute",
+  "Description": "Azure クラウドアカウント内の空の Virtual Machine Scale Sets を特定して削除します。",
+  "Risk": "空の Virtual Machine Scale Sets は不要なコストを発生させ、クラウドリソース管理を複雑化し、コスト最適化とコンプライアンスに影響を与える可能性があります。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/virtual-machine-scale-sets/overview",
+  "Remediation": {
+    "Code": {
+      "CLI": "az vmss delete --name <scale-set-name> --resource-group <resource-group>",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/VirtualMachines/empty-vm-scale-sets.html",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "コスト最適化と管理簡素化のため、空の Azure Virtual Machine Scale Sets を削除してください。",
+      "Url": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/VirtualMachines/empty-vm-scale-sets.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

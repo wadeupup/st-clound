@@ -1,0 +1,35 @@
+{
+  "Provider": "aws",
+  "CheckID": "s3_bucket_public_write_acl",
+  "CheckTitle": "すべてのユーザーまたは任意のAWS顧客が書き込み可能なS3バケットがないことを確認してください。",
+  "CheckType": [
+    "データ保護"
+  ],
+  "ServiceName": "s3",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:s3:::bucket_name",
+  "Severity": "critical",
+  "ResourceType": "AwsS3Bucket",
+  "ResourceGroup": "storage",
+  "Description": "すべてのユーザーまたは任意のAWS顧客が書き込み可能なS3バケットがないことを確認してください。",
+  "Risk": "Amazon S3 コンソールで利用可能なすべてのバケット ACL オプションを有効にしても、ACL だけでは全員があなたのバケットからオブジェクトをダウンロードできるようにはなりません。どのオプションを選択するかによっては、任意のユーザーがいくつかの操作を実行できる可能性があります。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "aws s3api put-bucket-acl --bucket <bucket_name> --acl private",
+      "NativeIaC": "https://www.trendmicro.com/cloudoneconformity-staging/knowledge-base/aws/S3/s3-bucket-public-write-access.html",
+      "Other": "",
+      "Terraform": "https://www.trendmicro.com/cloudoneconformity-staging/knowledge-base/aws/S3/s3-bucket-public-write-access.html"
+    },
+    "Recommendation": {
+      "Text": "ブロックパブリックアクセス設定を有効にできるのは、アクセスポイント、バケット、および AWS アカウントのみです。Amazon S3 は、オブジェクトごとのブロックパブリックアクセス設定をサポートしていません。アカウントにブロックパブリックアクセス設定を適用すると、その設定はすべての AWS リージョンにグローバルに適用されます。設定はすべてのリージョンで直ちにまたは同時に有効にならない場合がありますが、最終的にはすべてのリージョンに伝播します。",
+      "Url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-control-block-public-access.html"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

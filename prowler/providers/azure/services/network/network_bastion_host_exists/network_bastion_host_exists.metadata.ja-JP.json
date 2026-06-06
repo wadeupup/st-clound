@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "network_bastion_host_exists",
+  "CheckTitle": "Azure Bastion Host が存在することを確認する",
+  "CheckType": [],
+  "ServiceName": "network",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Network",
+  "ResourceGroup": "network",
+  "Description": "Azure Bastion サービスは、リモート アクセス用プロトコルのポートやサービスをインターネットへ直接公開せずに、インターネット経由で Azure Virtual Machines へ安全にリモート接続できます。Azure Bastion は 443/TCP 上の TLS を使用してこのアクセスを提供し、組織の Azure Active Directory サービス内の強化構成を利用します。",
+  "Risk": "Azure Bastion サービスにより、組織は Virtual Machines にパブリック IP アドレスを割り当てることなく、より安全な手段でインターネット経由アクセスできます。Azure Bastion は Web ブラウザー内の TLS を使用して Remote Desktop Protocol（RDP）と Secure Shell（SSH）アクセスを提供するため、Azure Virtual Machines で 3389/TCP と 22/TCP をインターネットへ開放する必要がありません。さらに、Bastion サービスには多要素認証、条件付きアクセス ポリシー、Azure Active Directory で構成されたその他の強化対策を集中アクセスポイントで適用できる利点があります。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/bastion/bastion-overview#sku",
+  "Remediation": {
+    "Code": {
+      "CLI": "az network bastion create --location <location> --name <name of bastion host> --public-ip-address <public IP address name or ID> --resource-group <resource group name or ID> --vnet-name <virtual network containing subnet called 'AzureBastionSubnet'> --scale-units <integer> --sku Standard [--disable-copy- paste true|false] [--enable-ip-connect true|false] [--enable-tunneling true|false]",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity-staging/knowledge-base/azure/Network/bastion-host-exists.html",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "Azure Portal から* 1. Bastions をクリック 2. Subscription を選択 3. Resource group を選択 4. 新しい Bastion host の Name を入力 5. Region を選択 6. Tier の横で Standard を選択 7. スライダーで Instance count を設定 8. Virtual network を選択または Create new 9. AzureBastionSubnet という名前の Subnet を選択。存在しない場合は /26 CIDR 範囲で AzureBastionSubnet を作成 10. 適切な Public IP address オプションを選択 11. Public IP address で Create new を選んだ場合は Public IP address 名を入力 12. Public IP address で Use existing を選んだ場合は Choose public IP address から IP を選択 13. Next: Tags > をクリック 14. 適切な Tags を設定 15. Next: Advanced > をクリック 16. 適切な Advanced オプションを選択 17. Next: Review + create > をクリック 18. Create をクリック。Azure CLI から az network bastion create --location <location> --name <name of bastion host> --public-ip-address <public IP address name or ID> --resource-group <resource group name or ID> --vnet-name <virtual network containing subnet called 'AzureBastionSubnet'> --scale-units <integer> --sku Standard [--disable-copy- paste true|false] [--enable-ip-connect true|false] [--enable-tunneling true|false]。PowerShell から 適切な Virtual network 設定と Public IP Address 設定を作成します。$subnetName = 'AzureBastionSubnet' $subnet = New-AzVirtualNetworkSubnetConfig -Name $subnetName -AddressPrefix <IP address range in CIDR notation making sure to use a /26> $virtualNet = New-AzVirtualNetwork -Name <virtual network name> - ResourceGroupName <resource group name> -Location <location> -AddressPrefix <IP address range in CIDR notation> -Subnet $subnet $publicip = New-AzPublicIpAddress -ResourceGroupName <resource group name> - Name <public IP address name> -Location <location> -AllocationMethod Dynamic -Sku Standard",
+      "Url": "https://learn.microsoft.com/en-us/powershell/module/az.network/get-azbastion?view=azps-9.2.0"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "Azure Bastion サービスには追加コストが発生し、特定の仮想ネットワーク構成が必要です。Standard ティアは Basic ティアより追加構成オプションを提供し、これらの追加機能に対してさらにコストが発生する可能性があります。"
+}

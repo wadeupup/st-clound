@@ -1,0 +1,35 @@
+{
+  "Provider": "aws",
+  "CheckID": "iam_avoid_root_usage",
+  "CheckTitle": "避免使用 root 账户",
+  "CheckType": [
+    "Software and Configuration Checks",
+    "Industry and Regulatory Standards",
+    "CIS AWS Foundations Benchmark"
+  ],
+  "ServiceName": "iam",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "high",
+  "ResourceType": "AwsIamUser",
+  "ResourceGroup": "IAM",
+  "Description": "避免使用 root 账户",
+  "Risk": "root 账户对 AWS 账户中的所有资源拥有不受限制的访问权限。强烈建议避免使用该账户。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "请遵循“确保 IAM 策略仅附加到组或角色”建议中的修复说明。",
+      "Url": "http://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

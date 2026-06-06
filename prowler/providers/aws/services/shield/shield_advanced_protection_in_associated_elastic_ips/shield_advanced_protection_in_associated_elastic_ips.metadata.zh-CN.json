@@ -1,0 +1,40 @@
+{
+  "Provider": "aws",
+  "CheckID": "shield_advanced_protection_in_associated_elastic_ips",
+  "CheckTitle": "Elastic IP 地址受 AWS Shield Advanced 保护",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践/网络可达性",
+    "行业与监管标准/AWS 基础安全最佳实践",
+    "影响/拒绝服务"
+  ],
+  "ServiceName": "shield",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsEc2Eip",
+  "ResourceGroup": "network",
+  "Description": "通过验证它们是否被列为受保护资源，来评估 **Elastic IP addresses** 是否受 **AWS Shield Advanced** 覆盖。",
+  "Risk": "如果没有 **Shield Advanced**，面向互联网的 EIP 更容易受到 **DDoS** 攻击，威胁 **可用性** 并导致 **成本** 激增。\n\n流量型或协议型洪泛攻击会使带宽饱和或耗尽连接状态，扰乱 EIP 后面的服务并拖慢事件响应。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/waf/latest/developerguide/configure-new-protection.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws shield create-protection --name <example_resource_name> --resource-arn arn:aws:ec2:<REGION>:<ACCOUNT_ID>:elastic-ip/eipalloc-<ALLOCATION_ID>",
+      "NativeIaC": "```yaml\n# CloudFormation：为弹性 IP 添加 Shield Advanced 保护\nResources:\n  Protection:\n    Type: AWS::Shield::Protection\n    Properties:\n      Name: <example_resource_name>\n      ResourceArn: arn:aws:ec2:<REGION>:<ACCOUNT_ID>:elastic-ip/eipalloc-<ALLOCATION_ID>  # 关键：要保护的 Elastic IP 的 ARN\n```",
+      "Other": "1. 打开 AWS WAF & Shield 控制台\n2. 前往 AWS Shield > Protected resources\n3. 点击 Add resources to protect\n4. 选择 Region 和资源类型：EC2 Elastic IP，然后点击 Load resources\n5. 选择目标 Elastic IP\n6. 点击 Protect with Shield Advanced",
+      "Terraform": "```hcl\n# Terraform：为 Elastic IP 添加 Shield Advanced 保护\nresource \"aws_shield_protection\" \"<example_resource_name>\" {\n  name         = \"<example_resource_name>\"\n  resource_arn = \"arn:aws:ec2:<REGION>:<ACCOUNT_ID>:elastic-ip/eipalloc-<ALLOCATION_ID>\" # 关键：要保护的 Elastic IP 的 ARN\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "将关键 EIP 注册为**Shield Advanced 受保护资源**。\n\n应用**纵深防御**：尽量减少公网暴露，使用应用层控制（WAF、速率限制），监控遥测数据，并定期审查保护措施，使网络访问符合**最小权限**原则。",
+      "Url": "https://hub.prowler.com/check/shield_advanced_protection_in_associated_elastic_ips"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

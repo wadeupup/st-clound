@@ -1,0 +1,44 @@
+{
+  "Provider": "aws",
+  "CheckID": "config_recorder_all_regions_enabled",
+  "CheckTitle": "AWS Config 记录器已启用且未处于故障状态或已禁用",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/CIS AWS Foundations Benchmark"
+  ],
+  "ServiceName": "config",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "monitoring",
+  "Description": "**AWS 账户**在每个区域都有**AWS Config 记录器**处于活动且健康状态。它识别没有记录器、记录器已禁用或记录器处于故障状态的区域。",
+  "Risk": "**Config 记录中的空白**会创建**盲点**。未监控区域中的更改未被捕获，削弱了**完整性**和**可审计性**。攻击者可以在不被注意的情况下更改资源或部署资产，导致配置错误并延迟**事件响应**。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://repost.aws/es/questions/QUGcgeerhcTamRkwgdwh_tLQ/enable-aws-config",
+    "https://www.tenable.com/audits/items/CIS_Amazon_Web_Services_Foundations_v1.5.0_L2.audit:6a5136528bd329139e5969f8f1e5ffbc",
+    "https://aws.amazon.com/blogs/mt/aws-config-best-practices/"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\nResources:\n  example_resource_recorder:\n    Type: AWS::Config::ConfigurationRecorder\n    Properties:\n      Name: example_resource\n      RoleARN: !Sub arn:aws:iam::${AWS::AccountId}:role/aws-service-role/config.amazonaws.com/AWSServiceRoleForConfig\n\n  example_resource_channel:\n    Type: AWS::Config::DeliveryChannel\n    Properties:\n      S3BucketName: example_resource\n\n  example_resource_status:\n    Type: AWS::Config::ConfigurationRecorderStatus\n    Properties:\n      Name: example_resource\n      Recording: true  # 此行修复安全问题\n    DependsOn:\n      - example_resource_channel\n```",
+      "Other": "1. 在 AWS 控制台中，转到 Config\n2. 点击设置 AWS Config（或设置）\n3. 选择资源记录选项（任意）并选择现有的 S3 存储桶进行交付\n4. 保留默认的 AWSServiceRoleForConfig 角色\n5. 点击确认/开启以开始记录\n6. 在设置页面上验证状态显示为 Recording（记录中）而不是 Failure（故障）",
+      "Terraform": "```hcl\nresource \"aws_iam_service_linked_role\" \"example_resource\" {\n  aws_service_name = \"config.amazonaws.com\"\n}\n\nresource \"aws_config_configuration_recorder\" \"example_resource\" {\n  name     = \"example_resource\"\n  role_arn = aws_iam_service_linked_role.example_resource.arn\n}\n\nresource \"aws_config_delivery_channel\" \"example_resource\" {\n  s3_bucket_name = \"example_resource\"\n}\n\nresource \"aws_config_configuration_recorder_status\" \"example_resource\" {\n  name         = aws_config_configuration_recorder.example_resource.name\n  is_recording = true  # 此行修复安全问题\n  depends_on   = [aws_config_delivery_channel.example_resource]\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "在每个区域启用 **AWS Config**，保持连续记录并维持健康的记录器状态。",
+      "Url": "https://hub.prowler.com/check/config_recorder_all_regions_enabled"
+    }
+  },
+  "Categories": [
+    "logging",
+    "forensics-ready"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

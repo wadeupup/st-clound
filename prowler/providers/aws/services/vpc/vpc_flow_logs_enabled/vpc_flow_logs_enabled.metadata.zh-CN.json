@@ -1,0 +1,45 @@
+{
+  "Provider": "aws",
+  "CheckID": "vpc_flow_logs_enabled",
+  "CheckTitle": "VPC 流日志已启用",
+  "CheckType": [
+    "软件和配置检查/AWS安全最佳实践",
+    "软件和配置检查/行业和监管标准/AWS 基础安全最佳实践",
+    "软件和配置检查/行业和监管标准/CIS AWS 基础基准",
+    "软件和配置检查/行业和监管标准/PCI-DSS",
+    "软件和配置检查/行业和监管标准/NIST 800-53 控制（美国）",
+    "软件和配置检查/行业和监管标准/NIST CSF 控制（美国）"
+  ],
+  "ServiceName": "vpc",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsEc2Vpc",
+  "ResourceGroup": "network",
+  "Description": "**AWS VPC** 已配置 **Flow Logs**，用于捕获其网络接口的 IP 流量并将记录传送到日志目标。\n\n缺少活动流日志配置的 VPC 会被高亮显示。",
+  "Risk": "如果没有流日志，网络活动将是不透明的，从而妨碍对恶意流量的检测和调查。攻击者可以在不被察觉的情况下进行探测、数据外泄或横向移动，影响**机密性**和**完整性**；中断和配置错误也更难以诊断，从而降低**可用性**。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/flow-logs.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/VPC/vpc-flow-logs-enabled.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws ec2 create-flow-logs --resource-type VPC --resource-ids <VPC_ID> --traffic-type ALL --log-destination-type s3 --log-destination arn:aws:s3:::<S3_BUCKET_NAME>",
+      "NativeIaC": "```yaml\n# CloudFormation：为现有 VPC 启用到 S3 的 VPC 流日志\nResources:\n  FlowLog:\n    Type: AWS::EC2::FlowLog\n    Properties:\n      ResourceId: <example_resource_id>         # 关键：以 VPC ID 为目标\n      ResourceType: VPC                         # 关键：在 VPC 级别启用流日志\n      TrafficType: ALL                          # 关键：记录所有流量\n      LogDestinationType: s3                    # 关键：将日志发送到 S3（无需 IAM 角色）\n      LogDestination: arn:aws:s3:::<example_resource_name>  # 严重：S3 bucket ARN\n```",
+      "Other": "1. 在 AWS Console 中，转到 VPC > Your VPCs\n2. 选择目标 VPC\n3. 打开 Flow logs 选项卡并点击 Create flow log\n4. 将 Traffic type 设置为 All\n5. 将 Destination 设置为 S3，并输入 Bucket ARN: arn:aws:s3:::<example_resource_name>\n6. 点击 Create flow log",
+      "Terraform": "```hcl\n# 为现有 VPC 启用到 S3 的 VPC 流日志\nresource \"aws_flow_log\" \"vpc\" {\n  vpc_id               = \"<example_resource_id>\"                 # 关键：以 VPC 为目标以启用流日志\n  traffic_type         = \"ALL\"                                   # 关键：记录所有流量\n  log_destination_type = \"s3\"                                    # 关键：将日志发送到 S3（无需 IAM 角色）\n  log_destination      = \"arn:aws:s3:::<example_resource_name>\"  # 严重：S3 bucket ARN\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "为所有 VPC 启用**VPC Flow Logs**以提供基线遥测。\n优先至少捕获 `REJECT`，对于敏感网络则捕获 `ALL`。将日志发送到一个集中式、受访问控制且具有保留策略的目标位置。对写入者/读取者应用**最小权限**，并与监控集成以实现**纵深防御**。",
+      "Url": "https://hub.prowler.com/check/vpc_flow_logs_enabled"
+    }
+  },
+  "Categories": [
+    "logging",
+    "forensics-ready"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "network_rdp_internet_access_restricted",
+  "CheckTitle": "确保来自 Internet 的 RDP 访问已评估并受限",
+  "CheckType": [],
+  "ServiceName": "network",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Network",
+  "ResourceGroup": "network",
+  "Description": "应定期评估网络安全组中的端口配置错误。对于可能暴露到 Internet 的特定端口和协议，应评估其必要性；凡非明确需要的应进行访问限制。",
+  "Risk": "通过 Internet 使用 RDP 的潜在安全问题在于，攻击者可使用多种暴力破解技术获取对 Azure 虚拟机的访问权限。一旦得手，攻击者可将虚拟机作为跳板，进一步入侵 Azure 虚拟网络中的其他主机，甚至攻击 Azure 之外联网设备。",
+  "RelatedUrl": "https://docs.microsoft.com/en-us/azure/security/azure-security-network-security-best-practices#disable-rdpssh-access-to-azure-virtual-machines",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity-staging/knowledge-base/azure/Network/unrestricted-rdp-access.html#",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-networking-policies/bc_azr_networking_2#terraform"
+    },
+    "Recommendation": {
+      "Text": "对于附加到网络安全组的资源，若并未明确需要且未进行最小化配置，不应开放 RDP 访问，应限制或消除来自 Internet 的访问。对于相关资源的内部访问，可配置加密网络隧道，例如：ExpressRoute、Site-to-site VPN、Point-to-site VPN。",
+      "Url": "https://docs.microsoft.com/en-us/security/benchmark/azure/security-controls-v3-network-security#ns-1-establish-network-segmentation-boundaries"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

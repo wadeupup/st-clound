@@ -1,0 +1,39 @@
+{
+  "Provider": "aws",
+  "CheckID": "vpc_subnet_no_public_ip_by_default",
+  "CheckTitle": "VPC サブネットはデフォルトではパブリック IP アドレスを割り当てません",
+  "CheckType": [
+    "ソフトウェアおよび設定のチェック/AWS セキュリティのベストプラクティス/ネットワーク到達可能性",
+    "ソフトウェアと設定のチェック/業界および規制基準/AWS 基盤セキュリティのベストプラクティス"
+  ],
+  "ServiceName": "vpc",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsEc2Subnet",
+  "ResourceGroup": "network",
+  "Description": "`MapPublicIpOnLaunch` が `true` である **VPC サブネット** は、起動時にインスタンスへパブリック IPv4 アドレスを自動的に割り当てます。\n\nこれは、デフォルトのパブリック IP 割り当て用に設定されているサブネットを識別します。",
+  "Risk": "**インターネットに公開されたインスタンス** はデフォルトで到達可能になり、ポートスキャン、SSH/RDP のブルートフォース攻撃、およびエクスプロイトの試行を可能にします。アクセスに成功すると、悪用や DDoS によって、データ漏えい（**機密性**）、不正な変更（**完全性**）、および停止（**可用性**）につながる可能性があります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/config/latest/developerguide/subnet-auto-assign-public-ip-disabled.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws ec2 modify-subnet-attribute --subnet-id <SUBNET_ID> --no-map-public-ip-on-launch",
+      "NativeIaC": "```yaml\n# CloudFormation: パブリックIPの自動割り当てが無効なサブネット\nResources:\n  ExampleSubnet:\n    Type: AWS::EC2::Subnet\n    Properties:\n      VpcId: <example_resource_id>\n      CidrBlock: 10.0.1.0/24\n      MapPublicIpOnLaunch: false  # 重要: インスタンス起動時の自動パブリックIPv4割り当てを無効にします\n```",
+      "Other": "1. AWS コンソールを開き、VPC に移動します\n2. Subnets をクリックし、対象のサブネットを選択します\n3. Actions > Edit subnet settings（または Modify auto-assign IP settings）を選択します\n4. Enable auto-assign public IPv4 address のチェックを外します\n5. 変更を保存します",
+      "Terraform": "```hcl\n# パブリックIPの自動割り当てが無効なサブネット\nresource \"aws_subnet\" \"example\" {\n  vpc_id     = \"<example_resource_id>\"\n  cidr_block = \"10.0.1.0/24\"\n\n  map_public_ip_on_launch = false  # 重大: デフォルトでパブリックIPを割り当てられないようにする\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "**最小権限の公開**を徹底するために、サブネットの自動割り当てを無効にします。ワークロードは**プライベートサブネット**に配置し、制御された送信経路（NAT またはプライベートエンドポイント）を使用し、管理には踏み台または SSM を優先します。\n\n*パブリックアクセスが必要な場合*は、IP を明示的に割り当て、**多層防御**のために厳格なセキュリティグループとルートで制限します。",
+      "Url": "https://hub.prowler.com/check/vpc_subnet_no_public_ip_by_default"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

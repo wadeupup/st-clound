@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "opensearch_service_domains_use_cognito_authentication_for_kibana",
+  "CheckTitle": "Amazon OpenSearch Service ドメインは、Kibana の認証に Amazon Cognito または SAML を有効にしています",
+  "CheckType": [
+    "ソフトウェアと構成のチェック/AWS セキュリティベストプラクティス",
+    "ソフトウェアと構成のチェック/業界および規制基準/AWS 基礎セキュリティベストプラクティス",
+    "TTPs/初期アクセス/不正アクセス",
+    "影響/データの露出"
+  ],
+  "ServiceName": "opensearch",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsOpenSearchServiceDomain",
+  "ResourceGroup": "database",
+  "Description": "**OpenSearch Service ドメイン**は、Kibana/OpenSearch Dashboards へのアクセスを認証するために **Amazon Cognito** または **SAML** を使用します。\n\nこの評価は、いずれかのプロバイダーが Dashboards アクセスのために有効になっているドメインを特定します。",
+  "Risk": "**フェデレーテッド認証**がない場合、Dashboards は弱いまたは共有された資格情報や広範な IP ルールを使用してアクセスされる可能性があり、不正なクエリや管理アクションが可能になります。これにより以下の脅威が生じます:\n- **機密性**: データの露出\n- **完全性**: インデックスの変更または削除\n- **可用性**: クラスターを劣化させる重いクエリ",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-ac.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws opensearch update-domain-config --domain-name <DOMAIN_NAME> --cognito-options Enabled=true,UserPoolId=<USER_POOL_ID>,IdentityPoolId=<IDENTITY_POOL_ID>,RoleArn=<ROLE_ARN>",
+      "NativeIaC": "```yaml\n# OpenSearch Dashboards のために Amazon Cognito 認証を有効にする\nResources:\n  <example_resource_name>:\n    Type: AWS::OpenSearchService::Domain\n    Properties:\n      DomainName: <example_resource_name>\n      CognitoOptions:\n        Enabled: true  # 重要: Dashboards のチェックを通過するために Cognito 認証を有効にする\n        UserPoolId: <USER_POOL_ID>\n        IdentityPoolId: <IDENTITY_POOL_ID>\n        RoleArn: <ROLE_ARN>\n```",
+      "Other": "1. AWS コンソールで、**OpenSearch Service** > **Domains** に移動し、ドメインを選択\n2. **Edit** をクリック\n3. **OpenSearch Dashboards 認証**の下で、**Amazon Cognito** を選択して有効にする\n4. Cognito の **ユーザープール ID**、**アイデンティティプール ID**、および **IAM ロール**を入力\n5. **変更を保存** をクリックし、ドメインの更新が完了するのを待つ",
+      "Terraform": "```hcl\n# OpenSearch Dashboards のために Amazon Cognito 認証を有効にする\nresource \"aws_opensearch_domain\" \"<example_resource_name>\" {\n  domain_name = \"<example_resource_name>\"\n\n  cognito_options {\n    enabled          = true  # 重要: Dashboards のチェックを通過するために Cognito 認証を有効にする\n    user_pool_id     = \"<USER_POOL_ID>\"\n    identity_pool_id = \"<IDENTITY_POOL_ID>\"\n    role_arn         = \"<ROLE_ARN>\"\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "Dashboards に対して **Cognito** または **SAML** を有効にし、細かいアクセス制御で **最小特権** を適用します。**MFA を使用した SSO** を優先し、共有/基本資格情報を避け、**VPC/プライベートエンドポイント**およびネットワーク制御を通じてアクセスを制限します。監査ログで監視し、**職務分離**を強制します。",
+      "Url": "https://hub.prowler.com/check/opensearch_service_domains_use_cognito_authentication_for_kibana"
+    }
+  },
+  "Categories": [
+    "identity-access"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

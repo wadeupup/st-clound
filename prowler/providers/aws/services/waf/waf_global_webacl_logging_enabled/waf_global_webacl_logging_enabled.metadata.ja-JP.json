@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "waf_global_webacl_logging_enabled",
+  "CheckTitle": "AWS WAF Classic Global Web ACL でログ記録が有効になっています",
+  "CheckType": [
+    "ソフトウェアと設定のチェック/業界および規制基準/AWS 基盤セキュリティのベストプラクティス",
+    "ソフトウェアおよび設定のチェック／業界および規制基準／NIST 800-53 管理策"
+  ],
+  "ServiceName": "waf",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsWafWebAcl",
+  "ResourceGroup": "security",
+  "Description": "**AWS WAF Classic グローバル Web ACL** では、各 ACL について評価されたウェブリクエストとルールアクションをキャプチャするために **ログ記録** が有効になっています",
+  "Risk": "**WAF logging** がないと、攻撃（SQLi/XSS のプローブ、ボット、ブルートフォース）や許可/ブロックの判断に対する**可視性**が失われ、検知とフォレンジックが制限されます。これにより、**機密性**、**完全性**、**可用性**が低下し、インシデント対応とチューニングが遅くなります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/waf/latest/developerguide/classic-logging.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/waf-controls.html#waf-1",
+    "https://docs.aws.amazon.com/cli/latest/reference/waf/put-logging-configuration.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws waf put-logging-configuration --logging-configuration ResourceArn=<web_acl_arn>,LogDestinationConfigs=<kinesis_firehose_delivery_stream_arn>",
+      "NativeIaC": "",
+      "Other": "1. AWS コンソールで、\"aws-waf-logs-\" で始まる名前の Amazon Kinesis Data Firehose 配信ストリームを作成します（CloudFront/グローバルの場合は、us-east-1 で作成）\n2. AWS WAF コンソールを開き、AWS WAF Classic に切り替えます\n3. フィルター: Global (CloudFront) を選択し、Web ACLs に移動します\n4. 対象の Web ACL を開き、Logging タブに移動します\n5. Enable logging をクリックし、手順 1 で作成した Firehose delivery stream を選択します\n6. Enable/Save をクリックします",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "すべてのグローバル Web ACL で**ログ記録**を有効にし、記録を一元化されたログプラットフォームに送信します。ログの送信先には**最小権限**を適用し、機密フィールドを秘匿化します。異常を監視してアラートを発し、**多層防御**と迅速な封じ込めのためにログをインシデント対応と統合します。",
+      "Url": "https://hub.prowler.com/check/waf_global_webacl_logging_enabled"
+    }
+  },
+  "Categories": [
+    "logging"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

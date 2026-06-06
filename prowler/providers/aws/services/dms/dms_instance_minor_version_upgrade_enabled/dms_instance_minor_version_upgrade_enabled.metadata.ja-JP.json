@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "dms_instance_minor_version_upgrade_enabled",
+  "CheckTitle": "DMS レプリケーションインスタンスで自動マイナーバージョンアップグレードが有効になっている",
+  "CheckType": [
+    "Software and Configuration Checks/Patch Management",
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices"
+  ],
+  "ServiceName": "dms",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsDmsReplicationInstance",
+  "ResourceGroup": "database",
+  "Description": "**AWS DMS レプリケーションインスタンス**は、`auto_minor_version_upgrade` 設定を評価して、メンテナンスウィンドウ中に**自動マイナーエンジン更新**が有効になっていることを確認します。",
+  "Risk": "**自動マイナーアップグレード**がない場合、DMS エンジンはセキュリティパッチと修正を見逃す可能性があり、既知の欠陥と不安定性の悪用を可能にします。\n- 機密性：パッチ未適用のコンポーネントによる暴露\n- 完全性：レプリケーションエラーまたはデータドリフト\n- 可用性：移行または CDC 中の停止",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/dms-controls.html#dms-6",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/DMS/auto-minor-version-upgrade.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws dms modify-replication-instance --region <REGION> --replication-instance-arn arn:aws:dms:<REGION>:<ACCOUNT_ID>:rep:<REPLICATION_ID> --auto-minor-version-upgrade --apply-immediately",
+      "NativeIaC": "```yaml\n# CloudFormation: DMS レプリケーションインスタンスで自動マイナーバージョンアップグレードを有効にする\nResources:\n  <example_resource_name>:\n    Type: AWS::DMS::ReplicationInstance\n    Properties:\n      ReplicationInstanceIdentifier: <example_resource_id>\n      ReplicationInstanceClass: dms.t3.micro\n      AutoMinorVersionUpgrade: true  # 重要：自動マイナーバージョンアップグレードを有効にする\n```",
+      "Other": "1. AWS コンソールを開き、データベース移行サービス (DMS) に移動\n2. レプリケーションインスタンスをクリックし、インスタンスを選択\n3. アクション > 変更を選択\n4. 自動マイナーバージョンアップグレードにチェック\n5. すぐに適用を選択\n6. 変更をクリックして保存",
+      "Terraform": "```hcl\n# Terraform: DMS レプリケーションインスタンスで自動マイナーバージョンアップグレードを有効にする\nresource \"aws_dms_replication_instance\" \"<example_resource_name>\" {\n  replication_instance_id    = \"<example_resource_id>\"\n  replication_instance_class = \"dms.t3.micro\"\n  auto_minor_version_upgrade = true  # 重要：自動マイナーバージョンアップグレードを有効にする\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "すべてのレプリケーションインスタンスで `auto_minor_version_upgrade` を有効にして、**継続的なパッチ適用**を維持します。\n- メンテナンスウィンドウを設定し、非本番環境で検証\n- リリースノートとヘルスメトリクスを監視\n- 変更管理に**最小権限**を強制\n- ロールバック用に**バックアップ**を保持",
+      "Url": "https://hub.prowler.com/check/dms_instance_minor_version_upgrade_enabled"
+    }
+  },
+  "Categories": [
+    "vulnerabilities"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

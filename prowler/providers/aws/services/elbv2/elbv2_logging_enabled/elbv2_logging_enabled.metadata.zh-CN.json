@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "elbv2_logging_enabled",
+  "CheckTitle": "ELBv2 Application Load Balancer 已配置访问日志到 S3",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/CIS AWS Foundations Benchmark"
+  ],
+  "ServiceName": "elbv2",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsElbv2LoadBalancer",
+  "ResourceGroup": "network",
+  "Description": "会检查 **ELBv2 Application Load Balancer** 是否已启用到 Amazon S3 的**访问日志**，用于捕获请求细节，如时间戳、客户端 IP、路径和响应码。",
+  "Risk": "缺少 **ALB 访问日志** 会降低**可见性**并削弱**事件检测**与**取证**能力。经由负载均衡器的恶意请求、凭证填充或数据外泄可能无法被及时发现，从而损害**机密性**与**完整性**，并延迟对**可用性**事件的恢复。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-access-logs.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/ELBv2/access-log.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws elbv2 modify-load-balancer-attributes --load-balancer-arn <lb_arn> --attributes Key=access_logs.s3.enabled,Value=true Key=access_logs.s3.bucket,Value=<bucket_name>",
+      "NativeIaC": "```yaml\n# CloudFormation: enable ALB access logs to S3\nResources:\n  <example_resource_name>:\n    Type: AWS::ElasticLoadBalancingV2::LoadBalancer\n    Properties:\n      Subnets:\n        - <subnet_id_1>\n        - <subnet_id_2>\n      SecurityGroups:\n        - <example_security_group_id>\n      LoadBalancerAttributes:\n        - Key: access_logs.s3.enabled  # critical: enable ALB access logging\n          Value: \"true\"\n        - Key: access_logs.s3.bucket   # critical: destination S3 bucket for logs\n          Value: \"<example_resource_name>\"\n```",
+      "Other": "1. 在 AWS 控制台进入 EC2 > Load Balancers 并选择目标 Application Load Balancer\n2. 打开 Attributes（或 Edit attributes）并找到 Access logs\n3. 勾选 Enable access logs 并选择投递到的 S3 存储桶\n4. 保存更改",
+      "Terraform": "```hcl\n# Terraform: enable ALB access logs to S3\nresource \"aws_lb\" \"<example_resource_name>\" {\n  name            = \"<example_resource_name>\"\n  security_groups = [\"<example_security_group_id>\"]\n  subnets         = [\"<subnet_id_1>\", \"<subnet_id_2>\"]\n\n  access_logs {\n    bucket  = \"<example_resource_name>\"  # critical: destination S3 bucket for logs\n    enabled = true                        # critical: enable ALB access logging\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "将 **ALB 访问日志**启用到专用且加密的 S3 存储桶。对日志投递与读取账户实施**最小权限**，设置生命周期保留策略，并可考虑启用 `Object Lock` 以防篡改。将日志集中到 **SIEM** 并对异常告警，作为**纵深防御**的一部分。",
+      "Url": "https://hub.prowler.com/check/elbv2_logging_enabled"
+    }
+  },
+  "Categories": [
+    "logging"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

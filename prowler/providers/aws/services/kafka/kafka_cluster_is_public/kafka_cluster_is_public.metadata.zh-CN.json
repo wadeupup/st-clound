@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "kafka_cluster_is_public",
+  "CheckTitle": "Kafka 集群不对公众开放",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践/网络可达性",
+    "TTPs/初始访问",
+    "影响/数据暴露"
+  ],
+  "ServiceName": "kafka",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "critical",
+  "ResourceType": "AwsMskCluster",
+  "ResourceGroup": "messaging",
+  "Description": "**Amazon MSK 集群**的代理端点**暴露给公共互联网**。\n\n无服务器集群默认是私有的；已配置的集群会根据其 `public access` 配置进行评估。",
+  "Risk": "公共代理削弱了**CIA**：\n- **机密性**：未经授权的消费者可以读取主题\n- **完整性**：恶意生产者注入或更改事件\n- **可用性**：洪水或扫描会给代理带来压力\n\n这会导致元数据枚举、数据泄露、流中毒和昂贵的出口流量。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/msk/latest/developerguide/public-access.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/MSK/public-access-msk-cluster.html",
+    "https://docs.aws.amazon.com/msk/latest/developerguide/client-access.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws kafka update-connectivity --cluster-arn <CLUSTER_ARN> --current-version <CURRENT_CLUSTER_VERSION> --connectivity-info '{\"PublicAccess\":{\"Type\":\"DISABLED\"}}'",
+      "NativeIaC": "```yaml\n# CloudFormation：确保 MSK 集群不对公众开放\nResources:\n  <example_resource_name>:\n    Type: AWS::MSK::Cluster\n    Properties:\n      ClusterName: <example_resource_name>\n      KafkaVersion: \"2.8.1\"\n      NumberOfBrokerNodes: 2\n      BrokerNodeGroupInfo:\n        ClientSubnets:\n          - <example_subnet_id_1>\n          - <example_subnet_id_2>\n        InstanceType: kafka.t3.small\n        ConnectivityInfo:\n          PublicAccess:\n            Type: DISABLED  # 关键：禁用对代理的公共访问\n```",
+      "Other": "1. 打开 Amazon MSK 控制台\n2. 选择您的集群并转到属性选项卡\n3. 在网络设置中，点击编辑公共访问\n4. 将公共访问设置为禁用（关闭）\n5. 点击保存更改",
+      "Terraform": "```hcl\n# Terraform：确保 MSK 集群不对公众开放\nresource \"aws_msk_cluster\" \"<example_resource_name>\" {\n  cluster_name           = \"<example_resource_name>\"\n  kafka_version          = \"2.8.1\"\n  number_of_broker_nodes = 2\n\n  broker_node_group_info {\n    client_subnets = [\n      \"<example_subnet_id_1>\",\n      \"<example_subnet_id_2>\",\n    ]\n    instance_type = \"kafka.t3.small\"\n\n    connectivity_info {\n      public_access {\n        type = \"DISABLED\"  # 关键：禁用对代理的公共访问\n      }\n    }\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "通过禁用公共访问并将暴露限制在受信任的网络内，保持代理在 VPC 内部私有。\n\n实施强身份验证（SASL/IAM、SASL/SCRAM 或 mTLS），要求使用 TLS，并应用 Kafka ACL。通过 VPN、堡垒机或私有网络（对等/Transit Gateway）提供访问。应用**最小权限**并监控代理连接。",
+      "Url": "https://hub.prowler.com/check/kafka_cluster_is_public"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

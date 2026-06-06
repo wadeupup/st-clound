@@ -1,0 +1,51 @@
+{
+  "Provider": "aws",
+  "CheckID": "apigateway_restapi_logging_enabled",
+  "CheckTitle": "API Gateway REST API ステージでログが有効になっています",
+  "CheckType": [
+    "ソフトウェアと設定チェック/AWS セキュリティベストプラクティス",
+    "ソフトウェアと設定チェック/業界および規制基準/AWS 基礎セキュリティベストプラクティス",
+    "TTPs/防御回避"
+  ],
+  "ServiceName": "apigateway",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsApiGatewayStage",
+  "ResourceGroup": "api_gateway",
+  "Description": "**API Gateway REST API ステージ**で**ステージログ**が有効になっており、実行ログまたはアクセスログを CloudWatch に送信します",
+  "Risk": "ステージログがない場合、API アクティビティの可視性が欠如し、悪用の検出とインシデント対応が妨げられます。\n攻撃者は、エンドポイントを調査し、データを流出させ、または統合を改ざんして、痕跡を残さずに、機密性、整合性、可用性に影響を与え、フォレンジック調査を妨げる可能性があります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/apigateway/latest/developerguide/security-monitoring.html",
+    "https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-logging.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/APIGateway/cloudwatch-logs.html",
+    "https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-logging.html",
+    "https://repost.aws/knowledge-center/api-gateway-cloudwatch-logs",
+    "https://repost.aws/knowledge-center/api-gateway-missing-cloudwatch-logs",
+    "https://docs.aws.amazon.com/apigateway/latest/developerguide/view-cloudwatch-log-events-in-cloudwatch-console.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws apigateway update-stage --rest-api-id <REST_API_ID> --stage-name <STAGE_NAME> --patch-operations op=replace,path='/*/*/logging/loglevel',value=ERROR",
+      "NativeIaC": "```yaml\n# CloudFormation: REST API ステージで実行ログを有効にします\nResources:\n  <example_resource_name>:\n    Type: AWS::ApiGateway::Stage\n    Properties:\n      StageName: <example_resource_name>\n      RestApiId: <example_resource_id>\n      DeploymentId: <example_resource_id>\n      MethodSettings:\n        - ResourcePath: \"/*\"\n          HttpMethod: \"*\"\n          LoggingLevel: ERROR  # 重要：すべてのメソッドの実行ログを有効にします\n```",
+      "Other": "1. API Gateway コンソールで、Settings を開き、プロンプトが表示された場合は CloudWatch log role ARN を設定します\n2. APIs > REST API を選択 > Stages > ステージを選択に移動します\n3. Logs and tracing > CloudWatch Logs > Errors only（または Errors and info）を選択をクリックします\n4. 変更を保存します",
+      "Terraform": "```hcl\n# REST API ステージ内のすべてのメソッドの実行ログを有効にします\nresource \"aws_api_gateway_method_settings\" \"<example_resource_name>\" {\n  rest_api_id = \"<example_resource_id>\"\n  stage_name  = \"<example_resource_name>\"\n  method_path = \"*/*\"\n  settings {\n    logging_level = \"ERROR\"  # 重要：ステージ実行ログを有効にします\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "すべての API Gateway ステージで**CloudWatch Logs**を有効にし、適切に `ERROR` または `INFO` を使用します。リクエスト ID（例：`$context.requestId`）を含めます。ログに**最小権限**を強制し、異常に対して**保持**と**アラート**を設定します。ログに機密データを含めないようにし、**多層防御**とトレーシングを使用します。",
+      "Url": "https://hub.prowler.com/check/apigateway_restapi_logging_enabled"
+    }
+  },
+  "Categories": [
+    "logging",
+    "forensics-ready"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "",
+  "CheckAliases": [
+    "apigateway_logging_enabled"
+  ]
+}
+

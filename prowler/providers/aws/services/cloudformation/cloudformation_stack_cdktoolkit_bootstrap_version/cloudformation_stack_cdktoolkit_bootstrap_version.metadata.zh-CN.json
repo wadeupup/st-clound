@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "cloudformation_stack_cdktoolkit_bootstrap_version",
+  "CheckTitle": "CDKToolkit CloudFormation 堆栈的 Bootstrap 版本为 21 或更高",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Patch Management"
+  ],
+  "ServiceName": "cloudformation",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsCloudFormationStack",
+  "ResourceGroup": "devops",
+  "Description": "**CloudFormation CDKToolkit** 堆栈的 `BootstrapVersion` 会与推荐的最小值（默认为 `21`）进行比较。较低的值表示环境使用来自旧模板的旧版引导资源和 IAM 角色。",
+  "Risk": "**过时的引导堆栈**可能缺乏最新的加固措施。资产存储桶或 ECR 仓库可能更容易被滥用，部署角色可能具有更广泛的信任。\n\n攻击者可能篡改工件或承担特权角色，损害完整性/机密性并启用权限提升。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://towardsthecloud.com/blog/aws-cdk-bootstrap",
+    "https://support.icompaas.com/support/solutions/articles/62000233694-ensure-that-cdktoolkit-stacks-have-a-bootstrap-version-of-21-or-higher-to-mitigate-security-risks",
+    "https://docs.aws.amazon.com/cdk/v2/guide/ref-cli-cmd-bootstrap.html",
+    "https://docs.aws.amazon.com/cdk/v2/guide/bootstrapping-customizing.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "cdk bootstrap aws://<ACCOUNT_ID>/<REGION>",
+      "NativeIaC": "```yaml\n# 最小 CloudFormation 以暴露 CDKToolkit 的 BootstrapVersion >= 21\n# 将此模板部署为名为 \"CDKToolkit\" 的堆栈\nResources:\n  CdkBootstrapVersion:\n    Type: AWS::SSM::Parameter\n    Properties:\n      Type: String\n      Name: /cdk-bootstrap/hnb659fds/version  # 关键：存储 CDK 使用的引导版本\n      Value: \"21\"                              # 关键：设置为 21（或更高）以满足检查\nOutputs:\n  BootstrapVersion:\n    Value: !GetAtt CdkBootstrapVersion.Value   # 关键：在堆栈输出中暴露版本以便检查通过\n```",
+      "Other": "1. 登录 AWS 控制台并打开 CloudShell\n2. 运行：cdk bootstrap aws://<ACCOUNT_ID>/<REGION>\n3. 在控制台中，转到 CloudFormation > 堆栈 > CDKToolkit > 输出\n4. 确认输出 \"BootstrapVersion\" 为 21 或更高",
+      "Terraform": "```hcl\n# 创建/更新 BootstrapVersion >= 21 的 CDKToolkit 堆栈\nresource \"aws_cloudformation_stack\" \"cdktoolkit\" {\n  name          = \"CDKToolkit\"\n  # 关键：模板将 BootstrapVersion 输出设置为 21（或更高）以便检查通过\n  template_body = <<YAML\nResources:\n  CdkBootstrapVersion:\n    Type: AWS::SSM::Parameter\n    Properties:\n      Type: String\n      Name: /cdk-bootstrap/hnb659fds/version  # 关键：存储引导版本\n      Value: \"21\"                              # 关键：版本必须 >= 21\nOutputs:\n  BootstrapVersion:\n    Value: !GetAtt CdkBootstrapVersion.Value   # 关键：通过堆栈输出暴露版本\nYAML\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "在每个账户和区域中标准化使用推荐版本或更高版本（例如，`>= 21`）的现代引导。\n\n对引导角色应用**最小权限**，限制受信任的账户，启用终止保护，并定期审查版本漂移以加强**纵深防御**。",
+      "Url": "https://hub.prowler.com/check/cloudformation_stack_cdktoolkit_bootstrap_version"
+    }
+  },
+  "Categories": [
+    "vulnerabilities"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "cloudfront_distributions_custom_ssl_certificate",
+  "CheckTitle": "CloudFrontディストリビューションがカスタムSSL/TLS証明書を使用している",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices"
+  ],
+  "ServiceName": "cloudfront",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsCloudFrontDistribution",
+  "ResourceGroup": "network",
+  "Description": "CloudFrontディストリビューションは、ビューアー接続用のデフォルトの`*.cloudfront.net`証明書ではなく、**カスタムSSL/TLS証明書**で設定されています。",
+  "Risk": "デフォルト証明書を使用すると、独自のホスト名でHTTPSが防止され、ホスト名検証が破損します。クライアントはエラーに直面したり、TLSを回避したりする可能性があり、**認証**と**可用性**に影響を与えます。TLSポスチャとドメインバインドセキュリティヘッダーへの制御が減少し、**機密性**とユーザーの信頼が弱まります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://trendmicro.com/cloudoneconformity/knowledge-base/aws/CloudFront/cloudfront-distro-custom-tls.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/cloudfront-controls.html#cloudfront-7",
+    "https://support.icompaas.com/support/solutions/articles/62000233491-ensure-cloudfront-distributions-use-custom-ssl-tls-certificates",
+    "https://reintech.io/blog/configure-https-ssl-certificates-cloudfront-distributions"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws cloudfront get-distribution-config --id <DISTRIBUTION_ID> --output json > current-config.json && echo 'Manually edit current-config.json to add Aliases and ViewerCertificate fields, then run:' && echo 'aws cloudfront update-distribution --id <DISTRIBUTION_ID> --distribution-config file://current-config.json --if-match $(aws cloudfront get-distribution-config --id <DISTRIBUTION_ID> --query \"ETag\" --output text)'",
+      "NativeIaC": "```yaml\nResources:\n  <example_resource_name>:\n    Type: AWS::CloudFront::Distribution\n    Properties:\n      DistributionConfig:\n        Enabled: true\n        Origins:\n          - Id: origin1\n            DomainName: <example_origin_domain>\n            S3OriginConfig: {}\n        DefaultCacheBehavior:\n          TargetOriginId: origin1\n          ViewerProtocolPolicy: redirect-to-https\n          ForwardedValues:\n            QueryString: false\n        Aliases:\n          - <example_domain>  # 重要：証明書でカバーされる代替ドメイン名（CNAME）を追加\n        ViewerCertificate:\n          AcmCertificateArn: <example_certificate_arn>  # 重要：カスタムACM証明書を添付（us-east-1内である必要がある）\n          SslSupportMethod: sni-only  # 重要：ACM証明書を使用する場合に必要\n```",
+      "Other": "1. CloudFrontコンソールを開き、ディストリビューションを選択\n2. 設定/一般タブに移動し、編集をクリック\n3. 代替ドメイン名（CNAME）で、<example_domain>を追加\n4. SSL証明書で、カスタムSSL証明書を選択し、ACM証明書を選択（us-east-1で発行され、<example_domain>をカバー）\n5. 保存/はい、編集をクリックし、ディストリビューションのデプロイを待つ",
+      "Terraform": "```hcl\nresource \"aws_cloudfront_distribution\" \"<example_resource_name>\" {\n  enabled = true\n\n  origin {\n    domain_name = \"<example_origin_domain>\"\n    origin_id   = \"origin1\"\n    s3_origin_config {}\n  }\n\n  default_cache_behavior {\n    target_origin_id       = \"origin1\"\n    viewer_protocol_policy = \"redirect-to-https\"\n    forwarded_values { query_string = false }\n  }\n\n  aliases = [\"<example_domain>\"]  # 重要：証明書でカバーされるCNAMEを追加\n\n  viewer_certificate {\n    acm_certificate_arn = \"<example_certificate_arn>\"  # 重要：カスタムACM証明書（us-east-1内）\n    ssl_support_method  = \"sni-only\"                    # 重要：ACM証明書を使用する場合に必要\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "- ドメインをカバーする**カスタムSSL/TLS証明書**を使用し、エイリアスを設定します。\n- モダンなTLSポリシー、**SNI**、**HSTS**を強制し、レガシープロトコルを無効化します。\n- 証明書のライフサイクルに**最小権限**を適用し、キーをローテーション/監視します。",
+      "Url": "https://hub.prowler.com/check/cloudfront_distributions_custom_ssl_certificate"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

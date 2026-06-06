@@ -1,0 +1,40 @@
+{
+  "Provider": "aws",
+  "CheckID": "stepfunctions_statemachine_logging_enabled",
+  "CheckTitle": "Step Functions 状态机已启用日志记录",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践/运行时行为分析"
+  ],
+  "ServiceName": "stepfunctions",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsStepFunctionStateMachine",
+  "ResourceGroup": "serverless",
+  "Description": "**AWS Step Functions 状态机** 配置为通过已定义的 `loggingConfiguration` 将 **执行日志** 发送到 CloudWatch Logs，且其 `level` 设置高于 `OFF`。",
+  "Risk": "如果没有**执行日志**，工作流故障和异常将**无法检测**，从而增加 MTTR，并带来静默数据丢失的风险。缺失审计追踪会削弱对**完整性**的监督，并使**取证**更加复杂，导致对已调用服务的滥用可能无法被发现，并造成**合规性**缺口。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/step-functions/latest/dg/logging.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/stepfunctions-controls.html#stepfunctions-1",
+    "https://support.icompaas.com/support/solutions/articles/62000233757-ensure-step-functions-state-machines-should-have-logging-enabled"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws stepfunctions update-state-machine --state-machine-arn <state-machine-arn> --logging-configuration file://logging-config.json",
+      "NativeIaC": "```yaml\nResources:\n  <example_resource_name>:\n    Type: AWS::StepFunctions::StateMachine\n    Properties:\n      RoleArn: arn:aws:iam::<account-id>:role/<example_role_name>\n      DefinitionString: |\n        {\"StartAt\":\"Pass\",\"States\":{\"Pass\":{\"Type\":\"Pass\",\"End\":true}}}\n      LoggingConfiguration:\n        Destinations:\n          - CloudWatchLogsLogGroup:\n              LogGroupArn: arn:aws:logs:<region>:<account-id>:log-group:<log-group-name>:*  # 关键：目标 CloudWatch Logs 组\n        Level: ERROR  # 关键：启用日志记录（不是 OFF）\n```",
+      "Other": "1. 打开 AWS Console > Step Functions > State machines\n2. 选择该状态机并点击 Edit\n3. 在 Logging 中，启用日志记录\n4. 选择一个现有的 CloudWatch Logs 日志组\n5. 将 Level 设置为 Error（或 All）\n6. 保存更改",
+      "Terraform": "```hcl\nresource \"aws_sfn_state_machine\" \"<example_resource_name>\" {\n  name       = \"<example_resource_name>\"\n  role_arn   = \"arn:aws:iam::<account-id>:role/<example_role_name>\"\n  definition = jsonencode({ StartAt = \"Pass\", States = { Pass = { Type = \"Pass\", End = true } } })\n\n  logging_configuration {\n    log_destination = \"arn:aws:logs:<region>:<account-id>:log-group:<log-group-name>:*\"  # 关键：CloudWatch Logs 目标\n    level           = \"ERROR\"                                                              # 关键：启用日志记录\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "在所有状态机上以适当的 `level`（例如 `ERROR` 或 `ALL`）启用 CloudWatch 日志记录，并将日志发送到受保护的日志组。对日志写入/读取应用**最小权限**，设置**保留期**，并使用 `includeExecutionData` 避免记录敏感数据，除非确有需要。使用 X-Ray 跟踪以实现**纵深防御**。",
+      "Url": "https://hub.prowler.com/check/stepfunctions_statemachine_logging_enabled"
+    }
+  },
+  "Categories": [
+    "logging"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "cloudwatch_log_metric_filter_policy_changes",
+  "CheckTitle": "IAM ポリシー変更に対する CloudWatch Logs メトリクスフィルターとアラームが存在すること",
+  "CheckType": [
+    "Software and Configuration Checks/Industry and Regulatory Standards/CIS AWS Foundations Benchmark",
+    "TTPs/Privilege Escalation"
+  ],
+  "ServiceName": "cloudwatch",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsCloudWatchAlarm",
+  "ResourceGroup": "monitoring",
+  "Description": "CloudWatch は、CloudTrail によって記録された **IAM ポリシー変更**（例：`CreatePolicy`、`DeletePolicy`、バージョン変更、インラインポリシーの編集、ポリシーのアタッチ/デタッチ）を追跡するためのメトリクスフィルターとアラームを使用します。本チェック結果は、対象 CloudTrail のロググループ上にそのフィルターと関連アラームが存在するかどうかを示します。",
+  "Risk": "**IAM ポリシー変更** に対するアラートがないと、権限の変更が検知されず、**権限昇格**、隠れたバックドア、あるいは権限の取り消しが可能になります。これはシステムの**機密性**と**完全性**を脅かし、重要なアクセスが削除または誤設定された場合には**可用性**にも影響を与えるおそれがあります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudwatch-alarms-for-cloudtrail.html",
+    "https://www.clouddefense.ai/compliance-rules/cis-v140/monitoring/cis-v140-4-4",
+    "https://www.intelligentdiscovery.io/controls/cloudwatch/cloudwatch-alarm-iam-policy-change"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation：IAM ポリシー変更用のメトリクスフィルターとアラームを作成\nResources:\n  IAMPolicyChangeMetricFilter:\n    Type: AWS::Logs::MetricFilter\n    Properties:\n      LogGroupName: <example_resource_name>  # 重要：監視対象の CloudTrail ロググループ\n      # 重要：本チェックで要求される IAM ポリシー変更イベントにマッチするパターン\n      FilterPattern: '{($.eventName=DeleteGroupPolicy)||($.eventName=DeleteRolePolicy)||($.eventName=DeleteUserPolicy)||($.eventName=PutGroupPolicy)||($.eventName=PutRolePolicy)||($.eventName=PutUserPolicy)||($.eventName=CreatePolicy)||($.eventName=DeletePolicy)||($.eventName=CreatePolicyVersion)||($.eventName=DeletePolicyVersion)||($.eventName=AttachRolePolicy)||($.eventName=DetachRolePolicy)||($.eventName=AttachUserPolicy)||($.eventName=DetachUserPolicy)||($.eventName=AttachGroupPolicy)||($.eventName=DetachGroupPolicy)}'\n      MetricTransformations:\n        - MetricName: <example_resource_name>   # 重要：フィルターから作成されるメトリクス\n          MetricNamespace: CISBenchmark        # 重要：メトリクスの名前空間\n          MetricValue: \"1\"\n\n  IAMPolicyChangeAlarm:\n    Type: AWS::CloudWatch::Alarm\n    Properties:\n      AlarmName: <example_resource_name>\n      # 重要：1 件以上のイベントが発生した際に上記メトリクスでアラーム\n      MetricName: <example_resource_name>\n      Namespace: CISBenchmark\n      Statistic: Sum\n      Period: 300\n      EvaluationPeriods: 1\n      Threshold: 1\n      ComparisonOperator: GreaterThanOrEqualToThreshold\n```",
+      "Other": "1. CloudWatch コンソールを開き、Logs > Log groups に移動して CloudTrail ロググループを選択します\n2. メトリクスフィルターを作成します：\n   - Filter pattern：{($.eventName=DeleteGroupPolicy)||($.eventName=DeleteRolePolicy)||($.eventName=DeleteUserPolicy)||($.eventName=PutGroupPolicy)||($.eventName=PutRolePolicy)||($.eventName=PutUserPolicy)||($.eventName=CreatePolicy)||($.eventName=DeletePolicy)||($.eventName=CreatePolicyVersion)||($.eventName=DeletePolicyVersion)||($.eventName=AttachRolePolicy)||($.eventName=DetachRolePolicy)||($.eventName=AttachUserPolicy)||($.eventName=DetachUserPolicy)||($.eventName=AttachGroupPolicy)||($.eventName=DetachGroupPolicy)}\n   - Metric name：<example_resource_name>\n   - Namespace：CISBenchmark\n   - Metric value：1\n3. 「Metric filters」タブで新しいフィルターを選択し、「Create alarm」（アラームの作成）をクリックします\n4. Statistic=Sum、Period=5 minutes、Threshold type=Static、条件=Greater/Equal、Threshold=1、Evaluation periods=1 を設定します\n5. アラームを作成します",
+      "Terraform": "```hcl\n# Terraform：IAM ポリシー変更用のメトリクスフィルターとアラーム\nresource \"aws_cloudwatch_log_metric_filter\" \"<example_resource_name>\" {\n  name           = \"<example_resource_name>\"\n  log_group_name = \"<example_resource_name>\"  # CloudTrail ロググループ\n\n  # 重要：本チェックで要求される IAM ポリシー変更イベントにマッチするパターン\n  pattern = \"{($.eventName=DeleteGroupPolicy)||($.eventName=DeleteRolePolicy)||($.eventName=DeleteUserPolicy)||($.eventName=PutGroupPolicy)||($.eventName=PutRolePolicy)||($.eventName=PutUserPolicy)||($.eventName=CreatePolicy)||($.eventName=DeletePolicy)||($.eventName=CreatePolicyVersion)||($.eventName=DeletePolicyVersion)||($.eventName=AttachRolePolicy)||($.eventName=DetachRolePolicy)||($.eventName=AttachUserPolicy)||($.eventName=DetachUserPolicy)||($.eventName=AttachGroupPolicy)||($.eventName=DetachGroupPolicy)}\"\n\n  metric_transformation {\n    name      = \"<example_resource_name>\"      # 重要：フィルターから作成されるメトリクス\n    namespace = \"CISBenchmark\"                 # 重要：メトリクスの名前空間\n    value     = \"1\"\n  }\n}\n\nresource \"aws_cloudwatch_metric_alarm\" \"<example_resource_name>\" {\n  alarm_name          = \"<example_resource_name>\"\n  # 重要：1 件以上のイベントが発生した際にこのメトリクスでアラーム\n  metric_name         = aws_cloudwatch_log_metric_filter.<example_resource_name>.metric_transformation[0].name\n  namespace           = aws_cloudwatch_log_metric_filter.<example_resource_name>.metric_transformation[0].namespace\n  statistic           = \"Sum\"\n  period              = 300\n  evaluation_periods  = 1\n  threshold           = 1\n  comparison_operator = \"GreaterThanOrEqualToThreshold\"\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "IAM ポリシーの作成/更新/削除およびポリシーのアタッチ/デタッチイベントに対するメトリクスフィルターを作成し、対応者に通知する **アラーム** を構成してください。\n- ポリシー変更に対して**最小権限の原則**と職務分掌を徹底する\n- 承認プロセスを必須とし、リージョン/アカウントをまたいで集中ログ管理を行う\n- アラートをインシデントレスポンスのワークフローと統合する",
+      "Url": "https://hub.prowler.com/check/cloudwatch_log_metric_filter_policy_changes"
+    }
+  },
+  "Categories": [
+    "logging"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "ロギングおよびモニタリング"
+}
+
+

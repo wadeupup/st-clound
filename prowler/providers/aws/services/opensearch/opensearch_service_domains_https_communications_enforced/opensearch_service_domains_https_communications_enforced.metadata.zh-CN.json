@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "opensearch_service_domains_https_communications_enforced",
+  "CheckTitle": "OpenSearch 域已启用 HTTPS 强制执行",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践",
+    "软件和配置检查/行业和法规标准/AWS 基础安全最佳实践",
+    "软件和配置检查/行业和监管标准/NIST 800-53 控制（美国）",
+    "软件和配置检查/行业和法规标准/PCI-DSS"
+  ],
+  "ServiceName": "opensearch",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsOpenSearchServiceDomain",
+  "ResourceGroup": "database",
+  "Description": "具有**HTTPS 强制执行**的 Amazon OpenSearch Service 域需要加密连接。此评估识别缺少 `Require HTTPS for all traffic` 的域，表明接受未加密的 HTTP。",
+  "Risk": "允许 HTTP 会以明文形式暴露查询、凭证和结果，从而可能被拦截和会话劫持。对手可以更改请求或响应，危害**机密性**和**完整性**，并收集认证数据进行**横向移动**。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-createupdatedomains.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws opensearch update-domain-config --domain-name <example_resource_name> --domain-endpoint-options EnforceHTTPS=true",
+      "NativeIaC": "```yaml\n# CloudFormation - 在 OpenSearch 域上启用 HTTPS 强制执行\nResources:\n  <example_resource_name>:\n    Type: AWS::OpenSearchService::Domain\n    Properties:\n      DomainEndpointOptions:\n        EnforceHTTPS: true  # 关键：要求所有流量使用 HTTPS，修复该问题\n```",
+      "Other": "1. 打开 Amazon OpenSearch Service 控制台\n2. 转到域并选择您的域\n3. 点击操作 > 编辑安全配置\n4. 勾选“要求所有流量到域使用 HTTPS”\n5. 点击保存更改",
+      "Terraform": "```hcl\n# 在 OpenSearch 域上启用 HTTPS 强制执行\nresource \"aws_opensearch_domain\" \"<example_resource_name>\" {\n  domain_name = \"<example_resource_name>\"\n\n  domain_endpoint_options {\n    enforce_https = true  # 关键：要求所有请求使用 HTTPS\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "在每个域上启用 `Require HTTPS for all traffic` 以强制执行 TLS。优先选择强协议（TLS 1.2+），并通过网络控制阻止 HTTP 以实现深度防御。应用**最小权限**访问策略并使用私有连接以最小化暴露和降级风险。",
+      "Url": "https://hub.prowler.com/check/opensearch_service_domains_https_communications_enforced"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

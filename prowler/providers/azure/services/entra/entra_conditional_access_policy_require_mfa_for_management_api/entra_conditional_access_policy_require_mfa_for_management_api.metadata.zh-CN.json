@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "entra_conditional_access_policy_require_mfa_for_management_api",
+  "CheckTitle": "确保对 Windows Azure 服务管理 API 强制要求多重身份验证",
+  "CheckType": [],
+  "ServiceName": "entra",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "#microsoft.graph.conditionalAccess",
+  "ResourceGroup": "IAM",
+  "Description": "此建议确保通过 Windows Azure 服务管理 API（即 Azure Powershell、Azure CLI、Azure Resource Manager API 等）访问资源的用户，必须使用多重身份验证（MFA）凭据。",
+  "Risk": "对 Windows Azure 服务管理 API 的管理访问应采用更高等级的身份验证审查。建议启用多重身份验证，以降低管理操作被滥用的可能性，并防止入侵者或被泄露的管理员凭据更改管理设置。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/entra/identity/conditional-access/howto-conditional-access-policy-azure-management",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "1. 在 Azure 管理员门户仪表板中打开 Microsoft Entra ID。2. 在 Entra ID 边栏中点击 Security。3. 在 Security 边栏中点击 Conditional Access。4. 在 Conditional Access 边栏中点击 Policies。5. 点击 + New policy。6. 为策略输入名称。7. 点击 Users 下方蓝色文本。8. 在 Include 下选择 All users。9. 在 Exclude 下勾选 Users and groups。10. 选择要从此策略中豁免的用户或组（如应急 break-glass 账户和非交互式服务账户），然后点击 Select。11. 点击 Target Resources 下方蓝色文本。12. 在 Include 下点击 Select apps 单选按钮。13. 点击 Select 下方蓝色文本。14. 勾选 Windows Azure Service Management APIs，然后点击 Select。15. 点击 Grant 下方蓝色文本。16. 在 Grant access 下勾选 Require multifactor authentication，然后点击 Select。17. 创建前将 Enable policy 设为 Report-only。18. 点击 Create。以仅报告模式测试策略后，将 Enable policy 从 Report-only 更新为 On。",
+      "Url": "https://learn.microsoft.com/en-us/entra/identity/conditional-access/concept-conditional-access-cloud-apps"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "条件访问策略需要 Microsoft Entra ID P1 或 P2 许可证。同样，如果用户丢失 MFA 访问能力，也可能带来额外维护成本。任何被授予此策略例外的用户或组都应被谨慎跟踪，仅授予最小必要权限，并应定期审查或调查条件访问例外。"
+}

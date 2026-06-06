@@ -1,0 +1,40 @@
+{
+  "Provider": "aws",
+  "CheckID": "redshift_cluster_automatic_upgrades",
+  "CheckTitle": "Redshift クラスターは自動バージョンアップグレードが有効になっています",
+  "CheckType": [
+    "ソフトウェアと構成のチェック/パッチ管理",
+    "ソフトウェアと構成のチェック/AWS セキュリティベストプラクティス"
+  ],
+  "ServiceName": "redshift",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsRedshiftCluster",
+  "ResourceGroup": "analytics",
+  "Description": "**Amazon Redshift クラスター**は、`AllowVersionUpgrade` を通じて自動メジャーエンジンアップグレードが許可されているため、メンテナンスウィンドウ中に更新が適用されます。",
+  "Risk": "自動アップグレードがない場合、クラスターは**脆弱なエンジンバージョン**を実行する可能性があり、既知の欠陥に対するエクスプロイトを可能にします。\n\n攻撃者はデータを読み取ったり改ざんしたりする可能性があります（**機密性/完全性**）、未解決のバグはダウンタイムを引き起こす可能性があります（**可用性**）。パッチ適用の遅延は、露出ウィンドウと運用リスクを増大させます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/systems-manager-automation-runbooks/latest/userguide/automation-aws-modify-redshift-maintenance.html",
+    "https://docs.aws.amazon.com/redshift/latest/mgmt/managing-cluster-operations.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws redshift modify-cluster --cluster-identifier <cluster_id> --allow-version-upgrade",
+      "NativeIaC": "```yaml\n# CloudFormation で Redshift がメジャーバージョンアップグレードを許可するようにする\nResources:\n  <example_resource_name>:\n    Type: AWS::Redshift::Cluster\n    Properties:\n      ClusterType: single-node\n      DBName: <db_name>\n      MasterUsername: <master_username>\n      MasterUserPassword: <master_user_password>\n      NodeType: <node_type>\n      AllowVersionUpgrade: true  # 重要: メンテナンスウィンドウ中に自動メジャーバージョンアップグレードを有効にします\n```",
+      "Other": "1. Amazon Redshift コンソールを開く\n2. クラスターに移動し、クラスターを選択\n3. 編集（またはメンテナンス設定の編集）をクリック\n4. \"メジャーバージョンアップグレード\"（バージョンアップグレードを許可）を有効にする\n5. 変更を保存をクリック",
+      "Terraform": "```hcl\n# 自動メジャーバージョンアップグレードを許可する Redshift クラスター\nresource \"aws_redshift_cluster\" \"<example_resource_name>\" {\n  cluster_identifier = \"<example_resource_id>\"\n  node_type          = \"<node_type>\"\n  master_username    = \"<master_username>\"\n  master_password    = \"<master_user_password>\"\n\n  allow_version_upgrade = true  # 重要: 自動メジャーバージョンアップグレードを有効にします\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "クラスターをパッチ適用状態に保つために `AllowVersionUpgrade` を有効にします。制御されたメンテナンスウィンドウと適切なメンテナンストラックを使用し、本番環境の前にステージングでアップグレードを検証します。\n\n**デフォルトでのセキュリティ**と**多層防御**に合わせて、テスト済みのバックアップとロールバックプランを保持します。*正当化された例外を文書化し、定期的にレビューします*。",
+      "Url": "https://hub.prowler.com/check/redshift_cluster_automatic_upgrades"
+    }
+  },
+  "Categories": [
+    "vulnerabilities"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

@@ -1,0 +1,32 @@
+{
+  "Provider": "aws",
+  "CheckID": "ec2_client_vpn_endpoint_connection_logging_enabled",
+  "CheckTitle": "EC2 Client VPN エンドポイントでクライアント接続ログ記録が有効になっている必要がある",
+  "CheckType": [],
+  "ServiceName": "ec2",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "low",
+  "ResourceType": "AwsEc2ClientVpnEndpoint",
+  "ResourceGroup": "network",
+  "Description": "このコントロールは、AWS Client VPN エンドポイントでクライアント接続ログ記録が有効になっているかをチェックします。エンドポイントでクライアント接続ログ記録が有効になっていない場合、コントロールは失敗します。",
+  "Risk": "Client VPN エンドポイントにより、リモートクライアントは AWS の仮想プライベートクラウド (VPC) 内のリソースに安全に接続できます。接続ログにより、VPN エンドポイント上のユーザーアクティビティを追跡し、可視性を提供できます。",
+  "RelatedUrl": "https://docs.aws.amazon.com/vpn/latest/clientvpn-admin/what-is.html",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://docs.aws.amazon.com/securityhub/latest/userguide/ec2-controls.html#ec2-51",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "接続ログ記録を有効にするには、AWS Client VPN 管理者ガイドの既存の Client VPN エンドポイントの接続ログ記録を有効にするを参照してください。",
+      "Url": "https://docs.aws.amazon.com/config/latest/developerguide/ec2-client-vpn-connection-log-enabled.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

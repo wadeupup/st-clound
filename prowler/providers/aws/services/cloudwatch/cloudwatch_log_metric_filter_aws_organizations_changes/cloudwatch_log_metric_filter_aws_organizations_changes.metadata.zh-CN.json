@@ -1,0 +1,45 @@
+{
+  "Provider": "aws",
+  "CheckID": "cloudwatch_log_metric_filter_aws_organizations_changes",
+  "CheckTitle": "CloudWatch Logs 存在用于 AWS Organizations 更改的指标过滤器和告警",
+  "CheckType": [
+    "Software and Configuration Checks/Industry and Regulatory Standards/CIS AWS Foundations Benchmark",
+    "Software and Configuration Checks/AWS Security Best Practices/Runtime Behavior Analysis",
+    "TTPs/Privilege Escalation"
+  ],
+  "ServiceName": "cloudwatch",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsCloudWatchAlarm",
+  "ResourceGroup": "monitoring",
+  "Description": "**CloudWatch Logs** 指标过滤器和告警监控由 CloudTrail 记录的 **AWS Organizations** 更改事件，包括 `CreateAccount`、`AttachPolicy`、`MoveAccount` 和 `UpdateOrganizationalUnit` 等操作。\n\n该检查评估在跟踪日志组上是否存在匹配 `organizations.amazonaws.com` 事件的过滤器以及与该指标关联的告警。",
+  "Risk": "如果没有对 **AWS Organizations 更改** 的告警，攻击者或配置错误就可以在无声无息中更改治理配置，从而实现未授权访问和绕过策略。他们可以创建/删除账户、修改或分离 SCP，甚至删除整个组织，带来数据暴露（C）、权限提升（I）和服务中断（A）等风险。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudwatch-alarms-for-cloudtrail.html",
+    "https://support.icompaas.com/support/solutions/articles/62000228348-ensure-a-log-metric-filter-and-alarm-exist-for-aws-organizations-changes",
+    "https://www.plerion.com/cloud-knowledge-base/ensure-aws-organizations-changes-are-monitored",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/CloudWatchLogs/organizations-changes-alarm.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation: CloudWatch Logs metric filter and alarm for AWS Organizations changes\nResources:\n  OrganizationsChangesMetricFilter:\n    Type: AWS::Logs::MetricFilter\n    Properties:\n      LogGroupName: <example_log_group_name>\n      FilterPattern: '{ ($.eventSource = organizations.amazonaws.com) && (($.eventName = \"AcceptHandshake\") || ($.eventName = \"AttachPolicy\") || ($.eventName = \"CancelHandshake\") || ($.eventName = \"CreateAccount\") || ($.eventName = \"CreateOrganization\") || ($.eventName = \"CreateOrganizationalUnit\") || ($.eventName = \"CreatePolicy\") || ($.eventName = \"DeclineHandshake\") || ($.eventName = \"DeleteOrganization\") || ($.eventName = \"DeleteOrganizationalUnit\") || ($.eventName = \"DeletePolicy\") || ($.eventName = \"EnableAllFeatures\") || ($.eventName = \"EnablePolicyType\") || ($.eventName = \"InviteAccountToOrganization\") || ($.eventName = \"LeaveOrganization\") || ($.eventName = \"DetachPolicy\") || ($.eventName = \"DisablePolicyType\") || ($.eventName = \"MoveAccount\") || ($.eventName = \"RemoveAccountFromOrganization\") || ($.eventName = \"UpdateOrganizationalUnit\") || ($.eventName = \"UpdatePolicy\")) }'  # Critical: matches AWS Organizations change events\n      MetricTransformations:\n        - MetricValue: \"1\"\n          MetricNamespace: CISBenchmark\n          MetricName: <example_resource_name>  # Critical: creates metric used by the alarm\n\n  OrganizationsChangesAlarm:\n    Type: AWS::CloudWatch::Alarm\n    Properties:\n      ComparisonOperator: GreaterThanOrEqualToThreshold\n      EvaluationPeriods: 1\n      MetricName: <example_resource_name>   # Critical: alarms on the metric from the filter\n      Namespace: CISBenchmark               # Critical: must match the metric filter namespace\n      Period: 300\n      Statistic: Sum\n      Threshold: 1\n```",
+      "Other": "1. 打开 CloudWatch > Logs > Log groups，并选择 CloudTrail 使用的日志组\n2. 选择 Create metric filter，并将 Filter pattern 设置为：\n   { ($.eventSource = organizations.amazonaws.com) && (($.eventName = \"AcceptHandshake\") || ($.eventName = \"AttachPolicy\") || ($.eventName = \"CancelHandshake\") || ($.eventName = \"CreateAccount\") || ($.eventName = \"CreateOrganization\") || ($.eventName = \"CreateOrganizationalUnit\") || ($.eventName = \"CreatePolicy\") || ($.eventName = \"DeclineHandshake\") || ($.eventName = \"DeleteOrganization\") || ($.eventName = \"DeleteOrganizationalUnit\") || ($.eventName = \"DeletePolicy\") || ($.eventName = \"EnableAllFeatures\") || ($.eventName = \"EnablePolicyType\") || ($.eventName = \"InviteAccountToOrganization\") || ($.eventName = \"LeaveOrganization\") || ($.eventName = \"DetachPolicy\") || ($.eventName = \"DisablePolicyType\") || ($.eventName = \"MoveAccount\") || ($.eventName = \"RemoveAccountFromOrganization\") || ($.eventName = \"UpdateOrganizationalUnit\") || ($.eventName = \"UpdatePolicy\")) }\n3. 分配指标：Namespace = CISBenchmark，Metric name = OrganizationsChanges，Metric value = 1，然后创建指标过滤器\n4. 在该指标过滤器上选择 Create alarm；设置 Statistic = Sum，Period = 5 分钟，Threshold type = Static，Threshold = 1，Evaluation periods = 1；创建告警",
+      "Terraform": "```hcl\n# CloudWatch Logs metric filter for AWS Organizations changes\nresource \"aws_cloudwatch_log_metric_filter\" \"organizations_changes\" {\n  name           = \"<example_resource_name>\"\n  log_group_name = \"<example_log_group_name>\"\n  pattern        = \"{ ($.eventSource = organizations.amazonaws.com) && (($.eventName = \\\"AcceptHandshake\\\") || ($.eventName = \\\"AttachPolicy\\\") || ($.eventName = \\\"CancelHandshake\\\") || ($.eventName = \\\"CreateAccount\\\") || ($.eventName = \\\"CreateOrganization\\\") || ($.eventName = \\\"CreateOrganizationalUnit\\\") || ($.eventName = \\\"CreatePolicy\\\") || ($.eventName = \\\"DeclineHandshake\\\") || ($.eventName = \\\"DeleteOrganization\\\") || ($.eventName = \\\"DeleteOrganizationalUnit\\\") || ($.eventName = \\\"DeletePolicy\\\") || ($.eventName = \\\"EnableAllFeatures\\\") || ($.eventName = \\\"EnablePolicyType\\\") || ($.eventName = \\\"InviteAccountToOrganization\\\") || ($.eventName = \\\"LeaveOrganization\\\") || ($.eventName = \\\"DetachPolicy\\\") || ($.eventName = \\\"DisablePolicyType\\\") || ($.eventName = \\\"MoveAccount\\\") || ($.eventName = \\\"RemoveAccountFromOrganization\\\") || ($.eventName = \\\"UpdateOrganizationalUnit\\\") || ($.eventName = \\\"UpdatePolicy\\\")) }\"  # Critical: matches AWS Organizations change events\n\n  metric_transformation {\n    name      = \"<example_resource_name>\"   # Critical: metric created by the filter\n    namespace = \"CISBenchmark\"              # Critical: used by the alarm\n    value     = \"1\"\n  }\n}\n\n# Alarm on the metric generated by the filter\nresource \"aws_cloudwatch_metric_alarm\" \"organizations_changes\" {\n  alarm_name          = \"<example_resource_name>\"\n  comparison_operator = \"GreaterThanOrEqualToThreshold\"\n  evaluation_periods  = 1\n  metric_name         = \"<example_resource_name>\"  # Critical: matches metric filter name\n  namespace           = \"CISBenchmark\"             # Critical: matches metric filter namespace\n  period              = 300\n  statistic           = \"Sum\"\n  threshold           = 1\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "将 CloudTrail 事件发送到 **CloudWatch Logs**，为 `organizations.amazonaws.com` 更改事件添加指标过滤器，并附加告警以通知响应人员。对组织管理员实施 **最小权限** 和 **职责分离**，强制启用 MFA 和审批，并定期测试告警以确保及时检测和响应。",
+      "Url": "https://hub.prowler.com/check/cloudwatch_log_metric_filter_aws_organizations_changes"
+    }
+  },
+  "Categories": [
+    "logging"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "Logging and Monitoring"
+}
+
+

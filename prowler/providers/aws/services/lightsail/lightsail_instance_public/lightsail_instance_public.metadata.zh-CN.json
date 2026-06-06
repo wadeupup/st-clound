@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "lightsail_instance_public",
+  "CheckTitle": "Lightsail 实例没有公共可访问的端口",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践/网络可达性",
+    "软件和配置检查/行业和法规标准/AWS 基础安全最佳实践",
+    "TTPs/初始访问"
+  ],
+  "ServiceName": "lightsail",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Other",
+  "ResourceGroup": "compute",
+  "Description": "**Lightsail 实例**如果具有**公共 IP**并且至少有一个防火墙规则允许**公共端口**，则被视为公开暴露。评估会检查实例地址和端口规则，以检测任何标记为`public`的端口或范围。",
+  "Risk": "公共 IP 加上开放端口使得互联网扫描、暴力破解和漏洞利用成为可能。\n- 机密性：数据泄露\n- 完整性：通过暴露的服务进行远程代码执行/管理员接管\n- 可用性：拒绝服务或滥用（僵尸网络、加密挖矿），服务中断",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/lightsail/latest/userguide/amazon-lightsail-editing-firewall-rules.html",
+    "https://docs.aws.amazon.com/lightsail/latest/userguide/understanding-public-ip-and-private-ip-addresses-in-amazon-lightsail.html#ipv4-addresses"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws lightsail put-instance-public-ports --instance-name <example_resource_name> --port-infos '[]'",
+      "NativeIaC": "```yaml\n# CloudFormation：从 Lightsail 实例中移除所有公共端口\nResources:\n  ClosePublicPorts:\n    Type: AWS::Lightsail::InstancePublicPorts\n    Properties:\n      InstanceName: <example_resource_name>\n      PortInfos: []  # 关键：空列表清除所有公共端口，因此实例不公开暴露\n```",
+      "Other": "1. 登录 AWS Lightsail 控制台\n2. 转到实例并选择 <example_resource_name>\n3. 打开网络选项卡\n4. 在 IPv4 防火墙中，删除所有现有规则，然后保存\n5. 如果启用了 IPv6，在 IPv6 防火墙中，删除所有现有规则，然后保存",
+      "Terraform": "```hcl\n# Terraform：确保 Lightsail 实例上没有开放的公共端口\nresource \"aws_lightsail_instance_public_ports\" \"<example_resource_name>\" {\n  instance_name = \"<example_resource_name>\"\n\n  # 关键：没有 port_info 块 -> 没有配置公共端口（全部关闭）\n  dynamic \"port_info\" {\n    for_each = []\n    content {\n      from_port = 0\n      to_port   = 0\n      protocol  = \"tcp\"\n    }\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "应用**最小权限**网络访问：关闭未使用的端口，限制来源（避免使用`0.0.0.0/0`），并审查 IPv4/IPv6 规则。使用**VPN**或**堡垒主机**进行管理。将服务置于私有网络或负载均衡器之后，并加固/监控任何需要的公共端点。",
+      "Url": "https://hub.prowler.com/check/lightsail_instance_public"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

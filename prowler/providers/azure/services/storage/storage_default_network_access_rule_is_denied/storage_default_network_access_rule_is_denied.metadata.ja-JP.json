@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "storage_default_network_access_rule_is_denied",
+  "CheckTitle": "Storage Accounts の既定ネットワーク アクセス ルールが Deny に設定されていることを確認する",
+  "CheckType": [],
+  "ServiceName": "storage",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AzureStorageAccount",
+  "ResourceGroup": "storage",
+  "Description": "ストレージ アカウントは任意ネットワークのクライアント接続を受け付けるため、既定ネットワーク アクセスを制限することで追加のセキュリティ層を提供できます。選択したネットワークのみにアクセスを制限するには、既定アクションを変更する必要があります。",
+  "Risk": "ストレージ アカウントはすべてのネットワーク（インターネット トラフィックを含む）からのアクセスを拒否するよう構成すべきです。特定の Azure Virtual networks からのトラフィックを許可することで、特定アプリ向けの安全なネットワーク境界を構築できます。さらに、特定のインターネットまたはオンプレミス クライアント接続を有効化するため、パブリック IP アドレス範囲を許可することも可能です。ネットワーク ルールを構成すると、許可ネットワーク上のアプリのみがストレージ アカウントへアクセスできます。許可ネットワークからの呼び出しでも、アプリはストレージ アカウントへアクセスするために適切な認可（有効なアクセス キーまたは SAS トークン）を引き続き必要とします。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "az storage account update --name <StorageAccountName> --resource-group <resourceGroupName> --default-action Deny",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/StorageAccounts/restrict-default-network-access.html",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-networking-policies/set-default-network-access-rule-for-storage-accounts-to-deny#terraform"
+    },
+    "Recommendation": {
+      "Text": "1. Storage Accounts に移動します。2. 各ストレージ アカウントで Networking ブレードをクリックします。3. Firewalls and virtual networks 見出しをクリックします。4. Selected networks からのアクセス許可を選択していることを確認します。5. 特定ネットワークからのトラフィックを許可するルールを追加します。6. Save をクリックして変更を適用します。",
+      "Url": ""
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "許可されたすべてのネットワークを各ネットワーク側でホワイトリスト化する必要があり、運用負荷が増えます。ネットワーク接続断の可能性があるため、営業時間中に重要リソースへ適用しないでください。"
+}

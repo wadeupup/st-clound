@@ -1,0 +1,40 @@
+{
+  "Provider": "aws",
+  "CheckID": "ssm_documents_set_as_public",
+  "CheckTitle": "SSMドキュメントは公開されておらず、信頼されているAWSアカウントとのみ共有されています",
+  "CheckType": [
+    "ソフトウェアと構成チェック/AWSセキュリティのベストプラクティス",
+    "影響/データ暴露"
+  ],
+  "ServiceName": "ssm",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsSsmPatchCompliance",
+  "ResourceGroup": "devops",
+  "Description": "**SSMドキュメント**は、**パブリック共有**（「すべて」）、および定義された信頼されたリスト以外のAWSアカウントとの共有を評価します。プライベートを維持するか、信頼されたアカウントと共有されているドキュメントのみが配布に制限があることを示します。",
+  "Risk": "公開または信頼されていない共有は、スクリプト、パラメータ、組み込み秘密の**機密性**を侵食するドキュメントの内容を暴露します。相手はマニュアルを研究して攻撃と再利用のためのロジックを作成することができ、それによって証明書の漏洩と下流の**完全性**と**可用性**の影響をもたらす。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/systems-manager/latest/userguide/ssm-before-you-share.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws ssm modify-document-permission --name <DOCUMENT_NAME> --permission-type Share --account-ids-to-remove all",
+      "NativeIaC": "",
+      "Other": "1.AWSシステムマネージャ>ドキュメントを開く\n2.「ドキュメント」>「権限」タブ>「編集」を選択します\n3.「プライベート」を選択（「パブリック」または「すべて」を削除）\n4.信頼されていないAWSアカウントIDを削除する\n5.保存",
+      "Terraform": "```hcl\nresource \"aws_ssm_document\" \"<example_resource_name>\" {\n  name          = \"<example_resource_name>\"\n  document_type = \"Command\"\n  content       = jsonencode({\n    schemaVersion = \"2.2\"\n    mainSteps     = []\n  })\n  # 重要：アクセス権限がありません -> ドキュメントは非公開の状態を維持します（公開または共有されません）\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "文書配布に**最小特権**を適用する: \n-文書のプライベートを維持する、特定の信頼されたアカウントIDのみと共有 \n-ドキュメントのアカウントレベルを有効にして共有を禁止 \n-コンテンツから機密を削除します。セキュリティパラメータ \n-ドキュメントを共有または実行できる人を制限します。レビューとバージョン管理が必要",
+      "Url": "https://hub.prowler.com/check/ssm_documents_set_as_public"
+    }
+  },
+  "Categories": [
+    "identity-access",
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

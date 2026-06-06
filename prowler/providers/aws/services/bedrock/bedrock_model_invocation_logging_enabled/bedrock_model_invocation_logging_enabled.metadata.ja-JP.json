@@ -1,0 +1,36 @@
+{
+  "Provider": "aws",
+  "CheckID": "bedrock_model_invocation_logging_enabled",
+  "CheckTitle": "Amazon Bedrockに対してモデル呼び出しログが有効になっていることを確認",
+  "CheckType": [],
+  "ServiceName": "bedrock",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:bedrock:region:account-id:model/resource-id",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "ai_ml",
+  "Description": "AWSクラウドアカウント内のすべてのモデル呼び出しのメタデータ、リクエスト、および応答を収集するために、Amazon Bedrockサービスに対してモデル呼び出しログが有効になっていることを確認します。",
+  "Risk": "Amazon Bedrockでは、モデル呼び出しログにより、AWSアカウント内のすべての'Converse'、'ConverseStream'、'InvokeModel'、および'InvokeModelWithResponseStream' API呼び出しの呼び出しリクエストと応答データ、およびメタデータを収集できます。各ログエントリには、タイムスタンプ、リクエストID、モデルID、トークン使用状況などの重要な詳細が含まれます。呼び出しログは、トラブルシューティング、パフォーマンス向上、悪用検出、セキュリティ監査に利用できます。デフォルトでは、モデル呼び出しログは無効になっています。",
+  "RelatedUrl": "https://docs.aws.amazon.com/bedrock/latest/userguide/model-invocation-logging.html",
+  "Remediation": {
+    "Code": {
+      "CLI": "aws bedrock put-model-invocation-logging-configuration --logging-config 's3Config={bucketName='tm-bedrock-logging-data',keyPrefix='invocation-logs'},textDataDeliveryEnabled=true,imageDataDeliveryEnabled=true,embeddingDataDeliveryEnabled=true'",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/Bedrock/enable-model-invocation-logging.html",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "AWSクラウドアカウント内のすべてのモデル呼び出しのメタデータ、リクエスト、および応答を収集するために、Amazon Bedrockサービスに対してモデル呼び出しログを有効にします。",
+      "Url": "https://docs.aws.amazon.com/bedrock/latest/userguide/model-invocation-logging.html#model-invocation-logging-console"
+    }
+  },
+  "Categories": [
+    "logging",
+    "forensics-ready",
+    "gen-ai"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

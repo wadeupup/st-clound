@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "efs_have_backup_enabled",
+  "CheckTitle": "EFS 文件系统已启用备份",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Effects/Data Destruction"
+  ],
+  "ServiceName": "efs",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsEfsFileSystem",
+  "ResourceGroup": "storage",
+  "Description": "评估 **Amazon EFS 文件系统** 是否通过 `backup policy` 配置了自动备份。该发现突出显示未启用备份或正在禁用备份的文件系统。",
+  "Risk": "缺少 EFS 备份会降低 **可用性** 和 **完整性**。意外删除、勒索软件或配置错误可能会清除或损坏数据，且没有恢复路径。没有时间点副本，RPO/RTO 会受到影响，局部事件可能演变为长期中断和不可逆的损失。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/efs/latest/ug/awsbackup.html",
+    "https://docs.aws.amazon.com/efs/latest/ug/automatic-backups.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws efs put-backup-policy --file-system-id <FILE_SYSTEM_ID> --backup-policy Status=ENABLED",
+      "NativeIaC": "```yaml\n# CloudFormation: Enable automatic backups for EFS\nResources:\n  <example_resource_name>:\n    Type: AWS::EFS::FileSystem\n    Properties:\n      BackupPolicy:\n        Status: ENABLED  # Critical: turns on EFS automatic backups via AWS Backup\n```",
+      "Other": "1. 在 AWS 控制台中，转到 Amazon EFS > 文件系统\n2. 选择目标文件系统\n3. 点击编辑（或更新）\n4. 将自动备份设置为已启用\n5. 保存更改",
+      "Terraform": "```hcl\n# Enable automatic backups for EFS\nresource \"aws_efs_file_system\" \"<example_resource_name>\" {\n  backup_policy {\n    status = \"ENABLED\"  # Critical: turns on EFS automatic backups\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "通过将文件系统 `backup policy` 设置为 `ENABLED` 来启用自动 EFS 备份，并应用纵深防御：\n- 使用分层保留策略安排频繁的备份作业\n- 使用不可变存储库和跨区域副本\n- 通过 **最小权限** 和 **职责分离** 限制删除/恢复\n- 定期测试恢复并记录灾难恢复目标",
+      "Url": "https://hub.prowler.com/check/efs_have_backup_enabled"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

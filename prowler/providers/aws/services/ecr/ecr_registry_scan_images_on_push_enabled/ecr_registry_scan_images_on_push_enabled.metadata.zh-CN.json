@@ -1,0 +1,40 @@
+{
+  "Provider": "aws",
+  "CheckID": "ecr_registry_scan_images_on_push_enabled",
+  "CheckTitle": "ECR 注册表已为所有存储库启用推送时镜像扫描",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices"
+  ],
+  "ServiceName": "ecr",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "container",
+  "Description": "评估具有存储库的 Amazon ECR 注册表是否在注册表级别配置了 `推送时扫描` 的镜像扫描，扫描规则覆盖所有存储库（无限制性过滤器），支持 **基础** 或 **增强** 扫描。",
+  "Risk": "缺少或过滤的 `推送时扫描` 允许 **易受攻击的镜像** 在未及时检测的情况下被推送和部署，从而可能被利用已知的 CVE（远程代码执行、权限提升）、供应链攻击和横向移动 - 威胁工作负载完整性和数据机密性。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/AmazonECR/latest/userguide/image-scanning.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws ecr put-registry-scanning-configuration --rules 'scanFrequency=SCAN_ON_PUSH,repositoryFilters=[{filter=string,filterType=WILDCARD}]'",
+      "NativeIaC": "",
+      "Other": "1. 打开 AWS 管理控制台并转到 Amazon ECR\n2. 在左侧菜单中，点击账户设置（或设置），然后找到注册表扫描\n3. 点击编辑\n4. 将扫描类型设置为增强扫描\n5. 启用推送时扫描\n6. 在存储库过滤器下，将过滤器类型设置为 WILDCARD，过滤器设置为 *\n7. 点击保存",
+      "Terraform": "```hcl\nresource \"aws_ecr_registry_scanning_configuration\" \"<example_resource_name>\" {\n  scan_type = \"ENHANCED\"\n\n  rule {\n    scan_frequency = \"SCAN_ON_PUSH\"  # Ensures scan on push\n    repository_filter {\n      filter      = \"*\"               # Applies to all repositories\n      filter_type = \"WILDCARD\"\n    }\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "启用注册表级别的 `推送时扫描`，并确保规则适用于所有存储库（无过滤器）。优先使用 **增强扫描** 以获得更广泛的覆盖范围，并在可用时与持续扫描配合使用。将发现结果集成到 CI/CD 门禁和告警中，以实施 **纵深防御** 并阻止风险镜像的推广。",
+      "Url": "https://hub.prowler.com/check/ecr_registry_scan_images_on_push_enabled"
+    }
+  },
+  "Categories": [
+    "container-security"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

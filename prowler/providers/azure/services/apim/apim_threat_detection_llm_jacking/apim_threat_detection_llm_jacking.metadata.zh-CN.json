@@ -1,0 +1,35 @@
+{
+  "Provider": "azure",
+  "CheckID": "apim_threat_detection_llm_jacking",
+  "CheckTitle": "确保 Azure API Management 已防护 LLM Jacking 攻击",
+  "CheckType": [],
+  "ServiceName": "apim",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Azure API Management Instance",
+  "ResourceGroup": "api_gateway",
+  "Description": "此检查通过分析 Log Analytics 中的 Azure API Management 诊断日志，在可配置时间窗口内监控来自单个 IP 地址的 LLM 相关操作（ImageGenerations_Create、ChatCompletions_Create、Completions_Create）频率，以检测潜在的 LLM Jacking 攻击。",
+  "Risk": "LLM Jacking 攻击可能导致对 AI 模型的未授权访问、潜在数据外泄、成本上升以及 AI 服务被滥用。攻击者可能利用这些端点生成内容、绕过速率限制，或在未正确授权的情况下访问高级 AI 能力。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/api-management/monitor-api-management",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "为防护 LLM Jacking 攻击：1. 为 APIM 实例启用诊断日志，并将日志发送到 Log Analytics 工作区 2. 为 LLM 操作频率监控配置合适阈值 3. 为可疑活动模式设置告警 4. 对敏感 AI 端点实施速率限制和 IP 允许列表 5. 定期审查并分析 APIM 访问日志中的异常",
+      "Url": "https://learn.microsoft.com/en-us/azure/api-management/monitor-api-management"
+    }
+  },
+  "Categories": [
+    "threat-detection",
+    "monitoring",
+    "logging"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "此检查要求：1. 已启用 APIM 诊断日志，并配置为将日志发送到 Log Analytics 工作区 2. 在审计配置中配置 Log Analytics 工作区 ID 和密钥 3. 具备查询 Log Analytics 工作区的适当权限"
+}

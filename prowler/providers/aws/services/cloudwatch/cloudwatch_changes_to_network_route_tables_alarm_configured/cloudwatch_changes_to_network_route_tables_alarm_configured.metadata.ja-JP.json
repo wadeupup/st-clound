@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "cloudwatch_changes_to_network_route_tables_alarm_configured",
+  "CheckTitle": "アカウントが CloudWatch Logs メトリクスフィルターとアラームで VPC ルートテーブルの変更を監視している",
+  "CheckType": [
+    "Software and Configuration Checks/Industry and Regulatory Standards/CIS AWS Foundations Benchmark",
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "TTPs/Defense Evasion",
+    "Effects/Data Exfiltration"
+  ],
+  "ServiceName": "cloudwatch",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsCloudWatchAlarm",
+  "ResourceGroup": "monitoring",
+  "Description": "**VPC ルートテーブルの変更** は、**CloudWatch Logs メトリクスフィルター** とそれに関連付けられた **アラーム** によって CloudTrail ログからキャプチャされ、`CreateRoute`、`CreateRouteTable`、`ReplaceRoute`、`ReplaceRouteTableAssociation`、`DeleteRoute`、`DeleteRouteTable`、`DisassociateRouteTable` などのイベントを対象とします。",
+  "Risk": "**ルートテーブルの変更** を監視しないと、不正または誤った編集によってトラフィックがリダイレクトされたり、検査をバイパスしたり、ルートがブラックホール化したりする可能性があり、**機密性**（データ外部流出）、**整合性**（経路の改ざん）、**可用性**（誤ルーティングによる障害）に影響を与えます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudwatch-alarms-for-cloudtrail.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation: Metric filter + alarm for VPC route table changes\nResources:\n  RouteTableChangeMetricFilter:\n    Type: AWS::Logs::MetricFilter\n    Properties:\n      LogGroupName: \"<example_resource_name>\"\n      # CRITICAL: Detect EC2 route table change events in CloudTrail logs\n      # Includes eventSource and the required eventNames\n      FilterPattern: '{($.eventSource = ec2.amazonaws.com) && (($.eventName = CreateRoute) || ($.eventName = CreateRouteTable) || ($.eventName = ReplaceRoute) || ($.eventName = ReplaceRouteTableAssociation) || ($.eventName = DeleteRouteTable) || ($.eventName = DeleteRoute) || ($.eventName = DisassociateRouteTable))}'\n      MetricTransformations:\n        - MetricValue: \"1\"\n          MetricNamespace: \"<example_resource_name>\"\n          MetricName: \"<example_resource_name>\"\n\n  RouteTableChangeAlarm:\n    Type: AWS::CloudWatch::Alarm\n    Properties:\n      # CRITICAL: Alarm on the metric from the filter above\n      Namespace: \"<example_resource_name>\"\n      MetricName: \"<example_resource_name>\"\n      ComparisonOperator: GreaterThanOrEqualToThreshold\n      EvaluationPeriods: 1\n      Period: 300\n      Statistic: Sum\n      Threshold: 1\n```",
+      "Other": "1. AWS コンソールで CloudWatch > ロググループを開き、CloudTrail ロググループを選択します\n2. [メトリクスフィルター] > [メトリクスフィルターの作成] に移動します\n3. フィルターパターンを次のように設定します：\n   {($.eventSource = ec2.amazonaws.com) && (($.eventName = CreateRoute) || ($.eventName = CreateRouteTable) || ($.eventName = ReplaceRoute) || ($.eventName = ReplaceRouteTableAssociation) || ($.eventName = DeleteRouteTable) || ($.eventName = DeleteRoute) || ($.eventName = DisassociateRouteTable))}\n4. メトリクスに名前を付け、メトリクス値を 1 に設定し、任意の名前空間/名前を選択します\n5. フィルターを作成します\n6. フィルターから [アラームの作成] をクリックします\n7. 統計：合計、期間：5 分、しきい値タイプ：静的、しきい値：1、条件：以上 を設定します\n8. アラームを作成します（通知はオプション）",
+      "Terraform": "```hcl\n# Metric filter + alarm for VPC route table changes\nresource \"aws_cloudwatch_log_metric_filter\" \"routes\" {\n  name           = \"<example_resource_name>\"\n  log_group_name = \"<example_resource_name>\"\n  # CRITICAL: Detect EC2 route table change events in CloudTrail logs\n  pattern = \"{($.eventSource = ec2.amazonaws.com) && (($.eventName = CreateRoute) || ($.eventName = CreateRouteTable) || ($.eventName = ReplaceRoute) || ($.eventName = ReplaceRouteTableAssociation) || ($.eventName = DeleteRouteTable) || ($.eventName = DeleteRoute) || ($.eventName = DisassociateRouteTable))}\"\n\n  metric_transformation {\n    name      = \"<example_resource_name>\"\n    namespace = \"<example_resource_name>\"\n    value     = \"1\"\n  }\n}\n\nresource \"aws_cloudwatch_metric_alarm\" \"routes\" {\n  alarm_name          = \"<example_resource_name>\"\n  # CRITICAL: Alarm targets the metric from the filter above\n  metric_name         = \"<example_resource_name>\"\n  namespace           = \"<example_resource_name>\"\n  comparison_operator = \"GreaterThanOrEqualToThreshold\"\n  evaluation_periods  = 1\n  period              = 300\n  statistic           = \"Sum\"\n  threshold           = 1\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "これらのルートテーブルイベントに対して CloudTrail 上に **CloudWatch Logs メトリクスフィルターとアラーム** を実装し、アラートをインシデント対応者に通知します。ルート変更に **最小権限の原則** を適用し、**変更管理** を要求し、VPC フローログやガードレールと組み合わせた **多層防御** により、安全でないルーティング変更を防止し迅速に封じ込めます。",
+      "Url": "https://hub.prowler.com/check/cloudwatch_changes_to_network_route_tables_alarm_configured"
+    }
+  },
+  "Categories": [
+    "logging"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+
+

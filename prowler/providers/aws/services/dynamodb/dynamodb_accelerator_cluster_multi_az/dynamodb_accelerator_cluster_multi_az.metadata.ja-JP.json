@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "dynamodb_accelerator_cluster_multi_az",
+  "CheckTitle": "DynamoDB Accelerator (DAX) クラスターのノードが複数の可用性ゾーンに配置されているか",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Effects/Denial of Service"
+  ],
+  "ServiceName": "dynamodb",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "database",
+  "Description": "**Amazon DynamoDB Accelerator (DAX)** クラスターのノード配置が**可用性ゾーン**全体で評価されます。リージョン内の複数の可用性ゾーンにノードが配置されているクラスターはマルチ AZ として認識され、ノードが単一の可用性ゾーンにのみ存在するクラスターはシングル AZ として認識されます。",
+  "Risk": "**マルチ AZ DAX ノード**がない場合、可用性ゾーンの障害やプライマリノードの障害により、キャッシュが**利用不可**になる可能性があり、**可用性**が損なわれ、負荷が DynamoDB にシフトする際に**レイテンシの急増**や**スロットリング**を引き起こします。キャッシュの喪失は、コストの増加を招き、読み取り集中型のワークロードで**タイムアウトの連鎖**を引き起こす可能性があります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://support.icompaas.com/support/solutions/articles/62000233618-ensure-dynamodb-accelerator-dax-clusters-have-nodes-in-multiple-availability-zones",
+    "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DAX.concepts.cluster.html#DAX.concepts.regions-and-azs",
+    "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DAX.create-cluster.console.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws dax increase-replication-factor --cluster-name <example_resource_name> --new-replication-factor 2 --availability-zones <AZ_1> <AZ_2>",
+      "NativeIaC": "```yaml\nResources:\n  DAXCluster:\n    Type: AWS::DAX::Cluster\n    Properties:\n      ClusterName: <example_resource_name>\n      IAMRoleARN: <example_resource_id>\n      NodeType: <NODE_TYPE>\n      ReplicationFactor: 2  # CRITICAL: at least 2 nodes so nodes can be placed in multiple AZs\n      SubnetGroupName: <example_resource_name>\n      AvailabilityZones:     # CRITICAL: specify multiple AZs to ensure multi-AZ placement\n        - <AZ_1>\n        - <AZ_2>\n```",
+      "Other": "1. AWS コンソールで、DynamoDB > DAX > Subnet groups に移動し、クラスターで使用されるサブネットグループに少なくとも 2 つの可用性ゾーンのサブネットが含まれていることを確認します。追加した場合は保存します。\n2. DynamoDB > DAX > Clusters に移動し、<example_resource_name> を選択して Modify を選択します。\n3. Cluster size を 2 以上に設定します。\n4. Availability Zones（またはノード配置）で、少なくとも 2 つの異なる可用性ゾーンを選択します。\n5. 変更を保存し、ステータスが Available になるまで待ち、Cluster details でノードが複数の可用性ゾーンを表示していることを確認します。",
+      "Terraform": "```hcl\nresource \"aws_dax_cluster\" \"example\" {\n  cluster_name       = \"<example_resource_name>\"\n  node_type          = \"<NODE_TYPE>\"\n  replication_factor = 2  # CRITICAL: at least 2 nodes to allow multi-AZ\n  iam_role_arn       = \"<example_resource_id>\"\n  subnet_group_name  = \"<example_resource_name>\"\n  availability_zones = [\"<AZ_1>\", \"<AZ_2>\"]  # CRITICAL: ensures nodes are in multiple AZs\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "**DAX クラスター**を、異なる**可用性ゾーン**に分散された少なくとも `3` つのノードでデプロイし、フォールトトレランスを確保します。複数の可用性ゾーンにまたがるサブネットグループを使用し、クラスターエンドポイント経由でアクセスし、**フェイルオーバー**を定期的に検証します。容量を監視して、シングル AZ またはシングルノードへの依存を避けます。",
+      "Url": "https://hub.prowler.com/check/dynamodb_accelerator_cluster_multi_az"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

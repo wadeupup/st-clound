@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "kinesis_stream_data_retention_period",
+  "CheckTitle": "Kinesis ストリームは、必要な最小時間以上データを保持します",
+  "CheckType": [
+    "ソフトウェアと構成のチェック/AWS セキュリティベストプラクティス",
+    "ソフトウェアと構成のチェック/業界および規制基準/AWS 基礎セキュリティベストプラクティス",
+    "影響/データ破壊"
+  ],
+  "ServiceName": "kinesis",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsKinesisStream",
+  "ResourceGroup": "messaging",
+  "Description": "**Kinesis Data Streams** の保持期間は、レコードが設定された最小期間（デフォルトは `168` 時間）以上保持されることを確認するために評価されます。",
+  "Risk": "保持期間が不十分だと、レコードが消費者によって読み取られたり再処理されたりする前に期限切れになり、**可用性**と分析の**整合性**が損なわれます。バックログや障害は、回復不能なデータギャップを生み出し、調査や回復を妨げ、イベントパイプラインに対する遅延によるサービス拒否を可能にします。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/streams/latest/dev/kinesis-extended-retention.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/kinesis-controls.html#kinesis-3"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws kinesis increase-stream-retention-period --stream-name <example_resource_name> --retention-period-hours 168",
+      "NativeIaC": "```yaml\n# CloudFormation: Kinesis ストリームの保持期間を必要な最小時間に設定します\nResources:\n  <example_resource_name>:\n    Type: AWS::Kinesis::Stream\n    Properties:\n      ShardCount: 1\n      RetentionPeriodHours: 168  # 重要: チェックを通過するために保持期間を >= 168 時間に設定します\n```",
+      "Other": "1. AWS コンソールにサインインし、Amazon Kinesis を開きます\n2. データストリームに移動し、<example_resource_name> を選択します\n3. 編集をクリックします\n4. 保持期間を 168 時間（またはポリシーに応じてそれ以上）に設定します\n5. 変更を保存をクリックします",
+      "Terraform": "```hcl\n# 適切な保持期間を持つ Kinesis ストリーム\nresource \"aws_kinesis_stream\" \"<example_resource_name>\" {\n  name             = \"<example_resource_name>\"\n  shard_count      = 1\n  retention_period = 168  # 重要: チェックを通過するために保持期間を >= 168 時間に設定します\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "**保持期間**を最悪の消費者遅延、再生の必要性、コンプライアンスウィンドウを超えるように設定します。デフォルトで少なくとも `168` 時間（必要に応じてカスタマイズ）を使用し、必要に応じて引き上げます。保持期間の変更には**変更管理**と最小特権を適用し、消費者の遅延を監視し、重要なストリームには**二次耐久性**（例：アーカイブ）を維持します。",
+      "Url": "https://hub.prowler.com/check/kinesis_stream_data_retention_period"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

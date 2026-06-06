@@ -1,0 +1,33 @@
+{
+  "Provider": "azure",
+  "CheckID": "storage_key_rotation_90_days",
+  "CheckTitle": "Storage Account のアクセスキーが定期的に再生成されていることを確認する",
+  "CheckType": [],
+  "ServiceName": "storage",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AzureStorageAccount",
+  "ResourceGroup": "storage",
+  "Description": "Storage Account のアクセスキーが定期的に再生成されていることを確認します。",
+  "Risk": "アクセスキーを定期的に再生成しない場合、偶発的な漏えいの可能性が高まり、ストレージアカウントリソースへの不正アクセスにつながるおそれがあります。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/storage/common/storage-account-keys-manage?tabs=azure-portal",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity-staging/knowledge-base/azure/StorageAccounts/regenerate-storage-account-access-keys-periodically.html#",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "偶発的な漏えいの可能性を低減し、ストレージアカウントリソースを不正アクセスから保護するため、Azure Storage Account のアクセスキーを 90 日ごとに再生成してください。",
+      "Url": "https://learn.microsoft.com/en-us/azure/storage/common/storage-account-create?tabs=azure-portal#regenerate-storage-access-keys"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

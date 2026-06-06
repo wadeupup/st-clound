@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "app_register_with_identity",
+  "CheckTitle": "App Service で Azure Active Directory への登録が有効化されていることを確認する",
+  "CheckType": [],
+  "ServiceName": "app",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Microsoft.Web/sites",
+  "ResourceGroup": "serverless",
+  "Description": "App Service のマネージド サービス ID は、接続文字列内の資格情報など、アプリからシークレットを排除することでセキュリティを向上させます。App Service で Azure Active Directory に登録すると、アプリはユーザー名やパスワードなしで他の Azure サービスへ安全に接続できます。",
+  "Risk": "App Service は Azure 上で高いスケーラビリティと自動パッチ適用を備えた Web ホスティング サービスを提供します。さらに、アプリ向けのマネージド ID も提供しており、Azure SQL Database や他の Azure サービスへのアクセスを保護するためのターンキー ソリューションです。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/app-service/configure-authentication-provider-aad?tabs=workforce-tenant",
+  "Remediation": {
+    "Code": {
+      "CLI": "az webapp identity assign --resource-group <RESOURCE_GROUP_NAME> --name <APP_NAME>",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/AppService/enable-registration-with-microsoft-entra-id.html",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-iam-policies/bc_azr_iam_1#terraform"
+    },
+    "Recommendation": {
+      "Text": "1. https://portal.azure.com で Azure Portal にログインします 2. App Services に移動します 3. 各アプリをクリックします 4. Setting セクションで Identity をクリックします 5. System assigned ペインで Status を On に設定します",
+      "Url": "https://learn.microsoft.com/en-us/azure/app-service/scenario-secure-app-authentication-app-service"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "既定では、Azure AD 経由のマネージド サービス ID は無効になっています。"
+}

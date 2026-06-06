@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "postgresql_flexible_server_allow_access_services_disabled",
+  "CheckTitle": "PostgreSQL Database Server の 'Allow access to Azure services' が無効化されていることを確認する",
+  "CheckType": [],
+  "ServiceName": "postgresql",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "PostgreSQL",
+  "ResourceGroup": "database",
+  "Description": "Azure サービスから PostgreSQL Database Server へのアクセスを無効化します。",
+  "Risk": "Azure サービスからのアクセスを有効にすると、サーバーのファイアウォールはサブスクリプション外を含むすべての Azure リソースからの接続を許可します。これは通常望ましい構成ではありません。代わりに、特定のネットワーク範囲のみを許可するファイアウォール ルール、または特定の仮想ネットワークのみを許可する VNET ルールを設定してください。",
+  "RelatedUrl": "https://docs.microsoft.com/en-us/azure/postgresql/concepts-firewall-rules",
+  "Remediation": {
+    "Code": {
+      "CLI": "az postgres server firewall-rule delete --name AllowAllWindowsAzureIps --resource-group <resourceGroupName> --server-name <serverName>",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/PostgreSQL/disable-all-services-access.html#",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-general-policies/ensure-allow-access-to-azure-services-for-postgresql-database-server-is-disabled#terraform"
+    },
+    "Recommendation": {
+      "Text": "Azure Portal から 1. https://portal.azure.com で Azure Portal にログインします。2. Azure Database for PostgreSQL servers に移動します。3. 各データベースで Connection security をクリックします。4. Firewall rules 配下で Allow access to Azure services を No に設定します。5. Save をクリックします。Azure CLI から PostgreSQL Database の AllowAllWindowsAzureIps ルールを削除するには次のコマンドを使用します。az postgres server firewall-rule delete --name AllowAllWindowsAzureIps -- resource-group <resourceGroupName> --server-name <serverName>",
+      "Url": "https://learn.microsoft.com/en-us/azure/postgresql/single-server/quickstart-create-server-database-azure-cli#configure-a-server-based-firewall-rule"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

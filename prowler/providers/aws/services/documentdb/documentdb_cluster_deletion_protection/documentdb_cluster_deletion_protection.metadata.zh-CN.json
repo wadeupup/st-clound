@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "documentdb_cluster_deletion_protection",
+  "CheckTitle": "DocumentDB 集群已启用删除保护",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices"
+  ],
+  "ServiceName": "documentdb",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsRdsDbCluster",
+  "ResourceGroup": "database",
+  "Description": "**Amazon DocumentDB 集群**会被评估集群配置中的 `deletion_protection` 设置。\n\n检查结果会突出显示未启用此保护的集群。",
+  "Risk": "如果没有**删除保护**，集群可能因误操作或滥用而被删除，导致突然中断和恢复点丢失，影响**可用性**和**数据完整性**。\n\n被入侵的账户或错误的自动化脚本可能会删除数据库或跳过最终快照，阻碍恢复。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://support.icompaas.com/support/solutions/articles/62000233689-ensure-documentdb-clusters-has-deletion-protection-enabled",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/DocumentDB/deletion-protection.html",
+    "https://docs.aws.amazon.com/documentdb/latest/developerguide/db-cluster-delete.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/documentdb-controls.html#documentdb-5"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws docdb modify-db-cluster --db-cluster-identifier <DB_CLUSTER_ID> --deletion-protection --apply-immediately",
+      "NativeIaC": "```yaml\n# CloudFormation: Enable deletion protection on a DocumentDB cluster\nResources:\n  <example_resource_name>:\n    Type: AWS::DocDB::DBCluster\n    Properties:\n      MasterUsername: \"<MASTER_USERNAME>\"\n      MasterUserPassword: \"<MASTER_USER_PASSWORD>\"\n      DeletionProtection: true  # CRITICAL: Prevents cluster deletion until disabled\n```",
+      "Other": "1. 在 AWS 控制台中，前往 Amazon DocumentDB > Clusters\n2. 选中目标集群并点击 Modify\n3. 启用 Deletion protection\n4. 勾选 Apply immediately，然后点击 Save changes",
+      "Terraform": "```hcl\n# Terraform: Enable deletion protection on a DocumentDB cluster\nresource \"aws_docdb_cluster\" \"<example_resource_name>\" {\n  master_username     = \"<MASTER_USERNAME>\"\n  master_password     = \"<MASTER_USER_PASSWORD>\"\n  deletion_protection = true  # CRITICAL: Prevents cluster deletion until disabled\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "为所有非临时集群启用**删除保护**，优先考虑生产环境。\n\n对删除和修改操作强制执行**最小权限**原则，要求通过变更控制来切换保护设置，并通过自动化持续强制执行此设置来实现**纵深防御**。*在停用之前*，请创建最终快照。",
+      "Url": "https://hub.prowler.com/check/documentdb_cluster_deletion_protection"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

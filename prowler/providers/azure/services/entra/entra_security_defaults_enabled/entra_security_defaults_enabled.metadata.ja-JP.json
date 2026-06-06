@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "entra_security_defaults_enabled",
+  "CheckTitle": "Microsoft Entra ID で Security Defaults が有効化されていることを確認する",
+  "CheckType": [],
+  "ServiceName": "entra",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "#microsoft.graph.identitySecurityDefaultsEnforcementPolicy",
+  "ResourceGroup": "security",
+  "Description": "Microsoft Entra ID の Security Defaults は、セキュリティ確保を容易にし、組織の保護に役立ちます。Security Defaults には一般的な攻撃に対する事前構成済みのセキュリティ設定が含まれます。Security Defaults は誰でも利用可能で、追加費用なしで全組織に基本的なセキュリティ水準を有効化することを目的としています。Azure ポータルで Security Defaults を有効化できます。",
+  "Risk": "Security Defaults は、組織が自ら ID セキュリティ設定を管理できるようになるまで、当社が組織に代わって管理する安全な既定設定を提供します。例えば、以下を実施します。- すべてのユーザーと管理者に MFA 登録を要求。- 必要に応じて（場所、デバイス、ロール、タスクなどの要因に基づき）MFA チャレンジを要求。- MFA を実行できないレガシー認証クライアントからの認証を無効化。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/entra/fundamentals/security-defaults",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/ActiveDirectory/security-defaults-enabled.html#",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "1. Azure Home から Portal Menu を選択します。2. Microsoft Entra ID > Properties に移動します 3. Manage security defaults を選択します 4. Enable security defaults を Enabled に設定します 5. Save を選択します",
+      "Url": "https://techcommunity.microsoft.com/t5/microsoft-entra-blog/introducing-security-defaults/ba-p/1061414"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "この推奨事項はまず実装し、その後サービス/製品固有の他の CIS ベンチマークによって上書きされる場合があります。管理者は Microsoft Entra ID の特定構成が Microsoft 365 など他の Microsoft サービスに影響する可能性がある点にも注意してください。"
+}

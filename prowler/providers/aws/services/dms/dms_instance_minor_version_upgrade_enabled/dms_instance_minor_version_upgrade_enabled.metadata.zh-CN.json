@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "dms_instance_minor_version_upgrade_enabled",
+  "CheckTitle": "DMS 复制实例已启用自动次要版本升级",
+  "CheckType": [
+    "Software and Configuration Checks/Patch Management",
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices"
+  ],
+  "ServiceName": "dms",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsDmsReplicationInstance",
+  "ResourceGroup": "database",
+  "Description": "**AWS DMS 复制实例**会评估 `auto_minor_version_upgrade` 设置，以确认在维护窗口期间启用了**自动次要引擎更新**。",
+  "Risk": "没有**自动次要版本升级**，DMS 引擎可能会错过安全补丁和修复，使已知漏洞和不稳定性被利用。\n- 机密性：通过未修补的组件暴露\n- 完整性：复制错误或数据漂移\n- 可用性：迁移或 CDC 期间的中断",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/dms-controls.html#dms-6",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/DMS/auto-minor-version-upgrade.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws dms modify-replication-instance --region <REGION> --replication-instance-arn arn:aws:dms:<REGION>:<ACCOUNT_ID>:rep:<REPLICATION_ID> --auto-minor-version-upgrade --apply-immediately",
+      "NativeIaC": "```yaml\n# CloudFormation: 在 DMS 复制实例上启用自动次要版本升级\nResources:\n  <example_resource_name>:\n    Type: AWS::DMS::ReplicationInstance\n    Properties:\n      ReplicationInstanceIdentifier: <example_resource_id>\n      ReplicationInstanceClass: dms.t3.micro\n      AutoMinorVersionUpgrade: true  # 关键：开启自动次要版本升级\n```",
+      "Other": "1. 打开 AWS 控制台并转到数据库迁移服务 (DMS)\n2. 单击复制实例并选择您的实例\n3. 选择操作 > 修改\n4. 勾选自动次要版本升级\n5. 选择立即应用\n6. 单击修改以保存",
+      "Terraform": "```hcl\n# Terraform: 在 DMS 复制实例上启用自动次要版本升级\nresource \"aws_dms_replication_instance\" \"<example_resource_name>\" {\n  replication_instance_id    = \"<example_resource_id>\"\n  replication_instance_class = \"dms.t3.micro\"\n  auto_minor_version_upgrade = true  # 关键：开启自动次要版本升级\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "在所有复制实例上启用 `auto_minor_version_upgrade` 以保持**持续补丁**。\n- 设置维护窗口并在非生产环境中验证\n- 监控发布说明和健康指标\n- 对变更控制强制执行**最小权限**\n- 保留**备份**以便回滚",
+      "Url": "https://hub.prowler.com/check/dms_instance_minor_version_upgrade_enabled"
+    }
+  },
+  "Categories": [
+    "vulnerabilities"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "appstream_fleet_session_idle_disconnect_timeout",
+  "CheckTitle": "AppStream フリートのセッションアイドル切断タイムアウトが 10 分以下です",
+  "CheckType": [
+    "ソフトウェアと設定チェック/AWS セキュリティベストプラクティス",
+    "影響/データ露出"
+  ],
+  "ServiceName": "appstream",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "compute",
+  "Description": "**Amazon AppStream フリート**は、**アイドル切断タイムアウト**設定について評価され、非アクティブなユーザーが切断され、セッションの `disconnect_timeout` ウィンドウが開始される前に、それが `10 分`（`<=600 秒`）以下に設定されていることを確認します。",
+  "Risk": "**長時間のアイドルセッション**は、ユーザーが不在の状態でデスクトップ/アプリケーションにアクセス可能なままにし、**セッションハイジャック**、**ショルダーサーフィン**、**データ露出**を可能にします。また、**容量を消費**し、**請求**を延長し、他のユーザーの**可用性**を低下させます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/appstream2/latest/developerguide/set-up-stacks-fleets.html",
+    "https://awscli.amazonaws.com/v2/documentation/api/2.9.6/reference/appstream/update-fleet.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws appstream update-fleet --name <FLEET_NAME> --idle-disconnect-timeout-in-seconds 600",
+      "NativeIaC": "```yaml\nResources:\n  <example_resource_name>:\n    Type: AWS::AppStream::Fleet\n    Properties:\n      Name: <example_resource_name>\n      InstanceType: stream.standard.small\n      ComputeCapacity:\n        DesiredInstances: 1\n      IdleDisconnectTimeoutInSeconds: 600  # 重要：10 分以下に設定してチェックを通過します\n```",
+      "Other": "1. AWS コンソールを開き、AppStream 2.0 > Fleets に移動します\n2. フリートを選択し、Edit をクリックします\n3. \"Idle disconnect timeout\" を見つけます\n4. 10 分（600 秒）以下に設定します\n5. Save をクリックします",
+      "Terraform": "```hcl\nresource \"aws_appstream_fleet\" \"<example_resource_name>\" {\n  name          = \"<example_resource_name>\"\n  instance_type = \"stream.standard.small\"\n  image_name    = \"<IMAGE_NAME>\"\n\n  compute_capacity {\n    desired_instances = 1\n  }\n\n  idle_disconnect_timeout_in_seconds = 600  # 重要：<= 10 分を強制してチェックを通過します\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "**アイドル切断タイムアウトを 10 分**に設定します。短い `disconnect_timeout` と組み合わせ、再接続時に**再認証**を要求し、**最小権限**を強制します。セッションメトリクスを監視し、ロールごとに調整して、**セキュリティ**、**コスト**、**ユーザーエクスペリエンス**のバランスを取ります。",
+      "Url": "https://hub.prowler.com/check/appstream_fleet_session_idle_disconnect_timeout"
+    }
+  },
+  "Categories": [
+    "identity-access"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "Infrastructure Security"
+}
+

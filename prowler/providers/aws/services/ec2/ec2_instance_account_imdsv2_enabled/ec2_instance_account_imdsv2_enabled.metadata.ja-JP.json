@@ -1,0 +1,37 @@
+{
+  "Provider": "aws",
+  "CheckID": "ec2_instance_account_imdsv2_enabled",
+  "CheckTitle": "SSRF 脆弱性から保護するために、アカウントレベルで EC2 インスタンスにインスタンスメタデータサービスバージョン 2 (IMDSv2) が強制されていることを確認",
+  "CheckType": [
+    "Data Protection"
+  ],
+  "ServiceName": "ec2",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id",
+  "Severity": "high",
+  "ResourceType": "AwsAccount",
+  "ResourceGroup": "governance",
+  "Description": "SSRF 脆弱性から保護するために、アカウントレベルで EC2 インスタンスにインスタンスメタデータサービスバージョン 2 (IMDSv2) が強制されていることを確認",
+  "Risk": "IMDSv1 を使用する EC2 インスタンスは SSRF 攻撃に対して脆弱です",
+  "RelatedUrl": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/configuring-IMDS-new-instances.html#set-imdsv2-account-defaults",
+  "Remediation": {
+    "Code": {
+      "CLI": "aws ec2 modify-instance-metadata-defaults --region <region> --http-tokens required --http-put-response-hop-limit 2",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "EC2 インスタンスでインスタンスメタデータサービスバージョン 2 (IMDSv2) を有効にします。各 AWS リージョンのアカウントレベルでこの設定を適用して、デフォルトのインスタンスメタデータバージョンを設定します。",
+      "Url": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/configuring-IMDS-new-instances.html#set-imdsv2-account-defaults"
+    }
+  },
+  "Categories": [
+    "internet-exposed",
+    "ec2-imdsv1"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "acm_certificates_with_secure_key_algorithms",
+  "CheckTitle": "ACM 证书使用安全的密钥算法",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践",
+    "软件和配置检查/行业和监管标准/AWS 基础安全最佳实践",
+    "软件和配置检查/行业和监管标准/PCI-DSS",
+    "软件和配置检查/行业和监管标准/NIST 800-53 控制（美国）"
+  ],
+  "ServiceName": "acm",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsCertificateManagerCertificate",
+  "ResourceGroup": "security",
+  "Description": "**ACM 证书**根据**公钥算法和大小**进行评估，识别使用弱参数（如 `RSA-1024` 或 ECDSA `P-192`）的证书。使用 `RSA-2048+` 或 ECDSA `P-256+` 的证书符合安全基线。",
+  "Risk": "**弱证书密钥**会降低 TLS 的机密性和真实性。\n\n可行的因式分解或离散对数攻击可能泄露私钥，从而启用**中间人攻击**、会话解密和**证书欺骗**，导致数据暴露和篡改。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://noise.getoto.net/2022/11/08/how-to-evaluate-and-use-ecdsa-certificates-in-aws-certificate-manager/",
+    "https://docs.aws.amazon.com/acm/latest/userguide/data-protection.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation: 使用安全密钥算法的 ACM 证书\nResources:\n  <example_resource_name>:\n    Type: AWS::CertificateManager::Certificate\n    Properties:\n      DomainName: <example_domain>\n      KeyAlgorithm: EC_prime256v1  # 关键：确保使用安全的密钥算法（RSA-2048+ 或 ECDSA P-256+）\n```",
+      "Other": "1. 在 AWS 控制台中，转到 Certificate Manager (ACM)\n2. 单击 Request a certificate 并输入 <example_domain>\n3. 在 Key algorithm 下，选择 ECDSA P-256（或 RSA 2048）\n4. 完成验证（推荐使用 DNS）\n5. 在使用证书的服务中（例如，ALB/CloudFront/API Gateway），用新证书替换旧证书\n6. 一旦不再使用，删除不安全的证书（例如，RSA-1024 或 P-192）",
+      "Terraform": "```hcl\n# Terraform: 使用安全密钥算法的 ACM 证书\nresource \"aws_acm_certificate\" \"<example_resource_name>\" {\n  domain_name   = \"<example_domain>\"\n  key_algorithm = \"EC_prime256v1\"  # 关键：确保使用安全的密钥算法（RSA-2048+ 或 ECDSA P-256+）\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "使用**强算法**：`RSA-2048+` 或 ECDSA `P-256/P-384`。替换弱或传统证书，并通过策略防止其使用。\n\n在兼容的情况下优先使用 ECDSA，对私钥应用**最小权限**，强制执行现代 TLS 策略，并自动化续订以保持加密强度。",
+      "Url": "https://hub.prowler.com/check/acm_certificates_with_secure_key_algorithms"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

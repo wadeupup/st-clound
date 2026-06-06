@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "dms_endpoint_ssl_enabled",
+  "CheckTitle": "DMS 端点已启用 SSL",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Effects/Data Exposure"
+  ],
+  "ServiceName": "dms",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsDmsEndpoint",
+  "ResourceGroup": "database",
+  "Description": "**AWS DMS 端点**的 SSL/TLS 模式会被检查；任何非 `none` 的值都表示复制实例与数据库之间的连接已加密。\n\n支持的模式包括 `require`、`verify-ca` 和 `verify-full`。",
+  "Risk": "没有 TLS，传输中的数据可能被读取或篡改，影响：\n- **机密性**：通过数据包嗅探和凭据泄露\n- **完整性**：通过 **中间人攻击** 篡改迁移流\n- **可用性**：会话劫持或任务中断",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://aws.amazon.com/blogs/database/configuring-ssl-encryption-on-oracle-and-postgresql-endpoints-in-aws-dms/",
+    "https://docs.aws.amazon.com/dms/latest/userguide/CHAP_Security.SSL.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/dms-controls.html#dms-9"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws dms modify-endpoint --endpoint-arn <endpoint-arn> --ssl-mode require",
+      "NativeIaC": "```yaml\n# CloudFormation: 在 DMS 端点上设置 SSL\nResources:\n  <example_resource_name>:\n    Type: AWS::DMS::Endpoint\n    Properties:\n      EndpointIdentifier: <example_resource_name>\n      EndpointType: source\n      EngineName: sqlserver\n      ServerName: <server_name>\n      Port: 1433\n      Username: <username>\n      Password: <password>\n      SslMode: require  # 关键：启用 SSL（非 \"none\"），修复此发现\n```",
+      "Other": "1. 在 AWS DMS 控制台中，转到端点\n2. 选择不合规的端点并选择修改\n3. 将 SSL 模式设置为 Require（如果您的引擎支持且证书可用，也可以选择 Verify-ca/Verify-full）\n4. 如果选择了 Verify-ca/Verify-full，请选择相应的 CA 证书\n5. 保存更改，然后测试连接以确认",
+      "Terraform": "```hcl\n# Terraform: 在 DMS 端点上设置 SSL\nresource \"aws_dms_endpoint\" \"<example_resource_name>\" {\n  endpoint_id   = \"<example_resource_name>\"\n  endpoint_type = \"source\"\n  engine_name   = \"sqlserver\"\n  server_name   = \"<server_name>\"\n  port          = 1433\n  username      = \"<username>\"\n  password      = \"<password>\"\n\n  ssl_mode = \"require\" # 关键：启用 SSL（非 \"none\"），修复此发现\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "将端点配置为至少使用 `require` 的 SSL/TLS；在支持的情况下优先使用 `verify-ca` 或 `verify-full`。管理受信任的 CA 材料并定期轮换。通过私有连接和严格的 IAM 应用**纵深防御**，并通过策略即代码和持续验证来强制执行此策略。",
+      "Url": "https://hub.prowler.com/check/dms_endpoint_ssl_enabled"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

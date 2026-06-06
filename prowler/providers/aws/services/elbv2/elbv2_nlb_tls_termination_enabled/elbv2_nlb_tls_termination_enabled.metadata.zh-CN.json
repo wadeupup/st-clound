@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "elbv2_nlb_tls_termination_enabled",
+  "CheckTitle": "ELBv2 Network Load Balancer 已启用 TLS 终止",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/PCI-DSS",
+    "Software and Configuration Checks/Industry and Regulatory Standards/NIST 800-53 Controls (USA)"
+  ],
+  "ServiceName": "elbv2",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsElbv2LoadBalancer",
+  "ResourceGroup": "network",
+  "Description": "**Network Load Balancer** 使用 `TLS` 协议的监听器表示在负载均衡器侧执行了 **TLS 终止**。该评估会识别至少具有一个 `TLS` 监听器的 NLB，以及仅使用明文 `TCP`/`UDP` 或将加密下放到目标端的 NLB。",
+  "Risk": "缺少 NLB 级 TLS 终止可能导致传输数据未加密，或在实例侧以不一致方式管理加密，从而削弱**机密性**和**完整性**。这也会将握手 CPU 开销转移到目标端，降低**可用性**，并使其更易受连接洪泛、降级攻击或弱密码套件暴露的影响。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/elasticloadbalancing/latest/network/listener-update-rules.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/ELBv2/network-load-balancer-listener-security.html#"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws elbv2 create-listener --load-balancer-arn <nlb_arn> --protocol TLS --port 443 --ssl-policy ELBSecurityPolicy-TLS13-1-2-2021-06 --certificates CertificateArn=<certificate_arn> --default-actions Type=forward,TargetGroupArn=<target_group_arn>",
+      "NativeIaC": "```yaml\n# CloudFormation: Add a TLS listener to enable TLS termination on the NLB\nResources:\n  \"<example_resource_name>\":\n    Type: AWS::ElasticLoadBalancingV2::Listener\n    Properties:\n      LoadBalancerArn: \"<example_resource_arn>\"\n      Protocol: TLS  # critical: enables TLS termination on the NLB\n      Port: 443\n      SslPolicy: ELBSecurityPolicy-TLS13-1-2-2021-06  # critical: required when Protocol is TLS\n      Certificates:\n        - CertificateArn: \"<example_resource_arn>\"  # critical: server certificate for TLS termination\n      DefaultActions:\n        - Type: forward\n          TargetGroupArn: \"<example_resource_arn>\"\n```",
+      "Other": "1. 在 AWS 控制台进入 EC2 > Load Balancers 并选择你的 Network Load Balancer\n2. 打开 Listeners 标签并点击 Add listener\n3. 将 Protocol 设为 TLS，Port 设为 443\n4. 选择 ACM 证书和安全策略\n5. 将 Default action 设为 Forward 到目标组\n6. 点击 Save changes",
+      "Terraform": "```hcl\n# Terraform: Add a TLS listener to enable TLS termination on the NLB\nresource \"aws_lb_listener\" \"<example_resource_name>\" {\n  load_balancer_arn = \"<example_resource_arn>\"\n  port              = 443\n  protocol          = \"TLS\"  # critical: enables TLS termination\n  ssl_policy        = \"ELBSecurityPolicy-TLS13-1-2-2021-06\"  # critical: required for TLS\n  certificate_arn   = \"<example_resource_arn>\"  # critical: server certificate for TLS termination\n\n  default_action {\n    type             = \"forward\"\n    target_group_arn = \"<example_resource_arn>\"\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "启用 **TLS 监听器** 在 NLB 侧终止客户端加密，并统一执行现代密码策略与证书轮换。通过**纵深防御**在必要时对目标端重新加密、限制后端仅允许来自 NLB 的访问，并使用安全存储自动化证书生命周期与过时协议监控。",
+      "Url": "https://hub.prowler.com/check/elbv2_nlb_tls_termination_enabled"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

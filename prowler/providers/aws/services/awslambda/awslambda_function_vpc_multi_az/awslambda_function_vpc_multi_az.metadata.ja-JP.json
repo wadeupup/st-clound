@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "awslambda_function_vpc_multi_az",
+  "CheckTitle": "Lambda関数が少なくとも2つの可用性ゾーンでVPCサブネットを使用して設定されている",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices/Network Reachability"
+  ],
+  "ServiceName": "awslambda",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsLambdaFunction",
+  "ResourceGroup": "serverless",
+  "Description": "VPCに接続された**AWS Lambda**関数は、少なくとも必要な数の**可用性ゾーン**（デフォルトで `2`）にまたがるサブネットを使用します。\n\n評価では、関数の設定されたサブネットの一意のAZ数をカウントします。",
+  "Risk": "単一AZ配置は**可用性**を制限します。AZ障害やサブネット/IP枯渇により、ENI作成とVPCアクセスがブロックされ、呼び出しの失敗、タイムアウト、イベントのバックログが発生する可能性があります。\n\nこれにより稼働時間が低下し、重要なイベントの処理が遅延する可能性があります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/lambda/latest/operatorguide/networking-vpc.html",
+    "https://stackzonecom.tawk.help/article/aws-config-rule-lambda-vpc-multi-az-check",
+    "https://stackoverflow.com/questions/62052490/why-aws-lambda-suggests-to-set-up-two-subnets-if-vpc-is-configured",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/lambda-controls.html#lambda-5"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws lambda update-function-configuration --function-name <example_resource_name> --vpc-config SubnetIds=<subnet_id_az1>,<subnet_id_az2>,SecurityGroupIds=<example_security_group_id>",
+      "NativeIaC": "```yaml\nResources:\n  <example_resource_name>:\n    Type: AWS::Lambda::Function\n    Properties:\n      Role: <example_role_arn>\n      Handler: index.handler\n      Runtime: python3.12\n      Code:\n        ZipFile: |\n          def handler(event, context):\n            return \"\"\n      VpcConfig:\n        SecurityGroupIds:\n          - <example_security_group_id>\n        SubnetIds:\n          - <subnet_id_az1>  # 重要：異なるAZのサブネットを選択\n          - <subnet_id_az2>  # 重要：関数が>=2つのAZで動作することを保証\n```",
+      "Other": "1. Lambdaコンソールを開き、関数を選択\n2. 設定 > VPC > 編集に移動\n3. ターゲットVPCを選択し、異なる可用性ゾーンで少なくとも2つのサブネットを選択\n4. セキュリティグループを選択\n5. 保存をクリック",
+      "Terraform": "```hcl\nresource \"aws_lambda_function\" \"<example_resource_name>\" {\n  function_name = \"<example_resource_name>\"\n  role          = \"<example_role_arn>\"\n  handler       = \"index.handler\"\n  runtime       = \"python3.12\"\n  filename      = \"function.zip\"\n\n  vpc_config {\n    subnet_ids         = [\"<subnet_id_az1>\", \"<subnet_id_az2>\"] # 重要：異なるAZのサブネット\n    security_group_ids = [\"<example_security_group_id>\"]\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "VPC接続された関数を`2`つの異なるAZのサブネットに分散して、**フォールトトレランス**を確保します。\n- 異なるAZからサブネットを選択\n- AZ固定の設定や固定IPを避ける\n- AZごとにエグレス/エンドポイントとルーティングを提供\n- AZフェイルオーバーを定期的にテスト\n**回復力**と**多層防御**と一致します。",
+      "Url": "https://hub.prowler.com/check/awslambda_function_vpc_multi_az"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

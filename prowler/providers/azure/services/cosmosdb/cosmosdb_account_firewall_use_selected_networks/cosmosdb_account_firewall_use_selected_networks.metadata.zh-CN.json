@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "cosmosdb_account_firewall_use_selected_networks",
+  "CheckTitle": "确保“防火墙和网络”限制为使用“选定网络”而非“所有网络”",
+  "CheckType": [],
+  "ServiceName": "cosmosdb",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "CosmosDB",
+  "ResourceGroup": "database",
+  "Description": "将 Cosmos DB 限制为仅在白名单网络上通信，可降低其攻击面。",
+  "Risk": "为 Cosmos DB 选择特定网络进行通信，可限制能够与数据库中存储内容交互的网络数量（包括互联网）。",
+  "RelatedUrl": "https://docs.microsoft.com/en-us/azure/cosmos-db/how-to-configure-private-endpoints",
+  "Remediation": {
+    "Code": {
+      "CLI": "az cosmosdb database list / az cosmosdb show <database id> **isVirtualNetworkFilterEnabled should be set to true**",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "1. 打开门户菜单。2. 选择 Azure Cosmos DB 边栏。3. 选择要审计的 Cosmos DB 账户。4. 选择 Networking。5. 在 Public network access 下，选择 Selected networks。6. 在 Virtual networks 下，选择 + Add existing virtual network 或 + Add a new virtual network。7. 对于现有网络，选择订阅、虚拟网络和子网并点击 Add。对于新网络，提供名称，按需更新默认值，然后点击 Create。8. 点击 Save。",
+      "Url": "https://learn.microsoft.com/en-us/azure/storage/common/storage-network-security?tabs=azure-portal"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "未将正确网络加入白名单将导致连接中断。"
+}

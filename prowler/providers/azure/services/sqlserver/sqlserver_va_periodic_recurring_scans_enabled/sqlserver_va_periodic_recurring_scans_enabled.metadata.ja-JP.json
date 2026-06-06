@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "sqlserver_va_periodic_recurring_scans_enabled",
+  "CheckTitle": "各 SQL server で Vulnerability Assessment（VA）設定 'Periodic recurring scans' が 'on' に設定されていることを確認する",
+  "CheckType": [],
+  "ServiceName": "sqlserver",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "SQLServer",
+  "ResourceGroup": "database",
+  "Description": "重要な SQL サーバーおよび対応する SQL データベースで Vulnerability Assessment（VA）の定期繰り返しスキャンを有効化します。",
+  "Risk": "VA 設定 'Periodic recurring scans' は、SQL サーバーと対応データベースに対して定期（週次）脆弱性スキャンをスケジュールします。定期的かつ継続的な脆弱性スキャンにより、最新の既知脆弱性シグネチャとベスト プラクティスに基づくリスク可視性が得られます。",
+  "RelatedUrl": "https://docs.microsoft.com/en-us/azure/sql-database/sql-vulnerability-assessment",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity-staging/knowledge-base/azure/Sql/periodic-vulnerability-scans.html#",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-general-policies/ensure-that-va-setting-periodic-recurring-scans-is-enabled-on-a-sql-server#terraform"
+    },
+    "Recommendation": {
+      "Text": "1. SQL servers に移動します。2. 各サーバー インスタンスで。3. Security Center をクリックします。4. Vulnerability Assessment Settings セクションで、未設定の場合は Storage Account を設定します。5. 'Periodic recurring scans' を ON に切り替えます。6. Save をクリックします。",
+      "Url": "https://learn.microsoft.com/en-us/azure/defender-for-cloud/sql-azure-vulnerability-assessment-enable"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "Azure Defender for SQL 機能を有効化すると、各 SQL サーバーに対して追加コストが発生します。"
+}

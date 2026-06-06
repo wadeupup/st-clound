@@ -1,0 +1,40 @@
+{
+  "Provider": "aws",
+  "CheckID": "vpc_vpn_connection_tunnels_up",
+  "CheckTitle": "AWS 站点到站点 VPN 连接的两个隧道均已启用",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践/网络可达性",
+    "影响/拒绝服务"
+  ],
+  "ServiceName": "vpc",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsEc2ClientVpnEndpoint",
+  "ResourceGroup": "network",
+  "Description": "**AWS Site-to-Site VPN** 连接具有两个 IPsec 隧道。此项会评估隧道状态，并检测是否有任何隧道不是 `UP`，以指示两个隧道是否同时可用，从而实现高可用性。",
+  "Risk": "仅有一条活动隧道或没有活动隧道时，链路会失去冗余，从而降低**可用性**并增加中断、会话掉线或路由黑洞的可能性。无法进行故障切换，导致关键工作负载和跨环境操作中断。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/vpn/latest/s2svpn/modify-vpn-tunnel-options.html",
+    "https://docs.aws.amazon.com/config/latest/developerguide/vpc-vpn-2-tunnels-up.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "1. 在 AWS 控制台中，前往 VPC > Site-to-Site VPN connections，并选择具有隧道 DOWN 的 VPN 连接\n2. 打开 Tunnel details 选项卡\n3. 对于每个隧道（1 和 2），选择 Actions > Download configuration，选择你的设备/供应商，并下载配置\n4. 在你的客户网关设备上，使用下载的参数配置两个隧道（预共享密钥、IKE/IPsec 设置、内部 CIDR，以及适用的路由/BGP）\n5. 如果你的设备需要不同的参数，请在 AWS 控制台中选择 Actions > Modify VPN tunnel options，选择隧道外部 IP，仅调整必要的选项（例如 IKE 版本或预共享密钥），然后保存\n6. 等待几分钟，并在 Tunnel details 下验证两个隧道都显示状态：UP",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "保持两条隧道均处于健康状态并随时准备进行故障切换：\n- 部署冗余的客户网关和弹性路由\n- 通过告警监控隧道健康状态\n- 定期测试故障切换并记录运行手册\n\n应用**高可用性**和**纵深防御**，以避免单点故障。",
+      "Url": "https://hub.prowler.com/check/vpc_vpn_connection_tunnels_up"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

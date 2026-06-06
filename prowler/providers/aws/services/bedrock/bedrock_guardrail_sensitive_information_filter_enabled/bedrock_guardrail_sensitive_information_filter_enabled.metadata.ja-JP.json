@@ -1,0 +1,34 @@
+{
+  "Provider": "aws",
+  "CheckID": "bedrock_guardrail_sensitive_information_filter_enabled",
+  "CheckTitle": "Amazon Bedrockガードレールに対して機密情報フィルターを設定",
+  "CheckType": [],
+  "ServiceName": "bedrock",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:bedrock:region:account-id:guardrails/resource-id",
+  "Severity": "high",
+  "ResourceType": "Other",
+  "ResourceGroup": "ai_ml",
+  "Description": "個人を特定できる情報（PII）、財務データ、または機密企業情報などの機密データの漏洩を防ぐために、Amazon Bedrockガードレールに対して機密情報フィルターが有効になっていることを確認します。",
+  "Risk": "機密情報フィルターが有効になっていない場合、Bedrockモデルは応答で機密または機密情報を意図せず生成または公開する可能性があり、データ侵害、規制違反、または評判の損害につながる可能性があります。",
+  "RelatedUrl": "https://docs.aws.amazon.com/bedrock/latest/userguide/guardrails.html",
+  "Remediation": {
+    "Code": {
+      "CLI": "aws bedrock put-guardrails-configuration --guardrails-config 'sensitiveInformationFilter=true'",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/Bedrock/guardrails-with-pii-mask-block.html",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "機密または機密情報の露出を防ぐために、Amazon Bedrockガードレールに対して機密情報フィルターを有効にします。",
+      "Url": "https://docs.aws.amazon.com/bedrock/latest/userguide/guardrails-sensitive-filters.html"
+    }
+  },
+  "Categories": [
+    "gen-ai"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

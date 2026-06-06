@@ -1,0 +1,45 @@
+{
+  "Provider": "aws",
+  "CheckID": "backup_recovery_point_encrypted",
+  "CheckTitle": "AWS Backup 恢复点在静态时已加密",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Effects/Data Exposure"
+  ],
+  "ServiceName": "backup",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsBackupRecoveryPoint",
+  "ResourceGroup": "storage",
+  "Description": "**AWS Backup 恢复点**会被评估是否使用备份库的 KMS 配置进行**静态加密**。缺少库级加密的项目会被突出显示，无论源资源的加密状态如何。",
+  "Risk": "未加密的恢复点如果获得了库访问权限，可能被读取或复制，从而可能进行离线分析和数据窃取（**机密性**）。快照或恢复可能被更改（**完整性**），不安全的恢复可能中断恢复操作（**可用性**）。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/backup-controls.html#backup-1",
+    "https://readmedium.com/how-would-you-desgin-a-solution-for-autmated-backup-and-recovery-of-data-and-services-in-aws-311662f5a43e",
+    "https://docs.aws.amazon.com/aws-backup/latest/devguide/encryption.html",
+    "https://medium.com/cloud-devops-security-ai-career-talk/how-would-you-desgin-a-solution-for-autmated-backup-and-recovery-of-data-and-services-in-aws-311662f5a43e",
+    "https://github.com/turbot/steampipe-mod-aws-compliance/issues/598"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation：加密的 AWS Backup 库\nResources:\n  <example_resource_name>:\n    Type: AWS::Backup::BackupVault\n    Properties:\n      BackupVaultName: <example_resource_name>\n      EncryptionKeyArn: <kms_key_arn>  # 关键：库使用此 KMS 密钥，因此存储在此处的恢复点在静态时已加密\n```",
+      "Other": "1. 在 AWS Backup 中，转到备份库 > 创建备份库\n2. 输入名称并选择 KMS 密钥（aws/backup 或客户管理的密钥）\n3. 保存库\n4. 转到备份计划 > 选择您的计划 > 编辑并将目标备份库设置为加密库 > 保存\n5. 要修复现有的未加密恢复点：恢复点 > 选择项目 > 复制 > 选择加密库 > 开始复制，然后删除原始未加密的恢复点",
+      "Terraform": "```hcl\n# 加密的 AWS Backup 库\nresource \"aws_backup_vault\" \"<example_resource_name>\" {\n  name        = \"<example_resource_name>\"\n  kms_key_arn = \"<kms_key_arn>\" # 关键：确保此库中的恢复点在静态时已加密\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "使用**KMS**加密所有恢复点，优先使用**客户管理的密钥**以便进行轮换和控制。对密钥和库应用**最小权限**，要求在跨账户/区域时进行加密复制，并持续监控未加密的工件。一致地使用 `aws/backup` 或 `CMEK`。",
+      "Url": "https://hub.prowler.com/check/backup_recovery_point_encrypted"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

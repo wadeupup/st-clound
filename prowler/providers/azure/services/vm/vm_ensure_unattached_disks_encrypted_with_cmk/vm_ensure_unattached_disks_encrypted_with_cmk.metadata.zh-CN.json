@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "vm_ensure_unattached_disks_encrypted_with_cmk",
+  "CheckTitle": "确保“未附加磁盘”使用“客户管理密钥”（CMK）加密",
+  "CheckType": [],
+  "ServiceName": "vm",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Microsoft.Compute/virtualMachines",
+  "ResourceGroup": "compute",
+  "Description": "确保订阅中的未附加磁盘使用客户管理密钥（CMK）进行加密。",
+  "Risk": "托管磁盘默认使用平台管理密钥加密。使用客户管理密钥可提供额外的安全层，或满足组织的监管要求。对托管磁盘加密可确保其全部内容在没有密钥时无法恢复，从而保护卷免受未授权读取。即便磁盘未附加到任何 VM，仍存在风险：若某个对 VM 服务具有管理权限的用户账户被攻陷，攻击者可挂载/附加这些数据磁盘，导致敏感信息泄露和篡改。",
+  "RelatedUrl": "https://docs.microsoft.com/en-us/azure/security/fundamentals/azure-disk-encryption-vms-vmss",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/VirtualMachines/sse-unattached-disk-cmk.html#",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "如果磁盘中存储的数据已无使用价值，请参考 Azure 文档删除未附加数据磁盘：https://learn.microsoft.com/en-us/rest/api/compute/disks/delete?view=rest-compute-2023-10-02&tabs=HTTP",
+      "Url": "https://learn.microsoft.com/en-us/azure/security/fundamentals/data-encryption-best-practices#protect-data-at-rest"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "你必须先配置好密钥保管库（Key Vault）才能使用此功能。该加密仅适用于标准层 VM。这可能会增加成本。使用和维护客户管理密钥需要额外工作来创建、保护和轮换密钥。"
+}

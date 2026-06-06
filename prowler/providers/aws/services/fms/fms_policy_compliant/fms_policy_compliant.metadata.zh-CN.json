@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "fms_policy_compliant",
+  "CheckTitle": "管理员账户中的所有 AWS FMS 策略在所有账户中均合规",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices/Network Reachability",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices"
+  ],
+  "ServiceName": "fms",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "security",
+  "Description": "会评估管理员账户中的 **Firewall Manager** 策略在组织范围内的合规性。该检查会审查每条策略的账户级状态，并标记为 `NON_COMPLIANT` 或未设置的条目。同时也会识别管理员范围内是否不存在生效策略。",
+  "Risk": "策略漂移或策略缺失会使范围内资源无法被强制执行控制，削弱**机密性**、**完整性**与**可用性**。缺少 WAF、Shield、安全组或网络防火墙基线可能导致 DDoS 暴露、不安全路由和开放访问，进而引发未授权进入与数据外泄。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://aws.amazon.com/firewall-manager/faqs/",
+    "https://docs.aws.amazon.com/waf/latest/developerguide/getting-started-fms-intro.html",
+    "https://www.amazonaws.cn/en/firewall-manager/faqs/",
+    "https://docs.aws.amazon.com/waf/latest/developerguide/fms-compliance.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "1. 使用 Firewall Manager 管理员账户登录 AWS 控制台\n2. 打开 Firewall Manager > Security policies\n3. 若无策略：点击 Create policy，选择你使用的策略类型，将范围设为 All accounts，启用 Automatic remediation，然后创建策略\n4. 若存在含 Noncompliant 账户的策略：打开该策略 > Edit > 启用 Automatic remediation，并确保范围包含 All accounts > Save\n5. 在 AWS Config（组织管理账户）中：Settings > Organization settings > Enable recording for all accounts and all regions > Save\n6. 返回各 Firewall Manager 策略并确认 Accounts within policy scope 显示 Compliant",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "通过 **Firewall Manager** 维持集中化强制执行：为所有相关账户/资源定义必需策略，在适当场景启用自动修复，并持续监控合规性。通过标准化 Web、网络与 DNS 防护并对漂移进行告警，落实**最小权限**与**纵深防御**。",
+      "Url": "https://hub.prowler.com/check/fms_policy_compliant"
+    }
+  },
+  "Categories": [
+    "internet-exposed",
+    "trust-boundaries"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

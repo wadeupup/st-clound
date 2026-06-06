@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "elasticache_redis_cluster_multi_az_enabled",
+  "CheckTitle": "ElastiCache Redis 复制组已启用多可用区",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Effects/Denial of Service"
+  ],
+  "ServiceName": "elasticache",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "database",
+  "Description": "**ElastiCache for Redis 复制组**已启用 **多可用区自动故障转移**，将主节点和副本节点分布在不同的可用区。",
+  "Risk": "如果没有 **多可用区故障转移**，节点或可用区中断可能使 Redis 端点无法访问，降低 **可用性**。冷缓存重建会将负载转移到数据库，存在饱和和级联超时的风险。故障期间最近的写入可能会丢失，影响 **完整性**。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/AmazonElastiCache/latest/dg/AutoFailover.html",
+    "https://repost.aws/knowledge-center/multi-az-replication-redis",
+    "https://www.trendmicro.com/cloudoneconformity-staging/knowledge-base/aws/ElastiCache/elasticache-multi-az.html#"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws elasticache modify-replication-group --replication-group-id <example_resource_id> --multi-az-enabled --automatic-failover-enabled --apply-immediately",
+      "NativeIaC": "```yaml\n# CloudFormation: Enable Multi-AZ on an ElastiCache Redis replication group\nResources:\n  <example_resource_name>:\n    Type: AWS::ElastiCache::ReplicationGroup\n    Properties:\n      ReplicationGroupDescription: \"<description>\"\n      Engine: redis\n      CacheNodeType: cache.t4g.small\n      NumCacheClusters: 2\n      MultiAZEnabled: true  # CRITICAL: Enables Multi-AZ for the replication group\n```",
+      "Other": "1. 在 AWS 控制台中，转到 ElastiCache > Redis\n2. 选择目标复制组\n3. 点击修改\n4. 启用多可用区（如果提示，也启用自动故障转移）\n5. 勾选立即应用并点击修改",
+      "Terraform": "```hcl\n# Enable Multi-AZ on an ElastiCache Redis replication group\nresource \"aws_elasticache_replication_group\" \"<example_resource_name>\" {\n  replication_group_id  = \"<example_resource_id>\"\n  description           = \"<description>\"\n  engine                = \"redis\"\n  node_type             = \"cache.t4g.small\"\n  number_cache_clusters = 2\n\n  multi_az_enabled           = true  # CRITICAL: Enables Multi-AZ\n  automatic_failover_enabled = true  # Required for Multi-AZ failover\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "在 Redis 复制组上启用 **带自动故障转移的多可用区**（`MultiAZ: enabled`），并将副本放置在单独的可用区中。使用遵循主节点/读取器端点的客户端，监控复制延迟，并定期测试故障转移。与快照配对以实现恢复；这确保了高 **可用性**和 **弹性**。",
+      "Url": "https://hub.prowler.com/check/elasticache_redis_cluster_multi_az_enabled"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

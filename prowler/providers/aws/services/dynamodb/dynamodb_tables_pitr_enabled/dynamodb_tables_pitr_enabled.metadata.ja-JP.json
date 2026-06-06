@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "dynamodb_tables_pitr_enabled",
+  "CheckTitle": "DynamoDB テーブルでポイントインタイムリカバリ (PITR) が有効になっているか",
+  "CheckType": [
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Effects/Data Destruction"
+  ],
+  "ServiceName": "dynamodb",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsDynamoDbTable",
+  "ResourceGroup": "database",
+  "Description": "**DynamoDB テーブル**で**ポイントインタイムリカバリ**（`PITR`）が有効になっています",
+  "Risk": "**PITR**がない場合、意図しないまたは悪意のある書き込み/削除を正確にロールバックできず、永続的なデータ損失と状態の破損を引き起こします。バグのあるデプロイメント、侵害された認証情報、または誤ったバッチジョブによる障害は、データの**整合性**と**可用性**を低下させ、インシデント回復とフォレンジック分析の時間を延長します。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/PointInTimeRecovery_Howitworks.html",
+    "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/PointInTimeRecovery.Tutorial.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws dynamodb update-continuous-backups --table-name <table_name> --point-in-time-recovery-specification PointInTimeRecoveryEnabled=true",
+      "NativeIaC": "```yaml\n# CloudFormation: enable PITR on a DynamoDB table\nResources:\n  <example_resource_name>:\n    Type: AWS::DynamoDB::Table\n    Properties:\n      PointInTimeRecoverySpecification:\n        PointInTimeRecoveryEnabled: true  # Critical: enables Point-in-Time Recovery (PITR)\n```",
+      "Other": "1. AWS 管理コンソールを開き、DynamoDB に移動します\n2. テーブルを選択し、Backups タブを開きます\n3. Point-in-time recovery セクションで Edit をクリックし、Turn on point-in-time recovery を選択します\n4. Save をクリックします",
+      "Terraform": "```hcl\n# Enable PITR on a DynamoDB table\nresource \"aws_dynamodb_table\" \"<example_resource_name>\" {\n  name         = \"<example_resource_name>\"\n  billing_mode = \"PAY_PER_REQUEST\"\n  hash_key     = \"id\"\n\n  attribute {\n    name = \"id\"\n    type = \"S\"\n  }\n\n  point_in_time_recovery {\n    enabled = true  # Critical: enables PITR\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "重要なテーブルで**PITR**を有効化し、RPO に合わせた回復ウィンドウ（1-35 日）を設定します。バックアップ設定を変更できるユーザーに**最小権限**を適用します。定期的に復元をテストし、バックアップステータスを監視します。一貫性のために PITR を IaC と変更管理に組み込み、重要なマイルストーンにはオンデマンドバックアップを使用して**多層防御**を実現します。",
+      "Url": "https://hub.prowler.com/check/dynamodb_tables_pitr_enabled"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "Data Protection"
+}
+

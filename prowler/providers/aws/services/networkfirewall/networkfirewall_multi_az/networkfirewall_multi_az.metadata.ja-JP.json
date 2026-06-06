@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "networkfirewall_multi_az",
+  "CheckTitle": "Network Firewall ファイアウォールは複数のアベイラビリティーゾーンにわたってデプロイされています",
+  "CheckType": [
+    "ソフトウェアと構成のチェック/AWS セキュリティベストプラクティス",
+    "ソフトウェアと構成のチェック/業界および規制基準/NIST 800-53 コントロール",
+    "影響/サービス拒否"
+  ],
+  "ServiceName": "networkfirewall",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsNetworkFirewallFirewall",
+  "ResourceGroup": "network",
+  "Description": "**AWS Network Firewall ファイアウォール**は、**マルチAZデプロイメント**のために評価され、複数のアベイラビリティーゾーンにサブネットマッピングが期待されます。\n\nサブネットマッピングが1つだけの構成は、シングルAZファイアウォールを示します。",
+  "Risk": "シングルAZファイアウォールは単一障害点です。AZの障害はトラフィックをドロップまたはブラックホール化し、**可用性**を低下させるか、検査をバイパスするルート変更を促し、**機密性**と**完全性**をフィルタリングされていないアクセス、データの流出、横方向の移動にさらします。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/id_id/network-firewall/latest/developerguide/arch-two-zone-igw.html",
+    "https://aws.amazon.com/es/blogs/networking-and-content-delivery/deployment-models-for-aws-network-firewall/",
+    "https://docs.aws.amazon.com/network-firewall/latest/developerguide/arch-two-zone-igw.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/networkfirewall-controls.html#networkfirewall-1"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws network-firewall associate-subnets --firewall-arn <FIREWALL_ARN> --subnet-mappings SubnetId=<SUBNET_ID_IN_DIFFERENT_AZ>",
+      "NativeIaC": "```yaml\n# CloudFormation: ファイアウォールが複数のAZにまたがるように、2番目のサブネットマッピングを追加します\nResources:\n  <example_resource_name>:\n    Type: AWS::NetworkFirewall::Firewall\n    Properties:\n      FirewallName: <example_resource_name>\n      FirewallPolicyArn: <example_firewall_policy_arn>\n      VpcId: <example_vpc_id>\n      SubnetMappings:\n        - SubnetId: <subnet-id-1>\n        - SubnetId: <subnet-id-2>  # 重要: マルチAZを達成するために異なるAZに2番目のサブネットを配置します\n```",
+      "Other": "1. AWS コンソールを開き、VPC > Network Firewall > Firewalls に移動します\n2. ファイアウォールを選択し、ファイアウォールの詳細タブを開きます\n3. 関連ポリシーとVPCで、編集をクリックします\n4. 新しいサブネットを追加をクリックし、同じVPC内の追加のアベイラビリティーゾーンとそのサブネットを選択します\n5. 少なくとも2つのAZが選択されていることを確認し、保存をクリックします",
+      "Terraform": "```hcl\n# Terraform: ファイアウォールを複数のAZにデプロイするために2番目のsubnet_mappingを追加します\nresource \"aws_networkfirewall_firewall\" \"<example_resource_name>\" {\n  name                = \"<example_resource_name>\"\n  firewall_policy_arn = \"<example_firewall_policy_arn>\"\n  vpc_id              = \"<example_vpc_id>\"\n\n  subnet_mapping {\n    subnet_id = \"<subnet-id-1>\"\n  }\n\n  subnet_mapping {\n    subnet_id = \"<subnet-id-2>\"  # 重要: マルチAZのために異なるAZに2番目のサブネットを配置します\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "ファイアウォールを`>=2`つのAZにわたってデプロイし、使用する各AZに専用のサブネットを持たせます。ステートフルインスペクションを維持するために、各AZごとに対称ルーティングをローカルエンドポイントに維持します。**多層防御**を適用し、ドリフトコントロールとAZフェイルオーバーテストを自動化して回復力を維持します。",
+      "Url": "https://hub.prowler.com/check/networkfirewall_multi_az"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

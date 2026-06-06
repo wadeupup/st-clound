@@ -1,0 +1,32 @@
+{
+  "Provider": "aws",
+  "CheckID": "cognito_user_pool_self_registration_disabled",
+  "CheckTitle": "确保 Amazon Cognito 用户池禁用自助注册",
+  "CheckType": [],
+  "ServiceName": "cognito",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:aws:cognito-idp:region:account:userpool/userpool-id",
+  "Severity": "medium",
+  "ResourceType": "AwsCognitoUserPool",
+  "ResourceGroup": "IAM",
+  "Description": "检查 Amazon Cognito 用户池是否禁用了自助注册。自助注册允许用户在用户池中注册账户。如果启用了自助注册，用户可以在没有管理员干预的情况下在用户池中注册账户。这可能导致对应用程序的未授权访问。",
+  "Risk": "如果启用了自助注册，用户可以在没有管理员干预的情况下在用户池中注册账户。这可能导致对应用程序的未授权访问。",
+  "RelatedUrl": "https://docs.aws.amazon.com/cognito-user-identity-pools/latest/APIReference/API_SignUp.html",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "要禁用 Amazon Cognito 用户池的自助注册，请执行以下操作：",
+      "Url": "https://docs.aws.amazon.com/cognito/latest/developerguide/signing-up-users-in-your-app.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

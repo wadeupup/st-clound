@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "iam_custom_role_has_permissions_to_administer_resource_locks",
+  "CheckTitle": "确保 IAM 自定义角色具有管理资源锁的权限",
+  "CheckType": [],
+  "ServiceName": "iam",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AzureRole",
+  "ResourceGroup": "IAM",
+  "Description": "确保已为自定义角色分配管理资源锁所需权限",
+  "Risk": "在 Azure 中，资源锁用于防止关键资源被意外删除或修改。资源锁可设置在资源组级别或单个资源级别。资源锁管理是一项关键任务，应由具备适当权限的自定义角色执行。这可确保只有授权用户能够管理资源锁。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/lock-resources?tabs=json",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity-staging/knowledge-base/azure/AccessControl/resource-lock-custom-role.html",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "资源锁用于防止关键 Azure 资源被意外删除或修改。资源锁管理应由具备适当权限的自定义角色执行。",
+      "Url": "https://www.trendmicro.com/cloudoneconformity-staging/knowledge-base/azure/AccessControl/resource-lock-custom-role.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

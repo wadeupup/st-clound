@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "awslambda_function_using_supported_runtimes",
+  "CheckTitle": "Lambda 函数使用受支持的运行时",
+  "CheckType": [
+    "Software and Configuration Checks/Patch Management",
+    "Software and Configuration Checks/AWS Security Best Practices"
+  ],
+  "ServiceName": "awslambda",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsLambdaFunction",
+  "ResourceGroup": "serverless",
+  "Description": "使用**过时运行时**的**Lambda 函数**（例如 `python3.8`、`nodejs14.x`、`go1.x`、`ruby2.7`）会根据已弃用的运行时标识符列表进行识别。",
+  "Risk": "未维护的运行时缺乏安全补丁，使代码和库暴露于已知的 CVE（**机密性、完整性**）。\n\n弃用可能会阻止创建/更新并破坏构建，导致部署失败或运行时错误（**可用性**）。工具可能会停止支持构建，减缓修复和恢复速度。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://aws.amazon.com/blogs/compute/managing-aws-lambda-runtime-upgrades/",
+    "https://docs.aws.amazon.com/lambda/latest/dg/runtime-support-policy.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/Lambda/supported-runtime-environment.html",
+    "https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws lambda update-function-configuration --function-name <FUNCTION_NAME> --runtime <SUPPORTED_RUNTIME>",
+      "NativeIaC": "```yaml\n# CloudFormation：将 Lambda 设置为受支持的运行时\nResources:\n  <example_resource_name>:\n    Type: AWS::Lambda::Function\n    Properties:\n      Role: <example_role_arn>\n      Handler: <example_handler>\n      Runtime: <SUPPORTED_RUNTIME>  # 修复：更改为受支持的运行时（例如 python3.12）以通过检查\n      Code:\n        S3Bucket: <example_bucket_name>\n        S3Key: <example_object_key>\n```",
+      "Other": "1. 打开 AWS Lambda 控制台并选择函数\n2. 转到配置 > 运行时设置 > 编辑\n3. 在运行时中，选择受支持的运行时（例如 python3.12）并点击保存",
+      "Terraform": "```hcl\n# 将 Lambda 设置为受支持的运行时\nresource \"aws_lambda_function\" \"<example_resource_name>\" {\n  function_name = \"<example_resource_name>\"\n  role          = \"<example_role_arn>\"\n  handler       = \"<example_handler>\"\n  runtime       = \"<SUPPORTED_RUNTIME>\" # 修复：使用受支持的运行时（例如 python3.12）以通过检查\n  filename      = \"<example_package.zip>\"\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "升级到**受支持的 LTS 运行时**（AL2/AL2023），并将运行时升级纳入安全的 SDLC。\n\n在暂存环境中测试，通过版本/别名部署，并保持依赖项最新。监控弃用通知。应用防护措施以阻止已弃用的 `runtime` 值，仅允许已批准的运行时，与**纵深防御**保持一致。",
+      "Url": "https://hub.prowler.com/check/awslambda_function_using_supported_runtimes"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

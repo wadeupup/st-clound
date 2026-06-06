@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "apigateway_restapi_tracing_enabled",
+  "CheckTitle": "API Gateway REST API ステージで X-Ray トレーシングが有効になっています",
+  "CheckType": [
+    "ソフトウェアと設定チェック/AWS セキュリティベストプラクティス/ランタイム動作分析",
+    "ソフトウェアと設定チェック/業界および規制基準/AWS 基礎セキュリティベストプラクティス"
+  ],
+  "ServiceName": "apigateway",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "low",
+  "ResourceType": "AwsApiGatewayStage",
+  "ResourceGroup": "api_gateway",
+  "Description": "**API Gateway REST API ステージ**で**AWS X-Ray アクティブトレーシング**が有効になっており、受信リクエストをサンプリングし、接続されたサービス間で分散トレースを生成します。",
+  "Risk": "X-Ray トレーシングがない場合、エンドツーエンドの可視性が失われ、タイムアウト、エラー、異常なレイテンシの検出が妨げられます。\n\nこれにより、インシデント対応と根本原因分析が遅れ、MTTR（平均修復時間）が増加し、部分的な中断（可用性）と検出されていない統合障害（整合性）のリスクがあります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/apigateway-controls.html#apigateway-3",
+    "https://docs.aws.amazon.com/xray/latest/devguide/xray-services-apigateway.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/APIGateway/tracing.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws apigateway update-stage --rest-api-id <restapi-id> --stage-name <stage-name> --patch-operations op=replace,path=/tracingEnabled,value=true",
+      "NativeIaC": "```yaml\n# CloudFormation: API Gateway REST API ステージで X-Ray トレーシングを有効にします\nResources:\n  <example_resource_name>:\n    Type: AWS::ApiGateway::Stage\n    Properties:\n      RestApiId: <example_resource_id>\n      DeploymentId: <example_resource_id>\n      StageName: <example_resource_name>\n      TracingEnabled: true  # 重要：このステージで AWS X-Ray トレーシングを有効にします\n```",
+      "Other": "1. AWS コンソールを開き、API Gateway に移動します\n2. REST API を選択し、Stages を選択します\n3. ターゲットステージを選択します\n4. Logs/Tracing タブを開き、Enable X-Ray Tracing をチェックします\n5. Save をクリックします",
+      "Terraform": "```hcl\n# API Gateway REST API ステージで X-Ray トレーシングを有効にします\nresource \"aws_api_gateway_stage\" \"example\" {\n  rest_api_id = \"<example_resource_id>\"\n  deployment_id = \"<example_resource_id>\"\n  stage_name  = \"<example_resource_name>\"\n  xray_tracing_enabled = true  # 重要：このステージで AWS X-Ray トレーシングを有効にします\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "すべての API Gateway ステージで**X-Ray アクティブトレーシング**を有効にし、ダウンストリームサービスを通じてトレースコンテキストを伝播します。\n\n慎重なサンプリングを使用し、トレースをログ/メトリクスと関連付け、エラー/レイテンシについてアラートを出します。X-Ray アクセスに**最小権限**を適用し、可観測性のために**多層防御**を使用します。",
+      "Url": "https://hub.prowler.com/check/apigateway_restapi_tracing_enabled"
+    }
+  },
+  "Categories": [
+    "logging"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

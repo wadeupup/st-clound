@@ -1,0 +1,33 @@
+{
+  "Provider": "azure",
+  "CheckID": "storage_ensure_encryption_with_customer_managed_keys",
+  "CheckTitle": "Microsoft Azure Storage accounts が Microsoft Managed Keys ではなく Customer Managed Keys（CMKs）を使用していることを確認する",
+  "CheckType": [],
+  "ServiceName": "storage",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AzureStorageAccount",
+  "ResourceGroup": "storage",
+  "Description": "Microsoft Azure Storage accounts が Microsoft Managed Keys ではなく Customer Managed Keys（CMKs）を使用していることを確認します",
+  "Risk": "ストレージ アカウント コンテンツの暗号化キーを自分で制御・管理したい場合は、customer-managed key を指定する必要があります。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/StorageAccounts/cmk-encryption.html",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-general-policies/ensure-that-storage-accounts-use-customer-managed-key-for-encryption#terraform"
+    },
+    "Recommendation": {
+      "Text": "保存データの機密性保護のため、Microsoft Managed keys ではなく Customer Managed Keys を使用した暗号化を有効化します。",
+      "Url": ""
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

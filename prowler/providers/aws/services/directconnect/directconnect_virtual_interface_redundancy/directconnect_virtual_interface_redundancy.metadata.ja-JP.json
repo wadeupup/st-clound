@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "directconnect_virtual_interface_redundancy",
+  "CheckTitle": "Direct Connect ゲートウェイまたは仮想プライベートゲートウェイが、異なる Direct Connect 接続上に少なくとも2つの仮想インターフェースを持っている",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Effects/Denial of Service"
+  ],
+  "ServiceName": "directconnect",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "network",
+  "Description": "**Direct Connect ゲートウェイ**と**仮想プライベートゲートウェイ**は、**インターフェースの冗長性**について評価されます：複数の仮想インターフェース（`VIFs`）が複数の**Direct Connect 接続**に分散されています。\n\n*1 つの VIF のみ、またはすべての VIF が単一の接続上にあるゲートウェイが識別されます。*",
+  "Risk": "接続の多様性がないと、**可用性**が損なわれます。単一のデバイス、ファイバー、またはロケーションの障害により、オンプレミスから VPC への接続が切断され、**障害**、**パケット損失**、またはルーティングブラックホールが発生する可能性があります。インターネット VPN へのフォールバックは、レイテンシを増加させ、スループットを制限し、回復を遅らせ、運用に影響を与える可能性があります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/awssupport/latest/user/fault-tolerance-checks.html#amazon-direct-connect-location-resiliency",
+    "https://repost.aws/knowledge-center/direct-connect-physical-redundancy",
+    "https://aws.amazon.com/directconnect/resiliency-recommendation/"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws directconnect create-private-virtual-interface --connection-id <CONNECTION_ID_DIFFERENT_FROM_EXISTING_VIF> --new-private-virtual-interface '{\"virtualInterfaceName\":\"<NAME>\",\"vlan\":<VLAN>,\"asn\":<BGP_ASN>,\"addressFamily\":\"ipv4\",\"amazonAddress\":\"<AMAZON_IP/30>\",\"customerAddress\":\"<CUSTOMER_IP/30>\",\"directConnectGatewayId\":\"<DIRECT_CONNECT_GATEWAY_ID>\"}'",
+      "NativeIaC": "",
+      "Other": "1. AWS コンソールで、Direct Connect を開きます\n2. Connections に移動し、既存の VIF で使用されている接続とは異なる接続を選択します\n3. 仮想インターフェースの作成をクリックし、Private を選択します\n4. Gateway について、Direct Connect ゲートウェイ（または VGW の場合は仮想プライベートゲートウェイ）を選択します\n5. VLAN、BGP ASN、IPv4 ピア IP（Amazon/Customer）を入力し、作成します\n6. ゲートウェイが少なくとも2つの異なる Direct Connect 接続上に少なくとも2つの VIF を持っていることを確認します",
+      "Terraform": "```hcl\n# 異なる DX 接続上に2番目のプライベート VIF を作成し、ゲートウェイにアタッチ\nresource \"aws_dx_private_virtual_interface\" \"example\" {\n  connection_id   = \"<example_resource_id>\"      # 重要：既存の VIF とは異なる Direct Connect 接続を使用\n  dx_gateway_id   = \"<example_resource_id>\"      # 重要：VIF を Direct Connect ゲートウェイにアタッチ（VGW の場合は virtual_gateway_id を使用）\n  name            = \"<NAME>\"\n  vlan            = 100\n  bgp_asn         = 65000\n  address_family  = \"ipv4\"\n  amazon_address  = \"169.254.100.1/30\"\n  customer_address = \"169.254.100.2/30\"\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "接続の**多層防御**を適用します：\n- 異なるロケーションの独立した**Direct Connect 接続**上で、ゲートウェイごとに少なくとも2つの `VIFs` をアタッチします\n- アクティブ/アクティブ動的ルーティングを優先し、リンク損失を生き延びるために容量を調整します\n- *オプション*プロバイダーの障害中に運用を維持するために**VPN/Transit Gateway**パスを追加します",
+      "Url": "https://hub.prowler.com/check/directconnect_virtual_interface_redundancy"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

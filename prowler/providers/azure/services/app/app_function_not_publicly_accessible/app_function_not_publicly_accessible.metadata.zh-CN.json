@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "app_function_not_publicly_accessible",
+  "CheckTitle": "确保 Azure Functions 不可被公共访问",
+  "CheckType": [],
+  "ServiceName": "app",
+  "SubServiceName": "function",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Microsoft.Web/sites",
+  "ResourceGroup": "serverless",
+  "Description": "不应将 Azure Functions 暴露到公共互联网。限制访问有助于保护应用免受潜在威胁并减少攻击面。",
+  "Risk": "将 Azure Functions 暴露到公共互联网会增加未授权访问、数据泄露以及其他安全威胁的风险。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/azure-functions/functions-networking-options",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/Functions/azure-function-exposed.html",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "审查 Azure Functions 安全指南并确保已配置访问限制。为增强安全性，可使用 Azure Private Link 和 Key Vault。",
+      "Url": "https://learn.microsoft.com/en-us/azure/app-service/overview-access-restrictions"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

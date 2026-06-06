@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "sagemaker_notebook_instance_root_access_disabled",
+  "CheckTitle": "Amazon SageMaker ノートブックインスタンスでは root アクセスが無効になっています",
+  "CheckType": [
+    "ソフトウェアと構成チェック/AWSセキュリティのベストプラクティス",
+    "ソフトウェアと設定のチェック/業界および規制基準/AWS 基盤セキュリティのベストプラクティス",
+    "TTPs/権限昇格"
+  ],
+  "ServiceName": "sagemaker",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsSageMakerNotebookInstance",
+  "ResourceGroup": "ai_ml",
+  "Description": "ユーザーの**rootアクセスが無効**になっている**Amazon SageMaker ノートブックインスタンス**。この評価では、対話型ユーザーがインスタンス上でroot権限を取得できるかどうかを確認し、`RootAccess`が`Disabled`に設定されていないノートブックを強調表示します。",
+  "Risk": "ユーザーに**rootアクセス**を許可すると、システムを完全に制御できるようになり、**完全性**（コード、パッケージ、カーネルの改ざん）、**機密性**（秘密情報、認証情報、データのコピーの読み取り）、および**可用性**（エージェントの無効化や環境の破壊）が危険にさらされます。ノートブックが侵害されると、インスタンスロールを介したラテラルムーブメントにつながる可能性があります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/sagemaker/latest/dg/nbi-root-access.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws sagemaker update-notebook-instance --notebook-instance-name <example_resource_name> --root-access Disabled",
+      "NativeIaC": "```yaml\n# CloudFormation: Disable root access on a SageMaker Notebook Instance\nResources:\n  Notebook:\n    Type: AWS::SageMaker::NotebookInstance\n    Properties:\n      InstanceType: ml.t3.medium\n      RoleArn: <example_role_arn>\n      RootAccess: Disabled  # Critical: disables user root access to pass the check\n```",
+      "Other": "1. AWS コンソールで、SageMaker > ノートブックインスタンス に移動します\n2. <example_resource_name> を選択し、実行中の場合は Stop をクリックします\n3. 停止後、Edit をクリックします\n4. Root access を Disabled に設定します\n5. 変更を保存してから、Start をクリックします",
+      "Terraform": "```hcl\n# Terraform: SageMaker Notebook Instance で root アクセスを無効化する\nresource \"aws_sagemaker_notebook_instance\" \"notebook\" {\n  name          = \"<example_resource_name>\"\n  role_arn      = \"<example_role_arn>\"\n  instance_type = \"ml.t3.medium\"\n  root_access   = \"Disabled\"  # Critical: チェックに合格するためにユーザーの root アクセスを無効化します\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "**最小権限**を適用してください：ノートブックユーザーの `RootAccess` を `Disabled` に設定します。必要なソフトウェアは、その場しのぎの root インストールではなく、**マネージドイメージ** または **ライフサイクル自動化** を通じて提供してください。ノートブックの IAM ロールを制限し、**多層防御**（ネットワーク分離と監視）を実施し、特権変更には管理された管理者ワークフローを必須にしてください。",
+      "Url": "https://hub.prowler.com/check/sagemaker_notebook_instance_root_access_disabled"
+    }
+  },
+  "Categories": [
+    "identity-access",
+    "gen-ai"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

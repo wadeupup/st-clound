@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "cloudformation_stack_cdktoolkit_bootstrap_version",
+  "CheckTitle": "CDKToolkit CloudFormationスタックのBootstrapバージョンが21以上である",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Patch Management"
+  ],
+  "ServiceName": "cloudformation",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsCloudFormationStack",
+  "ResourceGroup": "devops",
+  "Description": "**CloudFormation CDKToolkit**スタックの`BootstrapVersion`は、推奨される最小値（デフォルト`21`）と比較されます。低い値は、環境が古いテンプレートからのレガシーブートストラップリソースとIAMロールを使用していることを示します。",
+  "Risk": "**古いブートストラップスタック**は、最近の強化が不足している可能性があります。アセットバケットやECRリポジトリが悪用されやすく、デプロイロールがより広範な信頼を持っている可能性があります。\n\n攻撃者はアーティファクトを改ざんしたり、特権ロールを引き受けたりして、整合性/機密性を損ない、権限昇格を可能にする可能性があります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://towardsthecloud.com/blog/aws-cdk-bootstrap",
+    "https://support.icompaas.com/support/solutions/articles/62000233694-ensure-that-cdktoolkit-stacks-have-a-bootstrap-version-of-21-or-higher-to-mitigate-security-risks",
+    "https://docs.aws.amazon.com/cdk/v2/guide/ref-cli-cmd-bootstrap.html",
+    "https://docs.aws.amazon.com/cdk/v2/guide/bootstrapping-customizing.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "cdk bootstrap aws://<ACCOUNT_ID>/<REGION>",
+      "NativeIaC": "```yaml\n# CDKToolkitのBootstrapVersion >= 21を公開する最小CloudFormation\n# このテンプレートを\"CDKToolkit\"という名前のスタックとしてデプロイ\nResources:\n  CdkBootstrapVersion:\n    Type: AWS::SSM::Parameter\n    Properties:\n      Type: String\n      Name: /cdk-bootstrap/hnb659fds/version  # 重要：CDKが使用するブートストラップバージョンを保存\n      Value: \"21\"                              # 重要：チェックを満たすために21（以上）に設定\nOutputs:\n  BootstrapVersion:\n    Value: !GetAtt CdkBootstrapVersion.Value   # 重要：スタック出力でバージョンを公開してチェックをパス\n```",
+      "Other": "1. AWSコンソールにサインインし、CloudShellを開く\n2. 実行：cdk bootstrap aws://<ACCOUNT_ID>/<REGION>\n3. コンソールで、CloudFormation > スタック > CDKToolkit > 出力に移動\n4. 出力\"BootstrapVersion\"が21以上であることを確認",
+      "Terraform": "```hcl\n# BootstrapVersion >= 21でCDKToolkitスタックを作成/更新\nresource \"aws_cloudformation_stack\" \"cdktoolkit\" {\n  name          = \"CDKToolkit\"\n  # 重要：テンプレートがBootstrapVersion出力を21（以上）に設定してチェックをパス\n  template_body = <<YAML\nResources:\n  CdkBootstrapVersion:\n    Type: AWS::SSM::Parameter\n    Properties:\n      Type: String\n      Name: /cdk-bootstrap/hnb659fds/version  # 重要：ブートストラップバージョンを保存\n      Value: \"21\"                              # 重要：バージョンは >= 21 である必要がある\nOutputs:\n  BootstrapVersion:\n    Value: !GetAtt CdkBootstrapVersion.Value   # 重要：スタック出力でバージョンを公開\nYAML\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "すべてのアカウントとリージョンで、推奨バージョン以上（例：`>= 21`）のモダンブートストラップを標準化します。\n\nブートストラップロールに**最小権限**を適用し、信頼できるアカウントを制限し、終了保護を有効化し、バージョンドリフトを定期的に確認して**多層防御**を強化します。",
+      "Url": "https://hub.prowler.com/check/cloudformation_stack_cdktoolkit_bootstrap_version"
+    }
+  },
+  "Categories": [
+    "vulnerabilities"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

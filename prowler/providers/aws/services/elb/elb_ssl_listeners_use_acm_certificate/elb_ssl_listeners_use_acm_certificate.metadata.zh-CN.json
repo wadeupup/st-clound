@@ -1,0 +1,40 @@
+{
+  "Provider": "aws",
+  "CheckID": "elb_ssl_listeners_use_acm_certificate",
+  "CheckTitle": "Classic Load Balancer 的 HTTPS/SSL 监听器使用 ACM 签发证书",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices"
+  ],
+  "ServiceName": "elb",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsElbLoadBalancer",
+  "ResourceGroup": "network",
+  "Description": "Classic Load Balancer 的 HTTPS/SSL 监听器使用 **AWS Certificate Manager** 证书，且证书为 **Amazon 签发**（证书类型 `AMAZON_ISSUED`）。",
+  "Risk": "使用导入证书或非 Amazon 签发证书会降低对签发与轮换流程的控制，增加 **TLS 过期或弱配置** 的概率。这可能引发**服务中断**并使**中间人攻击**成为可能，从而危及数据**机密性**和**完整性**。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/elb-controls.html#elb-2",
+    "https://docs.aws.amazon.com/config/latest/developerguide/elb-acm-certificate-required.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws elb set-load-balancer-listener-ssl-certificate --load-balancer-name <load-balancer-name> --load-balancer-port <port> --ssl-certificate-id <acm_certificate_arn>",
+      "NativeIaC": "```yaml\n# CloudFormation: Attach an Amazon-issued ACM cert to a CLB HTTPS/SSL listener\nResources:\n  <example_resource_name>:\n    Type: AWS::ElasticLoadBalancing::LoadBalancer\n    Properties:\n      AvailabilityZones:\n        - <example_az>\n      Listeners:\n        - LoadBalancerPort: 443\n          InstancePort: 443\n          Protocol: HTTPS\n          SSLCertificateId: <acm_certificate_arn>  # critical: use Amazon-issued ACM certificate to pass ELB.2\n```",
+      "Other": "1. 在 AWS 控制台进入 EC2 > Load Balancing > Load Balancers（Classic）\n2. 选择目标 Classic Load Balancer\n3. 打开 Listeners 标签并选择 HTTPS/SSL 监听器\n4. 点击 Edit（或 Change SSL certificate）\n5. 选择由 Amazon 签发的 ACM 证书（非导入证书）\n6. 保存更改",
+      "Terraform": "```hcl\n# Terraform: Attach an Amazon-issued ACM cert to a CLB HTTPS/SSL listener\nresource \"aws_elb\" \"<example_resource_name>\" {\n  availability_zones = [\"<example_az>\"]\n\n  listener {\n    lb_port            = 443\n    lb_protocol        = \"https\"\n    instance_port      = 443\n    instance_protocol  = \"https\"\n    ssl_certificate_id = \"<acm_certificate_arn>\" # critical: Amazon-issued ACM cert to satisfy ELB.2\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "在 CLB HTTPS/SSL 监听器上统一使用**Amazon 签发的 ACM 证书**，以确保托管验证和**自动续期**。\n\n对证书操作实施**最小权限**，自动化轮换，并将证书健康监控纳入**纵深防御**体系。",
+      "Url": "https://hub.prowler.com/check/elb_ssl_listeners_use_acm_certificate"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

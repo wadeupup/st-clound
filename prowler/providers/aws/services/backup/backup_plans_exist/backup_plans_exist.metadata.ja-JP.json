@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "backup_plans_exist",
+  "CheckTitle": "少なくとも1つのAWS Backup計画が存在する",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices"
+  ],
+  "ServiceName": "backup",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "low",
+  "ResourceType": "AwsBackupBackupPlan",
+  "ResourceGroup": "storage",
+  "Description": "**AWS Backup**は、選択されたリソースのスケジュールと回復ポイントを保持する少なくとも1つの**バックアップ計画**の存在について評価されます。\n\n評価では、計画が設定されているかどうかを判断します。計画が見つからない場合（バックアップボルトが存在する場合でも）、計画の欠如が記録されます。",
+  "Risk": "バックアップ計画がない場合、リソースはスケジュールされた回復ポイントを欠き、RPO/RTOを弱めます。\n- 削除または破損後の回復不能なデータ（整合性）\n- 利用できない復元による長時間の中断（可用性）\n- 調査と制御された回復を妨げる一貫性のないバックアップ",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://awscli.amazonaws.com/v2/documentation/api/2.0.33/reference/backup/create-backup-plan.html",
+    "https://docs.aws.amazon.com/aws-backup/latest/devguide/about-backup-plans.html",
+    "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/backup_plan",
+    "https://medium.com/@christopheradamson253/backup-strategies-using-aws-backup-1b17b94a7957"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws backup create-backup-plan --backup-plan \"{\\\"BackupPlanName\\\":\\\"<example_resource_name>\\\",\\\"Rules\\\":[{\\\"RuleName\\\":\\\"<example_resource_name>\\\",\\\"TargetBackupVaultName\\\":\\\"Default\\\"}]}\"",
+      "NativeIaC": "```yaml\n# CloudFormation：チェックをパスするための最小AWS Backup計画を作成\nResources:\n  <example_resource_name>:\n    Type: AWS::Backup::BackupPlan\n    Properties:\n      BackupPlan:\n        BackupPlanName: <example_resource_name>  # 重要：少なくとも1つのバックアップ計画が存在することを保証\n        Rules:\n          - RuleName: <example_resource_name>     # 重要：最小必須ルール\n            TargetBackupVault: Default            # 重要：ルールに必要なボルト\n```",
+      "Other": "1. AWSコンソールで、AWS Backupに移動\n2. バックアップ計画 > バックアップ計画の作成をクリック\n3. 新しい計画を構築を選択\n4. 計画名を入力：<example_resource_name>\n5. バックアップルールの下で、ルール名：<example_resource_name>とターゲットバックアップボルト：Defaultを設定\n6. 計画の作成をクリック",
+      "Terraform": "```hcl\n# Terraform：チェックを満たす最小AWS Backup計画\nresource \"aws_backup_plan\" \"<example_resource_name>\" {\n  name = \"<example_resource_name>\"  # 重要：バックアップ計画を作成してチェックをパス\n\n  rule {\n    rule_name         = \"<example_resource_name>\"  # 重要：最小ルール\n    target_vault_name = \"Default\"                  # 重要：必須のボルト\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "重要なワークロードに対して**バックアップ計画**を確立し、強制します：\n- RPO/RTOを満たすためにスケジュール、保持、ライフサイクルを定義\n- タグを使用してポリシーで必要なすべてのリソースを含める\n- 可能な場合はクロスリージョン/アカウントコピーと不変性を有効化\n- バックアップロールに最小権限を適用\n- 定期的に復元をテストし、レポートを確認",
+      "Url": "https://hub.prowler.com/check/backup_plans_exist"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

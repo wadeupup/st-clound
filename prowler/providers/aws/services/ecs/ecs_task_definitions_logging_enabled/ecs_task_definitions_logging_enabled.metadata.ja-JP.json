@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "ecs_task_definitions_logging_enabled",
+  "CheckTitle": "ECS タスク定義がすべてのコンテナに対してロギングを設定している",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices/Runtime Behavior Analysis",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices"
+  ],
+  "ServiceName": "ecs",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsEcsTaskDefinition",
+  "ResourceGroup": "container",
+  "Description": "**Amazon ECS タスク定義** コンテナは、最新のアクティブリビジョンで、すべてのコンテナに対して非 null の `logDriver` を持つ **ロギング設定** を指定します。",
+  "Risk": "コンテナログがないと可視性が損なわれ、侵入、データ窃取、設定の改ざんが検出されません。\n\n監査証跡の欠如は機密性と整合性を弱め、フォレンジクスを妨げ、中断中に MTTR（平均修復時間）を増加させ、可用性とコンプライアンスの証拠に影響を与えます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/ecs-controls.html#ecs-9",
+    "https://docs.aws.amazon.com/AmazonECS/latest/developerguide/using_awslogs.html#specify-log-config",
+    "https://docs.aws.amazon.com/config/latest/developerguide/ecs-task-definition-log-configuration.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws ecs register-task-definition --family <task-family> --container-definitions '[{\"name\":\"<container-name>\",\"image\":\"<image>\",\"logConfiguration\":{\"logDriver\":\"awslogs\",\"options\":{\"awslogs-group\":\"<log-group>\",\"awslogs-region\":\"<region>\"}}}]'",
+      "NativeIaC": "```yaml\n# CloudFormation: ECS task definition with logging enabled for the container\nResources:\n  ExampleTaskDefinition:\n    Type: AWS::ECS::TaskDefinition\n    Properties:\n      ContainerDefinitions:\n        - Name: \"<example_resource_name>\"\n          Image: \"<image>\"\n          LogConfiguration:                 # Critical: ensures container has logging configured\n            LogDriver: awslogs              # Critical: non-null log driver passes the check\n            Options:\n              awslogs-group: \"<log-group>\" # Critical: CloudWatch Logs group\n              awslogs-region: \"<region>\"\n```",
+      "Other": "1. AWS コンソールで、Amazon ECS > タスク定義に移動します\n2. タスク定義を選択し、新しいリビジョンを作成をクリックします\n3. 各コンテナについて、編集を開き、ログ設定を awslogs に設定します\n4. ロググループを目的の CloudWatch Logs グループに設定し、リージョンを選択します\n5. 保存して作成して新しいリビジョンを登録します（すべてのコンテナにロギングがあることを確認）",
+      "Terraform": "```hcl\n# ECS task definition with logging enabled for the container\nresource \"aws_ecs_task_definition\" \"<example_resource_name>\" {\n  family                = \"<example_resource_name>\"\n  container_definitions = jsonencode([\n    {\n      name  = \"<example_resource_name>\"\n      image = \"<image>\"\n      logConfiguration = {                 # Critical: enables container logging\n        logDriver = \"awslogs\"             # Critical: non-null log driver passes the check\n        options = {\n          awslogs-group  = \"<log-group>\"  # Critical: CloudWatch Logs group\n          awslogs-region = \"<region>\"\n        }\n      }\n    }\n  ])\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "すべてのタスクに対して集中型の改ざん防止 **コンテナロギング** を実装します。コンテナごとに `logDriver` を定義し、アクセスが制限された管理先にログを送信します。**最小権限**、暗号化、保持を適用します。異常を監視し、アラートを発します。*外部コレクターを使用する場合は、同等のカバレッジと耐久性を確保してください。*",
+      "Url": "https://hub.prowler.com/check/ecs_task_definitions_logging_enabled"
+    }
+  },
+  "Categories": [
+    "logging"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

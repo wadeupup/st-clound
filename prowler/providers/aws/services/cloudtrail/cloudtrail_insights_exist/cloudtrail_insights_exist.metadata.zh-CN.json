@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "cloudtrail_insights_exist",
+  "CheckTitle": "CloudTrail 跟踪已启用 Insights",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices/Runtime Behavior Analysis",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/CIS AWS Foundations Benchmark"
+  ],
+  "ServiceName": "cloudtrail",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "low",
+  "ResourceType": "AwsCloudTrailTrail",
+  "ResourceGroup": "monitoring",
+  "Description": "正在记录日志的 **CloudTrail 跟踪** 通过 `insight selectors` 评估 **Insights**，这些选择器可对管理事件模式（API 调用和错误率）进行异常检测。该发现精确定位缺少这些选择器的记录跟踪。",
+  "Risk": "没有 **Insights**，异常的 API 调用或错误率可能被忽视，延迟检测凭据滥用、权限提升或失控的自动化。攻击者可能在响应之前快速更改策略、删除资源或窃取数据，影响机密性和可用性。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/logging-insights-events-with-cloudtrail.html",
+    "https://awscli.amazonaws.com/v2/documentation/api/2.18.18/reference/cloudtrail/put-insight-selectors.html",
+    "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudtrail"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws cloudtrail put-insight-selectors --trail-name <TRAIL_NAME> --insight-selectors '[{\"InsightType\":\"ApiCallRateInsight\"}]'",
+      "NativeIaC": "```yaml\nResources:\n  <example_resource_name>:\n    Type: AWS::CloudTrail::Trail\n    Properties:\n      TrailName: <example_resource_name>\n      S3BucketName: <example_resource_name>\n      IsLogging: true\n      InsightSelectors:\n        - InsightType: ApiCallRateInsight  # Critical fix: enables CloudTrail Insights on the trail\n```",
+      "Other": "1. 在 AWS 控制台中，转到 CloudTrail > 跟踪\n2. 选择正在记录日志的跟踪\n3. 在 CloudTrail Insights 部分单击编辑\n4. 启用 Insights 并选择 API 调用率（或错误率）\n5. 保存更改",
+      "Terraform": "```hcl\nresource \"aws_cloudtrail\" \"<example_resource_name>\" {\n  name           = \"<example_resource_name>\"\n  s3_bucket_name = \"<example_resource_name>\"\n  enable_logging = true\n\n  insight_selector {\n    insight_type = \"ApiCallRateInsight\"  # Critical fix: enables CloudTrail Insights on the trail\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "在所有记录日志的跟踪上启用 **CloudTrail Insights**（理想情况下是所有区域或组织跟踪）。同时激活 `ApiCallRateInsight` 和 `ApiErrorRateInsight`。将警报与监控集成并定期审查异常。应用 **纵深防御** 和最小权限原则以减少潜在的爆炸半径。",
+      "Url": "https://hub.prowler.com/check/cloudtrail_insights_exist"
+    }
+  },
+  "Categories": [
+    "forensics-ready"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

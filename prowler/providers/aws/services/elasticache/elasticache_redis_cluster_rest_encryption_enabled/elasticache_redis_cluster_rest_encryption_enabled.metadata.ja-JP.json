@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "elasticache_redis_cluster_rest_encryption_enabled",
+  "CheckTitle": "ElastiCache Redis キャッシュクラスターで保存時の暗号化が有効になっている",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Effects/Data Exposure"
+  ],
+  "ServiceName": "elasticache",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "database",
+  "Description": "**ElastiCache for Redis レプリケーショングループ**は、ディスク上のキャッシュデータとバックアップの **保存時の暗号化** について評価されます。この保護が有効になっていないグループが特定されます。",
+  "Risk": "保存時の暗号化がない場合、侵害や設定ミスによってストレージやバックアップにアクセスされると、キャッシュファイルとスナップショットを読み取ることができます。シークレット、トークン、PII が公開される可能性があり、**機密性**を損ない、キャッシュデータのオフライン分析を通じて**横方向の移動**を支援します。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/ElastiCache/in-transit-and-at-rest-encryption.html",
+    "https://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/at-rest-encryption.html#at-rest-encryption-enable",
+    "https://aws.amazon.com/blogs/security/amazon-elasticache-now-supports-encryption-for-elasticache-for-redis/"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation: enable at-rest encryption for an ElastiCache Redis replication group\nResources:\n  <example_resource_name>:\n    Type: AWS::ElastiCache::ReplicationGroup\n    Properties:\n      ReplicationGroupId: <example_resource_id>\n      ReplicationGroupDescription: Enable at-rest encryption\n      Engine: redis\n      CacheNodeType: cache.t3.micro\n      NumCacheClusters: 1\n      AtRestEncryptionEnabled: true  # CRITICAL: turns on encryption at rest for the replication group\n```",
+      "Other": "1. AWS コンソールで、ElastiCache > Redis に移動します\n2. 暗号化されていないレプリケーショングループを選択し、操作 > バックアップをクリックして手動バックアップを作成します\n3. バックアップが完了したら、バックアップをクリックし、それを選択してから復元をクリックします\n4. 復元設定で、保存時の暗号化をチェック/有効化します（デフォルトの KMS キーを使用）し、新しいレプリケーショングループを作成します\n5. アプリケーションを更新して、新しいレプリケーショングループエンドポイントを使用します\n6. 接続性とデータを確認してから、古い（暗号化されていない）レプリケーショングループを削除します",
+      "Terraform": "```hcl\n# Terraform: enable at-rest encryption for an ElastiCache Redis replication group\nresource \"aws_elasticache_replication_group\" \"<example_resource_name>\" {\n  replication_group_id  = \"<example_resource_id>\"\n  description           = \"Enable at-rest encryption\"\n  node_type             = \"cache.t3.micro\"\n  number_cache_clusters = 1\n  at_rest_encryption_enabled = true  # CRITICAL: turns on encryption at rest for the replication group\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "すべての Redis レプリケーショングループで **保存時の暗号化** を有効にします。**顧客管理の KMS キー**を使用し、キーに最小権限アクセスを適用し、キーの使用状況を監査します。保存時の暗号化は作成時に有効になるため（バックアップ、復元、置換）、制御された移行を計画します。**転送中の暗号化**と認証と組み合わせて、多層防御を実現します。",
+      "Url": "https://hub.prowler.com/check/elasticache_redis_cluster_rest_encryption_enabled"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

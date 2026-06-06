@@ -1,0 +1,45 @@
+{
+  "Provider": "aws",
+  "CheckID": "cloudtrail_log_file_validation_enabled",
+  "CheckTitle": "CloudTrail トレイルでログファイル検証が有効になっている",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/CIS AWS Foundations Benchmark"
+  ],
+  "ServiceName": "cloudtrail",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsCloudTrailTrail",
+  "ResourceGroup": "monitoring",
+  "Description": "**AWS CloudTrail トレイル** が **ログファイル整合性検証** が有効になっているかどうか (`LogFileValidationEnabled`) が評価されます。\n\n有効にすると、CloudTrail は署名付きダイジェストファイルを生成して、S3 に配信されたログファイルが変更されていないことを確認します。",
+  "Risk": "検証がない場合、攻撃者は検出されることなく監査エントリを変更、偽造、または削除でき、ログの **整合性** と否認防止を損ないます。\n\nこれにより、調査が損なわれ、アラート回避が可能になり、リージョンまたはアカウント間の不正な変更が隠蔽されます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-log-file-validation-intro.html",
+    "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-log-file-validation-enabling.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/CloudTrail/cloudtrail-log-file-integrity-validation.html",
+    "https://deepwiki.com/acantril/learn-cantrill-io-labs/7.1-cloudtrail-log-file-integrity"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws cloudtrail update-trail --name <trail_name> --enable-log-file-validation",
+      "NativeIaC": "```yaml\n# CloudFormation: Enable log file validation on a CloudTrail trail\nResources:\n  <example_resource_name>:\n    Type: AWS::CloudTrail::Trail\n    Properties:\n      S3BucketName: <example_resource_name>\n      EnableLogFileValidation: true  # Critical: enables integrity validation for delivered log files\n```",
+      "Other": "1. AWS コンソールを開き、CloudTrail に移動します\n2. トレイルをクリックし、<trail_name> を選択します\n3. 編集をクリックします\n4. 追加/高度な設定で、ログファイル検証を有効にするにチェックを入れます\n5. 変更を保存をクリックします",
+      "Terraform": "```hcl\n# Enable log file validation on a CloudTrail trail\nresource \"aws_cloudtrail\" \"<example_resource_name>\" {\n  name               = \"<example_resource_name>\"\n  s3_bucket_name     = \"<example_resource_name>\"\n  enable_log_file_validation = true  # Critical: ensures CloudTrail writes signed digests to detect tampering\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "すべてのトレイルで **ログファイル整合性検証** (`LogFileValidationEnabled=true`) を有効にします。\n\nログバケットに **最小権限の原則** を適用し、ダイジェストファイルを保持および保護し（例：S3 オブジェクトロック/MFA 削除）、検証結果を監視して **多層防御** をサポートします。",
+      "Url": "https://hub.prowler.com/check/cloudtrail_log_file_validation_enabled"
+    }
+  },
+  "Categories": [
+    "logging",
+    "forensics-ready"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

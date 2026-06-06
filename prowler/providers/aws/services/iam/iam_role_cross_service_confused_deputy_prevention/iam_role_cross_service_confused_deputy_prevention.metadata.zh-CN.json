@@ -1,0 +1,33 @@
+{
+  "Provider": "aws",
+  "CheckID": "iam_role_cross_service_confused_deputy_prevention",
+  "CheckTitle": "确保 IAM 服务角色防止跨服务混淆代理攻击",
+  "CheckType": [],
+  "ServiceName": "iam",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "high",
+  "ResourceType": "AwsIamRole",
+  "ResourceGroup": "IAM",
+  "Description": "确保 IAM 服务角色防止跨服务混淆代理攻击",
+  "Risk": "允许攻击者获得对资源的未授权访问",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "为了减轻跨服务混淆代理攻击，建议在 IAM 角色信任策略中使用 aws:SourceArn 和 aws:SourceAccount 全局条件上下文键。如果角色不支持这些字段，请考虑实施替代安全措施，例如定义更严格的基于资源的策略或使用特定服务的信任策略，以限制角色的权限和暴露。有关详细指导，请参阅 AWS 关于防止跨服务混淆代理问题的文档。",
+      "Url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/confused-deputy.html#cross-service-confused-deputy-prevention"
+    }
+  },
+  "Categories": [
+    "trust-boundaries"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

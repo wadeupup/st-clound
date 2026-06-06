@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "defender_container_images_scan_enabled",
+  "CheckTitle": "Azure Defender のイメージ スキャンまたはサードパーティ製プロバイダーによるイメージ脆弱性スキャンを有効化することを確認する",
+  "CheckType": [],
+  "ServiceName": "defender",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Microsoft.Security",
+  "ResourceGroup": "security",
+  "Description": "Azure（AKS）にデプロイされるイメージを脆弱性スキャンします。Azure Container Registry に保存されたイメージの脆弱性スキャンは、Azure Security Center で一般提供されています。この機能は情報セキュリティ分野の主要プロバイダーである Qualys により提供されています。Container Registry にイメージをプッシュすると、Security Center が自動的にスキャンを実行し、ファイルで定義されたパッケージや依存関係の既知脆弱性を確認します。スキャン完了後（約 10 分）、Security Center は検出された各脆弱性の詳細とセキュリティ分類を提示し、問題の修復方法と脆弱な攻撃面の保護に関するガイダンスを提供します。",
+  "Risk": "ソフトウェア パッケージ内の脆弱性は、ハッカーや悪意あるユーザーに悪用され、ローカルなクラウド リソースへの不正アクセスにつながる可能性があります。Azure Defender や他のサードパーティ製品では、イメージを既知脆弱性についてスキャンできます。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/container-registry/container-registry-check-health",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "",
+      "Url": "https://learn.microsoft.com/en-us/azure/container-registry/scan-images-defender"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "Azure Container Registry を使用していると、まれに問題が発生することがあります。たとえば、ローカル環境の Docker の問題でコンテナー イメージを pull できない場合や、ネットワーク問題でレジストリに接続できない場合があります。"
+}

@@ -1,0 +1,40 @@
+{
+  "Provider": "aws",
+  "CheckID": "lightsail_static_ip_unused",
+  "CheckTitle": "Lightsail の静的 IP はインスタンスに関連付けられています",
+  "CheckType": [
+    "ソフトウェアと構成のチェック/AWS セキュリティベストプラクティス",
+    "影響/リソース消費"
+  ],
+  "ServiceName": "lightsail",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "low",
+  "ResourceType": "Other",
+  "ResourceGroup": "compute",
+  "Description": "**Amazon Lightsail の静的 IP** が **インスタンスに関連付けられていない** と検出され、予約されているが未使用のアドレスを示しています。\n\n評価は、各静的 IP の関連付け状態に焦点を当て、潜在的な残存物を強調します。",
+  "Risk": "**未接続の静的 IP** は継続的な料金を発生させ、資産のドリフトを示します。DNS やアプリがまだアドレスを参照している場合、リクエストはブラックホール化され、**可用性** に影響を与えます。同じ IP を意図しないホストに後で接続すると、サービスやデータが露出し、**機密性** と **完全性** に影響を与える可能性があります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/lightsail/latest/userguide/understanding-public-ip-and-private-ip-addresses-in-amazon-lightsail.html",
+    "https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/Lightsail.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws lightsail attach-static-ip --static-ip-name <example_resource_name> --instance-name <example_resource_name>",
+      "NativeIaC": "```yaml\nResources:\n  AttachStaticIp:\n    Type: AWS::Lightsail::StaticIpAttachment\n    Properties:\n      InstanceName: <example_resource_name>  # 重要: 接続するインスタンス; IP を接続済みとしてマークします\n      StaticIpName: <example_resource_name>  # 重要: 接続する静的 IP; 関連付けることで FAIL を修正します\n```",
+      "Other": "1. AWS コンソールで、Lightsail > ネットワーキング > 静的 IP に移動します\n2. 未使用の静的 IP を選択し、「インスタンスに接続」をクリックします\n3. 対象のインスタンスを選択して確認します\n4. 静的 IP が接続されていることを確認します",
+      "Terraform": "```hcl\nresource \"aws_lightsail_static_ip_attachment\" \"attach\" {\n  static_ip_name = \"<example_resource_name>\"  # 重要: 接続する静的 IP を指定します\n  instance_name  = \"<example_resource_name>\"  # 重要: 対象インスタンス; 関連付けによりチェックが PASS になります\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "未使用の静的 IP を解放するか、意図したインスタンスに接続します。\n\nIP 割り当てには **最小特権** を適用し、タグ付けと所有権を強制し、未接続のアドレスに対するアラート付きの定期監査を実施します。*予約が必要な場合* は、目的を文書化し、ドリフトとコストを防ぐために期限を設定します。",
+      "Url": "https://hub.prowler.com/check/lightsail_static_ip_unused"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

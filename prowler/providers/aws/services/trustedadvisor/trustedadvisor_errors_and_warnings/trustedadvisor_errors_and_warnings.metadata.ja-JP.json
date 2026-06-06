@@ -1,0 +1,37 @@
+{
+  "Provider": "aws",
+  "CheckID": "trustedadvisor_errors_and_warnings",
+  "CheckTitle": "Trusted Advisorチェックにエラーや警告がない",
+  "CheckType": [
+    "ソフトウェアと構成チェック/AWSセキュリティのベストプラクティス"
+  ],
+  "ServiceName": "trustedadvisor",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "monitoring",
+  "Description": "**AWS Trusted Advisor**チェックステータスを評価して、「警告」または「エラー」アイテムを識別します。この検出は、セキュリティ**、**フォールトトレランス**、**サービス制限**、**コスト**などのカテゴリでTrusted Advisorによって報告されたステータスを反映しており、注意すべき構成やクォータを示しています。",
+  "Risk": "未解決の**警告/エラー**は、CIAに影響を与える誤った構成を残す可能性があります：\n-**機密性*：パブリックアクセスまたは弱い認証によりデータが暴露される\n-**整合性*：緩すぎる設定は不要な変更を許可\n-**可用性*：空乏や弾性差を制限するとダウンタイムが発生\nまた、不必要なコストも増加します。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://aws.amazon.com/premiumsupport/technology/trusted-advisor/best-practice-checklist/",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/TrustedAdvisor/checks.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "1.AWSコンソールにログインし、Trusted Advisorを開く\n2.チェックに移動し、ステータスを警告とエラーにフィルタする\n3.各失敗チェックを開き、「詳細/推奨アクションの表示」をクリックします\n4.影響を受けるリソースにリストされた修復プログラムを適用する\n5.チェックボックスの「リフレッシュ」をクリックし、すべてのチェックボックスに「OK」が表示されるまで繰り返します",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "Trusted Advisorの検出を修正するために継続的なプロセスを使用する：\n-**「エラー」**を優先し、次に「警告」`\n-所有権とSLAの割当て\n-アラートとワークフローの統合\n-最小権限**の実行、セグメント化、暗号化、MFA、およびテストバックアップ\n-修復を確認し、劣化を防ぐために定期的に再評価",
+      "Url": "https://hub.prowler.com/check/trustedadvisor_errors_and_warnings"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

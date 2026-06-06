@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "monitor_alert_service_health_exists",
+  "CheckTitle": "Service Health 用のアクティビティ ログ アラートが存在することを確認する",
+  "CheckType": [],
+  "ServiceName": "monitor",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Monitor",
+  "ResourceGroup": "monitoring",
+  "Description": "Microsoft Azure クラウド アカウント内で Service Health イベントが発生した際にトリガーされる Azure アクティビティ ログ アラートが構成されていることを確認します。新しいイベントがアラート ルール構成で指定された条件に一致した場合に、アラートが有効化される必要があります。",
+  "Risk": "Service Health イベントの監視が不足すると、重大なサービス障害、計画メンテナンス、セキュリティ勧告、または利用中の Azure サービスやリージョンに影響するその他の変更を見逃す可能性があります。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/service-health/overview",
+  "Remediation": {
+    "Code": {
+      "CLI": "az monitor activity-log alert create --subscription <subscription-id> --resource-group <resource-group> --name <alert-rule> --condition category=ServiceHealth and properties.incidentType=Incident --scope /subscriptions/<subscription-id> --action-group <action-group>",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/ActivityLog/service-health-alert.html",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "Service Health イベント用のアクティビティ ログ アラートを作成し、適切な担当者へ通知するアクション グループを構成します。",
+      "Url": "https://learn.microsoft.com/en-us/azure/service-health/alerts-activity-log-service-notifications-portal"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "既定では、Azure サブスクリプションには Service Health イベント用のアクティビティ ログ アラートは構成されていません。"
+}

@@ -1,0 +1,44 @@
+{
+  "Provider": "aws",
+  "CheckID": "sagemaker_notebook_instance_without_direct_internet_access_configured",
+  "CheckTitle": "Amazon SageMaker 笔记本实例已禁用直接互联网访问",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践/网络可达性",
+    "软件和配置检查/行业和监管标准/AWS 基础安全最佳实践",
+    "影响/数据暴露",
+    "影响/数据外泄"
+  ],
+  "ServiceName": "sagemaker",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsSageMakerNotebookInstance",
+  "ResourceGroup": "ai_ml",
+  "Description": "Amazon SageMaker 笔记本实例会针对 `DirectInternetAccess` 设置进行评估。\n\n禁用该设置的实例仅使用 VPC 连接；启用该设置的实例则允许直接出站互联网访问。",
+  "Risk": "笔记本直接访问互联网会削弱**出站控制**，危及**机密性**和**完整性**。\n\n对手或未经审查的代码可能会窃取数据、下载恶意软件，或运行命令与控制。公开的软件包安装会绕过检查，从而使供应链篡改以及从受损会话发起的**横向移动**成为可能。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/SageMaker/notebook-direct-internet-access.html",
+    "https://docs.aws.amazon.com/sagemaker/latest/dg/interface-vpc-endpoint.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation：禁用直接互联网访问的 SageMaker 笔记本\nResources:\n  <example_resource_name>:\n    Type: AWS::SageMaker::NotebookInstance\n    Properties:\n      NotebookInstanceName: <example_resource_name>\n      InstanceType: ml.t3.medium\n      RoleArn: <example_role_arn>\n      SubnetId: <example_subnet_id>               # 禁用直接互联网访问时必需\n      SecurityGroupIds:                           # 禁用直接互联网访问时必需\n        - <example_security_group_id>\n      DirectInternetAccess: \"Disabled\"            # 关键：禁用直接互联网访问以通过检查\n```",
+      "Other": "1. 在 AWS 控制台中，前往 SageMaker > Notebook instances\n2. 选择该 notebook 实例，选择 Stop，并等待状态变为 Stopped\n3. 点击 Edit\n4. 将 Direct internet access 设置为 Disabled\n5. 如果出现提示，选择一个 Subnet 和至少一个 Security group（禁用时需要 VPC）\n6. 点击 Update，然后选择 Start 以使实例重新上线",
+      "Terraform": "```hcl\n# 禁用直接互联网访问的 SageMaker notebook\nresource \"aws_sagemaker_notebook_instance\" \"<example_resource_name>\" {\n  name                = \"<example_resource_name>\"\n  role_arn            = \"<example_role_arn>\"\n  instance_type       = \"ml.t3.medium\"\n  subnet_id           = \"<example_subnet_id>\"          # 禁用直接互联网访问时必需\n  security_groups     = [\"<example_security_group_id>\"] # 禁用直接互联网访问时必需\n\n  direct_internet_access = \"Disabled\" # 关键：禁用直接互联网访问以通过检查\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "禁用直接互联网访问（`DirectInternetAccess: Disabled`）并将笔记本放置在私有子网中。\n\n对所需服务使用 **VPC 端点/PrivateLink**，通过允许列表限制出站流量并采用 **最小权限** 安全组，同时通过网络隔离和对出站流量的监控实施 **纵深防御**。",
+      "Url": "https://hub.prowler.com/check/sagemaker_notebook_instance_without_direct_internet_access_configured"
+    }
+  },
+  "Categories": [
+    "internet-exposed",
+    "trust-boundaries",
+    "gen-ai"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

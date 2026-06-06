@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "autoscaling_group_elb_health_check_enabled",
+  "CheckTitle": "与负载均衡器关联的 Auto Scaling 组已启用 ELB 健康检查",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践",
+    "软件和配置检查/行业和监管标准/AWS 基础安全最佳实践"
+  ],
+  "ServiceName": "autoscaling",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "low",
+  "ResourceType": "AwsAutoScalingAutoScalingGroup",
+  "ResourceGroup": "compute",
+  "Description": "附加到负载均衡器的 EC2 Auto Scaling 组会评估**基于 ELB 的健康检查**，这些检查使用负载均衡器的目标健康状态，而不是仅基于实例的检查。",
+  "Risk": "没有**ELB 健康检查**，组可能会保留负载均衡器探测失败的实例，导致：\n- 由于路由到不良目标而降低**可用性**\n- 更高的错误率影响事务**完整性**\n- 低效的扩展和增加的**成本**",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/autoscaling-controls.html#autoscaling-1",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/AutoScaling/auto-scaling-group-health-check.html",
+    "https://docs.aws.amazon.com/autoscaling/ec2/userguide/as-add-elb-healthcheck.html#as-add-elb-healthcheck-console"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws autoscaling update-auto-scaling-group --auto-scaling-group-name <auto-scaling-group-name> --health-check-type ELB",
+      "NativeIaC": "```yaml\n# CloudFormation: 为 Auto Scaling 组启用 ELB 健康检查\nResources:\n  <example_resource_name>:\n    Type: AWS::AutoScaling::AutoScalingGroup\n    Properties:\n      HealthCheckType: ELB  # 修复：使用 ELB 健康检查，以便 ASG 通过负载均衡器评估实例健康状态\n```",
+      "Other": "1. 在 AWS 控制台中，转到 EC2 > Auto Scaling Groups\n2. 选择 Auto Scaling 组\n3. 在 Details 选项卡上，单击 Health checks 下的 Edit\n4. 在 Additional health check types 下，选择 Elastic Load Balancing (ELB)\n5. 单击 Update/Save",
+      "Terraform": "```hcl\n# 在 Auto Scaling 组上启用 ELB 健康检查\nresource \"aws_autoscaling_group\" \"<example_resource_name>\" {\n  health_check_type = \"ELB\"  # 修复：确保 ASG 使用负载均衡器健康状态\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "为负载均衡器后面的 Auto Scaling 组启用**ELB 健康检查**，以反映真实的客户端可达性。通过以下方式应用**高可用性**和**纵深防御**：\n- 使用适合应用程序的 LB 探测\n- 调整宽限期和阈值设置以避免抖动\n- 监控健康指标和警报",
+      "Url": "https://hub.prowler.com/check/autoscaling_group_elb_health_check_enabled"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

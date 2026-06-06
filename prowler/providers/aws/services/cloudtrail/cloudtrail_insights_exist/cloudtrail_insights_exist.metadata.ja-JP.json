@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "cloudtrail_insights_exist",
+  "CheckTitle": "CloudTrail トレイルで Insights が有効になっている",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices/Runtime Behavior Analysis",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/CIS AWS Foundations Benchmark"
+  ],
+  "ServiceName": "cloudtrail",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "low",
+  "ResourceType": "AwsCloudTrailTrail",
+  "ResourceGroup": "monitoring",
+  "Description": "ログを記録している **CloudTrail トレイル** は、`insight selectors` を介して **Insights** が評価されます。これらのセレクターは、管理イベントパターン（API 呼び出しとエラー率）で異常検出を有効にします。この検出結果は、これらのセレクターが欠けているログ記録トレイルを特定します。",
+  "Risk": "**Insights** がない場合、異常な API 呼び出しやエラー率が見逃され、資格情報の悪用、権限昇格、または制御不能な自動化の検出が遅れる可能性があります。攻撃者は、応答前にポリシーを迅速に変更したり、リソースを削除したり、データを窃取したりして、機密性と可用性に影響を与える可能性があります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/logging-insights-events-with-cloudtrail.html",
+    "https://awscli.amazonaws.com/v2/documentation/api/2.18.18/reference/cloudtrail/put-insight-selectors.html",
+    "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudtrail"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws cloudtrail put-insight-selectors --trail-name <TRAIL_NAME> --insight-selectors '[{\"InsightType\":\"ApiCallRateInsight\"}]'",
+      "NativeIaC": "```yaml\nResources:\n  <example_resource_name>:\n    Type: AWS::CloudTrail::Trail\n    Properties:\n      TrailName: <example_resource_name>\n      S3BucketName: <example_resource_name>\n      IsLogging: true\n      InsightSelectors:\n        - InsightType: ApiCallRateInsight  # Critical fix: enables CloudTrail Insights on the trail\n```",
+      "Other": "1. AWS コンソールで、CloudTrail > トレイルに移動します\n2. ログを記録しているトレイルを選択します\n3. CloudTrail Insights セクションで編集をクリックします\n4. Insights を有効にし、API 呼び出し率（またはエラー率）を選択します\n5. 変更を保存します",
+      "Terraform": "```hcl\nresource \"aws_cloudtrail\" \"<example_resource_name>\" {\n  name           = \"<example_resource_name>\"\n  s3_bucket_name = \"<example_resource_name>\"\n  enable_logging = true\n\n  insight_selector {\n    insight_type = \"ApiCallRateInsight\"  # Critical fix: enables CloudTrail Insights on the trail\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "すべてのログ記録トレイル（理想的には全リージョンまたは組織トレイル）で **CloudTrail Insights** を有効にします。`ApiCallRateInsight` と `ApiErrorRateInsight` の両方をアクティブ化します。アラートを監視と統合し、定期的に異常を確認します。**多層防御** と最小権限の原則を適用して、潜在的な影響範囲を減らします。",
+      "Url": "https://hub.prowler.com/check/cloudtrail_insights_exist"
+    }
+  },
+  "Categories": [
+    "forensics-ready"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

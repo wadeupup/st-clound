@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "keyvault_rbac_key_expiration_set",
+  "CheckTitle": "RBAC Key Vault のすべてのキーに有効期限が設定されていることを確認する",
+  "CheckType": [],
+  "ServiceName": "keyvault",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "KeyVault",
+  "ResourceGroup": "security",
+  "Description": "ロールベース アクセス制御（RBAC）Azure Key Vault 内のすべてのキーに有効期限が設定されていることを確認します",
+  "Risk": "Azure Key Vault は、Microsoft Azure 環境内で暗号鍵を保存および使用する機能を提供します。exp（有効期限）属性は、その日時以降、キーを新規データの暗号化、新規キーのラップ、署名に使用してはならないことを示します。既定ではキーは期限切れになりません。そのため、Key Vault 内でキーをローテーションし、すべてのキーに明示的な有効期限を設定してキー ローテーションを強制することが推奨されます。これにより、割り当てられたライフタイムを超えてキーが使用されることを防げます。",
+  "RelatedUrl": "https://docs.microsoft.com/en-us/azure/key-vault/key-vault-whatis",
+  "Remediation": {
+    "Code": {
+      "CLI": "az keyvault key set-attributes --name <keyName> --vault-name <vaultName> --expires Y-m-d'T'H:M:S'Z'",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/KeyVault/key-expiration-check.html#",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-general-policies/set-an-expiration-date-on-all-keys#terraform"
+    },
+    "Recommendation": {
+      "Text": "Azure Portal から: 1. Key vaults に移動します。2. 各 Key vault で Keys をクリックします。3. メインペインで、Enabled のキーすべてに適切な有効期限が設定されていることを確認します。Azure CLI から: 次のコマンドでキーの有効期限を更新します: az keyvault key set-attributes --name <keyName> --vault-name <vaultName> -- expires Y-m-d'T'H:M:S'Z' 注: Microsoft API を使用して Key Vault 内のすべてのキーの有効期限を表示するには、'List' Key 権限が必要です。キーの有効期限を更新するには: 1. Key vault に移動し、Access Control (IAM) をクリックします。2. Add role assignment をクリックし、適切なユーザーに Key Vault Crypto Officer ロールを割り当てます。PowerShell から: Set-AzKeyVaultKeyAttribute -VaultName <VaultName> -Name <KeyName> -Expires <DateTime>",
+      "Url": "https://docs.microsoft.com/en-us/rest/api/keyvault/about-keys--secrets-and-certificates#key-vault-keys"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "キーはそれぞれ割り当てられた有効期限を過ぎると使用できません。キーは利用箇所に応じて定期的にローテーションする必要があります。"
+}

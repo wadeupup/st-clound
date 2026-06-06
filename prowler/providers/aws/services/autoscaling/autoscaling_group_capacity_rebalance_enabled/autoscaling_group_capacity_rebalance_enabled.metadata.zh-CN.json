@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "autoscaling_group_capacity_rebalance_enabled",
+  "CheckTitle": "Amazon EC2 Auto Scaling 组已启用容量重新平衡",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践",
+    "影响/拒绝服务"
+  ],
+  "ServiceName": "autoscaling",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsAutoScalingAutoScalingGroup",
+  "ResourceGroup": "compute",
+  "Description": "**EC2 Auto Scaling 组**使用**容量重新平衡**来响应 EC2 `rebalance` 建议，通过启动替换 Spot 实例并在有风险的实例健康后终止它们。\n\n*评估是否启用了此主动替换行为。*",
+  "Risk": "没有**容量重新平衡**，Spot 中断可能会降低目标并减少容量，导致超时、5xx 激增和积压增长。两分钟的通知通常不够，降低了服务**可用性**，并增加了级联故障和缓慢恢复的可能性。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/awssupport/latest/user/fault-tolerance-checks.html#amazon-ec2-auto-scaling-group-capacity-rebalance-enabled",
+    "https://docs.aws.amazon.com/autoscaling/ec2/userguide/ec2-auto-scaling-capacity-rebalancing.html",
+    "https://trendmicro.com/cloudoneconformity/knowledge-base/aws/EC2/enable-capacity-rebalancing.html",
+    "https://docs.aws.amazon.com/autoscaling/ec2/userguide/enable-capacity-rebalancing-console-cli.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws autoscaling update-auto-scaling-group --auto-scaling-group-name <example_resource_name> --capacity-rebalance",
+      "NativeIaC": "```yaml\n# CloudFormation: 在 Auto Scaling 组上启用容量重新平衡\nResources:\n  <example_resource_name>:\n    Type: AWS::AutoScaling::AutoScalingGroup\n    Properties:\n      MinSize: \"1\"\n      MaxSize: \"1\"\n      AvailabilityZones: [\"<example_az>\"]\n      LaunchTemplate:\n        LaunchTemplateName: <example_resource_name>\n        Version: \"$Default\"\n      CapacityRebalance: true  # 关键：启用有风险 Spot 实例的主动替换\n```",
+      "Other": "1. 在 AWS 控制台中，转到 EC2 > Auto Scaling Groups\n2. 选择 <example_resource_name> 并打开 Details 选项卡\n3. 单击 Allocation strategies > Edit，选中 Capacity rebalancing\n4. 单击 Update/Save",
+      "Terraform": "```hcl\n# Terraform: 在 Auto Scaling 组上启用容量重新平衡\nresource \"aws_autoscaling_group\" \"<example_resource_name>\" {\n  name               = \"<example_resource_name>\"\n  min_size           = 1\n  max_size           = 1\n  desired_capacity   = 1\n  availability_zones = [\"<example_az>\"]\n\n  launch_template {\n    id    = \"<example_resource_id>\"\n    version = \"$Latest\"\n  }\n\n  capacity_rebalance = true  # 关键：启用容量重新平衡\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "为使用 Spot 的 ASG 启用**容量重新平衡**。\n\n应用弹性实践：\n- 优先使用 `price-capacity-optimized` 分配\n- 将余量保持在 `MaxSize` 以下\n- 使用生命周期钩子进行排空/注销\n- 设计无状态、可容忍中断的工作负载（对依赖项使用最小权限和纵深防御）",
+      "Url": "https://hub.prowler.com/check/autoscaling_group_capacity_rebalance_enabled"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

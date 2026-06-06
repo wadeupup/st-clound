@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "kafka_cluster_uses_latest_version",
+  "CheckTitle": "MSK クラスターは最新の Kafka バージョンを使用するか、AWS 管理のバージョンでサーバーレスです",
+  "CheckType": [
+    "ソフトウェアと構成のチェック/パッチ管理",
+    "ソフトウェアと構成のチェック/AWS セキュリティベストプラクティス",
+    "ソフトウェアと構成のチェック/業界および規制基準/AWS 基礎セキュリティベストプラクティス"
+  ],
+  "ServiceName": "kafka",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsMskCluster",
+  "ResourceGroup": "messaging",
+  "Description": "**Amazon MSK クラスター**は、サポートされている最新の**Apache Kafka バージョン**の使用について評価されます。プロビジョニングされたクラスターは最新のリリースと比較され、**サーバーレスクラスター**はバージョン管理が自動的に行われるものとして扱われます。",
+  "Risk": "古い Kafka は既知の欠陥や弱い暗号化の悪用を可能にし、データの露出や改ざんのリスクを高めます（**機密性/完全性**）。修正が欠けていると、ブローカーのクラッシュやパーティションの不安定性が増加します（**可用性**）。サポート終了後、サイレントな自動アップグレードが予期しない動作や互換性の問題を引き起こす可能性があります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/msk/latest/developerguide/version-support.html#version-upgrades",
+    "https://docs.aws.amazon.com/lightsail/latest/userguide/amazon-lightsail-databases.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/MSK/enable-apache-kafka-latest-security-features.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws kafka update-cluster-kafka-version --cluster-arn <example_resource_id> --current-version <current_version> --target-kafka-version <latest_version>",
+      "NativeIaC": "```yaml\n# CloudFormation: MSK クラスターを最新の Kafka バージョンにアップグレード\nResources:\n  <example_resource_name>:\n    Type: AWS::MSK::Cluster\n    Properties:\n      ClusterName: <example_resource_name>\n      KafkaVersion: <latest_version>  # 重要: チェックを通過するために最新の Kafka バージョンに設定します\n      NumberOfBrokerNodes: 2\n      BrokerNodeGroupInfo:\n        InstanceType: kafka.m5.large\n        ClientSubnets:\n          - <example_resource_id>\n          - <example_resource_id>\n```",
+      "Other": "1. AWS マネジメントコンソールを開き、Amazon MSK に移動します\n2. クラスターを選択し、アクション > クラスターの更新を選択します\n3. Kafka バージョンで、最新の利用可能なバージョンを選択します\n4. レビューしてアップグレードを開始します（更新/アップグレードの開始）\n5. 操作が完了し、クラスターのステータスがアクティブに戻るまで待ちます",
+      "Terraform": "```hcl\n# Terraform: MSK クラスターを最新の Kafka バージョンにアップグレード\nresource \"aws_msk_cluster\" \"<example_resource_name>\" {\n  cluster_name           = \"<example_resource_name>\"\n  kafka_version          = \"<latest_version>\"  # 重要: チェックを通過するために最新の Kafka バージョンに設定します\n  number_of_broker_nodes = 2\n\n  broker_node_group_info {\n    instance_type  = \"kafka.m5.large\"\n    client_subnets = [\"<example_resource_id>\", \"<example_resource_id>\"]\n\n    storage_info {\n      ebs_storage_info { volume_size = 1000 }\n    }\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "制御されたアップグレード戦略を採用します:\n- MSK バージョンのサポートを追跡し、サポート終了前にアップグレードします\n- ステージングでテストし、メンテナンスウィンドウをスケジュールします\n- ダウンタイムを減らすためにブルー/グリーンまたはローリングアップグレードを使用します\n- クライアントの互換性とセキュリティ設定を検証します\n- 自動バージョン管理がリスクモデルに適合する場合はサーバーレス MSK を検討します",
+      "Url": "https://hub.prowler.com/check/kafka_cluster_uses_latest_version"
+    }
+  },
+  "Categories": [
+    "vulnerabilities"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

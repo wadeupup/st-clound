@@ -1,0 +1,36 @@
+{
+  "Provider": "aws",
+  "CheckID": "ec2_securitygroup_allow_wide_open_public_ipv4",
+  "CheckTitle": "确保没有安全组允许掩码在 0 到 24 之间的宽泛 IP 地址范围的入站和出站流量",
+  "CheckType": [
+    "Infrastructure Security"
+  ],
+  "ServiceName": "ec2",
+  "SubServiceName": "securitygroup",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "high",
+  "ResourceType": "AwsEc2SecurityGroup",
+  "ResourceGroup": "network",
+  "Description": "确保没有安全组允许掩码在 0 到 24 之间的宽泛 IP 地址范围的入站和出站流量。",
+  "Risk": "如果安全组未正确配置，将显著增加攻击面。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "采用零信任（Zero Trust）方法，将入站流量尽可能收窄，并同时考虑南北向与东西向流量的限制。",
+      "Url": "https://docs.aws.amazon.com/vpc/latest/userguide/VPC_SecurityGroups.html"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

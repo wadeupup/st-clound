@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "autoscaling_group_multiple_az",
+  "CheckTitle": "Auto Scaling グループが複数のアベイラビリティーゾーンを使用しています",
+  "CheckType": [
+    "ソフトウェアと設定チェック/AWS セキュリティベストプラクティス",
+    "影響/サービス拒否"
+  ],
+  "ServiceName": "autoscaling",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsAutoScalingAutoScalingGroup",
+  "ResourceGroup": "compute",
+  "Description": "**EC2 Auto Scaling グループ**は、リージョン内の**複数のアベイラビリティーゾーン**を使用し、インスタンスが単一のゾーンに限定されるのではなく、複数のゾーンに分散されています。",
+  "Risk": "単一のゾーンに依存すると、障害リスクが集中し、**可用性**が損なわれます。AZ の中断または容量不足により、置き換えとスケーリングがブロックされ、ダウンタイム、トラフィックの損失、より広範な爆発半径が発生する可能性があります。ワークロードが正常なゾーンにシフトできないため、回復が遅れる可能性があります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/autoscaling/ec2/userguide/as-add-az-console.html",
+    "https://docs.aws.amazon.com/autoscaling/ec2/userguide/ec2-auto-scaling-availability-zone-balanced.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/AutoScaling/multiple-availability-zones.html",
+    "https://docs.aws.amazon.com/autoscaling/ec2/userguide/disaster-recovery-resiliency.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws autoscaling update-auto-scaling-group --auto-scaling-group-name <example_resource_name> --vpc-zone-identifier \"<subnet_id_az1>,<subnet_id_az2>\"",
+      "NativeIaC": "```yaml\n# CloudFormation: ASG が複数の AZ にまたがることを保証します\nResources:\n  <example_resource_name>:\n    Type: AWS::AutoScaling::AutoScalingGroup\n    Properties:\n      MinSize: '1'\n      MaxSize: '1'\n      LaunchTemplate:\n        LaunchTemplateId: <example_resource_id>\n        Version: '$Latest'\n      VPCZoneIdentifier:\n        - <subnet_id_az1>\n        - <subnet_id_az2>  # 重要：複数の AZ を保証するために、異なる AZ の2番目のサブネットを追加します\n```",
+      "Other": "1. AWS コンソールで、EC2 > Auto Scaling Groups に移動します\n2. グループを選択し、Details タブを開きます\n3. Network > Edit をクリックします\n4. Subnets で、異なるアベイラビリティーゾーンから別のサブネットを追加します\n5. Update をクリックして保存します",
+      "Terraform": "```hcl\n# Terraform: ASG が複数の AZ にまたがることを保証します\nresource \"aws_autoscaling_group\" \"<example_resource_name>\" {\n  min_size = 1\n  max_size = 1\n\n  launch_template {\n    id      = \"<example_resource_id>\"\n    version = \"$Latest\"\n  }\n\n  vpc_zone_identifier = [\n    \"<subnet_id_az1>\",\n    \"<subnet_id_az2>\" # 重要：チェックを通過するために、異なる AZ の2つのサブネット\n  ]\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "各グループを少なくとも2つの**アベイラビリティーゾーン**に分散して、障害に備えた設計を行います。ロードバランサーを使用してトラフィックを分散し、ヘルスベースの置き換えを使用して容量を維持します。**レジリエンス**と**障害分離**の原則を適用して、ゾーン劣化中もサービスが継続できるようにします。",
+      "Url": "https://hub.prowler.com/check/autoscaling_group_multiple_az"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

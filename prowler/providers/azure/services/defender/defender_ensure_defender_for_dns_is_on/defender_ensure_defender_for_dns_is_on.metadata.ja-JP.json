@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "defender_ensure_defender_for_dns_is_on",
+  "CheckTitle": "Microsoft Defender for DNS が「オン」に設定されていることを確認する",
+  "CheckType": [],
+  "ServiceName": "defender",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AzureDefenderPlan",
+  "ResourceGroup": "security",
+  "Description": "Microsoft Defender for DNS が「オン」に設定されていることを確認する",
+  "Risk": "サブスクリプション内の DNS ルックアップはスキャンされ、潜在的なセキュリティ脅威となり得る Web サイトの動的リストと比較されます。これらの脅威はサービス内のセキュリティ侵害の結果である可能性があるため、スキャンにより潜在的なセキュリティ脅威の持ち込みを防ぐことができます。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "既定では、Microsoft Defender for Cloud は App Service インスタンスに対して有効化されていません。App Service インスタンス向けに Defender セキュリティ サービスを有効化することで、Microsoft Security Response Center が提供する脅威検知機能を利用した高度なセキュリティ防御が可能になります。",
+      "Url": ""
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

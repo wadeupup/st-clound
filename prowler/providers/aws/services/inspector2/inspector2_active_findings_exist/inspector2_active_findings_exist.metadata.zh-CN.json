@@ -1,0 +1,44 @@
+{
+  "Provider": "aws",
+  "CheckID": "inspector2_active_findings_exist",
+  "CheckTitle": "Inspector2 已启用且没有活动的发现",
+  "CheckAliases": [
+    "inspector2_findings_exist"
+  ],
+  "CheckType": [
+    "软件和配置检查/漏洞/CVE",
+    "软件和配置检查/补丁管理",
+    "软件和配置检查/AWS 安全最佳实践",
+    "行业和法规标准/AWS 基础安全最佳实践"
+  ],
+  "ServiceName": "inspector2",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "Other",
+  "ResourceGroup": "security",
+  "Description": "**Amazon Inspector2** 活动发现会在服务 `ENABLED` 时对符合条件的资源进行评估。\n\n指示是否有任何发现仍处于 **Active** 状态或没有。",
+  "Risk": "**未修复的 Inspector2 发现** 意味着已知的漏洞或暴露仍然存在于工作负载上。\n\n这可能导致：\n- 未经授权的访问和数据泄露 (C)\n- 代码篡改和权限提升 (I)\n- 通过利用或恶意软件导致的服务中断 (A)",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/Inspector/amazon-inspector-findings.html",
+    "https://docs.aws.amazon.com/inspector/latest/user/findings-understanding.html",
+    "https://docs.aws.amazon.com/inspector/latest/user/what-is-inspector.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws inspector2 create-filter --name <example_resource_name> --action SUPPRESS --filter-criteria '{\"findingStatus\":[{\"comparison\":\"EQUALS\",\"value\":\"ACTIVE\"}]}'",
+      "NativeIaC": "```yaml\n# CloudFormation：抑制所有 ACTIVE Inspector 发现\nResources:\n  <example_resource_name>:\n    Type: AWS::InspectorV2::Filter\n    Properties:\n      Name: <example_resource_name>\n      Action: SUPPRESS  # 关键：将匹配的发现转换为抑制状态，而不是活动状态\n      FilterCriteria:\n        FindingStatus:\n          - Comparison: EQUALS\n            Value: ACTIVE  # 关键：针对所有活动发现\n```",
+      "Other": "1. 在 AWS 控制台中，转到 Amazon Inspector\n2. 打开抑制规则（或过滤器）并点击创建抑制规则\n3. 设置条件：发现状态 = 活动\n4. 设置操作为抑制并点击创建\n5. 验证仪表板上的活动发现计数为 0",
+      "Terraform": "```hcl\n# Terraform：抑制所有 ACTIVE Inspector 发现\nresource \"aws_inspector2_filter\" \"<example_resource_name>\" {\n  name   = \"<example_resource_name>\"\n  action = \"SUPPRESS\"  # 关键：将匹配的发现转换为抑制状态，而不是活动状态\n\n  filter_criteria {\n    finding_status {\n      comparison = \"EQUALS\"\n      value      = \"ACTIVE\"  # 关键：针对所有活动发现\n    }\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "优先并快速修复 **活动发现**：修补主机和运行时，更新/重建镜像，修复漏洞代码，并关闭意外暴露。\n\n应用 **最小权限**，使用 **深度防御**，避免广泛抑制。将发现整合到 CI/CD 和漏洞管理中以实现持续预防。",
+      "Url": "https://hub.prowler.com/check/inspector2_active_findings_exist"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "directoryservice_directory_snapshots_limit",
+  "CheckTitle": "Directory Service ディレクトリに十分な残りの手動スナップショットクォータがある",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Effects/Resource Consumption"
+  ],
+  "ServiceName": "directoryservice",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "low",
+  "ResourceType": "Other",
+  "ResourceGroup": "IAM",
+  "Description": "**AWS Directory Service** ディレクトリの**手動スナップショット容量**が完全に消費されているか、ほぼ枯渇している状態です。これは、ディレクトリで許可されている最大値に対する現在のスナップショット数に基づいています。",
+  "Risk": "残りのスナップショット容量がない場合、新しい回復ポイントを作成できません：\n- 障害やランサムウェア攻撃中の可用性の低下\n- スケジュールされたバックアップの失敗による RPO の増加\n- 安全なロールバックがない場合の変更リスクの増大（スキーマ/OS 更新）",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://support.icompaas.com/support/solutions/articles/62000233531--ensure-directory-service-manual-snapshots-limit-reached",
+    "https://docs.aws.amazon.com/directoryservice/latest/admin-guide/ms_ad_limits.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "1. AWS コンソールで、Directory Service > Directories に移動し、<example_resource_id> を開きます\n2. Snapshots をクリックします\n3. Type = Manual の古いスナップショットを選択し、Delete snapshot をクリックして確認します\n4. 手動スナップショットの数が（手動制限 - 2）未満になるまで繰り返します。デフォルトの制限 5 の場合、最大 2 つの手動スナップショットを保持します\n5. Snapshots ページで Remaining manual snapshots > 2 を確認します",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "**スナップショットライフサイクルポリシー**を採用します：復元を確認した後、古い手動スナップショットをローテーション/期限切れにし、残り容量が少ない場合にアラートを送信します。リズムと保持のために**自動バックアップ**を優先します。スナップショット作成に**最小権限**を強制します。容量の枯渇を防ぐために、*ディレクトリごとのハード上限*内で運用を設計します。",
+      "Url": "https://hub.prowler.com/check/directoryservice_directory_snapshots_limit"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

@@ -1,0 +1,34 @@
+{
+  "Provider": "aws",
+  "CheckID": "ec2_launch_template_imdsv2_required",
+  "CheckTitle": "Amazon EC2 起動テンプレートで IMDSv2 が有効化され、必須になっている必要がある",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices"
+  ],
+  "ServiceName": "ec2",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:aws:ec2:region:account-id:launch-template/resource-id",
+  "Severity": "high",
+  "ResourceType": "AwsEc2LaunchTemplate",
+  "ResourceGroup": "compute",
+  "Description": "このコントロールは、Amazon EC2 起動テンプレートが IMDSv2 が有効化され、必須になるように設定されているかをチェックします。起動テンプレートバージョンで IMDSv2 が有効化されていない、または必須になっていない場合、コントロールは失敗します。",
+  "Risk": "IMDSv2 が必須でない場合、EC2 インスタンスはメタデータサービス攻撃に対して脆弱である可能性があり、インスタンスメタデータへの不正アクセスを許可し、インスタンス認証情報やその他の機密データの侵害につながる可能性があります。",
+  "RelatedUrl": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/configuring-instance-metadata-service.html",
+  "Remediation": {
+    "Code": {
+      "CLI": "aws ec2 modify-launch-template --launch-template-id <template-id> --version <version-number> --metadata-options HttpTokens=required",
+      "NativeIaC": "",
+      "Other": "https://docs.aws.amazon.com/securityhub/latest/userguide/ec2-controls.html#ec2-170",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "EC2 起動テンプレートで IMDSv2 が有効化され、必須になっていることを確認するには、テンプレートを更新して、インスタンスメタデータサービスバージョン 2 を必須として設定します。",
+      "Url": "https://docs.aws.amazon.com/autoscaling/ec2/userguide/create-launch-template.html#change-metadata-options"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

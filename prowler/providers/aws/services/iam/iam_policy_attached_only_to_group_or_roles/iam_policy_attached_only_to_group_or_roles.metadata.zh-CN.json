@@ -1,0 +1,35 @@
+{
+  "Provider": "aws",
+  "CheckID": "iam_policy_attached_only_to_group_or_roles",
+  "CheckTitle": "确保 IAM 策略仅附加到组或角色上",
+  "CheckType": [
+    "软件和配置检查",
+    "行业和监管标准",
+    "CIS AWS 基础基准"
+  ],
+  "ServiceName": "iam",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "low",
+  "ResourceType": "AwsIamPolicy",
+  "ResourceGroup": "IAM",
+  "Description": "确保 IAM 策略仅附加到组或角色上",
+  "Risk": "默认情况下，IAM 用户、组和角色对 AWS 资源没有访问权限。IAM 策略是授予用户、组或角色权限的方式。建议将 IAM 策略直接应用于组和角色，而不是用户。在组或角色级别分配权限可以减少随着用户数量增长而增加的访问管理复杂性。减少访问管理复杂性可能会进一步减少主体无意中获得或保留过多权限的机会。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "移除任何直接附加到用户的策略。请改用组或角色。",
+      "Url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "CAF 安全史诗：IAM"
+}

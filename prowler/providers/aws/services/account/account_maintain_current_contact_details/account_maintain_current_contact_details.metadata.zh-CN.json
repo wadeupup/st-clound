@@ -1,0 +1,46 @@
+{
+  "Provider": "aws",
+  "CheckID": "account_maintain_current_contact_details",
+  "CheckTitle": "AWS 账户联系信息是最新的",
+  "CheckType": [
+    "软件和配置检查/行业和监管标准/AWS 基础安全最佳实践"
+  ],
+  "ServiceName": "account",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "governance",
+  "Description": "**AWS 账户联系信息**对于**主要联系人**以及 `security`、`billing` 和 `operations` 的**备用联系人**是最新的，包含准确的电子邮件地址和电话号码。",
+  "Risk": "过时或单一联系人会延迟**安全通知**，减慢**事件响应**，并使**账户恢复**复杂化。\n\nAWS 可能在滥用缓解期间限制服务，降低**可用性**。错过的警报使持续滥用成为可能，存在**数据泄露**和未授权更改（**完整性**）的风险。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.prowler.com/checks/aws/iam-policies/iam_18-maintain-contact-details#aws-console",
+    "https://repost.aws/knowledge-center/update-phone-number",
+    "https://support.stax.io/docs/accounts/update-aws-account-contact-details",
+    "https://maartenbruntink.nl/blog/2022/09/26/aws-account-hygiene-101-mass-updating-alternate-account-contacts/",
+    "https://docs.aws.amazon.com/security-ir/latest/userguide/update-account-contact-info.html",
+    "https://docs.aws.amazon.com/accounts/latest/reference/manage-acct-update-contact-primary.html",
+    "https://repost.aws/knowledge-center/add-update-billing-contact",
+    "https://aws.amazon.com/blogs/security/update-the-alternate-security-contact-across-your-aws-accounts-for-timely-security-notifications/",
+    "https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_accounts_update_contacts.html",
+    "https://docs.aws.amazon.com/accounts/latest/reference/manage-acct-update-contact-alternate.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws account put-alternate-contact --alternate-contact-type=SECURITY --email-address=<SECURITY_EMAIL> --name=\"<SECURITY_CONTACT_NAME>\" --phone-number=\"<SECURITY_PHONE>\" --title=\"Security\"",
+      "NativeIaC": "",
+      "Other": "1. 登录 AWS 管理控制台\n2. 打开 Billing and Cost Management，然后单击您的账户名称 > Account\n3. 在 Contact information 下，单击 Edit，更新详细信息，然后单击 Update\n4. 在 Alternate contacts 下，单击 Edit\n5. 输入 Security 联系人姓名、电子邮件和电话（使用团队别名），然后单击 Update\n6. 如需要，对 Billing 和 Operations 重复此操作",
+      "Terraform": "```hcl\n# 为 AWS 账户设置 Security 备用联系人\nresource \"aws_account_alternate_contact\" \"<example_resource_name>\" {\n  alternate_contact_type = \"SECURITY\"  # 关键：确保 AWS 可以联系到您的安全团队\n  email_address          = \"<SECURITY_EMAIL>\"  # 关键：联系目的地\n  name                   = \"<SECURITY_CONTACT_NAME>\"\n  phone_number           = \"<SECURITY_PHONE>\"\n  title                  = \"Security\"\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "采用：\n- **主要联系人**和 `security`、`billing`、`operations` 的**备用联系人**\n- 共享的、受监控的别名和支持 SMS 的电话号码（非个人）\n- 跨账户的集中管理，定期审查\n- 对可修改联系数据的人员实施**最小权限**\n- 定期可访问性测试和文档化的所有权",
+      "Url": "https://hub.prowler.com/check/account_maintain_current_contact_details"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

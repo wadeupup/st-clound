@@ -1,0 +1,45 @@
+{
+  "Provider": "aws",
+  "CheckID": "networkfirewall_policy_default_action_fragmented_packets",
+  "CheckTitle": "网络防火墙策略默认情况下丢弃或转发分片数据包",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践/网络可达性",
+    "软件和配置检查/行业和法规标准/AWS 基础安全最佳实践",
+    "软件和配置检查/行业和监管标准/NIST 800-53 控制（美国）",
+    "TTPs/防御规避"
+  ],
+  "ServiceName": "networkfirewall",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsNetworkFirewallFirewall",
+  "ResourceGroup": "network",
+  "Description": "**网络防火墙策略**会评估`StatelessFragmentDefaultActions`设置，以确认**分片UDP数据包**使用`aws:drop`或`aws:forward_to_sfe`。",
+  "Risk": "使用`aws:pass`处理**分片UDP**允许未检查的流量通过防火墙。攻击者可以通过分片规避过滤器，从而实现**数据泄露**（机密性）、有效载荷走私和横向移动（完整性），以及导致服务压力的分片洪水（可用性）。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/network-firewall/latest/APIReference/API_FirewallPolicy.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/networkfirewall-controls.html#networkfirewall-5",
+    "https://docs.aws.amazon.com/network-firewall/latest/developerguide/firewall-policy-updating.html",
+    "https://docs.aws.amazon.com/network-firewall/latest/developerguide/stateless-default-actions.html",
+    "https://docs.aws.amazon.com/config/latest/developerguide/netfw-policy-default-action-fragment-packets.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\nResources:\n  <example_resource_name>:\n    Type: AWS::NetworkFirewall::FirewallPolicy\n    Properties:\n      FirewallPolicyName: <example_resource_name>\n      FirewallPolicy:\n        StatelessDefaultActions:\n          - aws:drop\n        StatelessFragmentDefaultActions:\n          - aws:drop  # 关键：确保默认情况下丢弃分片UDP数据包以通过检查\n```",
+      "Other": "1. 打开Amazon VPC控制台并转到网络防火墙 > 防火墙策略\n2. 选择要编辑的策略并选择编辑\n3. 在无状态默认操作下，找到分片数据包\n4. 将操作设置为丢弃（或转发到有状态规则组）\n5. 保存更改",
+      "Terraform": "```hcl\nresource \"aws_networkfirewall_firewall_policy\" \"<example_resource_name>\" {\n  name = \"<example_resource_name>\"\n\n  firewall_policy {\n    stateless_default_actions          = [\"aws:drop\"]\n    stateless_fragment_default_actions = [\"aws:drop\"]  # 关键：默认情况下丢弃分片UDP数据包以通过检查\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "将`StatelessFragmentDefaultActions`设置为`aws:drop`或`aws:forward_to_sfe`，以便分片被阻止或发送进行**有状态检查**。对流量流应用**最小特权**，使用规则组进行**深度防御**，并监控日志以检测异常分片。",
+      "Url": "https://hub.prowler.com/check/networkfirewall_policy_default_action_fragmented_packets"
+    }
+  },
+  "Categories": [
+    "trust-boundaries"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

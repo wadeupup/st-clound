@@ -1,0 +1,33 @@
+{
+  "Provider": "aws",
+  "CheckID": "s3_bucket_object_versioning",
+  "CheckTitle": "S3バケットでオブジェクトのバージョニングが有効になっているか確認する",
+  "CheckType": [
+    "データ保護"
+  ],
+  "ServiceName": "s3",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:s3:::bucket_name",
+  "Severity": "medium",
+  "ResourceType": "AwsS3Bucket",
+  "ResourceGroup": "storage",
+  "Description": "S3バケットでオブジェクトのバージョニングが有効になっているか確認する",
+  "Risk": "バージョン管理を使えば、意図しないユーザー操作とアプリケーション障害の両方から簡単に復旧できます。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://docs.prowler.com/checks/aws/s3-policies/s3_16-enable-versioning#aws-console",
+      "Terraform": "https://docs.prowler.com/checks/aws/s3-policies/s3_16-enable-versioning#terraform"
+    },
+    "Recommendation": {
+      "Text": "機密情報を含み、頻繁に変更され、バックアップだけではすべての変更を捉えるのに十分でない可能性があるバケットについては、Amazon コンソールまたは API を使用してバージョニングを構成してください。",
+      "Url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/Versioning.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

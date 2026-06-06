@@ -1,0 +1,33 @@
+{
+  "Provider": "aws",
+  "CheckID": "iam_role_cross_account_readonlyaccess_policy",
+  "CheckTitle": "IAM ロールが外部 AWS アカウントに対して ReadOnlyAccess アクセスを持たないようにする",
+  "CheckType": [],
+  "ServiceName": "iam",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "high",
+  "ResourceType": "AwsIamRole",
+  "ResourceGroup": "IAM",
+  "Description": "IAM ロールが外部 AWS アカウントに対して ReadOnlyAccess アクセスを持たないようにする",
+  "Risk": "AWS 管理の ReadOnlyAccess ポリシーは非常に強力であり、顧客に重大なデータ漏洩の脅威をもたらします。非常に慎重に付与する必要があります。サードパーティベンダーにアクセスを付与する場合は、ViewOnlyAccess や SecurityAudit などの代替の管理ポリシーを使用することを検討してください。",
+  "RelatedUrl": "https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_job-functions.html#awsmp_readonlyaccess",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "サードパーティのクラウドアカウントを含む信頼ポリシーを持つすべてのロールから AWS 管理の ReadOnlyAccess ポリシーを削除するか、ReadOnlyAccess ポリシーを必要とするすべてのロールの信頼ポリシーからサードパーティのクラウドアカウントを削除します。",
+      "Url": "https://docs.securestate.vmware.com/rule-docs/aws-iam-role-cross-account-readonlyaccess-policy"
+    }
+  },
+  "Categories": [
+    "trust-boundaries"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "CAF セキュリティエピック: IAM"
+}

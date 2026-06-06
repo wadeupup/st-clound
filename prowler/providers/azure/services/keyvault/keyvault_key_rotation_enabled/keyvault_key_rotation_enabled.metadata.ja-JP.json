@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "keyvault_key_rotation_enabled",
+  "CheckTitle": "サポート対象サービス向けに Azure Key Vault で自動キー ローテーションが有効化されていることを確認する",
+  "CheckType": [],
+  "ServiceName": "keyvault",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "KeyVault",
+  "ResourceGroup": "security",
+  "Description": "自動キー ローテーションは Public Preview で利用可能です。現在サポートされるアプリケーションは、Key Vault、Managed Disks、ならびに Key Vault 内のキーへアクセスする Storage accounts です。サポート対象アプリケーションは段階的に増加します。",
+  "Risk": "設定後は、組織ポリシーで定めた間隔でキーが失効する際に、自動プライベートキー ローテーションにより手動管理が不要になります。推奨キー有効期間は 2 年です。組織は独自のキー有効期限ポリシーを定義してください。",
+  "RelatedUrl": "https://docs.microsoft.com/en-us/azure/key-vault/keys/how-to-configure-key-rotation",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "注: Azure CLI と PowerShell は、時間間隔入力に ISO8601 フラグを使用します。すべての時間間隔入力は P<timespanInISO8601Format>(Y,M,D) 形式です。先頭の P は必須で、period を示します。（Y,M,D）はそれぞれ年・月・日を表します。2 年 2 か月 2 日は (P2Y2M2D) です。Azure Portal から: 1. Azure Portal 左上の Portal Menu を選択します。2. Key Vaults を選択します。3. 監査対象の Key Vault を選択します。4. Objects で Keys を選択します。5. 監査対象キーを選択します。6. 上部行で Rotation policy を選択します。7. Expiry time を選択します。8. Enable auto rotation を Enabled に設定します。9. 適切な Rotation option と Rotation time を設定します。10. 必要に応じて Notification time を設定します。11. Save を選択します。12. すべての Key Vault とキーで手順 3〜11 を繰り返します。PowerShell から: 各キーについて次のコマンドを実行してポリシーを更新します: Set-AzKeyVaultKeyRotationPolicy -VaultName test-kv -Name test-key -PolicyPath rotation_policy.json",
+      "Url": "https://docs.microsoft.com/en-us/azure/storage/common/customer-managed-keys-overview#update-the-key-version"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "必要なアプリケーションの実行には、操作ごとに追加コストが発生します。"
+}

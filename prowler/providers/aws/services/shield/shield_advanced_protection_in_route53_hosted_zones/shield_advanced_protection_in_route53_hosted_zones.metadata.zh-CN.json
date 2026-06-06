@@ -1,0 +1,40 @@
+{
+  "Provider": "aws",
+  "CheckID": "shield_advanced_protection_in_route53_hosted_zones",
+  "CheckTitle": "Route53 托管区域受 AWS Shield Advanced 保护",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践/网络可达性",
+    "软件和配置检查/行业和监管标准/AWS 基础安全最佳实践",
+    "影响/拒绝服务"
+  ],
+  "ServiceName": "shield",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsRoute53HostedZone",
+  "ResourceGroup": "network",
+  "Description": "**Route 53 托管区域**已启用一个处于活动状态的 **AWS Shield Advanced** 防护，并已注册到该区域的 `ARN`。",
+  "Risk": "如果没有 **Shield Advanced**，权威 DNS 容易受到以下攻击：\n- **流量型/反射型** 洪泛攻击\n- **查询/应用程序** 层攻击\n\n影响：解析中断和应用程序宕机（**可用性**）、延迟激增，以及因攻击流量导致的意外成本。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/waf/latest/developerguide/configure-new-protection.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws shield create-protection --name <example_resource_name> --resource-arn arn:aws:route53:::hostedzone/<example_resource_id>",
+      "NativeIaC": "```yaml\n# CloudFormation：为 Route53 托管区域添加 Shield Advanced 保护\nResources:\n  <example_resource_name>:\n    Type: AWS::Shield::Protection\n    Properties:\n      ResourceArn: arn:aws:route53:::hostedzone/<example_resource_id>  # 关键：使用 Shield Advanced 保护托管区域\n```",
+      "Other": "1. 打开 AWS WAF 与 Shield 控制台\n2. 前往 AWS Shield > Protected resources\n3. 点击 Add resources to protect\n4. 将 Scope 设置为 Global，并选择资源类型：Amazon Route 53 Hosted Zone\n5. 选择托管区域并点击 Protect with Shield Advanced",
+      "Terraform": "```hcl\n# 为 Route53 托管区域添加 Shield Advanced 保护\nresource \"aws_shield_protection\" \"<example_resource_name>\" {\n  name         = \"<example_resource_name>\"\n  resource_arn = \"arn:aws:route53:::hostedzone/<example_resource_id>\"  # 关键：使用 Shield Advanced 保护托管区域\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "将关键的 **Route 53 hosted zones** 添加为 **Shield Advanced protected resources**，以应用托管式 DDoS 防护。遵循 **纵深防御**：限制 DNS 暴露面，对保护变更实施最小权限，监控流量基线，并准备具有清晰升级路径的事件运行手册以加快响应。",
+      "Url": "https://hub.prowler.com/check/shield_advanced_protection_in_route53_hosted_zones"
+    }
+  },
+  "Categories": [
+    "resilience"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

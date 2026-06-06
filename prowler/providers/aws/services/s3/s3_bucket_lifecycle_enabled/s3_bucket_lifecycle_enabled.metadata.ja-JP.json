@@ -1,0 +1,33 @@
+{
+  "Provider": "aws",
+  "CheckID": "s3_bucket_lifecycle_enabled",
+  "CheckTitle": "S3 バケットでライフサイクル設定が有効になっているか確認してください",
+  "CheckType": [
+    "AWSの基礎的なセキュリティのベストプラクティス"
+  ],
+  "ServiceName": "s3",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:partition:s3:::bucket_name",
+  "Severity": "low",
+  "ResourceType": "AwsS3Bucket",
+  "ResourceGroup": "storage",
+  "Description": "S3 バケットでライフサイクル設定が有効になっているか確認してください。",
+  "Risk": "S3 バケットでライフサイクル管理が有効になっていないことのリスクには、ストレージコストの増加、管理されていないデータ保持、およびデータポリシーへの非準拠の可能性が含まれます。",
+  "RelatedUrl": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lifecycle-mgmt.html",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://docs.aws.amazon.com/securityhub/latest/userguide/s3-controls.html#s3-13",
+      "Terraform": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/S3/lifecycle-configuration.html"
+    },
+    "Recommendation": {
+      "Text": "S3 バケットでライフサイクルポリシーを有効にして、データの移行と有効期限切れを自動的に管理します。",
+      "Url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/how-to-set-lifecycle-configuration-intro.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "keyvault_private_endpoints",
+  "CheckTitle": "确保 Azure Key Vault 使用私有终结点",
+  "CheckType": [],
+  "ServiceName": "keyvault",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "KeyVault",
+  "ResourceGroup": "security",
+  "Description": "私有终结点可保护从 Azure Key Vault 到请求机密和密钥资源的网络流量。",
+  "Risk": "私有终结点会将发往 Azure Key Vault 的网络请求限制在已附加并被允许相互通信的资源终结点上。若将 Key Vault 分配到没有终结点的网络中，该网络上的其他资源可能查看从 Key Vault 到目标的全部流量。尽管配置较为复杂，但对于高安全级别机密，仍建议启用此配置。",
+  "RelatedUrl": "https://docs.microsoft.com/en-us/azure/private-link/private-endpoint-overview",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "在开始此修复流程前，请先查看所需前置条件的附加信息。通过 Azure 门户：1. 在 Azure 首页，从左上角打开 Portal Menu。2. 选择 Key Vaults。3. 选择一个要审计的 Key Vault。4. 在左侧栏选择 Networking。5. 在顶部选项中选择 Private endpoint connections。6. 选择 + Create。7. 选择 Key Vault 所在订阅及其他所需配置。8. 选择 Next。9. 在 resource type 中选择 Microsoft.KeyVault/vaults。10. 选择要关联私有终结点的 Key Vault。11. 选择 Next。12. 在 Virtual Networking 字段中，选择要分配该终结点的网络。13. 按需选择其他配置选项，包括现有或新的应用安全组。14. 选择 Next。15. 选择私有终结点要使用的 private DNS。16. 选择 Next。17. 可选添加 Tags。18. 选择 Next : Review + Create。19. 审核信息并选择 Create，然后按审计流程确认是否已成功应用。20. 对每个 Key Vault 重复步骤 3-19。通过 Azure CLI：1. 创建终结点，执行以下命令：az network private-endpoint create --resource-group <resourceGroup --vnet- name <vnetName> --subnet <subnetName> --name <PrivateEndpointName> -- private-connection-resource-id '/subscriptions/<AZURE SUBSCRIPTION ID>/resourceGroups/<resourceGroup>/providers/Microsoft.KeyVault/vaults/<keyVa ultName>' --group-ids vault --connection-name <privateLinkConnectionName> -- location <azureRegion> --manual-request 2. 手动批准终结点请求，执行以下命令：az keyvault private-endpoint-connection approve --resource-group <resourceGroup> --vault-name <keyVaultName> –name <privateLinkName> 4. 确定私有终结点的 IP 地址，以便将 Key Vault 连接到你此前创建的 Private DNS：5. 查找 networkInterfaces 的 id 属性，其值需在步骤 7 中填入变量 <privateEndpointNIC>。az network private-endpoint show -g <resourceGroupName> -n <privateEndpointName> 6. 查找 networkInterfaces 的 id 属性，其值需在步骤 7 中填入 <privateEndpointNIC>。az network nic show --ids <privateEndpointName> 7. 在你为私有终结点创建的 DNS 区域中创建 Private DNS 记录：az network private-dns record-set a add-record -g <resourcecGroupName> -z 'privatelink.vaultcore.azure.net' -n <keyVaultName> -a <privateEndpointNIC> 8. 使用 nslookup 验证私有终结点并确认 DNS 记录是否正确：nslookup <keyVaultName>.vault.azure.net nslookup <keyVaultName>.privatelink.vaultcore.azure.n",
+      "Url": "https://docs.microsoft.com/en-us/azure/storage/common/storage-private-endpoints"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "错误或时机不当的网络配置变更可能导致服务中断。此外，运行私有终结点并承载 PB 级及以上网络流量还可能产生额外费用层级。"
+}

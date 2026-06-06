@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "opensearch_service_domains_access_control_enabled",
+  "CheckTitle": "Amazon OpenSearch Service 域已启用细粒度访问控制",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践",
+    "软件和配置检查/行业和法规标准/AWS 基础安全最佳实践"
+  ],
+  "ServiceName": "opensearch",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsOpenSearchServiceDomain",
+  "ResourceGroup": "database",
+  "Description": "**Amazon OpenSearch Service 域**被评估为在`advanced-security-options`中启用了**细粒度访问控制**，确保在索引、文档和字段级别的基于角色的授权，用于 API 和 Dashboards 访问。",
+  "Risk": "如果没有**细粒度访问控制**，身份可能会获得过于广泛的权限，从而在索引和 Dashboards 中进行未经授权的读取或写入。这会破坏**机密性**和**完整性**，促进横向移动，并增加被破坏账户的影响范围。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://repost.aws/questions/QUvejSG0WDRByFVMcDchn_5w/how-do-resource-based-access-policies-interact-with-fgac-master-users-in-amazon-opensearch-service",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/opensearch-controls.html#opensearch-7",
+    "https://docs.aws.amazon.com/opensearch-service/latest/developerguide/fgac.html#fgac-enabling",
+    "https://ealtili.medium.com/how-to-use-fine-grained-access-control-in-amazon-opensearch-service-4dc86bffd40d"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws opensearch update-domain-config --domain-name <DOMAIN_NAME> --advanced-security-options '{\"Enabled\":true,\"MasterUserOptions\":{\"MasterUserARN\":\"<MASTER_USER_ARN>\"}}'",
+      "NativeIaC": "```yaml\n# CloudFormation：在 OpenSearch 域上启用细粒度访问控制（FGAC）\nResources:\n  <example_resource_name>:\n    Type: AWS::OpenSearchService::Domain\n    Properties:\n      DomainName: <example_resource_name>\n      AdvancedSecurityOptions:\n        Enabled: true  # 关键：开启 FGAC\n        MasterUserOptions:\n          MasterUserARN: <MASTER_USER_ARN>  # 关键：需要使用 IAM 主体启用 FGAC\n```",
+      "Other": "1. 在 AWS 控制台中，转到 Amazon OpenSearch Service\n2. 选择您的域并选择编辑安全配置\n3. 启用细粒度访问控制\n4. 设置主用户（选择 IAM ARN 并输入<MASTER_USER_ARN>或创建内部主用户）\n5. 保存更改并等待更新完成",
+      "Terraform": "```hcl\n# 在 OpenSearch 域上启用细粒度访问控制（FGAC）\nresource \"aws_opensearch_domain\" \"<example_resource_name>\" {\n  domain_name = \"<example_resource_name>\"\n\n  advanced_security_options {\n    enabled = true  # 关键：开启 FGAC\n    master_user_options {\n      master_user_arn = \"<MASTER_USER_ARN>\"  # 关键：需要使用 IAM 主体启用 FGAC\n    }\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "在`advanced-security-options`中启用**细粒度访问控制**。定义细粒度的基于角色的权限（索引/文档/字段）并将其映射到联合身份。应用**最小权限**、默认拒绝和**职责分离**。限制公共访问并定期审查角色映射。",
+      "Url": "https://hub.prowler.com/check/opensearch_service_domains_access_control_enabled"
+    }
+  },
+  "Categories": [
+    "identity-access"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

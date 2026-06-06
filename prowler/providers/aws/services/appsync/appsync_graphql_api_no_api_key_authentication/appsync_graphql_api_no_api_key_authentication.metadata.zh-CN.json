@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "appsync_graphql_api_no_api_key_authentication",
+  "CheckTitle": "AWS AppSync GraphQL API 不使用 API 密钥身份验证",
+  "CheckType": [
+    "软件和配置检查/AWS 安全最佳实践",
+    "TTPs/初始访问/未授权访问"
+  ],
+  "ServiceName": "appsync",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsAppSyncGraphQLApi",
+  "ResourceGroup": "api_gateway",
+  "Description": "**AWS AppSync GraphQL API** 会检查默认授权类型。该检查结果指示使用 `API_KEY` 而不是 IAM、Cognito、OIDC 或 Lambda 授权器配置的 API。",
+  "Risk": "静态**API 密钥**可能被泄露或重用，从而启用未授权的查询和变更。\n- **机密性**：不受限制的数据读取\n- **完整性**：未授权的写入和架构滥用\n- **可问责性**：没有用于审计的用户身份，难以撤销和限定范围",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://aws.amazon.com/blogs/mobile/graphql-security-appsync-amplify/",
+    "https://docs.aws.amazon.com/appsync/latest/devguide/security-authz.html",
+    "https://support.icompaas.com/support/solutions/articles/62000233666-ensure-aws-appsync-graphql-apis-should-not-be-authenticated-with-api-keys",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/appsync-controls.html#appsync-5"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws appsync update-graphql-api --api-id <api-id> --name <api-name> --authentication-type AWS_IAM",
+      "NativeIaC": "```yaml\n# CloudFormation: 将默认身份验证设置为非 API 密钥\nResources:\n  <example_resource_name>:\n    Type: AWS::AppSync::GraphQLApi\n    Properties:\n      Name: <example_resource_name>\n      AuthenticationType: AWS_IAM  # 关键：将默认身份验证从 API_KEY 切换\n```",
+      "Other": "1. 在 AWS 控制台中，转到 AppSync > APIs 并选择您的 GraphQL API\n2. 打开 Settings (Authorization)\n3. 将 Default authorization mode 更改为 AWS IAM（或 Cognito/OIDC/Lambda）\n4. 单击 Save",
+      "Terraform": "```hcl\n# 使用非 API 密钥身份验证的 AppSync GraphQL API\nresource \"aws_appsync_graphql_api\" \"<example_resource_name>\" {\n  name                = \"<example_resource_name>\"\n  authentication_type = \"AWS_IAM\"  # 关键：避免使用 API_KEY 默认身份验证\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "用更强的模式替换 `API_KEY` 并应用最小权限：\n- **AWS_IAM** 用于服务到服务\n- **Cognito User Pools** 或 **OIDC** 用于最终用户\n- **Lambda 授权器**用于自定义逻辑\n*如果访客访问不可避免*，限制为只读字段，强制执行节流，使用短密钥生命周期，并应用架构级授权。",
+      "Url": "https://hub.prowler.com/check/appsync_graphql_api_no_api_key_authentication"
+    }
+  },
+  "Categories": [
+    "identity-access"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

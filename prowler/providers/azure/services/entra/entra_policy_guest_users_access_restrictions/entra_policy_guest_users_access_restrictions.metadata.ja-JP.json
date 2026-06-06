@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "entra_policy_guest_users_access_restrictions",
+  "CheckTitle": "「Guest users access restrictions」が「Guest user access is restricted to properties and memberships of their own directory objects」に設定されていることを確認する",
+  "CheckType": [],
+  "ServiceName": "entra",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "#microsoft.graph.authorizationPolicy",
+  "ResourceGroup": "IAM",
+  "Description": "ゲスト ユーザーの権限を制限します。",
+  "Risk": "ゲスト アクセスを制限することで、ゲスト アカウントがユーザー、グループ、その他のディレクトリ リソースの列挙など特定のディレクトリ タスクを実行する権限を持たないようにし、ディレクトリ内の管理者ロールに割り当てられないようにできます。ゲスト アクセスには 3 つの制限レベルがあります。1. ゲスト ユーザーはメンバーと同等のアクセス（最も包括的）、2. ゲスト ユーザーはディレクトリ オブジェクトのプロパティとメンバーシップへの限定的アクセス（既定値）、3. ゲスト ユーザーのアクセスは自身のディレクトリ オブジェクトのプロパティとメンバーシップに限定（最も制限的）。推奨は 3 番目の最も制限的なオプションです。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/entra/identity/users/users-restrict-guest-permissions",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "1. Azure Home から Portal Menu を選択します 2. Microsoft Entra ID を選択します 3. 次に External Identities を選択します 4. External collaboration settings を選択します 5. Guest user access の Guest user access restrictions を「Guest user access is restricted to properties and memberships of their own directory objects」に変更します",
+      "Url": "https://learn.microsoft.com/en-us/entra/fundamentals/users-default-permissions#member-and-guest-users"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "これにより、管理者が承認する必要のあるリソースアクセス権限リクエストが増える可能性があります。https://learn.microsoft.com/en-us/azure/active-directory/enterprise- users/users-restrict-guest-permissions#services-currently-not-supported によると、現在未サポートのサービスでは新しいゲスト制限設定との互換性問題が発生する可能性があります。"
+}

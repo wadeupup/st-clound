@@ -1,0 +1,42 @@
+{
+  "Provider": "aws",
+  "CheckID": "kafka_cluster_mutual_tls_authentication_enabled",
+  "CheckTitle": "Kafka クラスターには TLS 認証が有効になっています",
+  "CheckType": [
+    "ソフトウェアと構成のチェック/AWS セキュリティベストプラクティス",
+    "ソフトウェアと構成のチェック/業界および規制基準/AWS 基礎セキュリティベストプラクティス",
+    "TTPs/初期アクセス"
+  ],
+  "ServiceName": "kafka",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsMskCluster",
+  "ResourceGroup": "messaging",
+  "Description": "Amazon MSK クラスターは、クライアントからブローカーへの接続で**クライアント認証**を強制します。サーバーレスクラスターはデフォルトで TLS ベースの認証を使用します。プロビジョニングされたクラスターでは、**相互 TLS (mTLS)** を明示的に有効にする必要があります。",
+  "Risk": "**mTLS** がないと、攻撃者はクライアントを偽装したりセッションを傍受したりして、**機密性**と**完全性**を損なう可能性があります。許可されていないプロデューサー/コンシューマーはトピックを読み取ったり変更したり、データストリームを汚染したり、ブローカーを氾濫させたりして、**可用性**を低下させ、下流システムに影響を与える可能性があります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/MSK/enable-mutual-tls-authentication-for-kafka-clients.html",
+    "https://docs.aws.amazon.com/msk/latest/developerguide/msk-update-security.html",
+    "https://docs.aws.amazon.com/msk/latest/developerguide/msk-authentication.html"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws kafka update-security --cluster-arn <CLUSTER_ARN> --current-version <CURRENT_VERSION> --client-authentication 'Tls={CertificateAuthorityArnList=[\"<ACM_PCA_ARN>\"]}' --encryption-info 'EncryptionInTransit={ClientBroker=TLS}'",
+      "NativeIaC": "```yaml\n# CloudFormation: MSK クラスターに対して mTLS を有効にする\nResources:\n  <example_resource_name>:\n    Type: AWS::MSK::Cluster\n    Properties:\n      ClusterName: <example_resource_name>\n      KafkaVersion: <example_kafka_version>\n      NumberOfBrokerNodes: 2\n      BrokerNodeGroupInfo:\n        InstanceType: kafka.m5.large\n        ClientSubnets:\n          - <subnet_id_1>\n          - <subnet_id_2>\n      ClientAuthentication:\n        Tls:\n          CertificateAuthorityArnList:\n            - <acm_pca_arn>  # CRITICAL: このプライベート CA を使用して相互 TLS を有効にします\n      EncryptionInfo:\n        EncryptionInTransit:\n          ClientBroker: TLS  # CRITICAL: mTLS を有効にする際に必要です\n```",
+      "Other": "1. AWS コンソールで Amazon MSK > クラスターに移動し、プロビジョニングされたクラスターを選択します (状態は ACTIVE である必要があります)\n2. アクション > セキュリティの更新 (またはセキュリティ > 編集) を選択します\n3. クライアント認証の下で TLS を有効にし、AWS Private CA ARN を追加します\n4. 転送中の暗号化の下で、クライアント-ブローカーを TLS に設定します\n5. 保存/更新し、更新が完了するのを待ちます",
+      "Terraform": "```hcl\n# Terraform: MSK クラスターに対して mTLS を有効にする\nresource \"aws_msk_cluster\" \"<example_resource_name>\" {\n  cluster_name           = \"<example_resource_name>\"\n  kafka_version          = \"<example_kafka_version>\"\n  number_of_broker_nodes = 2\n\n  broker_node_group_info {\n    instance_type  = \"kafka.m5.large\"\n    client_subnets = [\"<subnet_id_1>\", \"<subnet_id_2>\"]\n  }\n\n  client_authentication {\n    tls {\n      certificate_authority_arns = [\"<acm_pca_arn>\"]  # CRITICAL: このプライベート CA で相互 TLS を有効にします\n    }\n  }\n\n  encryption_info {\n    encryption_in_transit {\n      client_broker = \"TLS\"  # CRITICAL: mTLS を有効にする際に必要です\n    }\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "クライアント-ブローカー間のトラフィックに対して**相互 TLS** を有効にし、`PLAINTEXT` リスナーを無効にします。管理された CA から短期間のクライアント証明書を発行し、ローテーションを行います。Kafka ACL を使用して**最小特権**を適用し、信頼できるソースへのネットワークアクセスを制限し、**多層防御**の一環として認証イベントを監視します。",
+      "Url": "https://hub.prowler.com/check/kafka_cluster_mutual_tls_authentication_enabled"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

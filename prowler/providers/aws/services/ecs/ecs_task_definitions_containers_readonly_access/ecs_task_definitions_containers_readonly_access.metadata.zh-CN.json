@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "ecs_task_definitions_containers_readonly_access",
+  "CheckTitle": "ECS 任务定义的所有容器都具有只读根文件系统",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/CIS Host Hardening Benchmarks"
+  ],
+  "ServiceName": "ecs",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsEcsTaskDefinition",
+  "ResourceGroup": "container",
+  "Description": "Amazon ECS 任务定义通过 `readonlyRootFilesystem` 指定容器根文件系统是否为 **只读**。缺少此设置或设置为 `false` 的容器实际上对根文件系统具有写入访问权限。",
+  "Risk": "**可写根文件系统** 使运行时篡改和持久化成为可能。攻击者可以修改二进制文件或配置、植入后门或删除关键文件，从而降低 **完整性** 和 **可用性**。对可写路径的访问还可能暴露密钥和日志，削弱 **机密性** 并使事件响应复杂化。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/config/latest/developerguide/ecs-containers-readonly-access.html",
+    "https://docs.aws.amazon.com/AmazonECS/latest/userguide/task_definition_parameters.html#container_definition_readonly",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/ecs-controls.html#ecs-5"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws ecs register-task-definition --family <task-family> --container-definitions '[{\"name\":\"<container-name>\",\"image\":\"<image>\",\"readonlyRootFilesystem\":true}]'",
+      "NativeIaC": "```yaml\n# CloudFormation: ECS task definition with read-only root filesystem\nResources:\n  <example_resource_name>:\n    Type: AWS::ECS::TaskDefinition\n    Properties:\n      Family: <example_resource_name>\n      ContainerDefinitions:\n        - Name: <example_resource_name>\n          Image: <image>\n          ReadonlyRootFilesystem: true  # Critical: enforces read-only root FS for the container\n```",
+      "Other": "1. 在 AWS 控制台中，转到 Amazon ECS > 任务定义\n2. 选择任务系列 <task-family> 并点击创建新修订版\n3. 对于每个容器，编辑并启用只读根文件系统（readonlyRootFilesystem = true）\n4. 点击创建以注册新修订版\n5. （如需要）更新服务以使用新修订版",
+      "Terraform": "```hcl\n# ECS task definition with read-only root filesystem\nresource \"aws_ecs_task_definition\" \"<example_resource_name>\" {\n  family                = \"<example_resource_name>\"\n  container_definitions = jsonencode([\n    {\n      name                   = \"<example_resource_name>\"\n      image                  = \"<image>\"\n      readonlyRootFilesystem = true  # Critical: enforces read-only root FS for the container\n    }\n  ])\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "对容器强制执行 `readonlyRootFilesystem: true`。\n- 仅通过应用程序所需的特定卷授予写入访问权限\n- 应用 **最小权限** 和 **纵深防御**：以非 root 用户运行，删除不必要的功能，并保持镜像不可变，这样就不需要运行时写入",
+      "Url": "https://hub.prowler.com/check/ecs_task_definitions_containers_readonly_access"
+    }
+  },
+  "Categories": [
+    "container-security"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

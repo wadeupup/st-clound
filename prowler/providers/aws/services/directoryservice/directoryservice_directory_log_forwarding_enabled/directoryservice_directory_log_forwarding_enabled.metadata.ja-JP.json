@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "directoryservice_directory_log_forwarding_enabled",
+  "CheckTitle": "Directory Service ディレクトリで CloudWatch Logs へのログ転送が有効になっている",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices"
+  ],
+  "ServiceName": "directoryservice",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "Other",
+  "ResourceGroup": "IAM",
+  "Description": "**AWS Directory Service ディレクトリ**は、ログサブスクリプションを使用してドメインコントローラーのセキュリティイベントログを **CloudWatch Logs** に転送するように設定されています。\n\n評価では、この転送が設定されている、または設定されていないディレクトリを識別します。",
+  "Risk": "転送がない場合、AD セキュリティイベントの可視性が失われ、疑わしい認証、ポリシー変更、または権限付与の検出が遅れます。攻撃者は気づかれることなくエスカレートし、永続化でき、不正アクセス（機密性）およびアイデンティティ/ポリシー操作（整合性）のリスクがあり、フォレンジックスと対応を妨げます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.amazonaws.cn/en_us/directoryservice/latest/admin-guide/ms_ad_enable_log_forwarding.html",
+    "https://docs.aws.amazon.com/directoryservice/latest/admin-guide/incident-response.html",
+    "https://docs.aws.amazon.com/directoryservice/latest/admin-guide/ms_ad_enable_log_forwarding.html",
+    "https://support.icompaas.com/support/solutions/articles/62000233528--ensure-directory-service-monitoring-with-cloudwatch-logs"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "```yaml\n# CloudFormation：Directory Service ログ転送を CloudWatch Logs に有効化\nResources:\n  LogGroup:\n    Type: AWS::Logs::LogGroup\n    Properties:\n      LogGroupName: /aws/directoryservice/<example_resource_id>\n\n  LogsResourcePolicy:\n    Type: AWS::Logs::ResourcePolicy\n    Properties:\n      PolicyName: DSLogSubscription\n      PolicyDocument: |\n        {\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"ds.amazonaws.com\"},\"Action\":[\"logs:CreateLogStream\",\"logs:PutLogEvents\",\"logs:DescribeLogStreams\"],\"Resource\":\"arn:aws:logs:*:*:log-group:/aws/directoryservice/*\"}]}\n\n  DirectoryLogSubscription:\n    Type: AWS::DirectoryService::LogSubscription\n    Properties:\n      DirectoryId: <example_resource_id>          # 重要：ログ転送を有効にする対象 Directory Service ID\n      LogGroupName: /aws/directoryservice/<example_resource_id>  # 重要：CloudWatch Logs の宛先\n```",
+      "Other": "1. AWS コンソールで、Directory Service > Directories に移動し、ディレクトリを開きます\n2. Directory details ページで、Networking & security タブを選択します\n3. Log forwarding で、Enable をクリックします\n4. Create a new CloudWatch log group（または既存のものを選択）を選択します\n5. Enable をクリックしてログ転送を開始します",
+      "Terraform": "```hcl\n# Directory Service ログ転送を CloudWatch Logs に有効化\nresource \"aws_cloudwatch_log_group\" \"ds\" {\n  name = \"/aws/directoryservice/<example_resource_id>\"\n}\n\nresource \"aws_cloudwatch_log_resource_policy\" \"ds\" {\n  policy_name     = \"DSLogSubscription\"\n  policy_document = jsonencode({\n    Version   = \"2012-10-17\",\n    Statement = [{\n      Effect    = \"Allow\",\n      Principal = { Service = \"ds.amazonaws.com\" },\n      Action    = [\"logs:CreateLogStream\", \"logs:PutLogEvents\", \"logs:DescribeLogStreams\"],\n      Resource  = \"arn:aws:logs:*:*:log-group:/aws/directoryservice/*\"\n    }]\n  })\n}\n\nresource \"aws_directory_service_log_subscription\" \"enable\" {\n  directory_id  = \"<example_resource_id>\"                 # 重要：このディレクトリのログ転送を有効化\n  log_group_name = aws_cloudwatch_log_group.ds.name        # 重要：CloudWatch Logs の宛先\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "CloudWatch Logs への**ログ転送**を有効にし、維持します。\n\n- 厳格なアクセスと保持ポリシーを持つ保護されたグループでログを集中化します\n- 配信ロールとリーダーに最小権限を適用します。改ざんを防止します（不変性）\n- 高リスクイベントにアラートを送信し、多層防御のためにリージョン/アカウント間で集約します",
+      "Url": "https://hub.prowler.com/check/directoryservice_directory_log_forwarding_enabled"
+    }
+  },
+  "Categories": [
+    "logging"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

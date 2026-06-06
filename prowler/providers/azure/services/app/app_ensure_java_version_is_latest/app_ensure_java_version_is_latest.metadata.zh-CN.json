@@ -1,0 +1,31 @@
+{
+  "Provider": "azure",
+  "CheckID": "app_ensure_java_version_is_latest",
+  "CheckTitle": "如果 Web 应用使用 Java，确保“Java 版本”为最新",
+  "CheckType": [],
+  "ServiceName": "app",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "low",
+  "ResourceType": "Microsoft.Web/sites",
+  "ResourceGroup": "serverless",
+  "Description": "Java 软件会定期发布新版本，以修复安全缺陷或提供更多功能。建议 Web 应用使用最新 Java 版本，以便利用安全修复（如有）和/或新版本提供的新功能。",
+  "Risk": "新版本可能包含安全增强和附加功能。建议使用最新软件版本以获得增强能力和新特性。每次软件安装时，组织都需要评估给定更新是否满足自身要求。同时还必须验证所选更新版本与任何附加软件之间的兼容性及支持情况。",
+  "RelatedUrl": "https://learn.microsoft.com/en-us/azure/app-service/configure-common?tabs=portal#general-settings",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/AppService/latest-version-of-java.html",
+      "Terraform": "https://docs.prowler.com/checks/azure/azure-general-policies/ensure-that-java-version-is-the-latest-if-used-to-run-the-web-app#terraform"
+    },
+    "Recommendation": {
+      "Text": "1. 使用 https://portal.azure.com 登录 Azure 门户 2. 进入 App Services 3. 点击每个应用 4. 在 Settings 部分点击 Configuration 5. 点击 General settings，确保在 Java 堆栈下，Major Version 和 Minor Version 为最新稳定且受支持版本，并将 Java Web 服务器版本设置为自动更新选项。注意：如果 Java version 设置为 Off，则无需操作，因为你的 Web 应用未使用 Java。",
+      "Url": "https://learn.microsoft.com/en-us/azure/app-service/configure-language-java?pivots=platform-linux#choosing-a-java-runtime-version"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": "如果你的应用使用了依赖特定版本的特性或库，最新版本上可能不可用。若计划升级，请充分评估影响。升级可能带来不可预见的后果，甚至导致停机。"
+}

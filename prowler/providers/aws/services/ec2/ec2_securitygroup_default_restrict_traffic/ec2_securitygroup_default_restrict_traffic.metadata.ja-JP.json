@@ -1,0 +1,34 @@
+{
+  "Provider": "aws",
+  "CheckID": "ec2_securitygroup_default_restrict_traffic",
+  "CheckTitle": "すべての VPC のデフォルトセキュリティグループがすべてのトラフィックを制限していることを確認する",
+  "CheckType": [
+    "Infrastructure Security"
+  ],
+  "ServiceName": "ec2",
+  "SubServiceName": "securitygroup",
+  "ResourceIdTemplate": "arn:partition:service:region:account-id:resource-id",
+  "Severity": "high",
+  "ResourceType": "AwsEc2SecurityGroup",
+  "ResourceGroup": "network",
+  "Description": "すべての VPC のデフォルトセキュリティグループがすべてのトラフィックを制限していることを確認します。",
+  "Risk": "境界ファイアウォールがあっても、セキュリティグループが開放されていると、VPC アクセス権を持つ任意のユーザーやマルウェアが既知のポートや機密ポートをスキャンし、インスタンスへのアクセスを取得できるようになります。",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "https://docs.prowler.com/checks/aws/networking-policies/networking_4#aws-console",
+      "Terraform": "https://docs.prowler.com/checks/aws/networking-policies/networking_4#terraform"
+    },
+    "Recommendation": {
+      "Text": "ゼロトラストアプローチを適用します。制限されていない、または過度に許可的なセキュリティグループをスキャンして修復するプロセスを実装します。推奨されるベストプラクティスは、必要な最小限のポートに定義を絞り込むことです。",
+      "Url": "https://docs.aws.amazon.com/eks/latest/userguide/sec-group-reqs.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+

@@ -1,0 +1,43 @@
+{
+  "Provider": "aws",
+  "CheckID": "eventbridge_bus_exposed",
+  "CheckTitle": "AWS EventBridge イベントバスポリシーでパブリックアクセスを許可しないこと",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices/Network Reachability",
+    "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
+    "TTPs/Initial Access/Unauthorized Access"
+  ],
+  "ServiceName": "eventbridge",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "high",
+  "ResourceType": "AwsEventsEventbus",
+  "ResourceGroup": "messaging",
+  "Description": "EventBridge イベントバスのリソースポリシーについて、`Principal: \"*\"` や過度に広い条件により任意 AWS アカウントがイベント公開やバス上ルール管理を行える **パブリックアクセス** がないかを評価します。",
+  "Risk": "公開されたイベントバスは **イベント注入** と不正ルール変更を可能にし、**完全性** を損ない **横展開** を助長します。攻撃者は下流ターゲットを発火させ、**データ露出**、サービス中断、高頻度イベントによる想定外 **コスト** を引き起こせます。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/CloudWatchEvents-CrossAccountEventDelivery.html",
+    "https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/CWE_GettingStarted.html",
+    "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/CloudWatchEvents/event-bus-exposed.html",
+    "https://aws.amazon.com/blogs/compute/simplifying-cross-account-access-with-amazon-eventbridge-resource-policies/"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws events remove-permission --event-bus-name <event_bus_name> --statement-id <statement_id>",
+      "NativeIaC": "```yaml\n# CloudFormation: restrict EventBridge event bus access to a specific account (not public)\nResources:\n  <example_resource_name>:\n    Type: AWS::Events::EventBusPolicy\n    Properties:\n      StatementId: AllowSpecificAccount\n      Action: events:PutEvents\n      Principal: arn:aws:iam::<example_account_id>:root  # CRITICAL: limit access to a specific AWS account to prevent public access\n      # Omitting EventBusName applies this to the default event bus\n```",
+      "Other": "1. AWS コンソールで EventBridge > Event buses に移動します\n2. 対象イベントバスを選択し、Permissions タブを開きます\n3. Edit policy をクリックします\n4. Principal が \"*\" または AWS が \"*\" のステートメントを削除します\n5. 必要に応じて、信頼するアカウント ID のみを Principal とするステートメント（arn:aws:iam::<ACCOUNT_ID>:root）を追加します\n6. 変更を保存します",
+      "Terraform": "```hcl\nresource \"aws_cloudwatch_event_bus_policy\" \"<example_resource_name>\" {\n  # CRITICAL: Principal is a specific AWS account, not \"*\", preventing public access\n  policy = <<POLICY\n{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [{\n    \"Sid\": \"AllowSpecificAccount\",\n    \"Effect\": \"Allow\",\n    \"Principal\": {\"AWS\": \"arn:aws:iam::<example_account_id>:root\"},\n    \"Action\": \"events:PutEvents\",\n    \"Resource\": \"arn:aws:events:<example_region>:<example_account_id>:event-bus/default\"\n  }]\n}\nPOLICY\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "リソースポリシーに **最小権限** を適用してください。プリンシパルは特定アカウントまたは組織に限定し、アクションとイベント属性（例: `source`、`detail-type`）を制約します。`Principal: \"*\"` は避けてください。\n\n想定 `account` を含むルールパターンで **多層防御** を実装し、ポリシー変更とバスアクティビティを監視します。",
+      "Url": "https://hub.prowler.com/check/eventbridge_bus_exposed"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

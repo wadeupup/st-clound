@@ -1,0 +1,41 @@
+{
+  "Provider": "aws",
+  "CheckID": "dms_endpoint_mongodb_authentication_enabled",
+  "CheckTitle": "DMS MongoDB エンドポイントで認証メカニズムが有効になっている",
+  "CheckType": [
+    "Software and Configuration Checks/AWS Security Best Practices",
+    "Effects/Data Exposure"
+  ],
+  "ServiceName": "dms",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "",
+  "Severity": "medium",
+  "ResourceType": "AwsDmsEndpoint",
+  "ResourceGroup": "database",
+  "Description": "**AWS DMS MongoDB エンドポイント**は認証メカニズムを使用します。設定では、`AuthType` が `no` ではなく（例：`password`）、`scram_sha_1` や `mongodb_cr` などの `authMechanism` を持つことが期待されます。",
+  "Risk": "認証がない場合、認証されていない接続がソースにアクセスでき、**機密性**と**整合性**が低下します。攻撃者は、移行されたドキュメントを読み取ったり変更したり、CDC をハイジャックしたり、データを注入したり、レプリケーション中にレコードを流出させたりする可能性があります。",
+  "RelatedUrl": "",
+  "AdditionalURLs": [
+    "https://docs.aws.amazon.com/dms/latest/userguide/CHAP_Source.MongoDB.html",
+    "https://docs.aws.amazon.com/securityhub/latest/userguide/dms-controls.html#dms-11"
+  ],
+  "Remediation": {
+    "Code": {
+      "CLI": "aws dms modify-endpoint --endpoint-arn <endpoint-arn> --mongodb-settings '{\"AuthType\":\"password\"}' --username <username> --password <password>",
+      "NativeIaC": "```yaml\n# CloudFormation：MongoDB DMS エンドポイントで認証を有効化\nResources:\n  <example_resource_name>:\n    Type: AWS::DMS::Endpoint\n    Properties:\n      EndpointIdentifier: <example_resource_name>\n      EndpointType: source\n      EngineName: mongodb\n      MongoDbSettings:\n        AuthType: password  # 重要：認証モードを 'password' に設定して認証を有効化\n```",
+      "Other": "1. AWS コンソールで、Database Migration Service > Endpoints に移動します\n2. MongoDB エンドポイントを選択し、Modify をクリックします\n3. MongoDB settings で、Authentication mode を Password に設定します\n4. Username と Password を入力します\n5. Save changes をクリックします",
+      "Terraform": "```hcl\n# Terraform：MongoDB DMS エンドポイントで認証を有効化\nresource \"aws_dms_endpoint\" \"<example_resource_name>\" {\n  endpoint_id   = \"<example_resource_name>\"\n  endpoint_type = \"source\"\n  engine_name   = \"mongodb\"\n\n  mongodb_settings {\n    auth_type = \"password\"  # 重要：MongoDB エンドポイントの認証を有効化\n  }\n}\n```"
+    },
+    "Recommendation": {
+      "Text": "MongoDB エンドポイントで**強力な認証**を強制します：`AuthType` を `password` に設定し、`scram_sha_1` などの `authMechanism` を使用します。**最小権限**データベースアカウントを適用し、シークレットを **Secrets Manager** に保存し、多層防御のために **TLS** と組み合わせます。",
+      "Url": "https://hub.prowler.com/check/dms_endpoint_mongodb_authentication_enabled"
+    }
+  },
+  "Categories": [
+    "identity-access"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
+
