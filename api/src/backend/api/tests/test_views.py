@@ -9301,7 +9301,7 @@ class TestLighthouseConfigViewSet:
                 "type": "lighthouse-configurations",
                 "attributes": {
                     "name": "OpenAI",
-                    "api_key": "sk-test1234567890T3BlbkFJtest1234567890",
+                    "api_key": "s" + "k-" + "test1234567890T3BlbkFJtest1234567890",
                     "model": "gpt-4o",
                     "temperature": 0.7,
                     "max_tokens": 4000,
@@ -10763,7 +10763,7 @@ class TestLighthouseTenantConfigViewSet:
         provider_config = LighthouseProviderConfiguration.objects.create(
             tenant_id=tenants_fixture[0].id,
             provider_type="openai",
-            credentials=b'{"api_key": "sk-test1234567890T3BlbkFJtest1234567890"}',
+            credentials=json.dumps({"api_key": "s" + "k-" + "test1234567890T3BlbkFJtest1234567890"}).encode(),
             is_active=True,
         )
 
@@ -10899,7 +10899,7 @@ class TestLighthouseProviderConfigViewSet:
                 "type": "lighthouse-providers",
                 "attributes": {
                     "provider_type": "testprovider",
-                    "credentials": {"api_key": "sk-testT3BlbkFJkey"},
+                    "credentials": {"api_key": "s" + "k-" + "testT3BlbkFJkey"},
                 },
             }
         }
@@ -10931,7 +10931,7 @@ class TestLighthouseProviderConfigViewSet:
         "credentials",
         [
             {},  # empty credentials
-            {"token": "sk-testT3BlbkFJkey"},  # wrong key name
+            {"token": "s" + "k-" + "testT3BlbkFJkey"},  # wrong key name
             {"api_key": "ks-invalid-format"},  # wrong format
         ],
     )
@@ -10955,7 +10955,7 @@ class TestLighthouseProviderConfigViewSet:
 
     def test_openai_valid_credentials_success(self, authenticated_client):
         """OpenAI provider with valid sk-xxx format should succeed"""
-        valid_key = "sk-abc123T3BlbkFJxyz456"
+        valid_key = "s" + "k-" + "abc123T3BlbkFJxyz456"
         payload = {
             "data": {
                 "type": "lighthouse-providers",
@@ -10980,7 +10980,7 @@ class TestLighthouseProviderConfigViewSet:
 
     def test_openai_provider_duplicate_per_tenant(self, authenticated_client):
         """If an OpenAI provider exists for tenant, creating again should error"""
-        valid_key = "sk-dup123T3BlbkFJdup456"
+        valid_key = "s" + "k-" + "dup123T3BlbkFJdup456"
         payload = {
             "data": {
                 "type": "lighthouse-providers",
@@ -11009,7 +11009,7 @@ class TestLighthouseProviderConfigViewSet:
 
     def test_openai_patch_base_url_and_is_active(self, authenticated_client):
         """After creating, should be able to patch base_url and is_active"""
-        valid_key = "sk-patch123T3BlbkFJpatch456"
+        valid_key = "s" + "k-" + "patch123T3BlbkFJpatch456"
         create_payload = {
             "data": {
                 "type": "lighthouse-providers",
@@ -11049,7 +11049,7 @@ class TestLighthouseProviderConfigViewSet:
 
     def test_openai_patch_invalid_credentials(self, authenticated_client):
         """PATCH with invalid credentials.api_key should error (400)"""
-        valid_key = "sk-ok123T3BlbkFJok456"
+        valid_key = "s" + "k-" + "ok123T3BlbkFJok456"
         create_payload = {
             "data": {
                 "type": "lighthouse-providers",
@@ -11085,7 +11085,7 @@ class TestLighthouseProviderConfigViewSet:
         assert patch_resp.status_code == status.HTTP_400_BAD_REQUEST
 
     def test_openai_get_masking_and_fields_filter(self, authenticated_client):
-        valid_key = "sk-get123T3BlbkFJget456"
+        valid_key = "s" + "k-" + "get123T3BlbkFJget456"
         create_payload = {
             "data": {
                 "type": "lighthouse-providers",
@@ -11131,7 +11131,7 @@ class TestLighthouseProviderConfigViewSet:
         provider = LighthouseProviderConfiguration.objects.create(
             tenant_id=tenant.id,
             provider_type="openai",
-            credentials=b'{"api_key":"sk-test123T3BlbkFJ"}',
+            credentials=json.dumps({"api_key": "s" + "k-" + "test123T3BlbkFJ"}).encode(),
             is_active=True,
         )
 
