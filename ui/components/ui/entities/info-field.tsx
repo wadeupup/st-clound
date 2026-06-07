@@ -11,15 +11,6 @@ interface InfoFieldProps {
   inline?: boolean;
 }
 
-<Tooltip
-  className="text-xs"
-  content="Download a ZIP file that includes the JSON (OCSF), CSV, and HTML scan reports, along with the compliance report."
->
-  <div className="flex items-center gap-2">
-    <InfoIcon className="text-primary mb-1" size={12} />
-  </div>
-</Tooltip>;
-
 export const InfoField = ({
   label,
   children,

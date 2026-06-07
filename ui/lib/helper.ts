@@ -13,6 +13,7 @@ import {
 import {
   getAcceptLanguageFromLocale,
   LOCALE_STORAGE_KEY,
+  normalizeLocale,
 } from "@/lib/i18n";
 import { AuthSocialProvider, MetaDataProps, PermissionInfo } from "@/types";
 
@@ -64,7 +65,7 @@ export const getAuthHeaders = async (options?: { contentType?: boolean }) => {
   try {
     const { cookies } = await import("next/headers");
     const cookieStore = await cookies();
-    localeFromCookie = cookieStore.get(LOCALE_STORAGE_KEY)?.value;
+    localeFromCookie = normalizeLocale(cookieStore.get(LOCALE_STORAGE_KEY)?.value);
   } catch {
     localeFromCookie = undefined;
   }

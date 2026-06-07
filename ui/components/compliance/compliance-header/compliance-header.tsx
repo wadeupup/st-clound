@@ -4,6 +4,7 @@ import { Spacer } from "@heroui/spacer";
 import Image from "next/image";
 
 import { DataTableFilterCustom } from "@/components/ui/table/data-table-filter-custom";
+import { useI18n } from "@/lib/i18n/context";
 import { ScanEntity } from "@/types/scans";
 
 import { ComplianceScanInfo } from "./compliance-scan-info";
@@ -35,13 +36,14 @@ export const ComplianceHeader = ({
   complianceTitle,
   selectedScan,
 }: ComplianceHeaderProps) => {
+  const { t } = useI18n();
   const frameworkFilters = [];
 
   // Add CIS Profile Level filter if framework is CIS
   if (framework === "CIS") {
     frameworkFilters.push({
       key: "cis_profile_level",
-      labelCheckboxGroup: "Level",
+      labelCheckboxGroup: t.compliance.level,
       values: ["Level 1", "Level 2"],
       index: 0, // Show first
       showSelectAll: false, // No "Select All" option since Level 2 includes Level 1
@@ -54,7 +56,7 @@ export const ComplianceHeader = ({
     ? [
         {
           key: "region__in",
-          labelCheckboxGroup: "Regions",
+          labelCheckboxGroup: t.compliance.regions,
           values: uniqueRegions,
           index: 1, // Show after framework filters
         },

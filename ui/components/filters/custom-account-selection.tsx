@@ -1,6 +1,8 @@
 "use client";
 import { Select, SelectItem } from "@heroui/select";
 
+import { useI18n } from "@/lib/i18n/context";
+
 const accounts = [
   { key: "audit-test-1", label: "740350143844" },
   { key: "audit-test-2", label: "890837126756" },
@@ -15,11 +17,13 @@ const accounts = [
   { key: "audit-test-11", label: "501374829106" },
 ];
 export const CustomAccountSelection = () => {
+  const { t } = useI18n();
+
   return (
     <Select
-      label="Account"
-      aria-label="Select an Account"
-      placeholder="Select an account"
+      label={t.common.account}
+      aria-label={t.common.selectAccount}
+      placeholder={t.common.selectAnAccount}
       classNames={{
         selectorIcon: "right-2",
       }}

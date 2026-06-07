@@ -11,6 +11,7 @@ import {
 } from "@/components/shadcn";
 import { EntityInfo } from "@/components/ui/entities";
 import { FormControl, FormField, FormMessage } from "@/components/ui/form";
+import { useI18n } from "@/lib/i18n/context";
 
 interface SelectScanProviderProps<
   TFieldValues extends FieldValues = FieldValues,
@@ -35,6 +36,8 @@ export const SelectScanProvider = <
   control,
   name,
 }: SelectScanProviderProps<TFieldValues, TName>) => {
+  const { t } = useI18n();
+
   return (
     <FormField
       control={control}
@@ -47,12 +50,14 @@ export const SelectScanProvider = <
         return (
           <div className="flex flex-col gap-2">
             <span className="text-text-neutral-primary text-sm font-medium">
-              Select a cloud provider to launch a scan
+              {t.scans.launch.selectProviderLabel}
             </span>
             <FormControl>
               <Select value={field.value} onValueChange={field.onChange}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Choose a cloud provider">
+                  <SelectValue
+                    placeholder={t.scans.launch.chooseProviderPlaceholder}
+                  >
                     {selectedItem ? (
                       <EntityInfo
                         cloudProvider={
@@ -67,7 +72,7 @@ export const SelectScanProvider = <
                         showCopyAction={false}
                       />
                     ) : (
-                      "Choose a cloud provider"
+                      t.scans.launch.chooseProviderPlaceholder
                     )}
                   </SelectValue>
                 </SelectTrigger>

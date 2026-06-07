@@ -5,6 +5,7 @@ import { Control, Controller, FieldValues, Path } from "react-hook-form";
 
 import { CustomRadio } from "@/components/ui/custom";
 import { FormMessage } from "@/components/ui/form";
+import { useI18n } from "@/lib/i18n/context";
 
 type RadioGroupAlibabaCloudViaCredentialsFormProps<T extends FieldValues> = {
   control: Control<T>;
@@ -21,6 +22,9 @@ export const RadioGroupAlibabaCloudViaCredentialsTypeForm = <
   errorMessage,
   onChange,
 }: RadioGroupAlibabaCloudViaCredentialsFormProps<T>) => {
+  const { t } = useI18n();
+  const labels = t.providers.connectAccount.credentialsType;
+
   return (
     <Controller
       name={"alibabacloudCredentialsType" as Path<T>}
@@ -40,21 +44,26 @@ export const RadioGroupAlibabaCloudViaCredentialsTypeForm = <
             }}
           >
             <div className="flex flex-col gap-4">
-              <span className="text-default-500 text-sm">Using RAM Role</span>
-              <CustomRadio description="Connect assuming RAM Role" value="role">
+              <span className="text-default-500 text-sm">
+                {labels.usingRamRole}
+              </span>
+              <CustomRadio
+                description={labels.connectAssumingRamRole}
+                value="role"
+              >
                 <div className="flex items-center">
-                  <span className="ml-2">Connect assuming RAM Role</span>
+                  <span className="ml-2">{labels.connectAssumingRamRole}</span>
                 </div>
               </CustomRadio>
               <span className="text-default-500 text-sm">
-                Using Credentials
+                {labels.usingCredentials}
               </span>
               <CustomRadio
-                description="Connect via Access Keys"
+                description={labels.connectViaAccessKeys}
                 value="credentials"
               >
                 <div className="flex items-center">
-                  <span className="ml-2">Connect via Access Keys</span>
+                  <span className="ml-2">{labels.connectViaAccessKeys}</span>
                 </div>
               </CustomRadio>
             </div>

@@ -5,24 +5,26 @@ import { Spacer } from "@heroui/spacer";
 import { usePathname } from "next/navigation";
 import React from "react";
 
-import { VerticalSteps } from "./vertical-steps";
+import { useI18n } from "@/lib/i18n/context";
 
-const steps = [
-  {
-    title: "Create a new role",
-    description: "Enter the name of the role you want to add.",
-    href: "/roles/new",
-  },
-  {
-    title: "Edit a existing role",
-    description:
-      "Update the role's details, including its name and permissions.",
-    href: "/roles/edit",
-  },
-];
+import { VerticalSteps } from "./vertical-steps";
 
 export const WorkflowAddEditRole = () => {
   const pathname = usePathname();
+  const { t } = useI18n();
+
+  const steps = [
+    {
+      title: t.roles.workflow.createTitle,
+      description: t.roles.workflow.createDescription,
+      href: "/roles/new",
+    },
+    {
+      title: t.roles.workflow.editTitle,
+      description: t.roles.workflow.editDescription,
+      href: "/roles/edit",
+    },
+  ];
 
   // Calculate current step based on pathname
   const currentStepIndex = steps.findIndex((step) =>
@@ -33,11 +35,10 @@ export const WorkflowAddEditRole = () => {
   return (
     <section className="max-w-sm">
       <h1 className="mb-2 text-xl font-medium" id="getting-started">
-        Manage Role Permissions
+        {t.roles.workflow.manageRolePermissions}
       </h1>
       <p className="text-small text-default-500 mb-5">
-        Define a new role with customized permissions or modify an existing one
-        to meet your needs.
+        {t.roles.workflow.description}
       </p>
       <Progress
         classNames={{
@@ -45,13 +46,15 @@ export const WorkflowAddEditRole = () => {
           label: "text-small",
           value: "text-small text-default-400",
         }}
-        label="Steps"
+        label={t.roles.workflow.steps}
         maxValue={steps.length - 1}
         minValue={0}
         showValueLabel={true}
         size="md"
         value={currentStep}
-        valueLabel={`${currentStep + 1} of ${steps.length}`}
+        valueLabel={t.roles.workflow.stepOf
+          .replace("{current}", (currentStep + 1).toString())
+          .replace("{total}", steps.length.toString())}
       />
       <VerticalSteps
         hideProgressBars

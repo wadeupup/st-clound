@@ -7,6 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/shadcn/select/select";
+import { useI18n } from "@/lib/i18n/context";
 import { ProviderType, ScanProps } from "@/types";
 
 import { ComplianceScanInfo } from "./compliance-scan-info";
@@ -28,6 +29,7 @@ export const ScanSelector = ({
   selectedScanId,
   onSelectionChange,
 }: SelectScanComplianceDataProps) => {
+  const { t } = useI18n();
   const selectedScan = scans.find((item) => item.id === selectedScanId);
 
   return (
@@ -40,11 +42,11 @@ export const ScanSelector = ({
       }}
     >
       <SelectTrigger className="w-full min-w-[365px]">
-        <SelectValue placeholder="Select a scan">
+        <SelectValue placeholder={t.compliance.selectScan}>
           {selectedScan ? (
             <ComplianceScanInfo scan={selectedScan} />
           ) : (
-            "Select a scan"
+            t.compliance.selectScan
           )}
         </SelectValue>
       </SelectTrigger>

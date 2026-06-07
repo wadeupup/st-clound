@@ -7,6 +7,8 @@ import {
   translations,
   defaultLocale,
   LOCALE_STORAGE_KEY,
+  getHtmlLangFromLocale,
+  isLocale,
 } from "./index";
 
 interface I18nContextType {
@@ -17,35 +19,54 @@ interface I18nContextType {
 
 const I18nContext = createContext<I18nContextType | undefined>(undefined);
 
+const LOCALE_COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 365;
+
+const getLocaleFromCookie = (): Locale | undefined => {
+  if (typeof document === "undefined") return undefined;
+
+  const localeCookie = document.cookie
+    .split("; ")
+    .find((cookie) => cookie.startsWith(`${LOCALE_STORAGE_KEY}=`));
+  const locale = localeCookie?.split("=")[1];
+
+  return isLocale(locale) ? locale : undefined;
+};
+
+const getStoredLocale = (): Locale => {
+  if (typeof window === "undefined") return defaultLocale;
+
+  const localStorageLocale = localStorage.getItem(LOCALE_STORAGE_KEY);
+  if (isLocale(localStorageLocale)) return localStorageLocale;
+
+  return getLocaleFromCookie() ?? defaultLocale;
+};
+
+const persistLocale = (locale: Locale) => {
+  if (typeof window === "undefined") return;
+
+  localStorage.setItem(LOCALE_STORAGE_KEY, locale);
+  document.cookie = `${LOCALE_STORAGE_KEY}=${locale}; Path=/; Max-Age=${LOCALE_COOKIE_MAX_AGE_SECONDS}; SameSite=Lax`;
+  document.documentElement.lang = getHtmlLangFromLocale(locale);
+};
+
 export function I18nProvider({ children }: { children: ReactNode }) {
-  const [locale, setLocaleState] = useState<Locale>(() => {
-    if (typeof window === "undefined") return defaultLocale;
-    const stored = localStorage.getItem(LOCALE_STORAGE_KEY);
-    return (stored as Locale) || defaultLocale;
-  });
+  const [locale, setLocaleState] = useState<Locale>(() => getStoredLocale());
 
   const setLocale = (newLocale: Locale) => {
     setLocaleState(newLocale);
-    if (typeof window !== "undefined") {
-      localStorage.setItem(LOCALE_STORAGE_KEY, newLocale);
-      document.cookie = `${LOCALE_STORAGE_KEY}=${newLocale}; Path=/; SameSite=Lax`;
-    }
+    persistLocale(newLocale);
   };
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const stored = localStorage.getItem(LOCALE_STORAGE_KEY);
-      if (stored && (stored === "en" || stored === "zh" || stored === "ja")) {
-        setLocaleState(stored as Locale);
-        document.cookie = `${LOCALE_STORAGE_KEY}=${stored}; Path=/; SameSite=Lax`;
-      }
-    }
+    const storedLocale = getStoredLocale();
+    setLocaleState(storedLocale);
+    persistLocale(storedLocale);
   }, []);
 
   const value: I18nContextType = {
     locale,
     setLocale,
-    t: translations[locale],
+    t: translations[locale] as Translations,
   };
 
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;
@@ -58,4 +79,3 @@ export function useI18n() {
   }
   return context;
 }
-

@@ -10,6 +10,7 @@ import { NavigationProgress } from "@/components/ui/navigation-progress";
 import { Toaster } from "@/components/ui/toast";
 import { fontSans } from "@/config/fonts";
 import { siteConfig } from "@/config/site";
+import { getRequestHtmlLang } from "@/lib/i18n/server";
 import { cn } from "@/lib/utils";
 import { StoreInitializer } from "@/store/ui/store-initializer";
 
@@ -43,11 +44,12 @@ export default async function RootLayout({
 }: {
   children: ReactNode;
 }) {
+  const htmlLang = await getRequestHtmlLang();
   const providersData = await getProviders({ page: 1, pageSize: 1 });
   const hasProviders = !!(providersData?.data && providersData.data.length > 0);
 
   return (
-    <html suppressHydrationWarning lang="en">
+    <html suppressHydrationWarning lang={htmlLang}>
       <head />
       <body
         suppressHydrationWarning

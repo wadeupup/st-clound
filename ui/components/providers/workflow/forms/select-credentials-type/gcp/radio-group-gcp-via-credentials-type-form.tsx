@@ -6,6 +6,7 @@ import { Control, Controller } from "react-hook-form";
 
 import { CustomRadio } from "@/components/ui/custom";
 import { FormMessage } from "@/components/ui/form";
+import { useI18n } from "@/lib/i18n/context";
 
 type RadioGroupAWSViaCredentialsFormProps = {
   control: Control<any>;
@@ -20,6 +21,9 @@ export const RadioGroupGCPViaCredentialsTypeForm = ({
   errorMessage,
   onChange,
 }: RadioGroupAWSViaCredentialsFormProps) => {
+  const { t } = useI18n();
+  const labels = t.providers.connectAccount.credentialsType;
+
   return (
     <Controller
       name="gcpCredentialsType"
@@ -40,26 +44,28 @@ export const RadioGroupGCPViaCredentialsTypeForm = ({
           >
             <div className="flex flex-col gap-4">
               <span className="text-default-500 text-sm">
-                Using Service Account
+                {labels.usingServiceAccount}
               </span>
               <CustomRadio
-                description="Connect using Service Account"
+                description={labels.connectUsingServiceAccount}
                 value="service-account"
               >
                 <div className="flex items-center">
-                  <span className="ml-2">Connect via Service Account Key</span>
+                  <span className="ml-2">
+                    {labels.connectViaServiceAccountKey}
+                  </span>
                 </div>
               </CustomRadio>
               <span className="text-default-500 text-sm">
-                Using Application Default Credentials
+                {labels.usingApplicationDefaultCredentials}
               </span>
               <CustomRadio
-                description="Connect via Credentials"
+                description={labels.connectViaCredentials}
                 value="credentials"
               >
                 <div className="flex items-center">
                   <span className="ml-2">
-                    Connect via Application Default Credentials
+                    {labels.connectViaApplicationDefaultCredentials}
                   </span>
                 </div>
               </CustomRadio>

@@ -16,6 +16,8 @@ import {
 import { ComplianceHeader } from "@/components/compliance/compliance-header/compliance-header";
 import { ContentLayout } from "@/components/ui";
 import { calculateThreatScore } from "@/lib/compliance/threatscore-calculator";
+import { translations } from "@/lib/i18n";
+import { getRequestLocale } from "@/lib/i18n/server";
 import {
   ExpandedScanData,
   ScanEntity,
@@ -31,6 +33,8 @@ export default async function Compliance({
 }) {
   const resolvedSearchParams = await searchParams;
   const searchParamsKey = JSON.stringify(resolvedSearchParams || {});
+  const locale = await getRequestLocale();
+  const t = translations[locale];
 
   const filters = Object.fromEntries(
     Object.entries(resolvedSearchParams).filter(([key]) =>
@@ -134,7 +138,7 @@ export default async function Compliance({
   }
 
   return (
-    <ContentLayout title="Compliance" icon="lucide:shield-check">
+    <ContentLayout title={t.compliance.title} icon="lucide:shield-check">
       {selectedScanId ? (
         <>
           <div className="mb-6 flex flex-col gap-6">
@@ -163,6 +167,7 @@ export default async function Compliance({
             <SSRComplianceGrid
               searchParams={resolvedSearchParams}
               selectedScan={selectedScanData}
+              messages={t.compliance}
             />
           </Suspense>
         </>
@@ -176,9 +181,14 @@ export default async function Compliance({
 const SSRComplianceGrid = async ({
   searchParams,
   selectedScan,
+  messages,
 }: {
   searchParams: SearchParamsProps;
   selectedScan?: ScanEntity;
+  messages: {
+    noDataForSelectedScan: string;
+    provideValidScanId: string;
+  };
 }) => {
   const scanId = searchParams.scanId?.toString() || "";
   const regionFilter = searchParams["filter[region__in]"]?.toString() || "";
@@ -213,7 +223,7 @@ const SSRComplianceGrid = async ({
     return (
       <div className="flex h-full items-center">
         <div className="text-default-500 text-sm">
-          No compliance data available for the selected scan.
+          {messages.noDataForSelectedScan}
         </div>
       </div>
     );
@@ -223,7 +233,9 @@ const SSRComplianceGrid = async ({
   if (compliancesData?.errors?.length > 0) {
     return (
       <div className="flex h-full items-center">
-        <div className="text-default-500 text-sm">Provide a valid scan ID.</div>
+        <div className="text-default-500 text-sm">
+          {messages.provideValidScanId}
+        </div>
       </div>
     );
   }

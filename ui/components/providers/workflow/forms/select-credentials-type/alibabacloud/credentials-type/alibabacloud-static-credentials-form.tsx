@@ -1,6 +1,9 @@
+"use client";
+
 import { Control } from "react-hook-form";
 
 import { CustomInput } from "@/components/ui/custom";
+import { useI18n } from "@/lib/i18n/context";
 import { ProviderCredentialFields } from "@/lib/provider-credentials/provider-credential-fields";
 import { AlibabaCloudCredentials } from "@/types";
 
@@ -9,22 +12,24 @@ export const AlibabaCloudStaticCredentialsForm = ({
 }: {
   control: Control<AlibabaCloudCredentials>;
 }) => {
+  const { t } = useI18n();
+  const labels = t.providers.connectAccount.credentialsType;
+
   return (
     <>
       <div className="flex flex-col">
         <div className="text-md text-default-foreground leading-9 font-bold">
-          Connect via Access Keys
+          {labels.connectViaAccessKeys}
         </div>
         <div className="text-default-500 text-sm">
-          Provide a RAM user Access Key ID and Access Key Secret with read
-          access to the resources you want Prowler to assess.
+          {labels.alibabaAccessKeysDescription}
         </div>
       </div>
       <CustomInput
         control={control}
         name={ProviderCredentialFields.ALIBABACLOUD_ACCESS_KEY_ID}
         type="text"
-        label="Access Key ID"
+        label={labels.accessKeyId}
         labelPlacement="inside"
         placeholder="e.g. LTAI5txxxxxxxxxx"
         variant="bordered"
@@ -34,16 +39,14 @@ export const AlibabaCloudStaticCredentialsForm = ({
         control={control}
         name={ProviderCredentialFields.ALIBABACLOUD_ACCESS_KEY_SECRET}
         type="password"
-        label="Access Key Secret"
+        label={labels.accessKeySecret}
         labelPlacement="inside"
-        placeholder="Enter the access key secret"
+        placeholder={labels.enterAccessKeySecret}
         variant="bordered"
         isRequired
       />
       <div className="text-default-400 text-xs">
-        Keys never leave your browser unencrypted and are stored as secrets in
-        the backend. Rotate the key from Alibaba Cloud RAM console anytime if
-        needed.
+        {labels.alibabaAccessKeySecurityNote}
       </div>
     </>
   );

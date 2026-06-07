@@ -1,7 +1,10 @@
+"use client";
+
 import { Divider } from "@heroui/divider";
 import { Control } from "react-hook-form";
 
 import { CustomInput } from "@/components/ui/custom";
+import { useI18n } from "@/lib/i18n/context";
 import { ProviderCredentialFields } from "@/lib/provider-credentials/provider-credential-fields";
 import { AlibabaCloudCredentialsRole } from "@/types";
 
@@ -10,27 +13,29 @@ export const AlibabaCloudRoleCredentialsForm = ({
 }: {
   control: Control<AlibabaCloudCredentialsRole>;
 }) => {
+  const { t } = useI18n();
+  const labels = t.providers.connectAccount.credentialsType;
+
   return (
     <>
       <div className="flex flex-col">
         <div className="text-md text-default-foreground leading-9 font-bold">
-          Connect assuming RAM Role
+          {labels.connectAssumingRamRole}
         </div>
         <div className="text-default-500 text-sm">
-          Provide the RAM Role ARN to assume, along with the Access Keys of a
-          RAM user that has permission to assume the role.
+          {labels.alibabaRamRoleDescription}
         </div>
       </div>
 
       <span className="text-default-500 text-xs font-bold">
-        RAM Role to Assume
+        {labels.ramRoleToAssume}
       </span>
 
       <CustomInput
         control={control}
         name={ProviderCredentialFields.ALIBABACLOUD_ROLE_ARN}
         type="text"
-        label="Role ARN"
+        label={labels.roleArn}
         labelPlacement="inside"
         placeholder="e.g. acs:ram::1234567890123456:role/ProwlerRole"
         variant="bordered"
@@ -40,14 +45,14 @@ export const AlibabaCloudRoleCredentialsForm = ({
       <Divider />
 
       <span className="text-default-500 text-xs font-bold">
-        Credentials for Role Assumption
+        {labels.credentialsForRoleAssumption}
       </span>
 
       <CustomInput
         control={control}
         name={ProviderCredentialFields.ALIBABACLOUD_ACCESS_KEY_ID}
         type="text"
-        label="Access Key ID"
+        label={labels.accessKeyId}
         labelPlacement="inside"
         placeholder="e.g. LTAI5txxxxxxxxxx"
         variant="bordered"
@@ -57,30 +62,28 @@ export const AlibabaCloudRoleCredentialsForm = ({
         control={control}
         name={ProviderCredentialFields.ALIBABACLOUD_ACCESS_KEY_SECRET}
         type="password"
-        label="Access Key Secret"
+        label={labels.accessKeySecret}
         labelPlacement="inside"
-        placeholder="Enter the access key secret"
+        placeholder={labels.enterAccessKeySecret}
         variant="bordered"
         isRequired
       />
 
-      <span className="text-default-500 text-xs">Optional fields</span>
+      <span className="text-default-500 text-xs">{labels.optionalFields}</span>
 
       <CustomInput
         control={control}
         name={ProviderCredentialFields.ALIBABACLOUD_ROLE_SESSION_NAME}
         type="text"
-        label="Role Session Name"
+        label={labels.roleSessionName}
         labelPlacement="inside"
-        placeholder="Enter the role session name (default: ProwlerSession)"
+        placeholder={labels.enterRoleSessionNameWithDefault}
         variant="bordered"
         isRequired={false}
       />
 
       <div className="text-default-400 text-xs">
-        Keys never leave your browser unencrypted and are stored as secrets in
-        the backend. The role will be assumed using STS to obtain temporary
-        credentials.
+        {labels.alibabaRoleSecurityNote}
       </div>
     </>
   );

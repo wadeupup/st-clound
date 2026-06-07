@@ -1,6 +1,9 @@
+"use client";
+
 import { Control, Controller } from "react-hook-form";
 
 import { CustomInput, CustomTextarea } from "@/components/ui/custom";
+import { useI18n } from "@/lib/i18n/context";
 import { ProviderCredentialFields } from "@/lib/provider-credentials/provider-credential-fields";
 import { OCICredentials } from "@/types";
 
@@ -9,14 +12,17 @@ export const OracleCloudCredentialsForm = ({
 }: {
   control: Control<OCICredentials>;
 }) => {
+  const { t } = useI18n();
+  const labels = t.providers.connectAccount.credentialsType;
+
   return (
     <>
       <div className="flex flex-col">
         <div className="text-md text-default-foreground leading-9 font-bold">
-          Connect via API Key
+          {labels.connectViaApiKey}
         </div>
         <div className="text-default-500 text-sm">
-          Please provide your Oracle Cloud Infrastructure API key credentials.
+          {labels.ociApiKeyDescription}
         </div>
       </div>
       {/* Hidden input for tenancy - auto-populated from provider UID */}
@@ -29,7 +35,7 @@ export const OracleCloudCredentialsForm = ({
         control={control}
         name={ProviderCredentialFields.OCI_USER}
         type="text"
-        label="User OCID"
+        label={labels.userOcid}
         labelPlacement="inside"
         placeholder="ocid1.user.oc1..aaaaaaa..."
         variant="bordered"
@@ -39,9 +45,9 @@ export const OracleCloudCredentialsForm = ({
         control={control}
         name={ProviderCredentialFields.OCI_FINGERPRINT}
         type="text"
-        label="Fingerprint"
+        label={labels.fingerprint}
         labelPlacement="inside"
-        placeholder="Enter the API key fingerprint"
+        placeholder={labels.enterApiKeyFingerprint}
         variant="bordered"
         isRequired
       />
@@ -49,7 +55,7 @@ export const OracleCloudCredentialsForm = ({
         control={control}
         name={ProviderCredentialFields.OCI_REGION}
         type="text"
-        label="Region"
+        label={labels.region}
         labelPlacement="inside"
         placeholder="e.g. us-ashburn-1"
         variant="bordered"
@@ -58,7 +64,7 @@ export const OracleCloudCredentialsForm = ({
       <CustomTextarea
         control={control}
         name={ProviderCredentialFields.OCI_KEY_CONTENT}
-        label="Private Key Content"
+        label={labels.privateKeyContent}
         labelPlacement="inside"
         placeholder="-----BEGIN RSA PRIVATE KEY-----&#10;MIIEpAIBAAKCAQEA...&#10;-----END RSA PRIVATE KEY-----"
         variant="bordered"
@@ -69,15 +75,14 @@ export const OracleCloudCredentialsForm = ({
         control={control}
         name={ProviderCredentialFields.OCI_PASS_PHRASE}
         type="password"
-        label="Passphrase (Optional)"
+        label={labels.passphraseOptional}
         labelPlacement="inside"
-        placeholder="Enter passphrase if key is encrypted"
+        placeholder={labels.enterPassphraseIfKeyEncrypted}
         variant="bordered"
         isRequired={false}
       />
       <div className="text-default-400 text-xs">
-        Paste the raw content of your OCI private key file (PEM format). The key
-        will be automatically encoded for secure transmission.
+        {labels.ociPrivateKeyNote}
       </div>
     </>
   );

@@ -1,6 +1,9 @@
+"use client";
+
 import { Control } from "react-hook-form";
 
 import { CustomInput } from "@/components/ui/custom";
+import { useI18n } from "@/lib/i18n/context";
 import { AzureCredentials } from "@/types";
 
 export const AzureCredentialsForm = ({
@@ -8,23 +11,26 @@ export const AzureCredentialsForm = ({
 }: {
   control: Control<AzureCredentials>;
 }) => {
+  const { t } = useI18n();
+  const labels = t.providers.connectAccount.credentialsType;
+
   return (
     <>
       <div className="flex flex-col">
         <div className="text-md text-default-foreground leading-9 font-bold">
-          Connect via Credentials
+          {labels.connectViaCredentials}
         </div>
         <div className="text-default-500 text-sm">
-          Please provide the information for your Azure credentials.
+          {labels.azureCredentialsDescription}
         </div>
       </div>
       <CustomInput
         control={control}
         name="client_id"
         type="text"
-        label="Client ID"
+        label={labels.clientId}
         labelPlacement="inside"
-        placeholder="Enter the Client ID"
+        placeholder={labels.enterClientId}
         variant="bordered"
         isRequired
       />
@@ -32,9 +38,9 @@ export const AzureCredentialsForm = ({
         control={control}
         name="client_secret"
         type="password"
-        label="Client Secret"
+        label={labels.clientSecret}
         labelPlacement="inside"
-        placeholder="Enter the Client Secret"
+        placeholder={labels.enterClientSecret}
         variant="bordered"
         isRequired
       />
@@ -42,9 +48,9 @@ export const AzureCredentialsForm = ({
         control={control}
         name="tenant_id"
         type="text"
-        label="Tenant ID"
+        label={labels.tenantId}
         labelPlacement="inside"
-        placeholder="Enter the Tenant ID"
+        placeholder={labels.enterTenantId}
         variant="bordered"
         isRequired
       />

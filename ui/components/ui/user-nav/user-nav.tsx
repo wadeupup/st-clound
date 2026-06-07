@@ -16,9 +16,11 @@ import {
   AvatarImage,
 } from "@/components/ui/avatar/avatar";
 import { CustomLink } from "@/components/ui/custom/custom-link";
+import { useI18n } from "@/lib/i18n/context";
 
 export const UserNav = () => {
   const { data: session } = useSession();
+  const { t } = useI18n();
 
   if (!session?.user) return null;
 
@@ -41,7 +43,11 @@ export const UserNav = () => {
             className="h-9 w-9 rounded-full border-slate-300 bg-white/50 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800/50 dark:hover:bg-slate-800"
             asChild
           >
-            <CustomLink href="/profile" target="_self" aria-label="Account">
+            <CustomLink
+              href="/profile"
+              target="_self"
+              aria-label={t.common.account}
+            >
               <Avatar className="h-7 w-7">
                 <AvatarImage src="#" alt="Avatar" />
                 <AvatarFallback className="bg-slate-200 text-xs font-semibold text-slate-700 dark:bg-slate-700 dark:text-slate-200">
@@ -51,7 +57,7 @@ export const UserNav = () => {
             </CustomLink>
           </Button>
         </TooltipTrigger>
-        <TooltipContent>Account Settings</TooltipContent>
+        <TooltipContent>{t.profile.accountSettings}</TooltipContent>
       </Tooltip>
 
       <Tooltip>
@@ -61,12 +67,12 @@ export const UserNav = () => {
             size="icon-sm"
             className="h-9 w-9 rounded-full border-slate-300/50 hover:bg-slate-100 hover:border-slate-300 dark:border-slate-700/50 dark:hover:bg-slate-800 dark:hover:border-slate-600"
             onClick={() => logOut()}
-            aria-label="Sign out"
+            aria-label={t.profile.signOut}
           >
             <LogOut className="h-4 w-4 text-slate-600 dark:text-slate-400" />
           </Button>
         </TooltipTrigger>
-        <TooltipContent>Sign Out</TooltipContent>
+        <TooltipContent>{t.profile.signOut}</TooltipContent>
       </Tooltip>
     </div>
   );

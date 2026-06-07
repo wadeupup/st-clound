@@ -10,6 +10,7 @@ import { NavigationProgress, Toaster } from "@/components/ui";
 import { fontSans } from "@/config/fonts";
 import { siteConfig } from "@/config/site";
 import { cn } from "@/lib";
+import { getRequestHtmlLang } from "@/lib/i18n/server";
 
 import { Providers } from "../providers";
 
@@ -38,6 +39,7 @@ export default async function RootLayout({
 }: {
   children: ReactNode;
 }) {
+  const htmlLang = await getRequestHtmlLang();
   const session = await auth();
 
   if (session?.user) {
@@ -45,7 +47,7 @@ export default async function RootLayout({
   }
 
   return (
-    <html suppressHydrationWarning lang="en">
+    <html suppressHydrationWarning lang={htmlLang}>
       <head />
       <body
         suppressHydrationWarning

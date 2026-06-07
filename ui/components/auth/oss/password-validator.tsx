@@ -6,6 +6,7 @@ import {
   PASSWORD_REQUIREMENTS,
   passwordRequirementCheckers,
 } from "@/types/authFormSchema";
+import { useI18n } from "@/lib/i18n/context";
 
 interface PasswordRequirementsMessageProps {
   password: string;
@@ -16,40 +17,48 @@ const REQUIREMENTS = [
   {
     key: "minLength",
     checker: passwordRequirementCheckers.minLength,
-    label: `At least ${PASSWORD_REQUIREMENTS.minLength} characters`,
+    labelKey: "minLength",
   },
   {
     key: "specialChars",
     checker: passwordRequirementCheckers.specialChars,
-    label: "Special characters",
+    labelKey: "specialChars",
   },
   {
     key: "uppercase",
     checker: passwordRequirementCheckers.uppercase,
-    label: "Uppercase letters",
+    labelKey: "uppercase",
   },
   {
     key: "lowercase",
     checker: passwordRequirementCheckers.lowercase,
-    label: "Lowercase letters",
+    labelKey: "lowercase",
   },
   {
     key: "numbers",
     checker: passwordRequirementCheckers.numbers,
-    label: "Numbers",
+    labelKey: "numbers",
   },
-];
+] as const;
 
 export const PasswordRequirementsMessage = ({
   password,
   className = "",
 }: PasswordRequirementsMessageProps) => {
+  const { t } = useI18n();
   const hasPasswordInput = password.length > 0;
   if (!hasPasswordInput) {
     return null;
   }
   const results = REQUIREMENTS.map((req) => ({
     ...req,
+    label:
+      req.labelKey === "minLength"
+        ? t.auth.passwordRequirements.minLength.replace(
+            "{count}",
+            PASSWORD_REQUIREMENTS.minLength.toString(),
+          )
+        : t.auth.passwordRequirements[req.labelKey],
     isMet: req.checker(password),
   }));
   const metCount = results.filter((r) => r.isMet).length;
@@ -60,7 +69,7 @@ export const PasswordRequirementsMessage = ({
       <div
         className={`bg-bg-neutral-primary rounded-xl border p-3 ${allRequirementsMet ? "border-bg-pass" : "border-bg-fail"}`}
         role="region"
-        aria-label="Password requirements status"
+        aria-label={t.auth.passwordRequirements.statusLabel}
       >
         {allRequirementsMet ? (
           <div className="flex items-center gap-2">
@@ -69,7 +78,7 @@ export const PasswordRequirementsMessage = ({
               aria-hidden="true"
             />
             <p className="text-text-neutral-primary text-xs leading-tight font-medium">
-              Password meets all requirements
+              {t.auth.passwordRequirements.allMet}
             </p>
           </div>
         ) : (
@@ -80,12 +89,12 @@ export const PasswordRequirementsMessage = ({
                 aria-hidden="true"
               />
               <p className="text-text-neutral-primary text-xs leading-tight font-medium">
-                Password must include:
+                {t.auth.passwordRequirements.mustInclude}
               </p>
             </div>
             <ul
               className="ml-6 flex flex-col gap-0.5"
-              aria-label="Password requirements"
+              aria-label={t.auth.passwordRequirements.requirementsLabel}
             >
               {results.map((req) => (
                 <li
@@ -101,13 +110,15 @@ export const PasswordRequirementsMessage = ({
                     />
                     <span
                       className="text-text-neutral-secondary"
-                      aria-label={`${req.label} ${req.isMet ? "satisfied" : "required"}`}
+                      aria-label={`${req.label} ${req.isMet ? t.auth.passwordRequirements.satisfied : t.auth.passwordRequirements.required}`}
                     >
                       {req.label}
                     </span>
                   </div>
                   <span className="sr-only">
-                    {req.isMet ? "Requirement met" : "Requirement not met"}
+                    {req.isMet
+                      ? t.auth.passwordRequirements.requirementMet
+                      : t.auth.passwordRequirements.requirementNotMet}
                   </span>
                 </li>
               ))}

@@ -1,6 +1,9 @@
+"use client";
+
 import { Control } from "react-hook-form";
 
 import { CustomTextarea } from "@/components/ui/custom";
+import { useI18n } from "@/lib/i18n/context";
 import { KubernetesCredentials } from "@/types";
 
 export const KubernetesCredentialsForm = ({
@@ -8,22 +11,25 @@ export const KubernetesCredentialsForm = ({
 }: {
   control: Control<KubernetesCredentials>;
 }) => {
+  const { t } = useI18n();
+  const labels = t.providers.connectAccount.credentialsType;
+
   return (
     <>
       <div className="flex flex-col">
         <div className="text-md text-default-foreground leading-9 font-bold">
-          Connect via Credentials
+          {labels.connectViaCredentials}
         </div>
         <div className="text-default-500 text-sm">
-          Please provide the kubeconfig content for your Kubernetes credentials.
+          {labels.kubernetesCredentialsDescription}
         </div>
       </div>
       <CustomTextarea
         control={control}
         name="kubeconfig_content"
-        label="Kubeconfig Content"
+        label={labels.kubeconfigContent}
         labelPlacement="inside"
-        placeholder="Paste your Kubeconfig YAML content here"
+        placeholder={labels.pasteKubeconfigContent}
         variant="bordered"
         minRows={10}
         isRequired
