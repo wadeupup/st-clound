@@ -259,6 +259,7 @@ from api.v1.serializers import (
     UserSerializer,
     UserUpdateSerializer,
 )
+from api.v1.report_exports import get_or_create_localized_scan_report
 
 logger = logging.getLogger(BackendLogger.API)
 
@@ -1950,6 +1951,25 @@ class ScanViewSet(BaseRLSViewSet):
         running_resp = self._get_task_status(scan)
         if running_resp:
             return running_resp
+
+        localized_report, locale = get_or_create_localized_scan_report(
+            scan, request.headers.get("Accept-Language")
+        )
+        if localized_report:
+            loader = self._load_file(localized_report, s3=False)
+            if isinstance(loader, Response):
+                return loader
+
+            content, _filename = loader
+            filename = f"scan-{scan.id}-report.{locale}.zip"
+            response = self._serve_file(
+                content,
+                filename,
+                "application/x-zip-compressed",
+            )
+            response["Content-Language"] = locale
+            response["Vary"] = "Accept-Language"
+            return response
 
         if not scan.output_location:
             return Response(

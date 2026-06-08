@@ -922,6 +922,22 @@ export const en = {
       editScanNameDescription: "Allows you to edit the scan name",
       editScanNameButton: "Edit scan name",
     },
+    reportDownload: {
+      tooltip: "Download report",
+      pendingTitle: "The report is still being generated",
+      pendingDescription: "Please try again in a few minutes.",
+      successTitle: "Download Complete",
+      successDescription: "Your scan report has been downloaded successfully.",
+      failedTitle: "Download Failed",
+      unavailableDescription:
+        "This scan does not have a generated report yet. Run report generation before downloading.",
+      unknownError: "An unknown error occurred.",
+      processingError: "An error occurred while processing the file.",
+      unexpectedResponse: "Unexpected response. Please try again later.",
+      maxRetriesExceeded:
+        "The report is still being generated. Please try again later.",
+      unexpectedTaskState: "Unexpected task state.",
+    },
     scanDetails: {
       title: "Scan Details",
       viewScanDetails: "View the scan details",

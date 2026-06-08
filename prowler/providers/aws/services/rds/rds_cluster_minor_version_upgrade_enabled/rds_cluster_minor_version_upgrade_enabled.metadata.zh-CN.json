@@ -1,0 +1,31 @@
+{
+  "Provider": "aws",
+  "CheckID": "rds_cluster_minor_version_upgrade_enabled",
+  "CheckTitle": "确保RDS 集群s have minor version upgrade enabled.",
+  "CheckType": [],
+  "ServiceName": "rds",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:aws:rds:region:account-id:db-cluster",
+  "Severity": "medium",
+  "ResourceType": "AwsRdsDbCluster",
+  "ResourceGroup": "database",
+  "Description": "确保RDS 集群s have minor version upgrade enabled.",
+  "Risk": "Auto Minor Version Upgrade is a feature that you can enable to have your 数据库 automatically upgraded when a new minor 数据库 engine version is available. Minor version upgrades often patch 安全漏洞 and fix bugs and therefore should be applied.",
+  "RelatedUrl": "https://aws.amazon.com/blogs/database/best-practices-for-upgrading-amazon-rds-to-major-and-minor-versions-of-postgresql/",
+  "Remediation": {
+    "Code": {
+      "CLI": "aws rds modify-db-cluster --db-cluster-identifier <db_cluster_id> --auto-minor-version-upgrade --apply-immediately",
+      "NativeIaC": "https://docs.prowler.com/checks/aws/general-policies/ensure-aws-db-instance-gets-all-minor-upgrades-automatically#cloudformation",
+      "Other": "https://docs.aws.amazon.com/securityhub/latest/userguide/rds-controls.html#rds-35",
+      "Terraform": "https://docs.prowler.com/checks/aws/general-policies/ensure-aws-db-instance-gets-all-minor-upgrades-automatically#terraform"
+    },
+    "Recommendation": {
+      "Text": "Enable auto minor version upgrade for all 数据库s and environments.",
+      "Url": "https://aws.amazon.com/blogs/database/best-practices-for-upgrading-amazon-rds-to-major-and-minor-versions-of-postgresql/"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

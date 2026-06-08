@@ -1,0 +1,33 @@
+{
+  "Provider": "aws",
+  "CheckID": "rds_instance_transport_encrypted",
+  "CheckTitle": "RDS インスタンスs enforce SSL/TLS 暗号化 for client connections (Microsoft SQL Server, PostgreSQL, MySQL, MariaDB, Aurora PostgreSQL, and Aurora MySQL).をチェックします",
+  "CheckType": [],
+  "ServiceName": "rds",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:aws:rds:region:account-id:db-instance",
+  "Severity": "high",
+  "ResourceType": "AwsRdsDbInstance",
+  "ResourceGroup": "database",
+  "Description": "For SQL Server, PostgreSQL, and Aurora PostgreSQL データベースs, if the `rds.force_ssl` parameter valueが設定されています to 0, SSL/TLS connections are not enforced. For MySQL, Aurora MySQL, and MariaDB データベースs, if the `require_secure_transport` parameter valueが設定されています to OFF, SSL/TLS connections are not enforced. Enforcing SSL/TLS ensures that all client connections to RDS インスタンスs are 暗号化済み, protecting sensitive information in transit.",
+  "Risk": "If not enabled, sensitive information in transit is not protected.",
+  "RelatedUrl": "https://aws.amazon.com/premiumsupport/knowledge-center/rds-connect-ssl-connection/",
+  "Remediation": {
+    "Code": {
+      "CLI": "aws rds modify-db-parameter-group --region <REGION_NAME> --db-parameter-group-name <PARAMETER_GROUP_NAME> --parameters ParameterName='rds.force_ssl',ParameterValue='1',ApplyMethod='pending-reboot'",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/RDS/transport-encryption.html",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "instances provisioned with Amazon RDS enforce SSL/TLS for client connections to meet security and compliance requirements.を確認します",
+      "Url": "https://aws.amazon.com/premiumsupport/knowledge-center/rds-connect-ssl-connection/"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

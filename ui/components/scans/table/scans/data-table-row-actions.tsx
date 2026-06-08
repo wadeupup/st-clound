@@ -75,7 +75,9 @@ export function DataTableRowActions<ScanProps>({
                 description={t.scans.rowActions.downloadZipDescription}
                 textValue={t.scans.rowActions.downloadZip}
                 startContent={<DownloadIcon className={iconClasses} />}
-                onPress={() => downloadScanZip(scanId, toast)}
+                onPress={() =>
+                  downloadScanZip(scanId, toast, t.scans.reportDownload)
+                }
                 isDisabled={scanState !== "completed"}
               >
                 {t.scans.rowActions.downloadZip}

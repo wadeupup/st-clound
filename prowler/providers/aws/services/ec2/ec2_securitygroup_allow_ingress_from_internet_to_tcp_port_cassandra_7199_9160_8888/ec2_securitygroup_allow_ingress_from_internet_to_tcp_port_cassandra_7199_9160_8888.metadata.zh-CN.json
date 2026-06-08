@@ -1,0 +1,35 @@
+{
+  "Provider": "aws",
+  "CheckID": "ec2_securitygroup_allow_ingress_from_internet_to_tcp_port_cassandra_7199_9160_8888",
+  "CheckTitle": "确保no 安全组s allow 入站流量 from the 互联网 to Cassandra ports TCP 7199, 9160 and 8888.",
+  "CheckType": [
+    "Infrastructure Security"
+  ],
+  "ServiceName": "ec2",
+  "SubServiceName": "securitygroup",
+  "ResourceIdTemplate": "arn:partition:ec2:region:account-id:security-group/security-group-id",
+  "Severity": "critical",
+  "ResourceType": "AwsEc2SecurityGroup",
+  "ResourceGroup": "network",
+  "Description": "确保no 安全组s allow 入站流量 from the 互联网 to Cassandra ports TCP 7199, 9160 and 8888.",
+  "Risk": "Exposing Cassandra ports to the 互联网 can allow 未授权访问 to 数据库 services and may lead to data disclosure, data loss or service compromise.",
+  "RelatedUrl": "",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "Modify the 安全组 to remove 入站流量 rules that allow traffic from the 互联网 to TCP ports 7199, 9160 or 8888.",
+      "Url": "https://docs.aws.amazon.com/vpc/latest/userguide/VPC_SecurityGroups.html"
+    }
+  },
+  "Categories": [
+    "internet-exposed"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

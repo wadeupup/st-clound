@@ -922,6 +922,22 @@ export const ja = {
       editScanNameDescription: "スキャン名を編集できます",
       editScanNameButton: "スキャン名を編集",
     },
+    reportDownload: {
+      tooltip: "レポートをダウンロード",
+      pendingTitle: "レポートを生成中です",
+      pendingDescription: "数分後にもう一度お試しください。",
+      successTitle: "ダウンロード完了",
+      successDescription: "スキャンレポートをダウンロードしました。",
+      failedTitle: "ダウンロードに失敗しました",
+      unavailableDescription:
+        "このスキャンには、まだダウンロード可能なレポートが生成されていません。レポート生成後にダウンロードしてください。",
+      unknownError: "不明なエラーが発生しました。",
+      processingError: "ファイルの処理中にエラーが発生しました。",
+      unexpectedResponse: "予期しない応答です。しばらくしてからもう一度お試しください。",
+      maxRetriesExceeded:
+        "レポートをまだ生成中です。しばらくしてからもう一度お試しください。",
+      unexpectedTaskState: "予期しないタスク状態です。",
+    },
     scanDetails: {
       title: "スキャン詳細",
       viewScanDetails: "スキャンの詳細を表示",

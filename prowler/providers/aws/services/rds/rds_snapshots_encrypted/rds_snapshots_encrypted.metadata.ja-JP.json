@@ -1,0 +1,33 @@
+{
+  "Provider": "aws",
+  "CheckID": "rds_snapshots_encrypted",
+  "CheckTitle": "RDS Snapshots and Cluster Snapshots are 暗号化済み.をチェックします",
+  "CheckType": [],
+  "ServiceName": "rds",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:aws:rds:region:account-id:snapshot",
+  "Severity": "medium",
+  "ResourceType": "AwsRdsDbSnapshot",
+  "ResourceGroup": "database",
+  "Description": "RDS Snapshots and Cluster Snapshots are 暗号化済み.をチェックします",
+  "Risk": "your manual Amazon RDS データベース スナップショット are 暗号化済み in order to achieve compliance for data-at-rest 暗号化 within your 組織.を確認します",
+  "RelatedUrl": "https://docs.aws.amazon.com/securityhub/latest/userguide/rds-controls.html#rds-4",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/RDS/snapshot-encrypted.html#",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/RDS/snapshot-encrypted.html#",
+      "Terraform": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/RDS/snapshot-encrypted.html#"
+    },
+    "Recommendation": {
+      "Text": "When working with production データベースs that hold sensitive and critical data, it is strongly recommended to implement 暗号化 at rest and protect your data from attackers or unauthorized personnel. ",
+      "Url": "https://docs.aws.amazon.com/securityhub/latest/userguide/rds-controls.html#rds-4"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

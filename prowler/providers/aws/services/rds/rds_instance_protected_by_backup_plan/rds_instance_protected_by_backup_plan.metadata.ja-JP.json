@@ -1,0 +1,33 @@
+{
+  "Provider": "aws",
+  "CheckID": "rds_instance_protected_by_backup_plan",
+  "CheckTitle": "RDS インスタンスs are protected by a バックアップ plan.をチェックします",
+  "CheckType": [
+    "Software and Configuration Checks, AWS Security Best Practices"
+  ],
+  "ServiceName": "rds",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:aws:rds:region:account-id:db-instance",
+  "Severity": "medium",
+  "ResourceType": "AwsRdsDbInstance",
+  "ResourceGroup": "database",
+  "Description": "RDS インスタンスs are protected by a バックアップ plan.をチェックします",
+  "Risk": "a バックアップ plan, RDS インスタンスs are vulnerable to data loss, accidental deletion, or corruption. This could lead to significant operational disruptions or loss of critical data.がない場合、",
+  "RelatedUrl": "https://docs.aws.amazon.com/aws-backup/latest/devguide/assigning-resources.html",
+  "Remediation": {
+    "Code": {
+      "CLI": "aws backup create-backup-plan --backup-plan , aws backup tag-resource --resource-arn <rds-instance-arn> --tags Key=backup,Value=true",
+      "NativeIaC": "",
+      "Other": "https://docs.aws.amazon.com/securityhub/latest/userguide/rds-controls.html#rds-26",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "Create a バックアップ plan for the RDS インスタンス to protect it from data loss, accidental deletion, or corruption.",
+      "Url": "https://docs.aws.amazon.com/aws-backup/latest/devguide/assigning-resources.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

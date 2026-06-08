@@ -1,0 +1,31 @@
+{
+  "Provider": "aws",
+  "CheckID": "rds_cluster_copy_tags_to_snapshots",
+  "CheckTitle": "RDS DB clusters have copy tags to スナップショット enabledをチェックします",
+  "CheckType": [],
+  "ServiceName": "rds",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:aws:rds:region:account-id:db-cluster",
+  "Severity": "low",
+  "ResourceType": "AwsRdsDbCluster",
+  "ResourceGroup": "database",
+  "Description": "RDS DB clusters have copy tags to スナップショット enabled, Aurora instances do not support this feature at instance level so those who are clustered will be scan by this check.をチェックします",
+  "Risk": "If RDS クラスターs are not configured to copy tags to スナップショット, it could lead to compliance issues as the スナップショット will not inherit necessary metadata such as environment, owner, or purpose tags. This could result in inefficient tracking and management of RDS resources and their スナップショット.",
+  "RelatedUrl": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_Tagging.html#USER_Tagging.CopyTags",
+  "Remediation": {
+    "Code": {
+      "CLI": "aws rds modify-db-cluster --db-cluster-identifier <cluster-identifier> --copy-tags-to-snapshot",
+      "NativeIaC": "",
+      "Other": "https://docs.aws.amazon.com/securityhub/latest/userguide/rds-controls.html#rds-16",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "the `CopyTagsToSnapshot` settingが有効です for all RDS クラスターs to propagate cluster tags to their スナップショット for improved tracking and compliance.を確認します",
+      "Url": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_Tagging.html#USER_Tagging.CopyTags"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

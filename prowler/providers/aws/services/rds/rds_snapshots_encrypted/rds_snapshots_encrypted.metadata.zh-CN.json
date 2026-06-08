@@ -1,0 +1,33 @@
+{
+  "Provider": "aws",
+  "CheckID": "rds_snapshots_encrypted",
+  "CheckTitle": "检查RDS Snapshots and Cluster Snapshots are 已加密.",
+  "CheckType": [],
+  "ServiceName": "rds",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:aws:rds:region:account-id:snapshot",
+  "Severity": "medium",
+  "ResourceType": "AwsRdsDbSnapshot",
+  "ResourceGroup": "database",
+  "Description": "检查RDS Snapshots and Cluster Snapshots are 已加密.",
+  "Risk": "确保your manual Amazon RDS 数据库 快照 are 已加密 in order to achieve compliance for data-at-rest 加密 within your 组织.",
+  "RelatedUrl": "https://docs.aws.amazon.com/securityhub/latest/userguide/rds-controls.html#rds-4",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/RDS/snapshot-encrypted.html#",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/RDS/snapshot-encrypted.html#",
+      "Terraform": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/RDS/snapshot-encrypted.html#"
+    },
+    "Recommendation": {
+      "Text": "When working with production 数据库s that hold sensitive and critical data, it is strongly recommended to implement 加密 at rest and protect your data from attackers or unauthorized personnel. ",
+      "Url": "https://docs.aws.amazon.com/securityhub/latest/userguide/rds-controls.html#rds-4"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

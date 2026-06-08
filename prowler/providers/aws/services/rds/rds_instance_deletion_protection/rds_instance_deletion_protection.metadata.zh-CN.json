@@ -1,0 +1,31 @@
+{
+  "Provider": "aws",
+  "CheckID": "rds_instance_deletion_protection",
+  "CheckTitle": "检查RDS 实例s have 删除保护 enabled.",
+  "CheckType": [],
+  "ServiceName": "rds",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:aws:rds:region:account-id:db-instance",
+  "Severity": "medium",
+  "ResourceType": "AwsRdsDbInstance",
+  "ResourceGroup": "database",
+  "Description": "检查RDS 实例s have 删除保护 enabled.",
+  "Risk": "You can only delete instances that do not have 删除保护 enabled.",
+  "RelatedUrl": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_DeleteInstance.html",
+  "Remediation": {
+    "Code": {
+      "CLI": "aws rds modify-db-instance --db-instance-identifier <db_instance_id> --deletion-protection --apply-immediately",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/RDS/instance-deletion-protection.html",
+      "Terraform": "https://docs.prowler.com/checks/aws/general-policies/ensure-that-rds-clusters-and-instances-have-deletion-protection-enabled#terraform"
+    },
+    "Recommendation": {
+      "Text": "Enable 删除保护 using the AWS Management Console for production DB instances.",
+      "Url": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_DeleteInstance.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

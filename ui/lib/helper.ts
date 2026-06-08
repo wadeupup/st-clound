@@ -122,16 +122,93 @@ export const getAuthUrl = (provider: AuthSocialProvider) => {
   return url.toString();
 };
 
+type DownloadMessages = {
+  pendingTitle: string;
+  pendingDescription: string;
+  successTitle: string;
+  successDescription: string;
+  failedTitle: string;
+  unavailableDescription: string;
+  unknownError: string;
+  processingError: string;
+  unexpectedResponse: string;
+  maxRetriesExceeded: string;
+  unexpectedTaskState: string;
+};
+
+const DEFAULT_DOWNLOAD_MESSAGES: DownloadMessages = {
+  pendingTitle: "The report is still being generated",
+  pendingDescription: "Please try again in a few minutes.",
+  successTitle: "Download Complete",
+  successDescription: "Your scan report has been downloaded successfully.",
+  failedTitle: "Download Failed",
+  unavailableDescription:
+    "This scan does not have a generated report yet. Run report generation before downloading.",
+  unknownError: "An unknown error occurred.",
+  processingError: "An error occurred while processing the file.",
+  unexpectedResponse: "Unexpected response. Please try again later.",
+  maxRetriesExceeded: "The report is still being generated. Please try again later.",
+  unexpectedTaskState: "Unexpected task state.",
+};
+
+const REPORT_UNAVAILABLE_MESSAGE =
+  "The scan has no reports, or the report generation task has not started yet.";
+
+const getLocalizedDownloadError = (
+  error: string | undefined,
+  messages: DownloadMessages,
+) => {
+  if (!error) return messages.unknownError;
+
+  if (error.trim() === REPORT_UNAVAILABLE_MESSAGE) {
+    return messages.unavailableDescription;
+  }
+
+  if (error === "Max retries exceeded") {
+    return messages.maxRetriesExceeded;
+  }
+
+  if (error === "Unexpected task state") {
+    return messages.unexpectedTaskState;
+  }
+
+  return error;
+};
+
 export const downloadScanZip = async (
   scanId: string,
   toast: ReturnType<typeof useToast>["toast"],
+  messages: DownloadMessages = DEFAULT_DOWNLOAD_MESSAGES,
 ) => {
-  const result = await getExportsZip(scanId);
+  let result = await getExportsZip(scanId);
+
+  if (result?.pending) {
+    if (result.taskId) {
+      const taskResult = await checkTaskStatus(result.taskId);
+
+      if (taskResult.completed) {
+        result = await getExportsZip(scanId);
+      } else {
+        toast({
+          variant: "destructive",
+          title: messages.failedTitle,
+          description: getLocalizedDownloadError(taskResult.error, messages),
+        });
+        return;
+      }
+    } else {
+      toast({
+        title: messages.pendingTitle,
+        description: messages.pendingDescription,
+      });
+      return;
+    }
+  }
 
   if (result?.pending) {
     toast({
-      title: "The report is still being generated",
-      description: "Please try again in a few minutes.",
+      title: messages.pendingTitle,
+      description: messages.pendingDescription,
     });
     return;
   }
@@ -154,14 +231,14 @@ export const downloadScanZip = async (
     window.URL.revokeObjectURL(url);
 
     toast({
-      title: "Download Complete",
-      description: "Your scan report has been downloaded successfully.",
+      title: messages.successTitle,
+      description: messages.successDescription,
     });
   } else {
     toast({
       variant: "destructive",
-      title: "Download Failed",
-      description: result?.error || "An unknown error occurred.",
+      title: messages.failedTitle,
+      description: getLocalizedDownloadError(result?.error, messages),
     });
   }
 };
@@ -174,11 +251,12 @@ const downloadFile = async (
   outputType: string,
   successMessage: string,
   toast: ReturnType<typeof useToast>["toast"],
+  messages: DownloadMessages = DEFAULT_DOWNLOAD_MESSAGES,
 ): Promise<void> => {
   if (result?.pending) {
     toast({
-      title: "The report is still being generated",
-      description: "Please try again in a few minutes.",
+      title: messages.pendingTitle,
+      description: messages.pendingDescription,
     });
     return;
   }
@@ -202,14 +280,14 @@ const downloadFile = async (
       window.URL.revokeObjectURL(url);
 
       toast({
-        title: "Download Complete",
+        title: messages.successTitle,
         description: successMessage,
       });
     } catch (error) {
       toast({
         variant: "destructive",
-        title: "Download Failed",
-        description: "An error occurred while processing the file.",
+        title: messages.failedTitle,
+        description: messages.processingError,
       });
     }
     return;
@@ -218,8 +296,8 @@ const downloadFile = async (
   if (result?.error) {
     toast({
       variant: "destructive",
-      title: "Download Failed",
-      description: result.error,
+      title: messages.failedTitle,
+      description: getLocalizedDownloadError(result.error, messages),
     });
     return;
   }
@@ -227,8 +305,8 @@ const downloadFile = async (
   // Unexpected case
   toast({
     variant: "destructive",
-    title: "Download Failed",
-    description: "Unexpected response. Please try again later.",
+    title: messages.failedTitle,
+    description: messages.unexpectedResponse,
   });
 };
 

@@ -924,6 +924,21 @@ export const zh = {
       editScanNameDescription: "允许您编辑扫描名称",
       editScanNameButton: "编辑扫描名称",
     },
+    reportDownload: {
+      tooltip: "下载报告",
+      pendingTitle: "报告仍在生成中",
+      pendingDescription: "请稍后再试。",
+      successTitle: "下载完成",
+      successDescription: "扫描报告已成功下载。",
+      failedTitle: "下载失败",
+      unavailableDescription:
+        "此扫描尚未生成可下载报告，请先完成报告生成后再下载。",
+      unknownError: "发生未知错误。",
+      processingError: "处理文件时发生错误。",
+      unexpectedResponse: "响应异常，请稍后重试。",
+      maxRetriesExceeded: "报告仍在生成中，请稍后再试。",
+      unexpectedTaskState: "任务状态异常。",
+    },
     scanDetails: {
       title: "扫描详情",
       viewScanDetails: "查看扫描详情",

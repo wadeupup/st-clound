@@ -1,0 +1,33 @@
+{
+  "Provider": "aws",
+  "CheckID": "rds_instance_transport_encrypted",
+  "CheckTitle": "检查RDS 实例s enforce SSL/TLS 加密 for client connections (Microsoft SQL Server, PostgreSQL, MySQL, MariaDB, Aurora PostgreSQL, and Aurora MySQL).",
+  "CheckType": [],
+  "ServiceName": "rds",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:aws:rds:region:account-id:db-instance",
+  "Severity": "high",
+  "ResourceType": "AwsRdsDbInstance",
+  "ResourceGroup": "database",
+  "Description": "For SQL Server, PostgreSQL, and Aurora PostgreSQL 数据库s, if the `rds.force_ssl` parameter value已设置 to 0, SSL/TLS connections are not enforced. For MySQL, Aurora MySQL, and MariaDB 数据库s, if the `require_secure_transport` parameter value已设置 to OFF, SSL/TLS connections are not enforced. Enforcing SSL/TLS ensures that all client connections to RDS 实例s are 已加密, protecting sensitive information in transit.",
+  "Risk": "If not enabled, sensitive information in transit is not protected.",
+  "RelatedUrl": "https://aws.amazon.com/premiumsupport/knowledge-center/rds-connect-ssl-connection/",
+  "Remediation": {
+    "Code": {
+      "CLI": "aws rds modify-db-parameter-group --region <REGION_NAME> --db-parameter-group-name <PARAMETER_GROUP_NAME> --parameters ParameterName='rds.force_ssl',ParameterValue='1',ApplyMethod='pending-reboot'",
+      "NativeIaC": "",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/RDS/transport-encryption.html",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "确保instances provisioned with Amazon RDS enforce SSL/TLS for client connections to meet security and compliance requirements.",
+      "Url": "https://aws.amazon.com/premiumsupport/knowledge-center/rds-connect-ssl-connection/"
+    }
+  },
+  "Categories": [
+    "encryption"
+  ],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

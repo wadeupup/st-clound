@@ -1,0 +1,31 @@
+{
+  "Provider": "aws",
+  "CheckID": "rds_instance_deprecated_engine_version",
+  "CheckTitle": "RDS インスタンス is using a supported engine versionをチェックします",
+  "CheckType": [],
+  "ServiceName": "rds",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:aws:rds:region:account-id:db-instance",
+  "Severity": "medium",
+  "ResourceType": "AwsRdsDbInstance",
+  "ResourceGroup": "database",
+  "Description": "RDS is using a supported engine version for MariaDB, MySQL and PostgreSQLをチェックします",
+  "Risk": "If not enabled RDS インスタンスs may be vulnerable to security issues",
+  "RelatedUrl": "https://docs.aws.amazon.com/cli/latest/reference/rds/describe-db-engine-versions.html",
+  "Remediation": {
+    "Code": {
+      "CLI": "aws rds describe-db-engine-versions --engine <my_engine>'",
+      "NativeIaC": "",
+      "Other": "",
+      "Terraform": ""
+    },
+    "Recommendation": {
+      "Text": "all the RDS インスタンスs are using a supported engine versionを確認します",
+      "Url": "https://docs.aws.amazon.com/cli/latest/reference/rds/describe-db-engine-versions.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

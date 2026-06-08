@@ -1,0 +1,31 @@
+{
+  "Provider": "aws",
+  "CheckID": "rds_cluster_iam_authentication_enabled",
+  "CheckTitle": "检查RDS 集群s have IAM authentication enabled.",
+  "CheckType": [],
+  "ServiceName": "rds",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:aws:rds:region:account-id:db-cluster",
+  "Severity": "medium",
+  "ResourceType": "AwsRdsDbCluster",
+  "ResourceGroup": "database",
+  "Description": "检查RDS 集群s have IAM authentication enabled.",
+  "Risk": "确保the IAM Database Authentication feature已启用 for your RDS 数据库 clusters in order to use the Identity and Access Management (IAM) service to manage 数据库 access to your MySQL and PostgreSQL 数据库 clusters. With this feature enabled, you don't have to use a password when you connect to your MySQL/PostgreSQL 数据库, instead you can use an authentication token. An authentication token is a unique string of characters with a lifetime of 15 minutes that Amazon RDS generates on your request. IAM Database Authentication removes the need of storing user credentials within the 数据库 configuration, because authentication is managed externally using Amazon IAM.",
+  "RelatedUrl": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/UsingWithRDS.IAMDBAuth.Enabling.html",
+  "Remediation": {
+    "Code": {
+      "CLI": "aws rds modify-db-instance --region <REGION> --db-instance-identifier <DB_CLUSTER_ID> --enable-iam-database-authentication --apply-immediately",
+      "NativeIaC": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/RDS/iam-database-authentication.html#",
+      "Other": "https://docs.aws.amazon.com/securityhub/latest/userguide/rds-controls.html#rds-12",
+      "Terraform": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/RDS/iam-database-authentication.html#"
+    },
+    "Recommendation": {
+      "Text": "Enable IAM authentication for supported RDS 集群s.",
+      "Url": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/UsingWithRDS.IAMDBAuth.Enabling.html"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}

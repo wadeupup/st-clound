@@ -223,11 +223,15 @@ export const getExportsZip = async (scanId: string) => {
     const arrayBuffer = await response.arrayBuffer();
     // Convert to base64
     const base64 = Buffer.from(arrayBuffer).toString("base64");
+    const contentDisposition = response.headers.get("content-disposition");
+    const filename =
+      contentDisposition?.match(/filename="([^"]+)"/)?.[1] ||
+      `scan-${scanId}-report.zip`;
 
     return {
       success: true,
       data: base64,
-      filename: `scan-${scanId}-report.zip`,
+      filename,
     };
   } catch (error) {
     return {

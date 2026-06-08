@@ -3,6 +3,7 @@ import { useState } from "react";
 
 import { DownloadIconButton, useToast } from "@/components/ui";
 import { downloadScanZip } from "@/lib";
+import { useI18n } from "@/lib/i18n/context";
 
 interface DataTableDownloadDetailsProps<ScanProps> {
   row: Row<ScanProps>;
@@ -12,6 +13,7 @@ export function DataTableDownloadDetails<ScanProps>({
   row,
 }: DataTableDownloadDetailsProps<ScanProps>) {
   const { toast } = useToast();
+  const { t } = useI18n();
   const [isDownloading, setIsDownloading] = useState(false);
 
   const scanId = (row.original as { id: string }).id;
@@ -19,7 +21,7 @@ export function DataTableDownloadDetails<ScanProps>({
 
   const handleDownload = async () => {
     setIsDownloading(true);
-    await downloadScanZip(scanId, toast);
+    await downloadScanZip(scanId, toast, t.scans.reportDownload);
     setIsDownloading(false);
   };
 
@@ -27,6 +29,8 @@ export function DataTableDownloadDetails<ScanProps>({
     <DownloadIconButton
       paramId={scanId}
       onDownload={handleDownload}
+      ariaLabel={t.scans.reportDownload.tooltip}
+      textTooltip={t.scans.reportDownload.tooltip}
       isDownloading={isDownloading}
       isDisabled={scanState !== "completed"}
     />

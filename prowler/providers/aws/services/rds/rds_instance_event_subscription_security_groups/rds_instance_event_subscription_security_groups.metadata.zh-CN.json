@@ -1,0 +1,31 @@
+{
+  "Provider": "aws",
+  "CheckID": "rds_instance_event_subscription_security_groups",
+  "CheckTitle": "检查RDS Security Group events are subscribed.",
+  "CheckType": [],
+  "ServiceName": "rds",
+  "SubServiceName": "",
+  "ResourceIdTemplate": "arn:aws:rds:region:account-id:es",
+  "Severity": "medium",
+  "ResourceType": "AwsRdsEventSubscription",
+  "ResourceGroup": "database",
+  "Description": "确保Amazon RDS event notification subscriptions已启用 for 数据库 安全组s events.",
+  "Risk": "Amazon RDS 事件订阅s for 数据库 安全组s are designed to provide incident notification of events that may affect the security, availability, and reliability of the RDS 数据库 instances associated with these 安全组s.",
+  "RelatedUrl": "https://docs.aws.amazon.com/securityhub/latest/userguide/rds-controls.html#rds-22",
+  "Remediation": {
+    "Code": {
+      "CLI": "",
+      "NativeIaC": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/RDS/rds-db-security-groups-events.html#",
+      "Other": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/RDS/rds-db-security-groups-events.html#",
+      "Terraform": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/RDS/rds-db-security-groups-events.html#"
+    },
+    "Recommendation": {
+      "Text": "To subscribe to RDS 实例 event notifications, see Subscribing to Amazon RDS event notification in the Amazon RDS User Guide.",
+      "Url": "https://docs.aws.amazon.com/securityhub/latest/userguide/rds-controls.html#rds-22"
+    }
+  },
+  "Categories": [],
+  "DependsOn": [],
+  "RelatedTo": [],
+  "Notes": ""
+}
