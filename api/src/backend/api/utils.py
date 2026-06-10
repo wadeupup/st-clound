@@ -26,11 +26,7 @@ from prowler.providers.m365.m365_provider import M365Provider
 from prowler.providers.mongodbatlas.mongodbatlas_provider import MongodbatlasProvider
 from prowler.providers.oraclecloud.oraclecloud_provider import OraclecloudProvider
 
-AWS_DEFAULT_REGION_ENV_VARS = (
-    "PROWLER_AWS_DEFAULT_REGIONS",
-    "AWS_DEFAULT_REGION",
-    "AWS_REGION",
-)
+AWS_DEFAULT_REGIONS_ENV_VAR = "PROWLER_AWS_DEFAULT_REGIONS"
 
 
 class CustomOAuth2Client(OAuth2Client):
@@ -93,18 +89,31 @@ def normalize_aws_regions(regions) -> list[str]:
     return normalized_regions
 
 
-def get_default_aws_regions() -> list[str]:
-    """Return AWS default regions configured by the deployment environment."""
-    for env_var in AWS_DEFAULT_REGION_ENV_VARS:
-        regions = normalize_aws_regions(os.getenv(env_var))
-        if regions:
-            return regions
-    return []
+def get_all_aws_regions(partition: str = "aws") -> list[str]:
+    """Return all known AWS regions for a partition."""
+    try:
+        return sorted(AwsProvider.get_regions(partition=partition))
+    except Exception:
+        return []
+
+
+def get_default_aws_regions(partition: str = "aws") -> list[str]:
+    """Return the default AWS scan regions.
+
+    Deployments may explicitly override this with PROWLER_AWS_DEFAULT_REGIONS.
+    Without that override, AWS providers default to every commercial AWS region.
+    """
+    configured_regions = normalize_aws_regions(os.getenv(AWS_DEFAULT_REGIONS_ENV_VAR))
+    if configured_regions:
+        return configured_regions
+    return get_all_aws_regions(partition=partition)
 
 
 def get_aws_provider_regions(secret: dict | None) -> list[str]:
     """Return selected AWS regions from a provider secret."""
-    return normalize_aws_regions((secret or {}).get("regions"))
+    return normalize_aws_regions(
+        (secret or {}).get("regions")
+    ) or get_default_aws_regions()
 
 
 def return_prowler_provider(
@@ -159,20 +168,24 @@ def return_prowler_provider(
 
 
 def get_prowler_provider_kwargs(
-    provider: Provider, mutelist_processor: Processor | None = None
+    provider: Provider,
+    mutelist_processor: Processor | None = None,
+    scanner_args: dict | None = None,
 ) -> dict:
     """Get the Prowler provider kwargs based on the given provider type.
 
     Args:
         provider (Provider): The provider object containing the provider type and associated secret.
         mutelist_processor (Processor): The mutelist processor object containing the mutelist configuration.
+        scanner_args: Optional scan-level overrides.
 
     Returns:
         dict: The provider kwargs for the corresponding provider class.
     """
     prowler_provider_kwargs = dict(provider.secret.secret or {})
     if provider.provider == Provider.ProviderChoices.AWS.value:
-        regions = get_aws_provider_regions(prowler_provider_kwargs)
+        override_regions = normalize_aws_regions((scanner_args or {}).get("regions"))
+        regions = override_regions or get_aws_provider_regions(prowler_provider_kwargs)
         if regions:
             prowler_provider_kwargs = {
                 **prowler_provider_kwargs,
@@ -224,6 +237,7 @@ def get_prowler_provider_kwargs(
 def initialize_prowler_provider(
     provider: Provider,
     mutelist_processor: Processor | None = None,
+    scanner_args: dict | None = None,
 ) -> (
     AlibabacloudProvider
     | AwsProvider
@@ -241,13 +255,16 @@ def initialize_prowler_provider(
     Args:
         provider (Provider): The provider object containing the provider type and associated secrets.
         mutelist_processor (Processor): The mutelist processor object containing the mutelist configuration.
+        scanner_args: Optional scan-level overrides.
 
     Returns:
         AlibabacloudProvider | AwsProvider | AzureProvider | GcpProvider | GithubProvider | IacProvider | KubernetesProvider | M365Provider | MongodbatlasProvider | OraclecloudProvider: An instance of the corresponding provider class
             initialized with the provider's secrets.
     """
     prowler_provider = return_prowler_provider(provider)
-    prowler_provider_kwargs = get_prowler_provider_kwargs(provider, mutelist_processor)
+    prowler_provider_kwargs = get_prowler_provider_kwargs(
+        provider, mutelist_processor, scanner_args
+    )
     return prowler_provider(**prowler_provider_kwargs)
 
 

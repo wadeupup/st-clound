@@ -1568,7 +1568,7 @@ class ProviderViewSet(DisablePaginationMixin, BaseRLSViewSet):
 
         default_regions = [
             region
-            for region in get_default_aws_regions()
+            for region in get_default_aws_regions(partition=partition)
             if region in available_regions
         ]
 

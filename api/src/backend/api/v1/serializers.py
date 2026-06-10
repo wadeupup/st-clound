@@ -864,6 +864,7 @@ class ProviderSerializer(RLSSerializer):
 
     provider = ProviderEnumSerializerField()
     connection = serializers.SerializerMethodField(read_only=True)
+    regions = serializers.SerializerMethodField(read_only=True)
 
     included_serializers = {
         "provider_groups": "api.v1.serializers.ProviderGroupIncludedSerializer",
@@ -879,6 +880,7 @@ class ProviderSerializer(RLSSerializer):
             "uid",
             "alias",
             "connection",
+            "regions",
             # "scanner_args",
             "secret",
             "provider_groups",
@@ -900,6 +902,18 @@ class ProviderSerializer(RLSSerializer):
             "last_checked_at": obj.connection_last_checked_at,
         }
 
+    @extend_schema_field(serializers.ListField(child=serializers.CharField()))
+    def get_regions(self, obj):
+        if obj.provider != Provider.ProviderChoices.AWS.value:
+            return []
+
+        from api.utils import get_aws_provider_regions
+
+        try:
+            return get_aws_provider_regions(obj.secret.secret)
+        except Provider.secret.RelatedObjectDoesNotExist:
+            return []
+
 
 class ProviderIncludeSerializer(RLSSerializer):
     """
@@ -908,6 +922,7 @@ class ProviderIncludeSerializer(RLSSerializer):
 
     provider = ProviderEnumSerializerField()
     connection = serializers.SerializerMethodField(read_only=True)
+    regions = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Provider
@@ -919,6 +934,7 @@ class ProviderIncludeSerializer(RLSSerializer):
             "uid",
             "alias",
             "connection",
+            "regions",
             # "scanner_args",
         ]
 
@@ -936,6 +952,18 @@ class ProviderIncludeSerializer(RLSSerializer):
             "connected": obj.connected,
             "last_checked_at": obj.connection_last_checked_at,
         }
+
+    @extend_schema_field(serializers.ListField(child=serializers.CharField()))
+    def get_regions(self, obj):
+        if obj.provider != Provider.ProviderChoices.AWS.value:
+            return []
+
+        from api.utils import get_aws_provider_regions
+
+        try:
+            return get_aws_provider_regions(obj.secret.secret)
+        except Provider.secret.RelatedObjectDoesNotExist:
+            return []
 
 
 class ProviderCreateSerializer(RLSSerializer, BaseWriteSerializer):
@@ -1057,20 +1085,40 @@ class ScanCreateSerializer(RLSSerializer, BaseWriteSerializer):
         fields = [
             "id",
             "provider",
-            # "scanner_args",
+            "scanner_args",
             "name",
         ]
 
-    def create(self, validated_data):
-        # provider = validated_data.get("provider")
+    def validate_scanner_args(self, value):
+        from api.utils import normalize_aws_regions
 
-        # scanner_args will be disabled for the user in the first release
-        # if not validated_data.get("scanner_args"):
-        #     validated_data["scanner_args"] = provider.scanner_args
-        # else:
-        #     validated_data["scanner_args"] = merge_dicts(
-        #         provider.scanner_args, validated_data["scanner_args"]
-        #     )
+        if value is None:
+            return {}
+        if not isinstance(value, dict):
+            raise serializers.ValidationError("scanner_args must be an object.")
+
+        next_value = dict(value)
+        if "regions" in next_value:
+            regions = normalize_aws_regions(next_value.get("regions"))
+            if not regions:
+                raise serializers.ValidationError(
+                    {"regions": "Provide at least one AWS region."}
+                )
+            next_value["regions"] = regions
+
+        return next_value
+
+    def create(self, validated_data):
+        from api.utils import merge_dicts
+
+        provider = validated_data.get("provider")
+
+        if not validated_data.get("scanner_args"):
+            validated_data["scanner_args"] = provider.scanner_args
+        else:
+            validated_data["scanner_args"] = merge_dicts(
+                provider.scanner_args, validated_data["scanner_args"]
+            )
 
         if not validated_data.get("trigger"):
             validated_data["trigger"] = Scan.TriggerChoices.MANUAL.value

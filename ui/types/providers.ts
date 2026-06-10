@@ -46,6 +46,7 @@ export interface ProviderProps {
       connected: boolean;
       last_checked_at: string;
     };
+    regions: string[];
     scanner_args: {
       only_logs: boolean;
       excluded_checks: string[];

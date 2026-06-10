@@ -1,9 +1,10 @@
 "use client";
 
 import { Select, SelectItem } from "@heroui/select";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { Control, UseFormSetValue, useWatch } from "react-hook-form";
 
+import { Button } from "@/components/shadcn";
 import { useI18n } from "@/lib/i18n/context";
 import { ProviderCredentialFields } from "@/lib/provider-credentials/provider-credential-fields";
 
@@ -25,6 +26,7 @@ export const AWSRegionsSelect = ({
 }) => {
   const { t } = useI18n();
   const regionLabel = `AWS ${t.compliance.regions}`;
+  const hasInitializedRegions = useRef(false);
   const watchedRegions = useWatch({
     control,
     name: ProviderCredentialFields.AWS_REGIONS,
@@ -49,7 +51,12 @@ export const AWSRegionsSelect = ({
   }, [regions, defaultRegions]);
 
   useEffect(() => {
-    if (selectedRegions.length === 0 && defaultRegions.length > 0) {
+    if (
+      !hasInitializedRegions.current &&
+      selectedRegions.length === 0 &&
+      defaultRegions.length > 0
+    ) {
+      hasInitializedRegions.current = true;
       setValue(ProviderCredentialFields.AWS_REGIONS, defaultRegions, {
         shouldDirty: false,
         shouldValidate: false,
@@ -57,30 +64,64 @@ export const AWSRegionsSelect = ({
     }
   }, [defaultRegions, selectedRegions.length, setValue]);
 
+  const setSelectedRegions = (nextRegions: string[]) => {
+    setValue(ProviderCredentialFields.AWS_REGIONS, nextRegions, {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+  };
+
   return (
-    <Select
-      label={regionLabel}
-      placeholder={regionLabel}
-      selectedKeys={new Set(selectedRegions)}
-      selectionMode="multiple"
-      variant="bordered"
-      isRequired
-      onSelectionChange={(keys) => {
-        const nextRegions =
-          keys === "all"
-            ? regionOptions.map((region) => region.value)
-            : Array.from(keys).map(String);
-        setValue(ProviderCredentialFields.AWS_REGIONS, nextRegions, {
-          shouldDirty: true,
-          shouldValidate: true,
-        });
-      }}
-    >
-      {regionOptions.map((region) => (
-        <SelectItem key={region.value} textValue={region.label}>
-          {region.label}
-        </SelectItem>
-      ))}
-    </Select>
+    <div className="flex flex-col gap-2">
+      <Select
+        label={regionLabel}
+        placeholder={regionLabel}
+        selectedKeys={new Set(selectedRegions)}
+        selectionMode="multiple"
+        variant="bordered"
+        isRequired
+        onSelectionChange={(keys) => {
+          const nextRegions =
+            keys === "all"
+              ? regionOptions.map((region) => region.value)
+              : Array.from(keys).map(String);
+          setValue(ProviderCredentialFields.AWS_REGIONS, nextRegions, {
+            shouldDirty: true,
+            shouldValidate: true,
+          });
+        }}
+      >
+        {regionOptions.map((region) => (
+          <SelectItem key={region.value} textValue={region.label}>
+            {region.label}
+          </SelectItem>
+        ))}
+      </Select>
+      <div className="flex gap-2">
+        <Button
+          type="button"
+          size="sm"
+          variant="outline"
+          onClick={() =>
+            setSelectedRegions(regionOptions.map((region) => region.value))
+          }
+        >
+          Select all
+        </Button>
+        <Button
+          type="button"
+          size="sm"
+          variant="outline"
+          onClick={() =>
+            setValue(ProviderCredentialFields.AWS_REGIONS, [], {
+              shouldDirty: true,
+              shouldValidate: true,
+            })
+          }
+        >
+          Clear
+        </Button>
+      </div>
+    </div>
   );
 };
