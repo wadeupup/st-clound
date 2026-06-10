@@ -19,8 +19,8 @@ import { VerticalDotsIcon } from "@/components/icons";
 import { Button } from "@/components/shadcn";
 import { useToast } from "@/components/ui";
 import { CustomAlertModal } from "@/components/ui/custom";
-import { useI18n } from "@/lib/i18n/context";
 import { downloadScanZip } from "@/lib/helper";
+import { useI18n } from "@/lib/i18n/context";
 
 import { EditScanForm } from "../../forms";
 
@@ -38,6 +38,8 @@ export function DataTableRowActions<ScanProps>({
   const scanId = (row.original as { id: string }).id;
   const scanName = (row.original as any).attributes?.name;
   const scanState = (row.original as any).attributes?.state;
+  const scanProgress = (row.original as any).attributes?.progress;
+  const canDownloadReport = scanState === "completed" && scanProgress === 100;
 
   return (
     <>
@@ -75,10 +77,11 @@ export function DataTableRowActions<ScanProps>({
                 description={t.scans.rowActions.downloadZipDescription}
                 textValue={t.scans.rowActions.downloadZip}
                 startContent={<DownloadIcon className={iconClasses} />}
-                onPress={() =>
-                  downloadScanZip(scanId, toast, t.scans.reportDownload)
-                }
-                isDisabled={scanState !== "completed"}
+                onPress={() => {
+                  if (!canDownloadReport) return;
+                  downloadScanZip(scanId, toast, t.scans.reportDownload);
+                }}
+                isDisabled={!canDownloadReport}
               >
                 {t.scans.rowActions.downloadZip}
               </DropdownItem>

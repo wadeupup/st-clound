@@ -18,8 +18,12 @@ export function DataTableDownloadDetails<ScanProps>({
 
   const scanId = (row.original as { id: string }).id;
   const scanState = (row.original as any).attributes?.state;
+  const scanProgress = (row.original as any).attributes?.progress;
+  const canDownloadReport = scanState === "completed" && scanProgress === 100;
 
   const handleDownload = async () => {
+    if (!canDownloadReport) return;
+
     setIsDownloading(true);
     await downloadScanZip(scanId, toast, t.scans.reportDownload);
     setIsDownloading(false);
@@ -32,7 +36,7 @@ export function DataTableDownloadDetails<ScanProps>({
       ariaLabel={t.scans.reportDownload.tooltip}
       textTooltip={t.scans.reportDownload.tooltip}
       isDownloading={isDownloading}
-      isDisabled={scanState !== "completed"}
+      isDisabled={!canDownloadReport}
     />
   );
 }

@@ -1999,6 +1999,14 @@ class ScanViewSet(BaseRLSViewSet):
         if running_resp:
             return running_resp
 
+        if scan.progress != 100:
+            return Response(
+                {
+                    "detail": "The scan report is not available until scan progress reaches 100."
+                },
+                status=status.HTTP_202_ACCEPTED,
+            )
+
         localized_report, locale = get_or_create_localized_scan_report(
             scan, request.headers.get("Accept-Language")
         )
