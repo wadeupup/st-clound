@@ -61,6 +61,7 @@ from drf_spectacular.utils import (
 )
 from drf_spectacular.views import SpectacularAPIView
 from drf_spectacular_jsonapi.schemas.openapi import JsonApiAutoSchema
+from prowler.providers.aws.aws_provider import AwsProvider
 from rest_framework import permissions, status
 from rest_framework.decorators import action
 from rest_framework.exceptions import (
@@ -173,6 +174,7 @@ from api.rbac.permissions import Permissions, get_providers, get_role
 from api.rls import Tenant
 from api.utils import (
     CustomOAuth2Client,
+    get_default_aws_regions,
     get_findings_metadata_no_aggregations,
     validate_invitation,
 )
@@ -1540,6 +1542,51 @@ class ProviderViewSet(DisablePaginationMixin, BaseRLSViewSet):
             instance, context=self.get_serializer_context()
         )
         return Response(data=read_serializer.data, status=status.HTTP_200_OK)
+
+    @extend_schema(
+        tags=["Provider"],
+        summary="List AWS regions",
+        description="Return AWS regions supported by the bundled Prowler provider.",
+        parameters=[
+            OpenApiParameter(
+                name="partition",
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.QUERY,
+                required=False,
+                description="AWS partition, such as aws, aws-cn, or aws-us-gov.",
+            )
+        ],
+        responses={200: OpenApiResponse(description="AWS region options")},
+    )
+    @action(detail=False, methods=["get"], url_path="aws/regions")
+    def aws_regions(self, request):
+        partition = request.query_params.get("partition", "aws")
+        try:
+            available_regions = sorted(AwsProvider.get_regions(partition=partition))
+        except Exception as error:
+            raise ValidationError({"partition": str(error)})
+
+        default_regions = [
+            region
+            for region in get_default_aws_regions()
+            if region in available_regions
+        ]
+
+        return Response(
+            data={
+                "type": "aws-regions",
+                "id": partition,
+                "attributes": {
+                    "partition": partition,
+                    "default": default_regions,
+                    "regions": [
+                        {"value": region, "label": region}
+                        for region in available_regions
+                    ],
+                },
+            },
+            status=status.HTTP_200_OK,
+        )
 
     @extend_schema(
         tags=["Provider"],

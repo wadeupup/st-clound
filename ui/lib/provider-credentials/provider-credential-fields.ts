@@ -21,6 +21,7 @@ export const ProviderCredentialFields = {
   AWS_SESSION_TOKEN: "aws_session_token",
   ROLE_ARN: "role_arn",
   EXTERNAL_ID: "external_id",
+  AWS_REGIONS: "regions",
   SESSION_DURATION: "session_duration",
   ROLE_SESSION_NAME: "role_session_name",
 
@@ -88,6 +89,7 @@ export const ErrorPointers = {
   REFRESH_TOKEN: "/data/attributes/secret/refresh_token",
   ROLE_ARN: "/data/attributes/secret/role_arn",
   EXTERNAL_ID: "/data/attributes/secret/external_id",
+  AWS_REGIONS: "/data/attributes/secret/regions",
   SESSION_DURATION: "/data/attributes/secret/session_duration",
   ROLE_SESSION_NAME: "/data/attributes/secret/role_session_name",
   SERVICE_ACCOUNT_KEY: "/data/attributes/secret/service_account_key",

@@ -12,11 +12,15 @@ import { ProviderCredentialFields } from "@/lib/provider-credentials/provider-cr
 import { AWSCredentialsRole } from "@/types";
 import { IntegrationType } from "@/types/integrations";
 
+import { AWSRegionOption, AWSRegionsSelect } from "./aws-regions-select";
+
 export const AWSRoleCredentialsForm = ({
   control,
   setValue,
   externalId,
   templateLinks,
+  regions = [],
+  defaultRegions = [],
   type = "providers",
   integrationType,
 }: {
@@ -28,6 +32,8 @@ export const AWSRoleCredentialsForm = ({
     cloudformationQuickLink: string;
     terraform: string;
   };
+  regions?: AWSRegionOption[];
+  defaultRegions?: string[];
   type?: "providers" | "integrations";
   integrationType?: IntegrationType;
 }) => {
@@ -80,7 +86,9 @@ export const AWSRoleCredentialsForm = ({
       <Select
         name={ProviderCredentialFields.CREDENTIALS_TYPE}
         label={t.providers.connectAccount.credentialsType.authenticationMethod}
-        placeholder={t.providers.connectAccount.credentialsType.selectCredentialsType}
+        placeholder={
+          t.providers.connectAccount.credentialsType.selectCredentialsType
+        }
         selectedKeys={[credentialsType || defaultCredentialsType]}
         className="mb-4"
         variant="bordered"
@@ -95,26 +103,36 @@ export const AWSRoleCredentialsForm = ({
           key="aws-sdk-default"
           textValue={
             isCloudEnv
-              ? t.providers.connectAccount.credentialsType.prowlerCloudAssumeRole
+              ? t.providers.connectAccount.credentialsType
+                  .prowlerCloudAssumeRole
               : `${t.providers.connectAccount.credentialsType.awsSdkDefault} ${t.providers.connectAccount.credentialsType.recommended}`
           }
         >
           <div className="flex w-full items-center justify-between">
             <span>
               {isCloudEnv
-                ? t.providers.connectAccount.credentialsType.prowlerCloudAssumeRole
+                ? t.providers.connectAccount.credentialsType
+                    .prowlerCloudAssumeRole
                 : `${t.providers.connectAccount.credentialsType.awsSdkDefault} ${t.providers.connectAccount.credentialsType.recommended}`}
             </span>
             {isCloudEnv && (
               <Chip size="sm" variant="flat" color="success" className="ml-2">
-                {t.providers.connectAccount.credentialsType.recommended.replace(/[()]/g, "")}
+                {t.providers.connectAccount.credentialsType.recommended.replace(
+                  /[()]/g,
+                  "",
+                )}
               </Chip>
             )}
           </div>
         </SelectItem>
-        <SelectItem key="access-secret-key" textValue={t.providers.connectAccount.credentialsType.accessSecretKey}>
+        <SelectItem
+          key="access-secret-key"
+          textValue={t.providers.connectAccount.credentialsType.accessSecretKey}
+        >
           <div className="flex w-full items-center justify-between">
-            <span>{t.providers.connectAccount.credentialsType.accessSecretKey}</span>
+            <span>
+              {t.providers.connectAccount.credentialsType.accessSecretKey}
+            </span>
           </div>
         </SelectItem>
       </Select>
@@ -127,7 +145,9 @@ export const AWSRoleCredentialsForm = ({
             type="password"
             label={t.providers.connectAccount.credentialsType.awsAccessKeyId}
             labelPlacement="inside"
-            placeholder={t.providers.connectAccount.credentialsType.enterAwsAccessKeyId}
+            placeholder={
+              t.providers.connectAccount.credentialsType.enterAwsAccessKeyId
+            }
             variant="bordered"
             isRequired
           />
@@ -135,9 +155,13 @@ export const AWSRoleCredentialsForm = ({
             control={control}
             name={ProviderCredentialFields.AWS_SECRET_ACCESS_KEY}
             type="password"
-            label={t.providers.connectAccount.credentialsType.awsSecretAccessKey}
+            label={
+              t.providers.connectAccount.credentialsType.awsSecretAccessKey
+            }
             labelPlacement="inside"
-            placeholder={t.providers.connectAccount.credentialsType.enterAwsSecretAccessKey}
+            placeholder={
+              t.providers.connectAccount.credentialsType.enterAwsSecretAccessKey
+            }
             variant="bordered"
             isRequired
           />
@@ -147,7 +171,9 @@ export const AWSRoleCredentialsForm = ({
             type="password"
             label={t.providers.connectAccount.credentialsType.awsSessionToken}
             labelPlacement="inside"
-            placeholder={t.providers.connectAccount.credentialsType.enterAwsSessionToken}
+            placeholder={
+              t.providers.connectAccount.credentialsType.enterAwsSessionToken
+            }
             variant="bordered"
             isRequired={false}
           />
@@ -191,7 +217,9 @@ export const AWSRoleCredentialsForm = ({
             type="text"
             label={t.providers.connectAccount.credentialsType.roleArn}
             labelPlacement="inside"
-            placeholder={t.providers.connectAccount.credentialsType.enterRoleArn}
+            placeholder={
+              t.providers.connectAccount.credentialsType.enterRoleArn
+            }
             variant="bordered"
             isRequired={showRoleSection}
           />
@@ -218,7 +246,9 @@ export const AWSRoleCredentialsForm = ({
               type="text"
               label={t.providers.connectAccount.credentialsType.roleSessionName}
               labelPlacement="inside"
-              placeholder={t.providers.connectAccount.credentialsType.enterRoleSessionName}
+              placeholder={
+                t.providers.connectAccount.credentialsType.enterRoleSessionName
+              }
               variant="bordered"
               isRequired={false}
             />
@@ -228,11 +258,25 @@ export const AWSRoleCredentialsForm = ({
               type="number"
               label={t.providers.connectAccount.credentialsType.sessionDuration}
               labelPlacement="inside"
-              placeholder={t.providers.connectAccount.credentialsType.enterSessionDuration}
+              placeholder={
+                t.providers.connectAccount.credentialsType.enterSessionDuration
+              }
               variant="bordered"
               isRequired={false}
             />
           </div>
+        </>
+      )}
+
+      {type === "providers" && (
+        <>
+          <Divider />
+          <AWSRegionsSelect
+            control={control}
+            setValue={setValue}
+            regions={regions}
+            defaultRegions={defaultRegions}
+          />
         </>
       )}
     </>

@@ -133,6 +133,14 @@ ai-config.json
 
 # .env
 .env
+.env.*
+.env.official-local
+!.env.example
+DEPLOYMENT_NOTES.local.md
+PRODUCTION_DEPLOYMENT.local.md
+ADMIN_CREDENTIALS.local.md
+.deployment-secrets.local.md
+docker-compose.prod.local.yml
 ui/.env*
 api/.env*
 mcp_server/.env*

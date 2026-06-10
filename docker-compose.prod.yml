@@ -1,0 +1,143 @@
+services:
+  nginx:
+    image: nginx:1.27-alpine
+    ports:
+      - "18081:80"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - ui
+      - api
+
+  api:
+    hostname: prowler-api
+    build:
+      context: .
+      dockerfile: api/Dockerfile
+    image: st-cloud-cspm-api:prod
+    user: root
+    env_file:
+      - path: .env.prod
+        required: true
+    ports:
+      - "18080:8080"
+    volumes:
+      - ../data/api:/home/prowler/.config/prowler-api
+      - ../data/output:/tmp/prowler_api_output
+    depends_on:
+      postgres:
+        condition: service_healthy
+      valkey:
+        condition: service_healthy
+    entrypoint:
+      - /home/prowler/docker-entrypoint.sh
+      - prod
+
+  ui:
+    build:
+      context: ./ui
+      dockerfile: Dockerfile
+      target: prod
+      args:
+        NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL}
+        NEXT_PUBLIC_API_DOCS_URL: ${NEXT_PUBLIC_API_DOCS_URL}
+        NEXT_PUBLIC_PROWLER_RELEASE_VERSION: ${NEXT_PUBLIC_PROWLER_RELEASE_VERSION:-st-cloud-cspm}
+        NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID: ${NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID:-}
+    image: st-cloud-cspm-ui:prod
+    env_file:
+      - path: .env.prod
+        required: true
+    ports:
+      - "13000:3000"
+    depends_on:
+      mcp-server:
+        condition: service_healthy
+
+  postgres:
+    image: postgres:16.3-alpine3.20
+    hostname: postgres-db
+    environment:
+      POSTGRES_USER: ${POSTGRES_ADMIN_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_ADMIN_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    env_file:
+      - path: .env.prod
+        required: true
+    volumes:
+      - ../data/postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_ADMIN_USER}\" -d \"$${POSTGRES_DB}\""]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  valkey:
+    image: valkey/valkey:7-alpine3.19
+    hostname: valkey
+    env_file:
+      - path: .env.prod
+        required: true
+    volumes:
+      - ../data/valkey:/data
+    healthcheck:
+      test: ["CMD-SHELL", "valkey-cli ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  worker:
+    image: st-cloud-cspm-api:prod
+    hostname: prowler-worker
+    user: root
+    env_file:
+      - path: .env.prod
+        required: true
+    volumes:
+      - ../data/api:/home/prowler/.config/prowler-api
+      - ../data/output:/tmp/prowler_api_output
+    depends_on:
+      valkey:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    ulimits:
+      nofile:
+        soft: 65535
+        hard: 65535
+    entrypoint:
+      - /home/prowler/docker-entrypoint.sh
+      - worker
+
+  worker-beat:
+    image: st-cloud-cspm-api:prod
+    hostname: prowler-worker-beat
+    user: root
+    env_file:
+      - path: .env.prod
+        required: true
+    volumes:
+      - ../data/api:/home/prowler/.config/prowler-api
+      - ../data/output:/tmp/prowler_api_output
+    depends_on:
+      valkey:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    entrypoint:
+      - /home/prowler/docker-entrypoint.sh
+      - beat
+
+  mcp-server:
+    image: prowlercloud/prowler-mcp:stable
+    hostname: mcp-server
+    environment:
+      PROWLER_MCP_TRANSPORT_MODE: http
+    env_file:
+      - path: .env.prod
+        required: true
+    command: ["uvicorn", "--host", "0.0.0.0", "--port", "8000"]
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:8000/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10

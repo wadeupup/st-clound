@@ -60,6 +60,7 @@ RUN ARCH=$(uname -m) && \
 # Poetry needs git to install dependencies declared with git URLs.
 RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
+    gosu \
     && rm -rf /var/lib/apt/lists/*
 
 # Add prowler user

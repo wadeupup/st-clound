@@ -1392,6 +1392,17 @@ class FindingMetadataSerializer(BaseSerializerV1):
 
 
 # Provider secrets
+def _validate_aws_regions(regions: list[str]) -> list[str]:
+    normalized_regions = []
+    for region in regions:
+        clean_region = region.strip()
+        if not clean_region:
+            raise serializers.ValidationError("AWS region cannot be empty.")
+        if clean_region not in normalized_regions:
+            normalized_regions.append(clean_region)
+    return normalized_regions
+
+
 class BaseWriteProviderSecretSerializer(BaseWriteSerializer):
     @staticmethod
     def validate_secret_based_on_provider(
@@ -1454,6 +1465,12 @@ class AwsProviderSecret(serializers.Serializer):
     aws_access_key_id = serializers.CharField()
     aws_secret_access_key = serializers.CharField()
     aws_session_token = serializers.CharField(required=False)
+    regions = serializers.ListField(
+        child=serializers.CharField(), required=False, allow_empty=False
+    )
+
+    def validate_regions(self, regions):
+        return _validate_aws_regions(regions)
 
     class Meta:
         resource_name = "provider-secrets"
@@ -1607,6 +1624,12 @@ class AWSRoleAssumptionProviderSecret(serializers.Serializer):
     aws_access_key_id = serializers.CharField(required=False)
     aws_secret_access_key = serializers.CharField(required=False)
     aws_session_token = serializers.CharField(required=False)
+    regions = serializers.ListField(
+        child=serializers.CharField(), required=False, allow_empty=False
+    )
+
+    def validate_regions(self, regions):
+        return _validate_aws_regions(regions)
 
     class Meta:
         resource_name = "provider-secrets"

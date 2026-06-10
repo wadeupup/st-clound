@@ -1,5 +1,28 @@
 #!/bin/sh
 
+OUTPUT_DIR="${DJANGO_OUTPUT_DIR:-/tmp/prowler_api_output}"
+
+prepare_output_dir() {
+  mkdir -p "$OUTPUT_DIR"
+
+  if [ "$(id -u)" = "0" ]; then
+    chown -R prowler:prowler "$OUTPUT_DIR"
+    chmod 775 "$OUTPUT_DIR"
+    return
+  fi
+
+  if [ ! -w "$OUTPUT_DIR" ]; then
+    echo "Output directory $OUTPUT_DIR is not writable by $(id -un)."
+    echo "Start the container as root once or fix the mounted directory owner to prowler:prowler."
+    exit 1
+  fi
+}
+
+run_as_prowler() {
+  if [ "$(id -u)" = "0" ]; then
+    exec gosu prowler "$0" "$@"
+  fi
+}
 
 apply_migrations() {
   echo "Applying database migrations..."
@@ -52,20 +75,28 @@ manage_db_partitions() {
 
 case "$1" in
   dev)
+    prepare_output_dir
+    run_as_prowler "$@"
     apply_migrations
     apply_fixtures
     manage_db_partitions
     start_dev_server
     ;;
   prod)
+    prepare_output_dir
+    run_as_prowler "$@"
     apply_migrations
     manage_db_partitions
     start_prod_server
     ;;
   worker)
+    prepare_output_dir
+    run_as_prowler "$@"
     start_worker
     ;;
   beat)
+    prepare_output_dir
+    run_as_prowler "$@"
     start_worker_beat
     ;;
   *)

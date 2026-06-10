@@ -1,3 +1,4 @@
+import os
 from datetime import datetime, timezone
 
 from allauth.socialaccount.providers.oauth2.client import OAuth2Client
@@ -24,6 +25,12 @@ from prowler.providers.kubernetes.kubernetes_provider import KubernetesProvider
 from prowler.providers.m365.m365_provider import M365Provider
 from prowler.providers.mongodbatlas.mongodbatlas_provider import MongodbatlasProvider
 from prowler.providers.oraclecloud.oraclecloud_provider import OraclecloudProvider
+
+AWS_DEFAULT_REGION_ENV_VARS = (
+    "PROWLER_AWS_DEFAULT_REGIONS",
+    "AWS_DEFAULT_REGION",
+    "AWS_REGION",
+)
 
 
 class CustomOAuth2Client(OAuth2Client):
@@ -60,6 +67,44 @@ def merge_dicts(default_dict: dict, replacement_dict: dict) -> dict:
             result[key] = value
 
     return result
+
+
+def normalize_aws_regions(regions) -> list[str]:
+    """Normalize AWS regions from API payloads and environment variables."""
+    if not regions:
+        return []
+
+    if isinstance(regions, str):
+        raw_regions = regions.split(",")
+    elif isinstance(regions, (list, tuple, set)):
+        raw_regions = []
+        for region in regions:
+            if isinstance(region, str):
+                raw_regions.extend(region.split(","))
+    else:
+        return []
+
+    normalized_regions = []
+    for region in raw_regions:
+        clean_region = region.strip()
+        if clean_region and clean_region not in normalized_regions:
+            normalized_regions.append(clean_region)
+
+    return normalized_regions
+
+
+def get_default_aws_regions() -> list[str]:
+    """Return AWS default regions configured by the deployment environment."""
+    for env_var in AWS_DEFAULT_REGION_ENV_VARS:
+        regions = normalize_aws_regions(os.getenv(env_var))
+        if regions:
+            return regions
+    return []
+
+
+def get_aws_provider_regions(secret: dict | None) -> list[str]:
+    """Return selected AWS regions from a provider secret."""
+    return normalize_aws_regions((secret or {}).get("regions"))
 
 
 def return_prowler_provider(
@@ -125,8 +170,15 @@ def get_prowler_provider_kwargs(
     Returns:
         dict: The provider kwargs for the corresponding provider class.
     """
-    prowler_provider_kwargs = provider.secret.secret
-    if provider.provider == Provider.ProviderChoices.AZURE.value:
+    prowler_provider_kwargs = dict(provider.secret.secret or {})
+    if provider.provider == Provider.ProviderChoices.AWS.value:
+        regions = get_aws_provider_regions(prowler_provider_kwargs)
+        if regions:
+            prowler_provider_kwargs = {
+                **prowler_provider_kwargs,
+                "regions": set(regions),
+            }
+    elif provider.provider == Provider.ProviderChoices.AZURE.value:
         prowler_provider_kwargs = {
             **prowler_provider_kwargs,
             "subscription_ids": [provider.uid],
@@ -211,9 +263,15 @@ def prowler_provider_connection_test(provider: Provider) -> Connection:
     prowler_provider = return_prowler_provider(provider)
 
     try:
-        prowler_provider_kwargs = provider.secret.secret
+        prowler_provider_kwargs = dict(provider.secret.secret or {})
     except Provider.secret.RelatedObjectDoesNotExist as secret_error:
         return Connection(is_connected=False, error=secret_error)
+
+    if provider.provider == Provider.ProviderChoices.AWS.value:
+        regions = get_aws_provider_regions(prowler_provider_kwargs)
+        if regions:
+            prowler_provider_kwargs["aws_region"] = regions[0]
+        prowler_provider_kwargs.pop("regions", None)
 
     # For IaC provider, construct the kwargs properly for test_connection
     if provider.provider == Provider.ProviderChoices.IAC.value:

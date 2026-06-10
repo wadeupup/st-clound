@@ -150,6 +150,9 @@ export const addCredentialsFormSchema = (
               .string()
               .min(1, "AWS Secret Access Key is required"),
             [ProviderCredentialFields.AWS_SESSION_TOKEN]: z.string().optional(),
+            [ProviderCredentialFields.AWS_REGIONS]: z
+              .array(z.string())
+              .min(1, "Select at least one AWS region"),
           }
         : providerType === "azure"
           ? {
@@ -261,12 +264,15 @@ export const addCredentialsFormSchema = (
                             }
                           : {}),
     })
-    .superRefine((data: Record<string, string | undefined>, ctx) => {
+    .superRefine((data: Record<string, unknown>, ctx) => {
+      const isBlank = (value: unknown) =>
+        typeof value !== "string" || value.trim() === "";
+
       if (providerType === "m365") {
         // Validate based on the via parameter
         if (via === "app_client_secret") {
           const clientSecret = data[ProviderCredentialFields.CLIENT_SECRET];
-          if (!clientSecret || clientSecret.trim() === "") {
+          if (isBlank(clientSecret)) {
             ctx.addIssue({
               code: "custom",
               message: "Client Secret is required",
@@ -276,7 +282,7 @@ export const addCredentialsFormSchema = (
         } else if (via === "app_certificate") {
           const certificateContent =
             data[ProviderCredentialFields.CERTIFICATE_CONTENT];
-          if (!certificateContent || certificateContent.trim() === "") {
+          if (isBlank(certificateContent)) {
             ctx.addIssue({
               code: "custom",
               message: "Certificate Content is required",
@@ -338,6 +344,9 @@ export const addCredentialsRoleFormSchema = (providerType: string) =>
             .string()
             .optional(),
           [ProviderCredentialFields.AWS_SESSION_TOKEN]: z.string().optional(),
+          [ProviderCredentialFields.AWS_REGIONS]: z
+            .array(z.string())
+            .min(1, "Select at least one AWS region"),
           [ProviderCredentialFields.SESSION_DURATION]: z.string().optional(),
           [ProviderCredentialFields.ROLE_SESSION_NAME]: z.string().optional(),
           [ProviderCredentialFields.CREDENTIALS_TYPE]: z.string().optional(),
