@@ -1858,6 +1858,65 @@ class TestCreateComplianceRequirements:
 
             assert "requirements_created" in result
 
+    @patch("tasks.jobs.scan._create_compliance_summaries")
+    @patch("tasks.jobs.scan._persist_compliance_requirement_rows")
+    def test_create_compliance_requirements_with_manual_findings(
+        self,
+        mock_persist,
+        mock_create_summaries,
+        tenants_fixture,
+        scans_fixture,
+        providers_fixture,
+        findings_fixture,
+    ):
+        finding, muted_finding = findings_fixture
+        finding.status = StatusChoices.MANUAL
+        finding.muted = False
+        finding.save(update_fields=["status", "muted"])
+        muted_finding.muted = True
+        muted_finding.save(update_fields=["muted"])
+
+        with patch(
+            "tasks.jobs.scan.PROWLER_COMPLIANCE_OVERVIEW_TEMPLATE"
+        ) as mock_compliance_template:
+            tenant_id = str(tenants_fixture[0].id)
+            scan_id = str(scans_fixture[0].id)
+
+            mock_compliance_template.__getitem__.return_value = {
+                "test_compliance": {
+                    "framework": "Test Framework",
+                    "version": "1.0",
+                    "requirements": {
+                        "req_1": {
+                            "description": "Manual requirement",
+                            "checks": {"test_check_id": None},
+                            "checks_status": {
+                                "pass": 0,
+                                "fail": 0,
+                                "manual": 1,
+                                "total": 1,
+                            },
+                            "status": "MANUAL",
+                        },
+                    },
+                }
+            }
+
+            result = create_compliance_requirements(tenant_id, scan_id)
+
+        assert result["requirements_created"] == 1
+        assert result["regions_processed"] == ["us-east-1"]
+        mock_persist.assert_called_once()
+        persisted_rows = mock_persist.call_args[0][1]
+        assert persisted_rows[0]["requirement_status"] == "MANUAL"
+        mock_create_summaries.assert_called_once()
+        summary_statuses = mock_create_summaries.call_args[0][2]
+        assert summary_statuses[("test_compliance", "req_1")] == {
+            "fail_count": 0,
+            "pass_count": 0,
+            "total_count": 1,
+        }
+
     def test_create_compliance_requirements_kubernetes_provider(
         self,
         tenants_fixture,

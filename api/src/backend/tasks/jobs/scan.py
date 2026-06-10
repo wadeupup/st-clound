@@ -1091,14 +1091,14 @@ def _aggregate_findings_by_region(
     findings_count_by_compliance = {}
 
     with rls_transaction(tenant_id, using=READ_REPLICA_ALIAS):
-        # Fetch only PASS/FAIL findings (optimized query reduces data transfer)
-        # Other statuses are not needed for check_status or ThreatScore calculation
+        # Fetch statuses that can influence compliance overviews. MANUAL findings
+        # still identify regions and requirements that need review.
         findings = (
             Finding.all_objects.filter(
                 tenant_id=tenant_id,
                 scan_id=scan_id,
                 muted=False,
-                status__in=["PASS", "FAIL"],
+                status__in=["PASS", "FAIL", "MANUAL"],
             )
             .only("id", "check_id", "status", "compliance")
             .prefetch_related(
@@ -1123,8 +1123,11 @@ def _aggregate_findings_by_region(
 
                 # Aggregate check status by region
                 current_status = check_status_by_region.setdefault(region, {})
-                # Priority: FAIL > any other status
-                if current_status.get(finding.check_id) != "FAIL":
+                # Priority: FAIL > MANUAL > PASS.
+                previous_status = current_status.get(finding.check_id)
+                if previous_status != "FAIL" and (
+                    previous_status != "MANUAL" or status == "FAIL"
+                ):
                     current_status[finding.check_id] = status
 
                 # Aggregate ThreatScore compliance counts
@@ -1209,19 +1212,26 @@ def create_compliance_requirements(tenant_id: str, scan_id: str):
                     if not targets:
                         continue
                     status_lower = (status or "").lower()
-                    if status_lower not in {"pass", "fail"}:
+                    if status_lower not in {"pass", "fail", "manual"}:
                         continue
                     for compliance_id, requirement_id in targets:
                         compliance_stats = region_requirement_stats[region].setdefault(
                             compliance_id, {}
                         )
                         requirement_stats = compliance_stats.setdefault(
-                            requirement_id, {"passed_checks": 0, "failed_checks": 0}
+                            requirement_id,
+                            {
+                                "passed_checks": 0,
+                                "failed_checks": 0,
+                                "manual_checks": 0,
+                            },
                         )
                         if status_lower == "pass":
                             requirement_stats["passed_checks"] += 1
-                        else:
+                        elif status_lower == "fail":
                             requirement_stats["failed_checks"] += 1
+                        else:
+                            requirement_stats["manual_checks"] += 1
 
             # Prepare compliance requirement rows and compute summaries in single pass
             utc_datetime_now = datetime.now(tz=timezone.utc)
@@ -1244,11 +1254,14 @@ def create_compliance_requirements(tenant_id: str, scan_id: str):
                         stats = compliance_stats.get(requirement_id)
                         passed_checks = stats["passed_checks"] if stats else 0
                         failed_checks = stats["failed_checks"] if stats else 0
+                        manual_checks = stats["manual_checks"] if stats else 0
                         total_checks = len(requirement["checks"])
                         if total_checks == 0:
                             requirement_status = "MANUAL"
                         elif failed_checks > 0:
                             requirement_status = "FAIL"
+                        elif manual_checks > 0:
+                            requirement_status = "MANUAL"
                         else:
                             requirement_status = "PASS"
 
