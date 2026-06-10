@@ -43,7 +43,8 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
   };
 
   const findingTitle =
-    finding.attributes.check_metadata?.checktitle || t.findings.rowActions.securityFinding;
+    finding.attributes.check_metadata?.checktitle ||
+    t.findings.rowActions.securityFinding;
 
   // If current finding is selected and there are multiple selections, mute all
   // Otherwise, just mute this single finding
@@ -65,7 +66,10 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
     }
     const ids = getMuteIds();
     if (ids.length > 1) {
-      return t.findings.rowActions.muteSelectedFindings.replace("{count}", ids.length.toString());
+      return t.findings.rowActions.muteSelectedFindings.replace(
+        "{count}",
+        ids.length.toString(),
+      );
     }
     return t.findings.rowActions.muteThisFinding;
   };
@@ -132,7 +136,9 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
                 }
                 onPress={() => setIsMuteModalOpen(true)}
               >
-                {isMuted ? t.findings.rowActions.muted : t.findings.rowActions.mute}
+                {isMuted
+                  ? t.findings.rowActions.muted
+                  : t.findings.rowActions.mute}
                 {!isMuted && isCurrentSelected && hasMultipleSelected && (
                   <span className="ml-1 text-xs text-slate-500">
                     ({selectedFindingIds.length})

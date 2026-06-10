@@ -10,23 +10,24 @@ import {
   today,
 } from "@internationalized/date";
 import { useLocale } from "@react-aria/i18n";
-import type { DateValue } from "@react-types/datepicker";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { ComponentProps, useEffect, useRef, useState } from "react";
 
 import { useUrlFilters } from "@/hooks/use-url-filters";
 import { useI18n } from "@/lib/i18n/context";
+
+type DatePickerValue = NonNullable<ComponentProps<typeof DatePicker>["value"]>;
 
 export const CustomDatePicker = () => {
   const { t } = useI18n();
   const searchParams = useSearchParams();
   const { updateFilter } = useUrlFilters();
 
-  const [value, setValue] = useState<DateValue | null>(() => {
+  const [value, setValue] = useState<DatePickerValue | null>(() => {
     const dateParam = searchParams.get("filter[inserted_at]");
     if (!dateParam) return null;
     try {
-      return parseDate(dateParam);
+      return parseDate(dateParam) as unknown as DatePickerValue;
     } catch {
       return null;
     }
@@ -38,7 +39,7 @@ export const CustomDatePicker = () => {
   const nextWeek = startOfWeek(now.add({ weeks: 1 }), locale);
   const nextMonth = startOfMonth(now.add({ months: 1 }));
 
-  const applyDateFilter = (date: DateValue | null) => {
+  const applyDateFilter = (date: DatePickerValue | null) => {
     if (date) {
       updateFilter("inserted_at", date.toString());
     } else {
@@ -59,7 +60,7 @@ export const CustomDatePicker = () => {
     }
   }, [searchParams]);
 
-  const handleDateChange = (newValue: DateValue | null) => {
+  const handleDateChange = (newValue: DatePickerValue | null) => {
     setValue(newValue);
     applyDateFilter(newValue);
   };
@@ -90,23 +91,35 @@ export const CustomDatePicker = () => {
         CalendarTopContent={
           <ButtonGroup
             fullWidth
-            className="bg-slate-100 dark:bg-slate-800/50 [&>button]:border-slate-200 dark:[&>button]:border-slate-700 [&>button]:text-slate-900 dark:[&>button]:text-slate-100 px-3 pt-3 pb-2"
+            className="bg-slate-100 px-3 pt-3 pb-2 dark:bg-slate-800/50 [&>button]:border-slate-200 [&>button]:text-slate-900 dark:[&>button]:border-slate-700 dark:[&>button]:text-slate-100"
             radius="full"
             size="sm"
             variant="flat"
           >
-            <Button onPress={() => handleDateChange(now)}>{t.findings.datePicker.today}</Button>
-            <Button onPress={() => handleDateChange(nextWeek)}>
+            <Button
+              onPress={() =>
+                handleDateChange(now as unknown as DatePickerValue)
+              }
+            >
+              {t.findings.datePicker.today}
+            </Button>
+            <Button
+              onPress={() =>
+                handleDateChange(nextWeek as unknown as DatePickerValue)
+              }
+            >
               {t.findings.datePicker.nextWeek}
             </Button>
-            <Button onPress={() => handleDateChange(nextMonth)}>
+            <Button
+              onPress={() =>
+                handleDateChange(nextMonth as unknown as DatePickerValue)
+              }
+            >
               {t.findings.datePicker.nextMonth}
             </Button>
           </ButtonGroup>
         }
         calendarProps={{
-          focusedValue: value || undefined,
-          onFocusChange: setValue,
           nextButtonProps: {
             variant: "bordered",
           },

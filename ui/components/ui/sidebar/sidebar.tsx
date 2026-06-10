@@ -4,6 +4,7 @@ import clsx from "clsx";
 import Image from "next/image";
 import Link from "next/link";
 
+import stLogo from "@/components/icons/compliance/st.png";
 import { useSidebar } from "@/hooks/use-sidebar";
 import { useStore } from "@/hooks/use-store";
 import { cn } from "@/lib/utils";
@@ -11,12 +12,10 @@ import { cn } from "@/lib/utils";
 import { Button } from "../button/button";
 import { Menu } from "./menu";
 
-import stLogo from "@/components/icons/compliance/st.png";
-
 export function Sidebar() {
   const sidebar = useStore(useSidebar, (x) => x);
   if (!sidebar) return null;
-  const { isOpen, getOpenState, setIsHover, settings } = sidebar;
+  const { getOpenState, setIsHover, settings } = sidebar;
   return (
     <aside
       className={cn(
@@ -28,7 +27,7 @@ export function Sidebar() {
       <div
         onMouseEnter={() => setIsHover(true)}
         onMouseLeave={() => setIsHover(false)}
-        className="no-scrollbar relative flex h-full flex-col overflow-x-hidden overflow-y-auto border-r border-slate-200 bg-white/80 backdrop-blur-sm shadow-lg dark:border-slate-800 dark:bg-slate-900/80 px-3 py-6"
+        className="no-scrollbar relative flex h-full flex-col overflow-x-hidden overflow-y-auto border-r border-slate-200 bg-white/80 px-3 py-6 shadow-lg backdrop-blur-sm dark:border-slate-800 dark:bg-slate-900/80"
       >
         <Button
           className={cn(
@@ -53,10 +52,10 @@ export function Sidebar() {
               alt="ST Cloud"
               width={getOpenState() ? 40 : 30}
               height={getOpenState() ? 40 : 30}
-              className="object-contain flex-shrink-0"
+              className="flex-shrink-0 object-contain"
             />
             {getOpenState() && (
-              <span className="text-lg font-semibold text-slate-900 dark:text-slate-100 whitespace-nowrap">
+              <span className="text-lg font-semibold whitespace-nowrap text-slate-900 dark:text-slate-100">
                 ST Cloud
               </span>
             )}

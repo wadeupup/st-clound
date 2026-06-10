@@ -44,9 +44,11 @@ export const ja = {
     success: "成功！",
     userRegistered: "ユーザーが正常に登録されました。",
     sessionExpired: "セッション期限切れ",
-    sessionExpiredDesc: "セッションの有効期限が切れました。続行するには再度サインインしてください。",
+    sessionExpiredDesc:
+      "セッションの有効期限が切れました。続行するには再度サインインしてください。",
     sessionError: "セッションエラー",
-    sessionErrorDesc: "セッションに問題が発生しました。再度サインインしてください。",
+    sessionErrorDesc:
+      "セッションに問題が発生しました。再度サインインしてください。",
     authError: "認証エラー",
     authErrorDesc: "続行するには再度サインインしてください。",
     invalidCredentials: "メールアドレスまたはパスワードが無効です",
@@ -158,7 +160,8 @@ export const ja = {
       noDataAvailable: "重大度トレンドデータが利用できません",
       failedToLoadData: "重大度トレンドデータの読み込みに失敗しました",
       noDataForRange: "この期間の重大度トレンドデータが利用できません",
-      failedToLoad: "重大度トレンドの読み込みに失敗しました。もう一度お試しください。",
+      failedToLoad:
+        "重大度トレンドの読み込みに失敗しました。もう一度お試しください。",
     },
     graphsTabs: {
       newFindings: "新しい検出結果",
@@ -168,7 +171,8 @@ export const ja = {
       riskPlot: "リスクプロット",
       noResults: "結果がありません。",
       latestNewFailingFindings: "最新の失敗した検出結果",
-      showingLatestFindings: "重大度別に最新の 10 件の新しい失敗した検出結果を表示しています。",
+      showingLatestFindings:
+        "重大度別に最新の 10 件の新しい失敗した検出結果を表示しています。",
       noRegionData: "リージョンデータが利用できません",
       noCategoryData: "選択したフィルターにカテゴリデータがありません",
       noFindingsData: "選択したフィルターに検出結果データがありません",
@@ -176,9 +180,11 @@ export const ja = {
       noFailedFindingsToDisplay: "表示する失敗した検出結果がありません",
       noProvidersAvailable: "選択したフィルターにプロバイダーがありません",
       noRiskData: "選択したプロバイダーにリスクデータがありません",
-      providersNoScans: "{count} 個のプロバイダーに完了したスキャンがありません",
+      providersNoScans:
+        "{count} 個のプロバイダーに完了したスキャンがありません",
       riskPlotTitle: "リスクプロット",
-      riskPlotDescription: "脅威スコアは重大度加重であり、数量ベースではありません。重大度の高い検出結果がスコアに大きな影響を与えます。",
+      riskPlotDescription:
+        "脅威スコアは重大度加重であり、数量ベースではありません。重大度の高い検出結果がスコアに大きな影響を与えます。",
       failFindings: "失敗した検出結果",
       threatScore: "脅威スコア",
       checkOutOnFindings: "検出結果を確認",
@@ -196,7 +202,8 @@ export const ja = {
     regions: "リージョン",
     level: "レベル",
     selectScan: "スキャンを選択",
-    noDataForSelectedScan: "選択したスキャンのコンプライアンスデータはありません。",
+    noDataForSelectedScan:
+      "選択したスキャンのコンプライアンスデータはありません。",
     provideValidScanId: "有効なスキャン ID を指定してください。",
   },
   findings: {
@@ -272,7 +279,8 @@ export const ja = {
       region: "リージョン",
       firstSeen: "初回検出",
       delta: "デルタ",
-      deltaTooltip: "検出結果が新しい（NEW）、ステータスが変更された（CHANGED）、または以前のスキャンと比較して変更されていない（NONE）かを示します。",
+      deltaTooltip:
+        "検出結果が新しい（NEW）、ステータスが変更された（CHANGED）、または以前のスキャンと比較して変更されていない（NONE）かを示します。",
       severity: "重大度",
       findingId: "検出結果ID",
       checkId: "チェックID",
@@ -317,7 +325,8 @@ export const ja = {
       aboutToMute: "ミュートしようとしています",
       finding: "件の検出結果",
       findings: "件の検出結果",
-      mutedDescription: "ミュートされた検出結果はデフォルトで非表示になりますが、フィルターを使用して表示できます。",
+      mutedDescription:
+        "ミュートされた検出結果はデフォルトで非表示になりますが、フィルターを使用して表示できます。",
       ruleName: "ルール名",
       ruleNamePlaceholder: "例：開発環境のS3バケットを無視",
       ruleNameDescription: "このミュートルールの説明名",
@@ -342,7 +351,7 @@ export const ja = {
     },
     checks: {
       //
-    }
+    },
   },
   resources: {
     title: "リソース",
@@ -410,22 +419,30 @@ export const ja = {
     connectAccount: {
       title: "クラウドプロバイダーに接続",
       workflowTitle: "クラウドプロバイダーを追加",
-      workflowDescription: "これらの手順を完了して、クラウドプロバイダーを設定し、最初のスキャンを開始します。",
+      workflowDescription:
+        "これらの手順を完了して、クラウドプロバイダーを設定し、最初のスキャンを開始します。",
       steps: "ステップ",
       step1Title: "クラウドプロバイダーを選択",
-      step1Description: "接続するクラウドプロバイダーを選択し、サポートされているオプションから希望する認証方法を指定します。",
+      step1Description:
+        "接続するクラウドプロバイダーを選択し、サポートされているオプションから希望する認証方法を指定します。",
       step2Title: "認証情報を入力",
-      step2Description: "選択したクラウドプロバイダーへの安全な接続を確立するために必要な認証情報を提供します。",
+      step2Description:
+        "選択したクラウドプロバイダーへの安全な接続を確立するために必要な認証情報を提供します。",
       step3Title: "接続を確認してスキャンを開始",
-      step3Description: "認証情報が正しいことを確認し、クラウド環境のスキャンを開始します。",
+      step3Description:
+        "認証情報が正しいことを確認し、クラウド環境のスキャンを開始します。",
       testConnection: {
         title: "接続を確認してスキャンを開始",
         titleUpdated: "接続を確認",
-        description: "接続が成功すると、スキャンは 24 時間ごとに自動的に実行されます。単一のスキャンを実行する場合は、下のチェックボックスを選択してください。",
-        descriptionUpdated: "接続が成功すると、プロバイダーページにリダイレクトされます。",
-        providerIdError: "プロバイダー ID {error}。確認して再試行してください。",
+        description:
+          "接続が成功すると、スキャンは 24 時間ごとに自動的に実行されます。単一のスキャンを実行する場合は、下のチェックボックスを選択してください。",
+        descriptionUpdated:
+          "接続が成功すると、プロバイダーページにリダイレクトされます。",
+        providerIdError:
+          "プロバイダー ID {error}。確認して再試行してください。",
         unknownError: "不明なエラー",
-        credentialsIssue: "認証情報に問題があるようです。認証情報を確認して再試行してください。",
+        credentialsIssue:
+          "認証情報に問題があるようです。認証情報を確認して再試行してください。",
         runSingleScan: "単一のスキャンを実行（繰り返しスケジュールなし）。",
         checkNewCredentials: "新しい認証情報を確認して接続をテストします。",
         backToProviders: "プロバイダーに戻る",
@@ -445,7 +462,7 @@ export const ja = {
       readTheDocs: "ドキュメントを読む",
       searchProviders: "プロバイダーを検索",
       searchProvidersPlaceholder: "プロバイダーを検索...",
-      noProvidersFound: "\"{term}\" に一致するプロバイダーが見つかりません",
+      noProvidersFound: '"{term}" に一致するプロバイダーが見つかりません',
       providerAlias: "プロバイダーエイリアス（オプション）",
       providerAliasPlaceholder: "プロバイダーエイリアスを入力",
       back: "戻る",
@@ -492,17 +509,24 @@ export const ja = {
         azureCredentialsDescription: "Azure 認証情報を入力してください。",
         awsCredentialsDescription: "AWS 認証情報を入力してください。",
         gcpCredentialsDescription: "GCP 認証情報を入力してください。",
-        gcpServiceAccountKeyDescription: "GCP 認証情報のサービスアカウントキーを入力してください。",
-        kubernetesCredentialsDescription: "Kubernetes 認証情報の kubeconfig 内容を入力してください。",
-        mongoAtlasKeysDescription: "Prowler が評価するリソースへの読み取りアクセス権を持つ、組織レベルの MongoDB Atlas API 公開キーと秘密キーを入力してください。",
-        ociApiKeyDescription: "Oracle Cloud Infrastructure API キー認証情報を入力してください。",
+        gcpServiceAccountKeyDescription:
+          "GCP 認証情報のサービスアカウントキーを入力してください。",
+        kubernetesCredentialsDescription:
+          "Kubernetes 認証情報の kubeconfig 内容を入力してください。",
+        mongoAtlasKeysDescription:
+          "Prowler が評価するリソースへの読み取りアクセス権を持つ、組織レベルの MongoDB Atlas API 公開キーと秘密キーを入力してください。",
+        ociApiKeyDescription:
+          "Oracle Cloud Infrastructure API キー認証情報を入力してください。",
         usingServiceAccount: "サービスアカウントを使用",
         connectUsingServiceAccount: "サービスアカウントで接続",
         connectViaServiceAccountKey: "サービスアカウントキーで接続",
         serviceAccountKey: "サービスアカウントキー",
-        pasteServiceAccountKeyJson: "サービスアカウントキーの JSON 内容をここに貼り付け",
-        usingApplicationDefaultCredentials: "アプリケーションデフォルト認証情報を使用",
-        connectViaApplicationDefaultCredentials: "アプリケーションデフォルト認証情報で接続",
+        pasteServiceAccountKeyJson:
+          "サービスアカウントキーの JSON 内容をここに貼り付け",
+        usingApplicationDefaultCredentials:
+          "アプリケーションデフォルト認証情報を使用",
+        connectViaApplicationDefaultCredentials:
+          "アプリケーションデフォルト認証情報で接続",
         clientId: "クライアント ID",
         enterClientId: "クライアント ID を入力",
         clientSecret: "クライアントシークレット",
@@ -516,28 +540,38 @@ export const ja = {
         atlasPublicKey: "Atlas 公開キー",
         atlasPrivateKey: "Atlas 秘密キー",
         enterPrivateKey: "秘密キーを入力",
-        mongoAtlasKeySecurityNote: "キーは暗号化されていない状態でブラウザーから送信されることはなく、バックエンドにシークレットとして保存されます。必要に応じて MongoDB Atlas からいつでもキーをローテーションできます。",
+        mongoAtlasKeySecurityNote:
+          "キーは暗号化されていない状態でブラウザーから送信されることはなく、バックエンドにシークレットとして保存されます。必要に応じて MongoDB Atlas からいつでもキーをローテーションできます。",
         userOcid: "ユーザー OCID",
         fingerprint: "フィンガープリント",
         enterApiKeyFingerprint: "API キーのフィンガープリントを入力",
         region: "リージョン",
+        awsRegions: "AWS リージョン",
+        selectAwsRegions: "AWS リージョンを選択",
         privateKeyContent: "秘密キーの内容",
         passphraseOptional: "パスフレーズ（任意）",
-        enterPassphraseIfKeyEncrypted: "キーが暗号化されている場合はパスフレーズを入力",
-        ociPrivateKeyNote: "OCI 秘密キーファイルの生の内容（PEM 形式）を貼り付けてください。キーは安全な送信のため自動的にエンコードされます。",
+        enterPassphraseIfKeyEncrypted:
+          "キーが暗号化されている場合はパスフレーズを入力",
+        ociPrivateKeyNote:
+          "OCI 秘密キーファイルの生の内容（PEM 形式）を貼り付けてください。キーは安全な送信のため自動的にエンコードされます。",
         connectViaAccessKeys: "アクセスキーで接続",
-        alibabaAccessKeysDescription: "Prowler が評価するリソースへの読み取りアクセス権を持つ RAM ユーザーの Access Key ID と Access Key Secret を入力してください。",
+        alibabaAccessKeysDescription:
+          "Prowler が評価するリソースへの読み取りアクセス権を持つ RAM ユーザーの Access Key ID と Access Key Secret を入力してください。",
         usingRamRole: "RAM ロールを使用",
         accessKeyId: "Access Key ID",
         accessKeySecret: "Access Key Secret",
         enterAccessKeySecret: "Access Key Secret を入力",
-        alibabaAccessKeySecurityNote: "キーは暗号化されていない状態でブラウザーから送信されることはなく、バックエンドにシークレットとして保存されます。必要に応じて Alibaba Cloud RAM コンソールからいつでもキーをローテーションできます。",
+        alibabaAccessKeySecurityNote:
+          "キーは暗号化されていない状態でブラウザーから送信されることはなく、バックエンドにシークレットとして保存されます。必要に応じて Alibaba Cloud RAM コンソールからいつでもキーをローテーションできます。",
         connectAssumingRamRole: "RAM ロールを引き受けて接続",
-        alibabaRamRoleDescription: "引き受ける RAM ロール ARN と、そのロールを引き受ける権限を持つ RAM ユーザーのアクセスキーを入力してください。",
+        alibabaRamRoleDescription:
+          "引き受ける RAM ロール ARN と、そのロールを引き受ける権限を持つ RAM ユーザーのアクセスキーを入力してください。",
         ramRoleToAssume: "引き受ける RAM ロール",
         credentialsForRoleAssumption: "ロール引き受け用の認証情報",
-        enterRoleSessionNameWithDefault: "ロールセッション名を入力（デフォルト：ProwlerSession）",
-        alibabaRoleSecurityNote: "キーは暗号化されていない状態でブラウザーから送信されることはなく、バックエンドにシークレットとして保存されます。このロールは STS を使用して引き受けられ、一時認証情報を取得します。",
+        enterRoleSessionNameWithDefault:
+          "ロールセッション名を入力（デフォルト：ProwlerSession）",
+        alibabaRoleSecurityNote:
+          "キーは暗号化されていない状態でブラウザーから送信されることはなく、バックエンドにシークレットとして保存されます。このロールは STS を使用して引き受けられ、一時認証情報を取得します。",
         prowlerCloudAssumeRole: "Prowler Cloud が IAM ロールを引き受けます",
         awsSdkDefault: "AWS SDK デフォルト",
         accessSecretKey: "アクセスキーとシークレットキー",
@@ -562,10 +596,12 @@ export const ja = {
         readOnlyRoleMustBeCreatedSuffix: "を手動で作成する必要があります",
         readOnlyRole: "読み取り専用 IAM ロール",
         orUpdated: "または更新",
-        useCloudFormationQuickLink: "次の AWS CloudFormation クイックリンクを使用して IAM ロールを作成",
+        useCloudFormationQuickLink:
+          "次の AWS CloudFormation クイックリンクを使用して IAM ロールを作成",
         or: "または",
         referToDocumentation: "ドキュメントを参照",
-        useTemplateToCreateRole: "次のテンプレートのいずれかを使用して IAM ロールを作成",
+        useTemplateToCreateRole:
+          "次のテンプレートのいずれかを使用して IAM ロールを作成",
         cloudFormationTemplate: "CloudFormation テンプレート",
         terraformCode: "Terraform コード",
         externalIdLabel: "外部 ID：",
@@ -583,9 +619,11 @@ export const ja = {
       title: "プロバイダーグループ",
       manageGroups: "グループ管理",
       createNewGroup: "新しいプロバイダーグループを作成",
-      createNewGroupDescription: "プロバイダーとロールを管理するための新しいプロバイダーグループを作成します。",
+      createNewGroupDescription:
+        "プロバイダーとロールを管理するための新しいプロバイダーグループを作成します。",
       editGroup: "プロバイダーグループを編集",
-      editGroupDescription: "プロバイダーグループを編集して、プロバイダーとロールを管理します。",
+      editGroupDescription:
+        "プロバイダーグループを編集して、プロバイダーとロールを管理します。",
       groupNotFound: "プロバイダーグループが見つかりません",
       unavailableForRole: "あなたのロールでは利用できません",
       table: {
@@ -603,7 +641,8 @@ export const ja = {
         deleteProviderGroup: "プロバイダーグループを削除",
         deleteProviderGroupDescription: "プロバイダーグループを永続的に削除",
         deleteConfirmTitle: "本当によろしいですか？",
-        deleteConfirmDescription: "この操作は元に戻せません。プロバイダーアカウントが永続的に削除され、サーバーからデータが削除されます。",
+        deleteConfirmDescription:
+          "この操作は元に戻せません。プロバイダーアカウントが永続的に削除され、サーバーからデータが削除されます。",
       },
       forms: {
         providerGroupName: "プロバイダーグループ名",
@@ -611,8 +650,10 @@ export const ja = {
         providerGroupNameRequired: "プロバイダーグループ名は必須です",
         selectProviders: "プロバイダーを選択",
         selectRoles: "ロールを選択",
-        rolesOptionalDescription: "ロールもグループに関連付けることができます。この手順はオプションで、必要に応じて後で完了するか、ロールページから完了できます。",
-        rolesEditDescription: "グループに関連付けられたロールは、ここで直接編集するか、ロールページから編集できます。",
+        rolesOptionalDescription:
+          "ロールもグループに関連付けることができます。この手順はオプションで、必要に応じて後で完了するか、ロールページから完了できます。",
+        rolesEditDescription:
+          "グループに関連付けられたロールは、ここで直接編集するか、ロールページから編集できます。",
         createGroup: "グループを作成",
         updateGroup: "グループを更新",
         cancel: "キャンセル",
@@ -621,7 +662,8 @@ export const ja = {
         success: "成功！",
         groupCreatedSuccessfully: "グループが正常に作成されました。",
         groupUpdatedSuccessfully: "グループが正常に更新されました。",
-        groupRemovedSuccessfully: "プロバイダーグループが正常に削除されました。",
+        groupRemovedSuccessfully:
+          "プロバイダーグループが正常に削除されました。",
         noChangesDetected: "変更が検出されませんでした",
         noUpdatesMade: "プロバイダーグループに更新は行われませんでした。",
         somethingWentWrong: "エラーが発生しました",
@@ -663,7 +705,8 @@ export const ja = {
       deleteProviderDescription: "プロバイダーを永続的に削除",
       editProviderAliasTitle: "プロバイダーエイリアスを編集",
       deleteConfirmTitle: "本当によろしいですか？",
-      deleteConfirmDescription: "この操作は元に戻せません。プロバイダーアカウントが永続的に削除され、サーバーからデータが削除されます。",
+      deleteConfirmDescription:
+        "この操作は元に戻せません。プロバイダーアカウントが永続的に削除され、サーバーからデータが削除されます。",
     },
   },
   users: {
@@ -717,7 +760,8 @@ export const ja = {
     },
     deleteModal: {
       title: "本当に削除しますか？",
-      description: "この操作は元に戻せません。これにより、ユーザーアカウントが永久に削除され、サーバーからデータが削除されます。",
+      description:
+        "この操作は元に戻せません。これにより、ユーザーアカウントが永久に削除され、サーバーからデータが削除されます。",
       cancel: "キャンセル",
       delete: "削除",
       loading: "読み込み中",
@@ -772,14 +816,16 @@ export const ja = {
       selectRole: "ロールを選択",
       noRole: "ロールなし",
       noChangesDetected: "変更が検出されませんでした",
-      noChangesDescription: "保存する前に少なくとも1つのフィールドを変更してください。",
+      noChangesDescription:
+        "保存する前に少なくとも1つのフィールドを変更してください。",
       somethingWentWrong: "エラーが発生しました！",
       success: "成功！",
       invitationUpdated: "招待が正常に更新されました。",
     },
     deleteModal: {
       title: "本当に削除しますか？",
-      description: "この操作は元に戻せません。これにより、招待が永久に取り消されます。",
+      description:
+        "この操作は元に戻せません。これにより、招待が永久に取り消されます。",
       cancel: "キャンセル",
       revoke: "取り消す",
       loading: "読み込み中",
@@ -798,7 +844,8 @@ export const ja = {
       sendButton: "招待を送信",
       loading: "読み込み中",
       error: "エラー",
-      unexpectedError: "予期しないエラーが発生しました。もう一度お試しください。",
+      unexpectedError:
+        "予期しないエラーが発生しました。もう一度お試しください。",
       somethingWentWrong: "エラーが発生しました！",
     },
     workflow: {
@@ -806,9 +853,11 @@ export const ja = {
       description: "手順に従ってユーザーに招待を送信します。",
       steps: "ステップ",
       step1Title: "招待を送信",
-      step1Description: "招待したい人のメールアドレスを入力して招待を送信します。",
+      step1Description:
+        "招待したい人のメールアドレスを入力して招待を送信します。",
       step2Title: "招待の詳細を確認",
-      step2Description: "招待の詳細を確認し、招待を受け入れるために必要な情報を共有します。",
+      step2Description:
+        "招待の詳細を確認し、招待を受け入れるために必要な情報を共有します。",
       current: "現在",
     },
     checkDetails: {
@@ -833,7 +882,8 @@ export const ja = {
     searchPlaceholder: "検索...",
     workflow: {
       manageRolePermissions: "ロール権限の管理",
-      description: "カスタマイズした権限を持つ新しいロールを定義するか、既存のロールを変更して要件に合わせます。",
+      description:
+        "カスタマイズした権限を持つ新しいロールを定義するか、既存のロールを変更して要件に合わせます。",
       steps: "ステップ",
       stepOf: "{current} / {total}",
       createTitle: "新しいロールを作成",
@@ -877,7 +927,8 @@ export const ja = {
     },
     deleteModal: {
       title: "本当に削除しますか？",
-      description: "この操作は元に戻せません。これにより、ロールが永久に削除され、サーバーからデータが削除されます。",
+      description:
+        "この操作は元に戻せません。これにより、ロールが永久に削除され、サーバーからデータが削除されます。",
       cancel: "キャンセル",
       delete: "削除",
       loading: "読み込み中",
@@ -933,7 +984,8 @@ export const ja = {
         "このスキャンには、まだダウンロード可能なレポートが生成されていません。レポート生成後にダウンロードしてください。",
       unknownError: "不明なエラーが発生しました。",
       processingError: "ファイルの処理中にエラーが発生しました。",
-      unexpectedResponse: "予期しない応答です。しばらくしてからもう一度お試しください。",
+      unexpectedResponse:
+        "予期しない応答です。しばらくしてからもう一度お試しください。",
       maxRetriesExceeded:
         "レポートをまだ生成中です。しばらくしてからもう一度お試しください。",
       unexpectedTaskState: "予期しないタスク状態です。",
@@ -986,11 +1038,14 @@ export const ja = {
     },
     noProviders: {
       noCloudProvidersConfigured: "クラウドプロバイダーが設定されていません",
-      noProvidersConfiguredDescription: "クラウドプロバイダーが設定されていません。クラウドプロバイダーを設定することから始めてください。",
+      noProvidersConfiguredDescription:
+        "クラウドプロバイダーが設定されていません。クラウドプロバイダーを設定することから始めてください。",
       getStarted: "始める",
       noConnectedCloudProviders: "接続されたクラウドプロバイダーがありません",
-      noConnectedProvidersDescription: "現在接続されているクラウドプロバイダーがありません。オンデマンドスキャンを開始するには、クラウドプロバイダーを接続する必要があります。",
-      noConnectedProvidersDescription2: "クラウドプロバイダーが正しく設定されると、このメッセージは消え、オンデマンドスキャンを開始できるようになります。",
+      noConnectedProvidersDescription:
+        "現在接続されているクラウドプロバイダーがありません。オンデマンドスキャンを開始するには、クラウドプロバイダーを接続する必要があります。",
+      noConnectedProvidersDescription2:
+        "クラウドプロバイダーが正しく設定されると、このメッセージは消え、オンデマンドスキャンを開始できるようになります。",
       reviewCloudProviders: "クラウドプロバイダーを確認",
     },
     linkToScans: {

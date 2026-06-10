@@ -6,10 +6,6 @@ import { SignUpForm } from "@/components/auth/oss/sign-up-form";
 export const AuthForm = ({
   type,
   invitationToken,
-  googleAuthUrl,
-  githubAuthUrl,
-  isGoogleOAuthEnabled,
-  isGithubOAuthEnabled,
 }: {
   type: string;
   invitationToken?: string | null;

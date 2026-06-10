@@ -1,7 +1,8 @@
 "use client";
 import { useMemo } from "react";
-import { DataTableFilterCustom } from "@/components/ui/table";
+
 import { getFilterInvitations } from "@/components/filters/invitations-filters";
+import { DataTableFilterCustom } from "@/components/ui/table";
 import { useI18n } from "@/lib/i18n/context";
 
 export const InvitationsFilters = () => {
@@ -9,4 +10,3 @@ export const InvitationsFilters = () => {
   const filters = useMemo(() => getFilterInvitations(t), [locale, t]);
   return <DataTableFilterCustom key={locale} filters={filters} />;
 };
-

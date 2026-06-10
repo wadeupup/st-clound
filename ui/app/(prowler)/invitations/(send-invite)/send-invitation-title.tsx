@@ -5,4 +5,3 @@ export const SendInvitationTitle = () => {
   const { t } = useI18n();
   return <>{t.invitations.sendInvitation.title}</>;
 };
-

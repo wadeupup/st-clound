@@ -74,7 +74,9 @@ export const DeleteRoleForm = ({
             disabled={isLoading}
           >
             {!isLoading && <DeleteIcon size={24} />}
-            {isLoading ? t.roles.deleteModal.loading : t.roles.deleteModal.delete}
+            {isLoading
+              ? t.roles.deleteModal.loading
+              : t.roles.deleteModal.delete}
           </Button>
         </div>
       </form>

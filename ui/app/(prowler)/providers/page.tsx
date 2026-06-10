@@ -8,15 +8,13 @@ import {
   AddProviderButton,
   MutedFindingsConfigButton,
 } from "@/components/providers";
-import {
-  getColumnProviders,
-  SkeletonTableProviders,
-} from "@/components/providers/table";
+import { SkeletonTableProviders } from "@/components/providers/table";
 import { ContentLayout } from "@/components/ui";
 import { ProviderProps, SearchParamsProps } from "@/types";
-import { ProvidersTitle } from "./providers-title";
-import { ProvidersTableClient } from "./providers-table-client";
+
 import { ProvidersFilters } from "./providers-filters";
+import { ProvidersTableClient } from "./providers-table-client";
+import { ProvidersTitle } from "./providers-title";
 
 export default async function Providers({
   searchParams,
@@ -98,8 +96,7 @@ const ProvidersTable = async ({
     providersData?.data?.map((provider: ProviderProps) => {
       const groupNames =
         provider.relationships?.provider_groups?.data?.map(
-          (group: { id: string }) =>
-            providerGroupDict[group.id] || "",
+          (group: { id: string }) => providerGroupDict[group.id] || "",
         ) || [];
       return { ...provider, groupNames };
     }) || [];

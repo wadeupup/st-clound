@@ -19,28 +19,30 @@ const THREAT_COLORS = {
   NEUTRAL: "var(--bg-neutral-tertiary)",
 } as const;
 
-const getThreatLevelConfig = (t: ReturnType<typeof useI18n>["t"]) => ({
-  DANGER: {
-    label: t.overview.threatScore.criticalRisk,
-    color: THREAT_COLORS.DANGER,
-    minScore: 0,
-    maxScore: 30,
-  },
-  WARNING: {
-    label: t.overview.threatScore.moderateRisk,
-    color: THREAT_COLORS.WARNING,
-    minScore: 31,
-    maxScore: 60,
-  },
-  SUCCESS: {
-    label: t.overview.threatScore.secure,
-    color: THREAT_COLORS.SUCCESS,
-    minScore: 61,
-    maxScore: 100,
-  },
-} as const);
+const getThreatLevelConfig = (t: ReturnType<typeof useI18n>["t"]) =>
+  ({
+    DANGER: {
+      label: t.overview.threatScore.criticalRisk,
+      color: THREAT_COLORS.DANGER,
+      minScore: 0,
+      maxScore: 30,
+    },
+    WARNING: {
+      label: t.overview.threatScore.moderateRisk,
+      color: THREAT_COLORS.WARNING,
+      minScore: 31,
+      maxScore: 60,
+    },
+    SUCCESS: {
+      label: t.overview.threatScore.secure,
+      color: THREAT_COLORS.SUCCESS,
+      minScore: 61,
+      maxScore: 100,
+    },
+  }) as const;
 
-type ThreatLevelKey = keyof typeof THREAT_LEVEL_CONFIG;
+type ThreatLevelConfig = ReturnType<typeof getThreatLevelConfig>;
+type ThreatLevelKey = keyof ThreatLevelConfig;
 
 interface ThreatScoreProps {
   score?: number | null;
@@ -51,7 +53,10 @@ interface ThreatScoreProps {
   className?: string;
 }
 
-function getThreatLevel(score: number, config: ReturnType<typeof getThreatLevelConfig>): ThreatLevelKey {
+function getThreatLevel(
+  score: number,
+  config: ThreatLevelConfig,
+): ThreatLevelKey {
   for (const [key, cfg] of Object.entries(config)) {
     if (score >= cfg.minScore && score <= cfg.maxScore) {
       return key as ThreatLevelKey;
@@ -63,7 +68,7 @@ function getThreatLevel(score: number, config: ReturnType<typeof getThreatLevelC
 // Convert section scores to tooltip data for the radial chart
 function convertSectionScoresToTooltipData(
   sectionScores?: SectionScores,
-  config?: ReturnType<typeof getThreatLevelConfig>,
+  config?: ThreatLevelConfig,
 ): Array<{ name: string; value: number; color: string }> {
   if (!sectionScores || !config) return [];
 
@@ -109,7 +114,10 @@ export function ThreatScore({
   const config = threatLevelConfig[threatLevel];
 
   // Convert section scores to tooltip data
-  const tooltipData = convertSectionScoresToTooltipData(sectionScores, threatLevelConfig);
+  const tooltipData = convertSectionScoresToTooltipData(
+    sectionScores,
+    threatLevelConfig,
+  );
 
   // Extract top gaps from critical requirements
   const gaps = extractTopGaps(criticalRequirements, 2);
@@ -143,7 +151,7 @@ export function ThreatScore({
           {/* Overlaid Text (centered) */}
           {hasData && (
             <div className="pointer-events-none absolute top-[65%] left-1/2 z-0 -translate-x-1/2 -translate-y-1/2 text-center">
-              <p className="text-slate-600 dark:text-slate-400 text-sm text-nowrap">
+              <p className="text-sm text-nowrap text-slate-600 dark:text-slate-400">
                 {config.label}
               </p>
             </div>
@@ -157,7 +165,7 @@ export function ThreatScore({
             padding="md"
             className="items-center justify-center"
           >
-            <div className="text-slate-600 dark:text-slate-400 flex flex-col gap-1.5 text-sm leading-6">
+            <div className="flex flex-col gap-1.5 text-sm leading-6 text-slate-600 dark:text-slate-400">
               {/* Improvement Message */}
               {scoreDelta !== undefined &&
                 scoreDelta !== null &&
@@ -168,8 +176,11 @@ export function ThreatScore({
                       className="mt-0.5 min-h-4 min-w-4 shrink-0"
                     />
                     <p>
-                      {scoreDelta > 0 ? t.overview.threatScore.improved : t.overview.threatScore.decreased}{" "}
-                      {Math.abs(scoreDelta)}{t.overview.threatScore.percent}
+                      {scoreDelta > 0
+                        ? t.overview.threatScore.improved
+                        : t.overview.threatScore.decreased}{" "}
+                      {Math.abs(scoreDelta)}
+                      {t.overview.threatScore.percent}
                     </p>
                   </div>
                 )}
@@ -182,8 +193,10 @@ export function ThreatScore({
                     className="mt-0.5 min-h-4 min-w-4 shrink-0"
                   />
                   <p>
-                    {t.overview.threatScore.majorGapsInclude} {gaps.slice(0, 2).join(", ")}
-                    {gaps.length > 2 && ` ${t.overview.threatScore.andMore.replace("{count}", String(gaps.length - 2))}`}
+                    {t.overview.threatScore.majorGapsInclude}{" "}
+                    {gaps.slice(0, 2).join(", ")}
+                    {gaps.length > 2 &&
+                      ` ${t.overview.threatScore.andMore.replace("{count}", String(gaps.length - 2))}`}
                   </p>
                 </div>
               )}
@@ -195,7 +208,7 @@ export function ThreatScore({
             padding="md"
             className="items-center justify-center"
           >
-            <p className="text-slate-600 dark:text-slate-400 text-sm">
+            <p className="text-sm text-slate-600 dark:text-slate-400">
               {t.overview.threatScore.dataUnavailable}
             </p>
           </Card>

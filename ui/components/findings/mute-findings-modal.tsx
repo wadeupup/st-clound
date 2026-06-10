@@ -86,7 +86,10 @@ export function MuteFindingsModal({
             <span className="font-semibold text-slate-900 dark:text-white">
               {findingIds.length}
             </span>{" "}
-            {findingIds.length === 1 ? t.findings.muteModal.finding : t.findings.muteModal.findings}.
+            {findingIds.length === 1
+              ? t.findings.muteModal.finding
+              : t.findings.muteModal.findings}
+            .
           </p>
           <p className="mt-1 text-xs text-slate-500 dark:text-slate-500">
             {t.findings.muteModal.mutedDescription}

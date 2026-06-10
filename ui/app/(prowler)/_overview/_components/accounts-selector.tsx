@@ -104,7 +104,9 @@ export function AccountsSelector({ providers }: AccountsSelectorProps) {
       return <span className="truncate">{name}</span>;
     }
     return (
-      <span className="truncate">{selectedIds.length} {t.overview.accountsSelector.accountsSelected}</span>
+      <span className="truncate">
+        {selectedIds.length} {t.overview.accountsSelector.accountsSelected}
+      </span>
     );
   };
 
@@ -128,7 +130,11 @@ export function AccountsSelector({ providers }: AccountsSelectorProps) {
           id="accounts-selector"
           aria-labelledby="accounts-label"
         >
-          {selectedLabel() || <MultiSelectValue placeholder={t.overview.accountsSelector.allAccounts} />}
+          {selectedLabel() || (
+            <MultiSelectValue
+              placeholder={t.overview.accountsSelector.allAccounts}
+            />
+          )}
         </MultiSelectTrigger>
         <MultiSelectContent search={false}>
           {visibleProviders.length > 0 ? (

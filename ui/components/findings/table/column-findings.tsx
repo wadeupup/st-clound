@@ -59,7 +59,13 @@ const getProviderData = (
   );
 };
 
-const FindingDetailsCell = ({ row, t }: { row: any; t: ReturnType<typeof useI18n>["t"] }) => {
+const FindingDetailsCell = ({
+  row,
+  t,
+}: {
+  row: any;
+  t: ReturnType<typeof useI18n>["t"];
+}) => {
   const searchParams = useSearchParams();
   const findingId = searchParams.get("id");
   const isOpen = findingId === row.original.id;
@@ -190,7 +196,12 @@ export function getColumnFindings(
     {
       id: "moreInfo",
       header: ({ column }) => {
-        return <DataTableColumnHeader column={column} title={t.findings.table.details} />;
+        return (
+          <DataTableColumnHeader
+            column={column}
+            title={t.findings.table.details}
+          />
+        );
       },
       cell: ({ row }) => <FindingDetailsCell row={row} t={t} />,
       enableSorting: false,
@@ -227,7 +238,12 @@ export function getColumnFindings(
     {
       accessorKey: "resourceName",
       header: ({ column }) => {
-        return <DataTableColumnHeader column={column} title={t.findings.table.resourceName} />;
+        return (
+          <DataTableColumnHeader
+            column={column}
+            title={t.findings.table.resourceName}
+          />
+        );
       },
       cell: ({ row }) => {
         const resourceName = getResourceData(row, "name");
@@ -319,14 +335,21 @@ export function getColumnFindings(
     {
       accessorKey: "region",
       header: ({ column }) => {
-        return <DataTableColumnHeader column={column} title={t.findings.table.region} />;
+        return (
+          <DataTableColumnHeader
+            column={column}
+            title={t.findings.table.region}
+          />
+        );
       },
       cell: ({ row }) => {
         const region = getResourceData(row, "region");
 
         return (
           <div className="w-[80px] text-xs">
-            {typeof region === "string" ? region : t.findings.table.invalidRegion}
+            {typeof region === "string"
+              ? region
+              : t.findings.table.invalidRegion}
           </div>
         );
       },
@@ -335,7 +358,12 @@ export function getColumnFindings(
     {
       accessorKey: "service",
       header: ({ column }) => {
-        return <DataTableColumnHeader column={column} title={t.findings.table.service} />;
+        return (
+          <DataTableColumnHeader
+            column={column}
+            title={t.findings.table.service}
+          />
+        );
       },
       cell: ({ row }) => {
         const { servicename } = getFindingsMetadata(row);
@@ -346,7 +374,12 @@ export function getColumnFindings(
     {
       accessorKey: "cloudProvider",
       header: ({ column }) => {
-        return <DataTableColumnHeader column={column} title={t.findings.table.cloudProvider} />;
+        return (
+          <DataTableColumnHeader
+            column={column}
+            title={t.findings.table.cloudProvider}
+          />
+        );
       },
       cell: ({ row }) => {
         const provider = getProviderData(row, "provider");
@@ -368,7 +401,12 @@ export function getColumnFindings(
     {
       id: "actions",
       header: ({ column }) => {
-        return <DataTableColumnHeader column={column} title={t.findings.table.actions} />;
+        return (
+          <DataTableColumnHeader
+            column={column}
+            title={t.findings.table.actions}
+          />
+        );
       },
       cell: ({ row }) => {
         return <DataTableRowActions row={row} />;

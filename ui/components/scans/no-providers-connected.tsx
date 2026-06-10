@@ -32,7 +32,9 @@ export const NoProvidersConnected = () => {
             className="w-full justify-center md:w-fit"
             aria-label="Go to Cloud providers page"
           >
-            <Link href="/providers">{t.scans.noProviders.reviewCloudProviders}</Link>
+            <Link href="/providers">
+              {t.scans.noProviders.reviewCloudProviders}
+            </Link>
           </Button>
         </div>
       </CardContent>

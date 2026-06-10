@@ -43,7 +43,9 @@ export function DataTableRowActions<ProviderProps>({
         isOpen={isDeleteOpen}
         onOpenChange={setIsDeleteOpen}
         title={t.providers.providerGroups.rowActions.deleteConfirmTitle}
-        description={t.providers.providerGroups.rowActions.deleteConfirmDescription}
+        description={
+          t.providers.providerGroups.rowActions.deleteConfirmDescription
+        }
       >
         <DeleteGroupForm groupId={groupId} setIsOpen={setIsDeleteOpen} />
       </CustomAlertModal>
@@ -64,24 +66,38 @@ export function DataTableRowActions<ProviderProps>({
             color="default"
             variant="flat"
           >
-            <DropdownSection title={t.providers.providerGroups.rowActions.actions}>
+            <DropdownSection
+              title={t.providers.providerGroups.rowActions.actions}
+            >
               <DropdownItem
                 key="edit"
-                description={t.providers.providerGroups.rowActions.editProviderGroupDescription}
-                textValue={t.providers.providerGroups.rowActions.editProviderGroup}
+                description={
+                  t.providers.providerGroups.rowActions
+                    .editProviderGroupDescription
+                }
+                textValue={
+                  t.providers.providerGroups.rowActions.editProviderGroup
+                }
                 startContent={<EditDocumentBulkIcon className={iconClasses} />}
                 onPress={() => router.push(`/manage-groups?groupId=${groupId}`)}
               >
                 {t.providers.providerGroups.rowActions.editProviderGroup}
               </DropdownItem>
             </DropdownSection>
-            <DropdownSection title={t.providers.providerGroups.rowActions.dangerZone}>
+            <DropdownSection
+              title={t.providers.providerGroups.rowActions.dangerZone}
+            >
               <DropdownItem
                 key="delete"
                 className="text-text-error"
                 color="danger"
-                description={t.providers.providerGroups.rowActions.deleteProviderGroupDescription}
-                textValue={t.providers.providerGroups.rowActions.deleteProviderGroup}
+                description={
+                  t.providers.providerGroups.rowActions
+                    .deleteProviderGroupDescription
+                }
+                textValue={
+                  t.providers.providerGroups.rowActions.deleteProviderGroup
+                }
                 startContent={
                   <DeleteDocumentBulkIcon
                     className={clsx(iconClasses, "!text-text-error")}

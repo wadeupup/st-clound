@@ -27,7 +27,11 @@ export const ClearFiltersButton = ({
   }
 
   return (
-    <Button aria-label={displayAriaLabel} onClick={clearAllFilters} variant="link">
+    <Button
+      aria-label={displayAriaLabel}
+      onClick={clearAllFilters}
+      variant="link"
+    >
       <XCircle className="mr-0.5 size-4" />
       {displayText}
     </Button>

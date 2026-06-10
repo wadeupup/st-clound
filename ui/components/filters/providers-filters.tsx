@@ -1,6 +1,6 @@
 "use client";
 import { Translations } from "@/lib/i18n";
-import { FilterOption, FilterEntity } from "@/types/filters";
+import { FilterEntity, FilterOption } from "@/types/filters";
 import {
   PROVIDER_DISPLAY_NAMES,
   PROVIDER_TYPES,
@@ -51,4 +51,3 @@ export const getFilterProviders = (t: Translations): FilterOption[] => {
     },
   ];
 };
-

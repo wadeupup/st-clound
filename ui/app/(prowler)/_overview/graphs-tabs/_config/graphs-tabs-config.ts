@@ -23,4 +23,9 @@ export const getGraphTabs = (t: Translations["overview"]["graphsTabs"]) => [
   },
 ];
 
-export type TabId = "findings" | "threat-map" | "risk-radar" | "risk-pipeline" | "risk-plot";
+export type TabId =
+  | "findings"
+  | "threat-map"
+  | "risk-radar"
+  | "risk-pipeline"
+  | "risk-plot";

@@ -5,4 +5,3 @@ export const RoleManagementTitle = () => {
   const { t } = useI18n();
   return <>{t.roles.roleManagement}</>;
 };
-

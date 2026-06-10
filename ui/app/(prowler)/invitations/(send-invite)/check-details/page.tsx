@@ -4,6 +4,7 @@ import { getInvitationInfoById } from "@/actions/invitations/invitation";
 import { InvitationDetails } from "@/components/invitations";
 import { SkeletonInvitationInfo } from "@/components/invitations/workflow";
 import { SearchParamsProps } from "@/types";
+
 import { ErrorDisplay } from "./error-display";
 
 export default async function CheckDetailsPage({

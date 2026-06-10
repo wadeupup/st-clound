@@ -5,4 +5,3 @@ export const RolesTitle = () => {
   const { t } = useI18n();
   return <>{t.roles.title}</>;
 };
-

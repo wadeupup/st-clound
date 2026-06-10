@@ -1,11 +1,11 @@
 "use client";
 
-import { ReactNode } from "react";
 import Image from "next/image";
+import { ReactNode } from "react";
 
+import stLogo from "@/components/icons/compliance/st.png";
 import { ThemeSwitch } from "@/components/ThemeSwitch";
 import { LanguageSwitcher } from "@/components/ui/language-switcher/language-switcher";
-import stLogo from "@/components/icons/compliance/st.png";
 
 interface AuthLayoutProps {
   title: string;
@@ -14,7 +14,7 @@ interface AuthLayoutProps {
 
 export const AuthLayout = ({ title, children }: AuthLayoutProps) => {
   return (
-    <div className="flex min-h-screen w-full items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900 px-4 py-12">
+    <div className="flex min-h-screen w-full items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 px-4 py-12 dark:from-slate-950 dark:to-slate-900">
       <div className="flex w-full max-w-md flex-col items-center gap-10">
         {/* Logo */}
         <div className="flex flex-col items-center gap-3">
@@ -34,9 +34,9 @@ export const AuthLayout = ({ title, children }: AuthLayoutProps) => {
         </div>
 
         {/* Auth Form Container */}
-        <div className="w-full space-y-6 rounded-xl border border-slate-200 bg-white/80 backdrop-blur-sm shadow-lg dark:border-slate-800 dark:bg-slate-900/80 p-8">
+        <div className="w-full space-y-6 rounded-xl border border-slate-200 bg-white/80 p-8 shadow-lg backdrop-blur-sm dark:border-slate-800 dark:bg-slate-900/80">
           {/* Header with Title, Language Switcher and Theme Toggle */}
-          <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-4">
+          <div className="flex items-center justify-between border-b border-slate-200 pb-4 dark:border-slate-800">
             <h1
               className="text-2xl font-semibold text-slate-900 dark:text-slate-100"
               suppressHydrationWarning

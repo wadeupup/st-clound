@@ -70,11 +70,11 @@ export function RiskPlotClient({ data }: RiskPlotClientProps) {
     const scoreColor = getScoreColor(point.x);
 
     return (
-      <div className="border-slate-200 bg-white/80 backdrop-blur-sm dark:border-slate-700 dark:bg-slate-800/50 pointer-events-none min-w-[200px] rounded-xl border p-3 shadow-lg">
-        <p className="text-slate-900 dark:text-slate-100 mb-2 text-sm font-semibold">
+      <div className="pointer-events-none min-w-[200px] rounded-xl border border-slate-200 bg-white/80 p-3 shadow-lg backdrop-blur-sm dark:border-slate-700 dark:bg-slate-800/50">
+        <p className="mb-2 text-sm font-semibold text-slate-900 dark:text-slate-100">
           {point.name}
         </p>
-        <p className="text-slate-600 dark:text-slate-400 text-sm font-medium">
+        <p className="text-sm font-medium text-slate-600 dark:text-slate-400">
           <span style={{ color: scoreColor, fontWeight: "bold" }}>
             {point.x}%
           </span>{" "}
@@ -92,19 +92,22 @@ export function RiskPlotClient({ data }: RiskPlotClientProps) {
       <div className="flex flex-1 gap-12">
         {/* Plot Section - in Card */}
         <div className="flex basis-[70%] flex-col">
-          <div className="border-slate-200 bg-white/80 backdrop-blur-sm dark:border-slate-800 dark:bg-slate-900/80 flex flex-1 flex-col rounded-lg border shadow-lg p-4">
+          <div className="flex flex-1 flex-col rounded-lg border border-slate-200 bg-white/80 p-4 shadow-lg backdrop-blur-sm dark:border-slate-800 dark:bg-slate-900/80">
             <div className="mb-4">
-              <h3 className="text-slate-900 dark:text-slate-100 text-lg font-semibold">
+              <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
                 {t.overview.graphsTabs.riskPlotTitle}
               </h3>
-              <p className="text-slate-600 dark:text-slate-400 mt-1 text-xs">
+              <p className="mt-1 text-xs text-slate-600 dark:text-slate-400">
                 {t.overview.graphsTabs.riskPlotDescription}
               </p>
             </div>
 
             <ScatterPlot<RiskPlotPoint>
               data={data}
-              xAxis={{ label: t.overview.graphsTabs.failFindings, dataKey: "y" }}
+              xAxis={{
+                label: t.overview.graphsTabs.failFindings,
+                dataKey: "y",
+              }}
               yAxis={{
                 label: t.overview.graphsTabs.threatScore,
                 dataKey: "x",
@@ -129,12 +132,12 @@ export function RiskPlotClient({ data }: RiskPlotClientProps) {
           {selectedPoint && selectedPoint.severityData ? (
             <div className="flex w-full flex-col">
               <div className="mb-4">
-                <h4 className="text-slate-900 dark:text-slate-100 text-base font-semibold">
+                <h4 className="text-base font-semibold text-slate-900 dark:text-slate-100">
                   {selectedPoint.name}
                 </h4>
-                <p className="text-slate-600 dark:text-slate-400 text-xs">
-                  {t.overview.graphsTabs.threatScore}: {selectedPoint.x}% | {t.overview.graphsTabs.failFindings}:{" "}
-                  {selectedPoint.y}
+                <p className="text-xs text-slate-600 dark:text-slate-400">
+                  {t.overview.graphsTabs.threatScore}: {selectedPoint.x}% |{" "}
+                  {t.overview.graphsTabs.failFindings}: {selectedPoint.y}
                 </p>
               </div>
               <HorizontalBarChart
@@ -144,7 +147,7 @@ export function RiskPlotClient({ data }: RiskPlotClientProps) {
             </div>
           ) : (
             <div className="flex w-full items-center justify-center text-center">
-              <p className="text-slate-600 dark:text-slate-400 text-sm">
+              <p className="text-sm text-slate-600 dark:text-slate-400">
                 Select a point on the plot to view details
               </p>
             </div>

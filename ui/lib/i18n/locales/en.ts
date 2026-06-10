@@ -44,9 +44,11 @@ export const en = {
     success: "Success!",
     userRegistered: "The user was registered successfully.",
     sessionExpired: "Session Expired",
-    sessionExpiredDesc: "Your session has expired. Please sign in again to continue.",
+    sessionExpiredDesc:
+      "Your session has expired. Please sign in again to continue.",
     sessionError: "Session Error",
-    sessionErrorDesc: "There was a problem with your session. Please sign in again.",
+    sessionErrorDesc:
+      "There was a problem with your session. Please sign in again.",
     authError: "Authentication Error",
     authErrorDesc: "Please sign in again to continue.",
     invalidCredentials: "Invalid email or password",
@@ -168,7 +170,8 @@ export const en = {
       riskPlot: "Risk Plot",
       noResults: "No results.",
       latestNewFailingFindings: "Latest new failing findings",
-      showingLatestFindings: "Showing the latest 10 new failing findings by severity.",
+      showingLatestFindings:
+        "Showing the latest 10 new failing findings by severity.",
       noRegionData: "No region data available",
       noCategoryData: "No category data available for the selected filters",
       noFindingsData: "No findings data available for the selected filters",
@@ -178,7 +181,8 @@ export const en = {
       noRiskData: "No risk data available for the selected providers",
       providersNoScans: "{count} provider(s) have no completed scans",
       riskPlotTitle: "Risk Plot",
-      riskPlotDescription: "ThreatScore is severity-weighted, not quantity-based. Higher severity findings have greater impact on the score.",
+      riskPlotDescription:
+        "ThreatScore is severity-weighted, not quantity-based. Higher severity findings have greater impact on the score.",
       failFindings: "Fail Findings",
       threatScore: "ThreatScore",
       checkOutOnFindings: "Check out on Findings",
@@ -196,7 +200,8 @@ export const en = {
     regions: "Regions",
     level: "Level",
     selectScan: "Select a scan",
-    noDataForSelectedScan: "No compliance data available for the selected scan.",
+    noDataForSelectedScan:
+      "No compliance data available for the selected scan.",
     provideValidScanId: "Provide a valid scan ID.",
   },
   findings: {
@@ -272,7 +277,8 @@ export const en = {
       region: "Region",
       firstSeen: "First Seen",
       delta: "Delta",
-      deltaTooltip: "Indicates whether the finding is new (NEW), has changed status (CHANGED), or remains unchanged (NONE) compared to previous scans.",
+      deltaTooltip:
+        "Indicates whether the finding is new (NEW), has changed status (CHANGED), or remains unchanged (NONE) compared to previous scans.",
       severity: "Severity",
       findingId: "Finding ID",
       checkId: "Check ID",
@@ -317,12 +323,14 @@ export const en = {
       aboutToMute: "You are about to mute",
       finding: "finding",
       findings: "findings",
-      mutedDescription: "Muted findings will be hidden by default but can be shown using filters.",
+      mutedDescription:
+        "Muted findings will be hidden by default but can be shown using filters.",
       ruleName: "Rule Name",
       ruleNamePlaceholder: "e.g., Ignore dev environment S3 buckets",
       ruleNameDescription: "A descriptive name for this mute rule",
       reason: "Reason",
-      reasonPlaceholder: "e.g., These are expected findings in the development environment",
+      reasonPlaceholder:
+        "e.g., These are expected findings in the development environment",
       reasonDescription: "Explain why these findings are being muted",
       muteFindings: "Mute Findings",
       success: "Success",
@@ -410,24 +418,32 @@ export const en = {
     connectAccount: {
       title: "Connect a Cloud Provider",
       workflowTitle: "Add a Cloud Provider",
-      workflowDescription: "Complete these steps to configure your cloud provider and initiate your first scan.",
+      workflowDescription:
+        "Complete these steps to configure your cloud provider and initiate your first scan.",
       steps: "Steps",
       step1Title: "Choose your Cloud Provider",
-      step1Description: "Select the cloud provider you wish to connect and specify your preferred authentication method from the supported options.",
+      step1Description:
+        "Select the cloud provider you wish to connect and specify your preferred authentication method from the supported options.",
       step2Title: "Enter Authentication Details",
-      step2Description: "Provide the necessary credentials to establish a secure connection to your selected cloud provider.",
+      step2Description:
+        "Provide the necessary credentials to establish a secure connection to your selected cloud provider.",
       step3Title: "Verify Connection & Start Scan",
-      step3Description: "Ensure your credentials are correct and start scanning your cloud environment.",
+      step3Description:
+        "Ensure your credentials are correct and start scanning your cloud environment.",
       testConnection: {
         title: "Check connection and launch scan",
         titleUpdated: "Check connection",
-        description: "After a successful connection, a scan will automatically run every 24 hours. To run a single scan instead, select the checkbox below.",
-        descriptionUpdated: "A successful connection will redirect you to the providers page.",
+        description:
+          "After a successful connection, a scan will automatically run every 24 hours. To run a single scan instead, select the checkbox below.",
+        descriptionUpdated:
+          "A successful connection will redirect you to the providers page.",
         providerIdError: "Provider ID {error}. Please check and try again.",
         unknownError: "Unknown error",
-        credentialsIssue: "It seems there was an issue with your credentials. Please review your credentials and try again.",
+        credentialsIssue:
+          "It seems there was an issue with your credentials. Please review your credentials and try again.",
         runSingleScan: "Run a single scan (no recurring schedule).",
-        checkNewCredentials: "Check the new credentials and test the connection.",
+        checkNewCredentials:
+          "Check the new credentials and test the connection.",
         backToProviders: "Back to providers",
         loading: "Loading",
         updateCredentials: "Update credentials",
@@ -440,12 +456,13 @@ export const en = {
         connectionFailed: "Connection failed, please review credentials.",
       },
       stepOverrideTitle: "Make sure the new credentials are valid",
-      stepOverrideDescription: "Valid credentials will take you back to the providers page",
+      stepOverrideDescription:
+        "Valid credentials will take you back to the providers page",
       unknownProvider: "Unknown Provider",
       readTheDocs: "Read the docs",
       searchProviders: "Search providers",
       searchProvidersPlaceholder: "Search providers...",
-      noProvidersFound: "No providers found matching \"{term}\"",
+      noProvidersFound: 'No providers found matching "{term}"',
       providerAlias: "Provider alias (optional)",
       providerAliasPlaceholder: "Enter the provider alias",
       back: "Back",
@@ -489,20 +506,30 @@ export const en = {
         specifyCredentials: "Specify which AWS credentials to use",
         authenticationMethod: "Authentication Method",
         selectCredentialsType: "Select credentials type",
-        azureCredentialsDescription: "Please provide the information for your Azure credentials.",
-        awsCredentialsDescription: "Please provide the information for your AWS credentials.",
-        gcpCredentialsDescription: "Please provide the information for your GCP credentials.",
-        gcpServiceAccountKeyDescription: "Please provide the service account key for your GCP credentials.",
-        kubernetesCredentialsDescription: "Please provide the kubeconfig content for your Kubernetes credentials.",
-        mongoAtlasKeysDescription: "Provide an organization-level MongoDB Atlas API public and private key with read access to the resources you want Prowler to assess.",
-        ociApiKeyDescription: "Please provide your Oracle Cloud Infrastructure API key credentials.",
+        azureCredentialsDescription:
+          "Please provide the information for your Azure credentials.",
+        awsCredentialsDescription:
+          "Please provide the information for your AWS credentials.",
+        gcpCredentialsDescription:
+          "Please provide the information for your GCP credentials.",
+        gcpServiceAccountKeyDescription:
+          "Please provide the service account key for your GCP credentials.",
+        kubernetesCredentialsDescription:
+          "Please provide the kubeconfig content for your Kubernetes credentials.",
+        mongoAtlasKeysDescription:
+          "Provide an organization-level MongoDB Atlas API public and private key with read access to the resources you want Prowler to assess.",
+        ociApiKeyDescription:
+          "Please provide your Oracle Cloud Infrastructure API key credentials.",
         usingServiceAccount: "Using Service Account",
         connectUsingServiceAccount: "Connect using Service Account",
         connectViaServiceAccountKey: "Connect via Service Account Key",
         serviceAccountKey: "Service Account Key",
-        pasteServiceAccountKeyJson: "Paste your Service Account Key JSON content here",
-        usingApplicationDefaultCredentials: "Using Application Default Credentials",
-        connectViaApplicationDefaultCredentials: "Connect via Application Default Credentials",
+        pasteServiceAccountKeyJson:
+          "Paste your Service Account Key JSON content here",
+        usingApplicationDefaultCredentials:
+          "Using Application Default Credentials",
+        connectViaApplicationDefaultCredentials:
+          "Connect via Application Default Credentials",
         clientId: "Client ID",
         enterClientId: "Enter the Client ID",
         clientSecret: "Client Secret",
@@ -516,28 +543,37 @@ export const en = {
         atlasPublicKey: "Atlas Public Key",
         atlasPrivateKey: "Atlas Private Key",
         enterPrivateKey: "Enter the private key",
-        mongoAtlasKeySecurityNote: "Keys never leave your browser unencrypted and are stored as secrets in the backend. Rotate the key from MongoDB Atlas anytime if needed.",
+        mongoAtlasKeySecurityNote:
+          "Keys never leave your browser unencrypted and are stored as secrets in the backend. Rotate the key from MongoDB Atlas anytime if needed.",
         userOcid: "User OCID",
         fingerprint: "Fingerprint",
         enterApiKeyFingerprint: "Enter the API key fingerprint",
         region: "Region",
+        awsRegions: "AWS regions",
+        selectAwsRegions: "Select AWS regions",
         privateKeyContent: "Private Key Content",
         passphraseOptional: "Passphrase (Optional)",
         enterPassphraseIfKeyEncrypted: "Enter passphrase if key is encrypted",
-        ociPrivateKeyNote: "Paste the raw content of your OCI private key file (PEM format). The key will be automatically encoded for secure transmission.",
+        ociPrivateKeyNote:
+          "Paste the raw content of your OCI private key file (PEM format). The key will be automatically encoded for secure transmission.",
         connectViaAccessKeys: "Connect via Access Keys",
-        alibabaAccessKeysDescription: "Provide a RAM user Access Key ID and Access Key Secret with read access to the resources you want Prowler to assess.",
+        alibabaAccessKeysDescription:
+          "Provide a RAM user Access Key ID and Access Key Secret with read access to the resources you want Prowler to assess.",
         usingRamRole: "Using RAM Role",
         accessKeyId: "Access Key ID",
         accessKeySecret: "Access Key Secret",
         enterAccessKeySecret: "Enter the access key secret",
-        alibabaAccessKeySecurityNote: "Keys never leave your browser unencrypted and are stored as secrets in the backend. Rotate the key from Alibaba Cloud RAM console anytime if needed.",
+        alibabaAccessKeySecurityNote:
+          "Keys never leave your browser unencrypted and are stored as secrets in the backend. Rotate the key from Alibaba Cloud RAM console anytime if needed.",
         connectAssumingRamRole: "Connect assuming RAM Role",
-        alibabaRamRoleDescription: "Provide the RAM Role ARN to assume, along with the Access Keys of a RAM user that has permission to assume the role.",
+        alibabaRamRoleDescription:
+          "Provide the RAM Role ARN to assume, along with the Access Keys of a RAM user that has permission to assume the role.",
         ramRoleToAssume: "RAM Role to Assume",
         credentialsForRoleAssumption: "Credentials for Role Assumption",
-        enterRoleSessionNameWithDefault: "Enter the role session name (default: ProwlerSession)",
-        alibabaRoleSecurityNote: "Keys never leave your browser unencrypted and are stored as secrets in the backend. The role will be assumed using STS to obtain temporary credentials.",
+        enterRoleSessionNameWithDefault:
+          "Enter the role session name (default: ProwlerSession)",
+        alibabaRoleSecurityNote:
+          "Keys never leave your browser unencrypted and are stored as secrets in the backend. The role will be assumed using STS to obtain temporary credentials.",
         prowlerCloudAssumeRole: "Prowler Cloud will assume your IAM role",
         awsSdkDefault: "AWS SDK Default",
         accessSecretKey: "Access & Secret Key",
@@ -557,15 +593,18 @@ export const en = {
         roleSessionName: "Role session name",
         enterRoleSessionName: "Enter the role session name",
         sessionDuration: "Session duration (seconds)",
-        enterSessionDuration: "Enter the session duration (default: 3600 seconds)",
+        enterSessionDuration:
+          "Enter the session duration (default: 3600 seconds)",
         readOnlyRoleMustBeCreatedPrefix: "A",
         readOnlyRoleMustBeCreatedSuffix: "must be manually created",
         readOnlyRole: "read-only IAM role",
         orUpdated: " or updated",
-        useCloudFormationQuickLink: "Use the following AWS CloudFormation Quick Link to create the IAM Role",
+        useCloudFormationQuickLink:
+          "Use the following AWS CloudFormation Quick Link to create the IAM Role",
         or: "or",
         referToDocumentation: "Refer to the documentation",
-        useTemplateToCreateRole: "Use one of the following templates to create the IAM role",
+        useTemplateToCreateRole:
+          "Use one of the following templates to create the IAM role",
         cloudFormationTemplate: "CloudFormation Template",
         terraformCode: "Terraform Code",
         externalIdLabel: "External ID:",
@@ -583,9 +622,11 @@ export const en = {
       title: "Provider Groups",
       manageGroups: "Manage Groups",
       createNewGroup: "Create a new provider group",
-      createNewGroupDescription: "Create a new provider group to manage the providers and roles.",
+      createNewGroupDescription:
+        "Create a new provider group to manage the providers and roles.",
       editGroup: "Edit provider group",
-      editGroupDescription: "Edit the provider group to manage the providers and roles.",
+      editGroupDescription:
+        "Edit the provider group to manage the providers and roles.",
       groupNotFound: "Provider group not found",
       unavailableForRole: "Unavailable for your role",
       table: {
@@ -603,7 +644,8 @@ export const en = {
         deleteProviderGroup: "Delete Provider Group",
         deleteProviderGroupDescription: "Delete the provider group permanently",
         deleteConfirmTitle: "Are you absolutely sure?",
-        deleteConfirmDescription: "This action cannot be undone. This will permanently delete your provider account and remove your data from the server.",
+        deleteConfirmDescription:
+          "This action cannot be undone. This will permanently delete your provider account and remove your data from the server.",
       },
       forms: {
         providerGroupName: "Provider group name",
@@ -611,8 +653,10 @@ export const en = {
         providerGroupNameRequired: "Provider group name is required",
         selectProviders: "Select Providers",
         selectRoles: "Select Roles",
-        rolesOptionalDescription: "Roles can also be associated with the group. This step is optional and can be completed later if needed or from the Roles page.",
-        rolesEditDescription: "The roles associated with the group can be edited directly here or from the Roles page.",
+        rolesOptionalDescription:
+          "Roles can also be associated with the group. This step is optional and can be completed later if needed or from the Roles page.",
+        rolesEditDescription:
+          "The roles associated with the group can be edited directly here or from the Roles page.",
         createGroup: "Create Group",
         updateGroup: "Update Group",
         cancel: "Cancel",
@@ -621,7 +665,8 @@ export const en = {
         success: "Success!",
         groupCreatedSuccessfully: "The group was created successfully.",
         groupUpdatedSuccessfully: "The group was updated successfully.",
-        groupRemovedSuccessfully: "The provider group was removed successfully.",
+        groupRemovedSuccessfully:
+          "The provider group was removed successfully.",
         noChangesDetected: "No changes detected",
         noUpdatesMade: "No updates were made to the provider group.",
         somethingWentWrong: "Oops! Something went wrong",
@@ -663,7 +708,8 @@ export const en = {
       deleteProviderDescription: "Delete the provider permanently",
       editProviderAliasTitle: "Edit Provider Alias",
       deleteConfirmTitle: "Are you absolutely sure?",
-      deleteConfirmDescription: "This action cannot be undone. This will permanently delete your provider account and remove your data from the server.",
+      deleteConfirmDescription:
+        "This action cannot be undone. This will permanently delete your provider account and remove your data from the server.",
     },
   },
   users: {
@@ -717,7 +763,8 @@ export const en = {
     },
     deleteModal: {
       title: "Are you absolutely sure?",
-      description: "This action cannot be undone. This will permanently delete your user account and remove your data from the server.",
+      description:
+        "This action cannot be undone. This will permanently delete your user account and remove your data from the server.",
       cancel: "Cancel",
       delete: "Delete",
       loading: "Loading",
@@ -779,7 +826,8 @@ export const en = {
     },
     deleteModal: {
       title: "Are you absolutely sure?",
-      description: "This action cannot be undone. This will permanently revoke your invitation.",
+      description:
+        "This action cannot be undone. This will permanently revoke your invitation.",
       cancel: "Cancel",
       revoke: "Revoke",
       loading: "Loading",
@@ -806,9 +854,11 @@ export const en = {
       description: "Follow the steps to send an invitation to the users.",
       steps: "Steps",
       step1Title: "Send Invitation",
-      step1Description: "Enter the email address of the person you want to invite and send the invitation.",
+      step1Description:
+        "Enter the email address of the person you want to invite and send the invitation.",
       step2Title: "Review Invitation Details",
-      step2Description: "Review the invitation details and share the information required for the person to accept the invitation.",
+      step2Description:
+        "Review the invitation details and share the information required for the person to accept the invitation.",
       current: "Current",
     },
     checkDetails: {
@@ -833,13 +883,15 @@ export const en = {
     searchPlaceholder: "Search...",
     workflow: {
       manageRolePermissions: "Manage Role Permissions",
-      description: "Define a new role with customized permissions or modify an existing one to meet your needs.",
+      description:
+        "Define a new role with customized permissions or modify an existing one to meet your needs.",
       steps: "Steps",
       stepOf: "{current} of {total}",
       createTitle: "Create a new role",
       createDescription: "Enter the name of the role you want to add.",
       editTitle: "Edit an existing role",
-      editDescription: "Update the role's details, including its name and permissions.",
+      editDescription:
+        "Update the role's details, including its name and permissions.",
     },
     filters: {
       permissions: "Permissions",
@@ -877,7 +929,8 @@ export const en = {
     },
     deleteModal: {
       title: "Are you absolutely sure?",
-      description: "This action cannot be undone. This will permanently delete your role and remove your data from the server.",
+      description:
+        "This action cannot be undone. This will permanently delete your role and remove your data from the server.",
       cancel: "Cancel",
       delete: "Delete",
       loading: "Loading",
@@ -986,11 +1039,14 @@ export const en = {
     },
     noProviders: {
       noCloudProvidersConfigured: "No Cloud Providers Configured",
-      noProvidersConfiguredDescription: "No cloud providers have been configured. Start by setting up a cloud provider.",
+      noProvidersConfiguredDescription:
+        "No cloud providers have been configured. Start by setting up a cloud provider.",
       getStarted: "Get Started",
       noConnectedCloudProviders: "No Connected Cloud Providers",
-      noConnectedProvidersDescription: "No cloud providers are currently connected. Connecting a cloud provider is required to launch on-demand scans.",
-      noConnectedProvidersDescription2: "Once the cloud providers are correctly configured, this message will disappear, and on-demand scans can be launched.",
+      noConnectedProvidersDescription:
+        "No cloud providers are currently connected. Connecting a cloud provider is required to launch on-demand scans.",
+      noConnectedProvidersDescription2:
+        "Once the cloud providers are correctly configured, this message will disappear, and on-demand scans can be launched.",
       reviewCloudProviders: "Review Cloud Providers",
     },
     linkToScans: {

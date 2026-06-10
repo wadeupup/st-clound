@@ -22,7 +22,7 @@ export function FindingsViewClient({ data }: FindingsViewClientProps) {
           <h3 className="text-sm font-bold uppercase">
             {t.overview.graphsTabs.latestNewFailingFindings}
           </h3>
-          <p className="text-slate-600 dark:text-slate-400 text-xs">
+          <p className="text-xs text-slate-600 dark:text-slate-400">
             {t.overview.graphsTabs.showingLatestFindings}
           </p>
         </div>
@@ -41,4 +41,3 @@ export function FindingsViewClient({ data }: FindingsViewClientProps) {
     </div>
   );
 }
-

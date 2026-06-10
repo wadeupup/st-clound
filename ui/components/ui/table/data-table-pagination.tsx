@@ -17,8 +17,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/shadcn/select/select";
-import { useI18n } from "@/lib/i18n/context";
 import { getPaginationInfo } from "@/lib";
+import { useI18n } from "@/lib/i18n/context";
 import { MetaDataProps } from "@/types";
 
 interface DataTablePaginationProps {
@@ -77,7 +77,10 @@ export function DataTablePagination({
   return (
     <div className="flex w-full flex-col-reverse items-center justify-between gap-4 overflow-auto p-1 sm:flex-row sm:gap-8">
       <div className="text-sm whitespace-nowrap">
-        {t.findings.pagination.entriesInTotal.replace("{count}", totalEntries.toString())}
+        {t.findings.pagination.entriesInTotal.replace(
+          "{count}",
+          totalEntries.toString(),
+        )}
       </div>
       {totalEntries > 10 && (
         <div className="flex flex-col-reverse items-center gap-4 sm:flex-row sm:gap-6 lg:gap-8">
@@ -132,7 +135,8 @@ export function DataTablePagination({
             </Select>
           </div>
           <div className="flex items-center justify-center text-sm font-medium">
-            {t.findings.pagination.page} {currentPage} {t.findings.pagination.of} {totalPages}
+            {t.findings.pagination.page} {currentPage}{" "}
+            {t.findings.pagination.of} {totalPages}
           </div>
           <div className="flex items-center gap-2">
             <Link

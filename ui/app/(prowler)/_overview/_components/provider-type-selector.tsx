@@ -202,7 +202,11 @@ export const ProviderTypeSelector = ({
           id="provider-type-selector"
           aria-labelledby="provider-type-label"
         >
-          {selectedLabel() || <MultiSelectValue placeholder={t.overview.providerSelector.allProviders} />}
+          {selectedLabel() || (
+            <MultiSelectValue
+              placeholder={t.overview.providerSelector.allProviders}
+            />
+          )}
         </MultiSelectTrigger>
         <MultiSelectContent search={false}>
           {availableTypes.length > 0 ? (

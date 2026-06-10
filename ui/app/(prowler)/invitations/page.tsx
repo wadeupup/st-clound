@@ -1,5 +1,4 @@
 import { Spacer } from "@heroui/spacer";
-import Link from "next/link";
 import React, { Suspense } from "react";
 
 import { getInvitations } from "@/actions/invitations/invitation";
@@ -8,10 +7,11 @@ import { FilterControls } from "@/components/filters";
 import { SkeletonTableInvitation } from "@/components/invitations/table";
 import { ContentLayout } from "@/components/ui";
 import { InvitationProps, Role, SearchParamsProps } from "@/types";
-import { InvitationsTitle } from "./invitations-title";
-import { InvitationsInviteButton } from "./invitations-invite-button";
+
 import { InvitationsFilters } from "./invitations-filters";
+import { InvitationsInviteButton } from "./invitations-invite-button";
 import { InvitationsTable } from "./invitations-table";
+import { InvitationsTitle } from "./invitations-title";
 
 export default async function Invitations({
   searchParams,
@@ -68,12 +68,7 @@ const SSRDataTable = async ({
 
   // Handle case where invitationsData is undefined
   if (!invitationsData) {
-    return (
-      <InvitationsTable
-        data={[]}
-        metadata={undefined}
-      />
-    );
+    return <InvitationsTable data={[]} metadata={undefined} />;
   }
 
   // Create a dictionary for roles by invitation ID
@@ -98,8 +93,8 @@ const SSRDataTable = async ({
   );
 
   // Expand the invitations
-  const expandedInvitations = invitationsData?.data?.map(
-    (invitation: InvitationProps) => {
+  const expandedInvitations =
+    invitationsData?.data?.map((invitation: InvitationProps) => {
       const role = roleDict[invitation.id];
 
       return {
@@ -110,8 +105,7 @@ const SSRDataTable = async ({
         },
         roles, // Include all roles here for each invitation
       };
-    },
-  ) || [];
+    }) || [];
 
   // Create the expanded response
   const expandedResponse = {

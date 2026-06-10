@@ -52,16 +52,21 @@ export const RoleItem = ({
   const permissionState = attributes?.permission_state || "";
   const detailsId = `role-details-${role.id}`;
 
-  const permissions = getRolePermissions(attributes, { permissions: t.profile.permissions });
+  const permissions = getRolePermissions(attributes, {
+    permissions: t.profile.permissions,
+  });
 
   return (
-    <Card variant="inner" className="bg-slate-50/50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
+    <Card
+      variant="inner"
+      className="border-slate-200 bg-slate-50/50 dark:border-slate-700 dark:bg-slate-800/50"
+    >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Chip size="sm" variant="flat" color="primary">
             {roleName}
           </Chip>
-          <span className="text-xs text-slate-600 dark:text-slate-400 capitalize">
+          <span className="text-xs text-slate-600 capitalize dark:text-slate-400">
             {permissionState}
           </span>
         </div>
@@ -78,7 +83,7 @@ export const RoleItem = ({
       {isExpanded && (
         <div
           id={detailsId}
-          className="animate-fadeIn border-slate-200 dark:border-slate-700 border-t pt-4"
+          className="animate-fadeIn border-t border-slate-200 pt-4 dark:border-slate-700"
           role="region"
           aria-label={`Details for role ${roleName}`}
         >

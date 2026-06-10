@@ -6,8 +6,8 @@ import { getProvider } from "@/actions/providers";
 import { getScan } from "@/actions/scans";
 import { getTask } from "@/actions/task";
 import { ScanDetail } from "@/components/scans/table";
-import { useI18n } from "@/lib/i18n/context";
 import { checkTaskStatus } from "@/lib";
+import { useI18n } from "@/lib/i18n/context";
 import { ScanProps } from "@/types";
 
 import { SkeletonScanDetail } from "./skeleton-scan-detail";

@@ -12,4 +12,3 @@ export function OverviewTitle({ children }: { children: React.ReactNode }) {
     </ContentLayout>
   );
 }
-

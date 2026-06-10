@@ -2,8 +2,8 @@
 
 import { useMemo } from "react";
 
-import { getFilterScans } from "@/components/filters/scans-filters";
 import { FilterControls } from "@/components/filters/filter-controls";
+import { getFilterScans } from "@/components/filters/scans-filters";
 import { useRelatedFilters } from "@/hooks";
 import { useI18n } from "@/lib/i18n/context";
 import { FilterEntity, FilterType } from "@/types";

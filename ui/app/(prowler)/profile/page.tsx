@@ -1,7 +1,6 @@
 import React, { Suspense } from "react";
 
 import { getUserInfo } from "@/actions/users/users";
-import { ContentLayout } from "@/components/ui";
 import { UserBasicInfoCard } from "@/components/users/profile";
 import { MembershipsCard } from "@/components/users/profile/memberships-card";
 import { RolesCard } from "@/components/users/profile/roles-card";
@@ -17,26 +16,20 @@ import {
 import { ProfileTitle } from "./profile-title";
 
 export default async function Profile({
-  searchParams,
+  searchParams: _searchParams,
 }: {
   searchParams: Promise<SearchParamsProps>;
 }) {
-  const resolvedSearchParams = await searchParams;
-
   return (
     <ProfileTitle>
       <Suspense fallback={<SkeletonUserInfo />}>
-        <SSRDataUser searchParams={resolvedSearchParams} />
+        <SSRDataUser />
       </Suspense>
     </ProfileTitle>
   );
 }
 
-async function SSRDataUser({
-  searchParams,
-}: {
-  searchParams: SearchParamsProps;
-}) {
+async function SSRDataUser() {
   const userProfile = (await getUserInfo()) as UserProfileResponse | undefined;
   if (!userProfile?.data) {
     return null;
@@ -112,4 +105,4 @@ async function SSRDataUser({
       </div>
     </div>
   );
-};
+}

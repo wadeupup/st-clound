@@ -1,9 +1,9 @@
 "use client";
 
 import { Divider } from "@heroui/divider";
-
 import { Snippet } from "@heroui/snippet";
 import { Tooltip } from "@heroui/tooltip";
+
 import { CopyIcon, DoneIcon } from "@/components/icons";
 import { Card, CardContent } from "@/components/shadcn";
 import { DateWithTime, InfoField } from "@/components/ui/entities";
@@ -49,10 +49,16 @@ export const UserBasicInfoCard = ({
   const { name, email, company_name, date_joined } = user.attributes;
 
   return (
-    <Card variant="base" padding="none" className="rounded-xl border border-slate-200 bg-white/80 backdrop-blur-sm shadow-lg dark:border-slate-800 dark:bg-slate-900/80 p-6">
+    <Card
+      variant="base"
+      padding="none"
+      className="rounded-xl border border-slate-200 bg-white/80 p-6 shadow-lg backdrop-blur-sm dark:border-slate-800 dark:bg-slate-900/80"
+    >
       <CardContent>
         <div className="flex flex-col">
-          <span className="text-md font-bold text-slate-900 dark:text-slate-100">{name}</span>
+          <span className="text-md font-bold text-slate-900 dark:text-slate-100">
+            {name}
+          </span>
           <span className="text-xs font-light text-slate-600 dark:text-slate-400">
             {email}
             {company_name && ` | ${company_name}`}
@@ -62,25 +68,27 @@ export const UserBasicInfoCard = ({
         <div className="flex flex-row gap-4 md:items-start md:justify-start md:gap-8">
           <div className="flex gap-2 whitespace-nowrap md:flex-col md:items-start md:justify-start">
             <div className="flex items-center gap-2">
-              <InfoField 
-                label={t.profile.dateJoined} 
+              <InfoField
+                label={t.profile.dateJoined}
                 variant="simple"
-                className="[&>span]:text-slate-600 [&>span]:dark:text-slate-400 [&>div]:text-slate-900 [&>div]:dark:text-slate-100"
+                className="[&>div]:text-slate-900 [&>div]:dark:text-slate-100 [&>span]:text-slate-600 [&>span]:dark:text-slate-400"
               >
                 <DateWithTime inline dateTime={date_joined} />
               </InfoField>
             </div>
           </div>
           <div className="flex flex-col gap-2">
-            <InfoField 
-              label={t.profile.organizationId} 
+            <InfoField
+              label={t.profile.organizationId}
               variant="transparent"
-              className="[&>span]:text-slate-600 [&>span]:dark:text-slate-400 [&>div]:text-slate-900 [&>div]:dark:text-slate-100"
+              className="[&>div]:text-slate-900 [&>div]:dark:text-slate-100 [&>span]:text-slate-600 [&>span]:dark:text-slate-400"
             >
               {tenantId ? (
                 <TenantIdCopy id={tenantId} />
               ) : (
-                <span className="text-xs font-light text-slate-600 dark:text-slate-400">{t.profile.noOrganization}</span>
+                <span className="text-xs font-light text-slate-600 dark:text-slate-400">
+                  {t.profile.noOrganization}
+                </span>
               )}
             </InfoField>
           </div>

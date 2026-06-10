@@ -113,7 +113,9 @@ export function DataTableRowActions<InvitationProps>({
                 key="delete"
                 className="text-text-error"
                 color="danger"
-                description={t.invitations.rowActions.revokeInvitationDescription}
+                description={
+                  t.invitations.rowActions.revokeInvitationDescription
+                }
                 textValue={t.invitations.rowActions.revokeInvitation}
                 startContent={
                   <DeleteDocumentBulkIcon

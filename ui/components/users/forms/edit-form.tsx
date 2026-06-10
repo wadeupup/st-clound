@@ -119,12 +119,16 @@ export const EditForm = ({
         >
           <div className="text-small flex items-center">
             <UserIcon className="mr-2 h-4 w-4" />
-            <span className="text-text-neutral-secondary">{t.users.editModal.name}:</span>
+            <span className="text-text-neutral-secondary">
+              {t.users.editModal.name}:
+            </span>
             <span className="ml-2 font-semibold">{userName}</span>
           </div>
           <div className="text-small flex items-center">
             <ShieldIcon className="mr-2 h-4 w-4" />
-            <span className="text-text-neutral-secondary">{t.users.editModal.role}:</span>
+            <span className="text-text-neutral-secondary">
+              {t.users.editModal.role}:
+            </span>
             <span className="ml-2 font-semibold">
               {currentRole ? currentRole : t.users.editModal.noRole}
             </span>

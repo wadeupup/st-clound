@@ -17,8 +17,8 @@ import {
   InfoField,
 } from "@/components/ui/entities";
 import { SeverityBadge, StatusFindingBadge } from "@/components/ui/table";
-import { useI18n } from "@/lib/i18n/context";
 import { createDict } from "@/lib";
+import { useI18n } from "@/lib/i18n/context";
 import { buildGitFileUrl } from "@/lib/iac-utils";
 import { FindingProps, ProviderType, ResourceProps } from "@/types";
 
@@ -269,13 +269,18 @@ export const ResourceDetail = ({
           <div className="flex flex-row items-center justify-start gap-2">
             <CardTitle>{t.resources.resourceDetail.title}</CardTitle>
             {providerData.provider === "iac" && gitUrl && (
-              <Tooltip content={t.resources.resourceDetail.goToResource} size="sm">
+              <Tooltip
+                content={t.resources.resourceDetail.goToResource}
+                size="sm"
+              >
                 <a
                   href={gitUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-bg-data-info mt-1 inline-flex cursor-pointer"
-                  aria-label={t.resources.resourceDetail.openResourceInRepository}
+                  aria-label={
+                    t.resources.resourceDetail.openResourceInRepository
+                  }
                 >
                   <ExternalLink size={16} className="inline" />
                 </a>
@@ -285,7 +290,10 @@ export const ResourceDetail = ({
           {getProviderLogo(providerData.provider as ProviderType)}
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
-          <InfoField label={t.resources.resourceDetail.resourceUid} variant="simple">
+          <InfoField
+            label={t.resources.resourceDetail.resourceUid}
+            variant="simple"
+          >
             <Snippet
               className="border-border-neutral-tertiary bg-bg-neutral-tertiary rounded-lg border py-1"
               hideSymbol
@@ -333,7 +341,10 @@ export const ResourceDetail = ({
             const parsedMetadata = parseMetadata(attributes.metadata);
             return parsedMetadata &&
               Object.entries(parsedMetadata).length > 0 ? (
-              <InfoField label={t.resources.resourceDetail.metadata} variant="simple">
+              <InfoField
+                label={t.resources.resourceDetail.metadata}
+                variant="simple"
+              >
                 <div className="border-border-neutral-tertiary bg-bg-neutral-tertiary relative w-full rounded-lg border">
                   <Snippet
                     className="absolute top-2 right-2 z-10 bg-transparent"
@@ -372,7 +383,9 @@ export const ResourceDetail = ({
       {/* Failed findings associated with this resource section */}
       <Card variant="base" padding="lg">
         <CardHeader>
-          <CardTitle>{t.resources.resourceDetail.failedFindingsTitle}</CardTitle>
+          <CardTitle>
+            {t.resources.resourceDetail.failedFindingsTitle}
+          </CardTitle>
         </CardHeader>
         <CardContent>
           {findingsLoading ? (
@@ -385,7 +398,10 @@ export const ResourceDetail = ({
           ) : failedFindings.length > 0 ? (
             <div className="flex flex-col gap-4">
               <p className="dark:text-prowler-theme-pale/80 text-sm text-gray-600">
-                {t.resources.resourceDetail.totalFailedFindings.replace("{count}", failedFindings.length.toString())}
+                {t.resources.resourceDetail.totalFailedFindings.replace(
+                  "{count}",
+                  failedFindings.length.toString(),
+                )}
               </p>
               {failedFindings.map((finding: ResourceFinding, index: number) => {
                 const { attributes: findingAttrs, id } = finding;
@@ -398,7 +414,10 @@ export const ResourceDetail = ({
                       className="shadow-small dark:bg-prowler-blue-400 flex flex-col gap-2 rounded-lg px-4 py-2"
                     >
                       <p className="text-sm text-red-600">
-                        {t.resources.resourceDetail.findingNoAttributes.replace("{id}", id)}
+                        {t.resources.resourceDetail.findingNoAttributes.replace(
+                          "{id}",
+                          id,
+                        )}
                       </p>
                     </div>
                   );
@@ -406,7 +425,8 @@ export const ResourceDetail = ({
 
                 const { severity, check_metadata, status } = findingAttrs;
                 const checktitle =
-                  check_metadata?.checktitle || t.resources.resourceDetail.unknownCheck;
+                  check_metadata?.checktitle ||
+                  t.resources.resourceDetail.unknownCheck;
 
                 return (
                   <button

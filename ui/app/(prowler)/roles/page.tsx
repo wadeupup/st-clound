@@ -1,5 +1,4 @@
 import { Spacer } from "@heroui/spacer";
-import Link from "next/link";
 import { Suspense } from "react";
 
 import { getRoles } from "@/actions/roles";
@@ -7,10 +6,11 @@ import { FilterControls } from "@/components/filters";
 import { SkeletonTableRoles } from "@/components/roles/table";
 import { ContentLayout } from "@/components/ui";
 import { SearchParamsProps } from "@/types";
-import { RolesTitle } from "./roles-title";
+
 import { RolesAddButton } from "./roles-add-button";
 import { RolesFilters } from "./roles-filters";
 import { RolesTable } from "./roles-table";
+import { RolesTitle } from "./roles-title";
 
 export default async function Roles({
   searchParams,
@@ -57,10 +57,5 @@ const SSRDataTable = async ({
 
   const rolesData = await getRoles({ query, page, sort, filters, pageSize });
 
-  return (
-    <RolesTable
-      data={rolesData?.data || []}
-      metadata={rolesData?.meta}
-    />
-  );
+  return <RolesTable data={rolesData?.data || []} metadata={rolesData?.meta} />;
 };

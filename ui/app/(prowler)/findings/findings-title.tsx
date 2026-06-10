@@ -6,4 +6,3 @@ export function FindingsTitle() {
   const { t } = useI18n();
   return <>{t.findings.title}</>;
 }
-

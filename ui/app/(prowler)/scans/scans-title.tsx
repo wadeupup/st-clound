@@ -6,4 +6,3 @@ export function ScansTitle() {
   const { t } = useI18n();
   return <>{t.scans.title}</>;
 }
-

@@ -46,10 +46,9 @@ export const getInvitations = async ({
     // Use getErrorMessage helper to safely extract error message
     const errorMessage = getErrorMessage(error);
     const errorStack = error instanceof Error ? error.stack : undefined;
-    const errorType = error instanceof Error 
-      ? error.constructor.name 
-      : typeof error;
-    
+    const errorType =
+      error instanceof Error ? error.constructor.name : typeof error;
+
     // Log all error details in a single message to reduce log noise
     const errorDetails: string[] = [
       `Error fetching invitations: ${errorMessage}`,
@@ -57,13 +56,13 @@ export const getInvitations = async ({
       `URL: ${apiBaseUrl}/tenants/invitations`,
       `API Base URL: ${apiBaseUrl}`,
     ];
-    
+
     if (errorStack) {
       errorDetails.push(`Stack: ${errorStack}`);
     }
-    
+
     console.error(errorDetails.join("\n"));
-    
+
     return undefined;
   }
 };

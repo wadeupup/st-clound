@@ -20,8 +20,8 @@ import { Button } from "@/components/shadcn";
 import { useToast } from "@/components/ui";
 import { CustomLink } from "@/components/ui/custom/custom-link";
 import { Form } from "@/components/ui/form";
-import { useI18n } from "@/lib/i18n/context";
 import { checkTaskStatus } from "@/lib/helper";
+import { useI18n } from "@/lib/i18n/context";
 import { ProviderType } from "@/types";
 import { ApiError, testConnectionFormSchema } from "@/types";
 
@@ -153,13 +153,16 @@ export const TestConnectionForm = ({
           } catch (error) {
             form.setError("providerId", {
               type: "server",
-              message: t.providers.connectAccount.testConnection.unexpectedError,
+              message:
+                t.providers.connectAccount.testConnection.unexpectedError,
             });
           }
         } else {
           setConnectionStatus({
             connected: false,
-            error: error || t.providers.connectAccount.testConnection.connectionFailed,
+            error:
+              error ||
+              t.providers.connectAccount.testConnection.connectionFailed,
           });
         }
       } else {
@@ -211,7 +214,10 @@ export const TestConnectionForm = ({
         </div>
         <div className="text-center">
           <p className="text-primary text-xl font-medium">
-            {t.providers.connectAccount.testConnection.scanInitiatedSuccessfully}
+            {
+              t.providers.connectAccount.testConnection
+                .scanInitiatedSuccessfully
+            }
           </p>
           <p className="text-small mt-2 font-bold text-gray-500">
             {t.providers.connectAccount.testConnection.redirectingToScans}
@@ -262,7 +268,8 @@ export const TestConnectionForm = ({
               </div>
               <div className="min-w-0 flex-1">
                 <p className="text-small text-text-error-primary break-words">
-                  {connectionStatus.error || t.providers.connectAccount.testConnection.unknownError}
+                  {connectionStatus.error ||
+                    t.providers.connectAccount.testConnection.unknownError}
                 </p>
               </div>
             </div>
@@ -312,7 +319,9 @@ export const TestConnectionForm = ({
                 icon="icon-park-outline:close-small"
                 className="h-5 w-5 text-gray-600 dark:text-gray-400"
               />
-              <span>{t.providers.connectAccount.testConnection.backToProviders}</span>
+              <span>
+                {t.providers.connectAccount.testConnection.backToProviders}
+              </span>
             </CustomLink>
           ) : connectionStatus?.error ? (
             <Button

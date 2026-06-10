@@ -7,6 +7,7 @@ import { useMemo } from "react";
 import React from "react";
 
 import { useI18n } from "@/lib/i18n/context";
+
 import { VerticalSteps } from "./vertical-steps";
 
 export const WorkflowSendInvite = () => {

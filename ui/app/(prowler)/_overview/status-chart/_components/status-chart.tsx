@@ -132,7 +132,12 @@ export const StatusChart = ({
               variant: CardVariant.fail,
             }}
             label={t.overview.statusChart.failFindings}
-            stats={[{ icon: Bell, label: `${failFindingsData.new} ${t.overview.statusChart.new}` }]}
+            stats={[
+              {
+                icon: Bell,
+                label: `${failFindingsData.new} ${t.overview.statusChart.new}`,
+              },
+            ]}
             emptyState={
               failFindingsData.total === 0
                 ? { message: t.overview.statusChart.noFailedFindings }
@@ -153,7 +158,12 @@ export const StatusChart = ({
               variant: CardVariant.pass,
             }}
             label={t.overview.statusChart.passFindings}
-            stats={[{ icon: Bell, label: `${passFindingsData.new} ${t.overview.statusChart.new}` }]}
+            stats={[
+              {
+                icon: Bell,
+                label: `${passFindingsData.new} ${t.overview.statusChart.new}`,
+              },
+            ]}
             emptyState={
               passFindingsData.total === 0
                 ? { message: t.overview.statusChart.noPassedFindings }

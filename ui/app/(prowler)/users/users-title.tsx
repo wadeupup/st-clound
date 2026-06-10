@@ -5,4 +5,3 @@ export const UsersTitle = () => {
   const { t } = useI18n();
   return <>{t.users.title}</>;
 };
-

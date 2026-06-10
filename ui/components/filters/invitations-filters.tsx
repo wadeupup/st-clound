@@ -38,4 +38,3 @@ export const getFilterInvitations = (t: Translations): FilterOption[] => {
     },
   ];
 };
-

@@ -105,7 +105,10 @@ export function BreadcrumbNavigation({
     return path;
   };
 
-  const renderTitleWithIcon = (titleText: string | ReactNode, isLink: boolean = false) => (
+  const renderTitleWithIcon = (
+    titleText: string | ReactNode,
+    isLink: boolean = false,
+  ) => (
     <>
       {typeof icon === "string" ? (
         <Icon

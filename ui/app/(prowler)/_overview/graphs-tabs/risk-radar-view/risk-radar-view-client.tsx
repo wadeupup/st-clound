@@ -67,7 +67,7 @@ export function RiskRadarViewClient({ data }: RiskRadarViewClientProps) {
         <div className="flex basis-[70%] flex-col overflow-hidden">
           <Card variant="base" className="flex flex-1 flex-col overflow-hidden">
             <div className="mb-4 flex items-center justify-between">
-              <h3 className="text-slate-900 dark:text-slate-100 text-lg font-semibold">
+              <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
                 Risk Radar
               </h3>
               <CategorySelector
@@ -93,10 +93,10 @@ export function RiskRadarViewClient({ data }: RiskRadarViewClientProps) {
           {selectedPoint && selectedPoint.severityData ? (
             <div className="flex w-full flex-col">
               <div className="mb-4">
-                <h4 className="text-slate-900 dark:text-slate-100 text-base font-semibold">
+                <h4 className="text-base font-semibold text-slate-900 dark:text-slate-100">
                   {selectedPoint.category}
                 </h4>
-                <p className="text-slate-600 dark:text-slate-400 text-xs">
+                <p className="text-xs text-slate-600 dark:text-slate-400">
                   {selectedPoint.value} Total Findings
                 </p>
               </div>
@@ -107,7 +107,7 @@ export function RiskRadarViewClient({ data }: RiskRadarViewClientProps) {
             </div>
           ) : (
             <div className="flex w-full items-center justify-center text-center">
-              <p className="text-slate-600 dark:text-slate-400 text-sm">
+              <p className="text-sm text-slate-600 dark:text-slate-400">
                 Select a category on the radar to view details
               </p>
             </div>

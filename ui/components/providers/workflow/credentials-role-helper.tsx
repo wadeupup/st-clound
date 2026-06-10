@@ -28,28 +28,38 @@ export const CredentialsRoleHelper = ({
     <div className="flex flex-col gap-2">
       <div className="flex flex-col gap-4">
         <p className="text-sm text-gray-600 dark:text-gray-400">
-          {t.providers.connectAccount.credentialsType.readOnlyRoleMustBeCreatedPrefix && (
+          {t.providers.connectAccount.credentialsType
+            .readOnlyRoleMustBeCreatedPrefix && (
             <span>
-              {t.providers.connectAccount.credentialsType.readOnlyRoleMustBeCreatedPrefix}{" "}
+              {
+                t.providers.connectAccount.credentialsType
+                  .readOnlyRoleMustBeCreatedPrefix
+              }{" "}
             </span>
           )}
-          <strong>{t.providers.connectAccount.credentialsType.readOnlyRole}</strong>
-          {t.providers.connectAccount.credentialsType.readOnlyRoleMustBeCreatedSuffix && (
+          <strong>
+            {t.providers.connectAccount.credentialsType.readOnlyRole}
+          </strong>
+          {t.providers.connectAccount.credentialsType
+            .readOnlyRoleMustBeCreatedSuffix && (
             <span>
               {" "}
-              {t.providers.connectAccount.credentialsType.readOnlyRoleMustBeCreatedSuffix}
+              {
+                t.providers.connectAccount.credentialsType
+                  .readOnlyRoleMustBeCreatedSuffix
+              }
             </span>
           )}
           {isAmazonS3 && (
-            <span>
-              {" "}
-              {t.providers.connectAccount.credentialsType.orUpdated}
-            </span>
+            <span> {t.providers.connectAccount.credentialsType.orUpdated}</span>
           )}
         </p>
 
         <Button
-          aria-label={t.providers.connectAccount.credentialsType.useCloudFormationQuickLink}
+          aria-label={
+            t.providers.connectAccount.credentialsType
+              .useCloudFormationQuickLink
+          }
           variant="link"
           className="h-auto w-fit min-w-0 p-0"
           asChild
@@ -59,7 +69,10 @@ export const CredentialsRoleHelper = ({
             target="_blank"
             rel="noopener noreferrer"
           >
-            {t.providers.connectAccount.credentialsType.useCloudFormationQuickLink}
+            {
+              t.providers.connectAccount.credentialsType
+                .useCloudFormationQuickLink
+            }
           </a>
         </Button>
 
@@ -74,12 +87,15 @@ export const CredentialsRoleHelper = ({
         <p className="text-sm text-gray-600 dark:text-gray-400">
           {isAmazonS3
             ? t.providers.connectAccount.credentialsType.referToDocumentation
-            : t.providers.connectAccount.credentialsType.useTemplateToCreateRole}
+            : t.providers.connectAccount.credentialsType
+                .useTemplateToCreateRole}
         </p>
 
         <div className="flex w-fit flex-col gap-2">
           <Button
-            aria-label={t.providers.connectAccount.credentialsType.cloudFormationTemplate}
+            aria-label={
+              t.providers.connectAccount.credentialsType.cloudFormationTemplate
+            }
             variant="link"
             className="h-auto w-fit min-w-0 p-0"
             asChild
@@ -89,11 +105,16 @@ export const CredentialsRoleHelper = ({
               target="_blank"
               rel="noopener noreferrer"
             >
-              {t.providers.connectAccount.credentialsType.cloudFormationTemplate}
+              {
+                t.providers.connectAccount.credentialsType
+                  .cloudFormationTemplate
+              }
             </a>
           </Button>
           <Button
-            aria-label={t.providers.connectAccount.credentialsType.terraformCode}
+            aria-label={
+              t.providers.connectAccount.credentialsType.terraformCode
+            }
             variant="link"
             className="h-auto w-fit min-w-0 p-0"
             asChild

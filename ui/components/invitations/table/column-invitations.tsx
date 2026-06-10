@@ -22,18 +22,29 @@ export const getColumnsInvitation = (
     {
       accessorKey: "email",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={t.invitations.table.email} />
+        <DataTableColumnHeader
+          column={column}
+          title={t.invitations.table.email}
+        />
       ),
       cell: ({ row }) => {
         const data = getInvitationData(row);
-        return <p className="font-semibold">{data?.email || t.invitations.table.nA}</p>;
+        return (
+          <p className="font-semibold">
+            {data?.email || t.invitations.table.nA}
+          </p>
+        );
       },
       enableSorting: false,
     },
     {
       accessorKey: "state",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={t.invitations.table.state} param="state" />
+        <DataTableColumnHeader
+          column={column}
+          title={t.invitations.table.state}
+          param="state"
+        />
       ),
       cell: ({ row }) => {
         const { state } = getInvitationData(row);
@@ -43,11 +54,15 @@ export const getColumnsInvitation = (
     {
       accessorKey: "role",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={t.invitations.table.role} />
+        <DataTableColumnHeader
+          column={column}
+          title={t.invitations.table.role}
+        />
       ),
       cell: ({ row }) => {
         const roleName =
-          row.original.relationships?.role?.attributes?.name || t.invitations.table.noRole;
+          row.original.relationships?.role?.attributes?.name ||
+          t.invitations.table.noRole;
         return <p className="font-semibold">{roleName}</p>;
       },
       enableSorting: false,
@@ -83,7 +98,10 @@ export const getColumnsInvitation = (
     {
       accessorKey: "actions",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={t.invitations.table.actions} />
+        <DataTableColumnHeader
+          column={column}
+          title={t.invitations.table.actions}
+        />
       ),
       id: "actions",
       cell: ({ row }) => {

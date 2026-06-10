@@ -2,6 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AnimatePresence, motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 import { useForm, useWatch } from "react-hook-form";
 import * as z from "zod";
 
@@ -28,6 +29,7 @@ export const LaunchScanWorkflow = ({
 }: {
   providers: ProviderInfo[];
 }) => {
+  const router = useRouter();
   const formSchema = z.object({
     ...onDemandScanFormSchema().shape,
     scanName: z
@@ -85,6 +87,7 @@ export const LaunchScanWorkflow = ({
       });
       // Reset form after successful submission
       form.reset();
+      router.refresh();
     }
   };
 

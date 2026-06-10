@@ -28,7 +28,11 @@ export const getColumnsRoles = (
     {
       accessorKey: "role",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={t.roles.table.role} param="name" />
+        <DataTableColumnHeader
+          column={column}
+          title={t.roles.table.role}
+          param="name"
+        />
       ),
       cell: ({ row }) => {
         const data = getRoleAttributes(row);
@@ -38,7 +42,11 @@ export const getColumnsRoles = (
     {
       accessorKey: "users",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={t.roles.table.users} param="users" />
+        <DataTableColumnHeader
+          column={column}
+          title={t.roles.table.users}
+          param="users"
+        />
       ),
       cell: ({ row }) => {
         const relationships = getRoleRelationships(row);

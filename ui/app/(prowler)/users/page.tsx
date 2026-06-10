@@ -1,5 +1,4 @@
 import { Spacer } from "@heroui/spacer";
-import Link from "next/link";
 import { Suspense } from "react";
 
 import { getRoles } from "@/actions/roles/roles";
@@ -8,10 +7,11 @@ import { FilterControls } from "@/components/filters";
 import { ContentLayout } from "@/components/ui";
 import { SkeletonTableUser } from "@/components/users/table";
 import { Role, SearchParamsProps, UserProps } from "@/types";
-import { UsersTitle } from "./users-title";
+
+import { UsersFilters } from "./users-filters";
 import { UsersInviteButton } from "./users-invite-button";
 import { UsersTable } from "./users-table";
-import { UsersFilters } from "./users-filters";
+import { UsersTitle } from "./users-title";
 
 export default async function Users({
   searchParams,
@@ -96,10 +96,5 @@ const SSRDataTable = async ({
     };
   });
 
-  return (
-    <UsersTable
-      data={expandedUsers || []}
-      metadata={usersData?.meta}
-    />
-  );
+  return <UsersTable data={expandedUsers || []} metadata={usersData?.meta} />;
 };

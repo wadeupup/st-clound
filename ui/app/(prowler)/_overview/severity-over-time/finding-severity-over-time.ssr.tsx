@@ -2,9 +2,9 @@ import { getSeverityTrendsByTimeRange } from "@/actions/overview/severity-trends
 
 import { pickFilterParams } from "../_lib/filter-params";
 import { SSRComponentProps } from "../_types";
+import { FindingSeverityOverTimeSkeleton } from "./_components/finding-severity-over-time.skeleton";
 import { FindingSeverityOverTimeCard } from "./_components/finding-severity-over-time-card";
 import { FindingSeverityOverTimeEmpty } from "./_components/finding-severity-over-time-empty";
-import { FindingSeverityOverTimeSkeleton } from "./_components/finding-severity-over-time.skeleton";
 import { DEFAULT_TIME_RANGE } from "./_constants/time-range.constants";
 
 export { FindingSeverityOverTimeSkeleton };

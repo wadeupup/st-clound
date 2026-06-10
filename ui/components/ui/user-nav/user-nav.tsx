@@ -65,7 +65,7 @@ export const UserNav = () => {
           <Button
             variant="ghost"
             size="icon-sm"
-            className="h-9 w-9 rounded-full border-slate-300/50 hover:bg-slate-100 hover:border-slate-300 dark:border-slate-700/50 dark:hover:bg-slate-800 dark:hover:border-slate-600"
+            className="h-9 w-9 rounded-full border-slate-300/50 hover:border-slate-300 hover:bg-slate-100 dark:border-slate-700/50 dark:hover:border-slate-600 dark:hover:bg-slate-800"
             onClick={() => logOut()}
             aria-label={t.profile.signOut}
           >

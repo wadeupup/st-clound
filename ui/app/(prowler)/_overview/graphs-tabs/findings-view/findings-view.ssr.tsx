@@ -50,5 +50,7 @@ export async function FindingsViewSSR({ searchParams }: FindingsViewSSRProps) {
       })
     : [];
 
-  return <FindingsViewClient data={(expandedFindings || []) as FindingProps[]} />;
+  return (
+    <FindingsViewClient data={(expandedFindings || []) as FindingProps[]} />
+  );
 }

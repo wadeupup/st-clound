@@ -45,12 +45,18 @@ export const RadioGroupAWSViaCredentialsTypeForm = ({
                 {t.providers.connectAccount.credentialsType.usingIamRole}
               </span>
               <CustomRadio
-                description={t.providers.connectAccount.credentialsType.connectAssumingIamRole}
+                description={
+                  t.providers.connectAccount.credentialsType
+                    .connectAssumingIamRole
+                }
                 value="role"
               >
                 <div className="flex items-center">
                   <span className="ml-2">
-                    {t.providers.connectAccount.credentialsType.connectAssumingIamRole}{" "}
+                    {
+                      t.providers.connectAccount.credentialsType
+                        .connectAssumingIamRole
+                    }{" "}
                     <span className="text-default-500">
                       {t.providers.connectAccount.credentialsType.recommended}
                     </span>
@@ -61,12 +67,18 @@ export const RadioGroupAWSViaCredentialsTypeForm = ({
                 {t.providers.connectAccount.credentialsType.usingCredentials}
               </span>
               <CustomRadio
-                description={t.providers.connectAccount.credentialsType.connectViaCredentials}
+                description={
+                  t.providers.connectAccount.credentialsType
+                    .connectViaCredentials
+                }
                 value="credentials"
               >
                 <div className="flex items-center">
                   <span className="ml-2">
-                    {t.providers.connectAccount.credentialsType.connectViaCredentials}
+                    {
+                      t.providers.connectAccount.credentialsType
+                        .connectViaCredentials
+                    }
                   </span>
                 </div>
               </CustomRadio>

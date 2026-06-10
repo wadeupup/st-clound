@@ -9,9 +9,7 @@ import {
 } from "@/actions/resources";
 import { FilterControls } from "@/components/filters";
 import { SkeletonTableResources } from "@/components/resources/skeleton/skeleton-table-resources";
-import { getColumnResources } from "@/components/resources/table/column-resources";
 import { ContentLayout } from "@/components/ui";
-import { DataTable } from "@/components/ui/table";
 import {
   createDict,
   extractFiltersAndQuery,
@@ -20,10 +18,11 @@ import {
   replaceFieldKey,
 } from "@/lib";
 import { ResourceProps, SearchParamsProps } from "@/types";
-import { ResourcesTitle } from "./resources-title";
+
 import { ErrorDisplay } from "./error-display";
 import { ResourcesFilters } from "./resources-filters";
 import { ResourcesTable } from "./resources-table";
+import { ResourcesTitle } from "./resources-title";
 
 export default async function Resources({
   searchParams,

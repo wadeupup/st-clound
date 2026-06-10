@@ -139,7 +139,7 @@ export async function RiskPipelineViewSSR({
         <div className="text-center">
           <RiskPipelineViewEmpty
             message="noFailedFindings"
-            className="text-slate-600 dark:text-slate-400 mb-4 text-sm block"
+            className="mb-4 block text-sm text-slate-600 dark:text-slate-400"
           />
           <SankeyChart
             data={sankeyData}

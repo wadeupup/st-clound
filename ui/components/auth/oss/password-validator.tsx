@@ -2,11 +2,11 @@
 
 import { AlertCircle, CheckCircle } from "lucide-react";
 
+import { useI18n } from "@/lib/i18n/context";
 import {
   PASSWORD_REQUIREMENTS,
   passwordRequirementCheckers,
 } from "@/types/authFormSchema";
-import { useI18n } from "@/lib/i18n/context";
 
 interface PasswordRequirementsMessageProps {
   password: string;

@@ -14,4 +14,3 @@ export function ProfileTitle({ children }: { children: ReactNode }) {
     </ContentLayout>
   );
 }
-

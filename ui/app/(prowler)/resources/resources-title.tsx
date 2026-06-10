@@ -5,4 +5,3 @@ export const ResourcesTitle = () => {
   const { t } = useI18n();
   return <>{t.resources.title}</>;
 };
-

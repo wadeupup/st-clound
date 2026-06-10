@@ -77,7 +77,9 @@ export const DeleteGroupForm = ({
             disabled={isLoading}
           >
             {!isLoading && <DeleteIcon size={24} />}
-            {isLoading ? t.providers.providerGroups.forms.loading : t.providers.providerGroups.forms.delete}
+            {isLoading
+              ? t.providers.providerGroups.forms.loading
+              : t.providers.providerGroups.forms.delete}
           </Button>
         </div>
       </form>

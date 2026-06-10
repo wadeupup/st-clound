@@ -1,5 +1,6 @@
 "use client";
 import { usePathname } from "next/navigation";
+
 import { CheckDetailsTitle } from "./check-details-title";
 import { SendInvitationTitle } from "./send-invitation-title";
 
@@ -9,4 +10,3 @@ export const DynamicTitle = () => {
 
   return isCheckDetails ? <CheckDetailsTitle /> : <SendInvitationTitle />;
 };
-

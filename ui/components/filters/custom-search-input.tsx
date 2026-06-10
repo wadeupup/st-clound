@@ -71,7 +71,10 @@ export const CustomSearchInput: React.FC = () => {
       placeholder={t.findings.searchPlaceholder}
       value={searchQuery}
       startContent={
-        <SearchIcon className="text-slate-600 dark:text-slate-400 shrink-0" width={16} />
+        <SearchIcon
+          className="shrink-0 text-slate-600 dark:text-slate-400"
+          width={16}
+        />
       }
       onChange={(e) => {
         const value = e.target.value;
@@ -82,9 +85,9 @@ export const CustomSearchInput: React.FC = () => {
         searchQuery && (
           <button
             onClick={clearIconSearch}
-            className="text-slate-600 dark:text-slate-400 shrink-0 focus:outline-none"
+            className="shrink-0 text-slate-600 focus:outline-none dark:text-slate-400"
           >
-            <XCircle className="text-slate-600 dark:text-slate-400 h-4 w-4" />
+            <XCircle className="h-4 w-4 text-slate-600 dark:text-slate-400" />
           </button>
         )
       }

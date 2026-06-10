@@ -31,7 +31,9 @@ export const NoProvidersAdded = () => {
             className="w-full max-w-xs justify-center"
             size="lg"
           >
-            <Link href="/providers/connect-account">{t.scans.noProviders.getStarted}</Link>
+            <Link href="/providers/connect-account">
+              {t.scans.noProviders.getStarted}
+            </Link>
           </Button>
         </CardContent>
       </Card>

@@ -1,6 +1,6 @@
 "use client";
-import { useI18n } from "@/lib/i18n/context";
 import { DataTableFilterCustom } from "@/components/ui/table";
+import { useI18n } from "@/lib/i18n/context";
 
 export const ResourcesFilters = ({
   uniqueRegions,
@@ -35,4 +35,3 @@ export const ResourcesFilters = ({
     />
   );
 };
-

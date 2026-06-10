@@ -21,7 +21,10 @@ import { RadioGroupProvider } from "../../radio-group-provider";
 export type FormValues = z.infer<typeof addProviderFormSchema>;
 
 // Helper function for labels and placeholders
-const getProviderFieldDetails = (providerType: ProviderType | undefined, t: ReturnType<typeof useI18n>["t"]) => {
+const getProviderFieldDetails = (
+  providerType: ProviderType | undefined,
+  t: ReturnType<typeof useI18n>["t"],
+) => {
   switch (providerType) {
     case "aws":
       return {
@@ -257,7 +260,9 @@ export const ConnectAccountForm = () => {
               ) : (
                 <ChevronRightIcon size={24} />
               )}
-              {isLoading ? t.providers.connectAccount.loading : t.providers.connectAccount.next}
+              {isLoading
+                ? t.providers.connectAccount.loading
+                : t.providers.connectAccount.next}
             </Button>
           )}
         </div>

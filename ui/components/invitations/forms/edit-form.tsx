@@ -101,14 +101,18 @@ export const EditForm = ({
           <CardContent className="flex flex-row justify-center gap-4">
             <div className="text-small text-text-neutral-secondary flex items-center">
               <MailIcon className="text-text-neutral-secondary mr-2 h-4 w-4" />
-              <span className="text-text-neutral-secondary">{t.invitations.editModal.email}:</span>
+              <span className="text-text-neutral-secondary">
+                {t.invitations.editModal.email}:
+              </span>
               <span className="text-text-neutral-secondary ml-2 font-semibold">
                 {invitationEmail}
               </span>
             </div>
             <div className="text-small flex items-center text-gray-600">
               <ShieldIcon className="text-text-neutral-secondary mr-2 h-4 w-4" />
-              <span className="text-text-neutral-secondary">{t.invitations.editModal.role}:</span>
+              <span className="text-text-neutral-secondary">
+                {t.invitations.editModal.role}:
+              </span>
               <span className="text-text-neutral-secondary ml-2 font-semibold">
                 {currentRole || t.invitations.editModal.noRole}
               </span>

@@ -131,7 +131,9 @@ export const FindingDetail = ({
             <InfoField label={t.findings.findingDetail.service}>
               {attributes.check_metadata.servicename}
             </InfoField>
-            <InfoField label={t.findings.findingDetail.region}>{resource.region}</InfoField>
+            <InfoField label={t.findings.findingDetail.region}>
+              {resource.region}
+            </InfoField>
             <InfoField label={t.findings.findingDetail.firstSeen}>
               <DateWithTime inline dateTime={attributes.first_seen_at || "-"} />
             </InfoField>
@@ -147,20 +149,32 @@ export const FindingDetail = ({
                 </div>
               </InfoField>
             )}
-            <InfoField label={t.findings.findingDetail.severity} variant="simple">
+            <InfoField
+              label={t.findings.findingDetail.severity}
+              variant="simple"
+            >
               <SeverityBadge severity={attributes.severity || "-"} />
             </InfoField>
           </div>
-          <InfoField label={t.findings.findingDetail.findingId} variant="simple">
+          <InfoField
+            label={t.findings.findingDetail.findingId}
+            variant="simple"
+          >
             <CodeSnippet value={findingDetails.id} />
           </InfoField>
           <InfoField label={t.findings.findingDetail.checkId} variant="simple">
             <CodeSnippet value={attributes.check_id} />
           </InfoField>
-          <InfoField label={t.findings.findingDetail.findingUid} variant="simple">
+          <InfoField
+            label={t.findings.findingDetail.findingUid}
+            variant="simple"
+          >
             <CodeSnippet value={attributes.uid} />
           </InfoField>
-          <InfoField label={t.findings.findingDetail.resourceId} variant="simple">
+          <InfoField
+            label={t.findings.findingDetail.resourceId}
+            variant="simple"
+          >
             <CodeSnippet value={resource.uid} />
           </InfoField>
 
@@ -224,7 +238,10 @@ export const FindingDetail = ({
 
               {/* CLI Command section */}
               {attributes.check_metadata.remediation.code.cli && (
-                <InfoField label={t.findings.findingDetail.cliCommand} variant="simple">
+                <InfoField
+                  label={t.findings.findingDetail.cliCommand}
+                  variant="simple"
+                >
                   <Snippet>
                     <span className="text-xs whitespace-pre-line">
                       {attributes.check_metadata.remediation.code.cli}
@@ -267,7 +284,8 @@ export const FindingDetail = ({
           )}
 
           <InfoField label={t.findings.findingDetail.categories}>
-            {attributes.check_metadata.categories?.join(", ") || t.findings.findingDetail.none}
+            {attributes.check_metadata.categories?.join(", ") ||
+              t.findings.findingDetail.none}
           </InfoField>
         </CardContent>
       </Card>
@@ -278,7 +296,10 @@ export const FindingDetail = ({
           <CardTitle>{t.findings.findingDetail.resourceDetails}</CardTitle>
           {providerDetails.provider === "iac" && gitUrl && (
             <CardAction>
-              <Tooltip content={t.findings.findingDetail.goToResource} size="sm">
+              <Tooltip
+                content={t.findings.findingDetail.goToResource}
+                size="sm"
+              >
                 <a
                   href={gitUrl}
                   target="_blank"
@@ -306,7 +327,9 @@ export const FindingDetail = ({
             <InfoField label={t.findings.findingDetail.service}>
               {renderValue(resource.service)}
             </InfoField>
-            <InfoField label={t.findings.findingDetail.region}>{renderValue(resource.region)}</InfoField>
+            <InfoField label={t.findings.findingDetail.region}>
+              {renderValue(resource.region)}
+            </InfoField>
           </div>
 
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -351,16 +374,24 @@ export const FindingDetail = ({
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
           <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-            <InfoField label={t.findings.findingDetail.scanName}>{scan.name || t.findings.findingDetail.notAvailable}</InfoField>
+            <InfoField label={t.findings.findingDetail.scanName}>
+              {scan.name || t.findings.findingDetail.notAvailable}
+            </InfoField>
             <InfoField label={t.findings.findingDetail.resourcesScanned}>
               {scan.unique_resource_count}
             </InfoField>
-            <InfoField label={t.findings.findingDetail.progress}>{scan.progress}%</InfoField>
+            <InfoField label={t.findings.findingDetail.progress}>
+              {scan.progress}%
+            </InfoField>
           </div>
 
           <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-            <InfoField label={t.findings.findingDetail.trigger}>{scan.trigger}</InfoField>
-            <InfoField label={t.findings.findingDetail.state}>{scan.state}</InfoField>
+            <InfoField label={t.findings.findingDetail.trigger}>
+              {scan.trigger}
+            </InfoField>
+            <InfoField label={t.findings.findingDetail.state}>
+              {scan.state}
+            </InfoField>
             <InfoField label={t.findings.findingDetail.duration}>
               {formatDuration(scan.duration)}
             </InfoField>

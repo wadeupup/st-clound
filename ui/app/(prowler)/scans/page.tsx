@@ -15,8 +15,6 @@ import { LaunchScanWorkflow } from "@/components/scans/launch-workflow";
 import { SkeletonTableScans } from "@/components/scans/table";
 import { ColumnGetScansWrapper } from "@/components/scans/table/scans/column-get-scans-wrapper";
 import { ContentLayout } from "@/components/ui";
-import { CustomBanner } from "@/components/ui/custom/custom-banner";
-import { DataTable } from "@/components/ui/table";
 import {
   createProviderDetailsMapping,
   extractProviderUIDs,
@@ -181,9 +179,6 @@ const SSRDataTableScans = async ({
     }) || [];
 
   return (
-    <ColumnGetScansWrapper
-      data={expandedScansData || []}
-      metadata={meta}
-    />
+    <ColumnGetScansWrapper data={expandedScansData || []} metadata={meta} />
   );
 };

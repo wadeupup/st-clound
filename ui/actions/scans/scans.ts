@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { apiBaseUrl, getAuthHeaders, getErrorMessage } from "@/lib";
@@ -41,7 +42,10 @@ export const getScans = async ({
   });
 
   try {
-    const response = await fetch(url.toString(), { headers });
+    const response = await fetch(url.toString(), {
+      headers,
+      cache: "no-store",
+    });
 
     return handleApiResponse(response);
   } catch (error) {
@@ -59,6 +63,7 @@ export const getScansByState = async () => {
   try {
     const response = await fetch(url.toString(), {
       headers,
+      cache: "no-store",
     });
 
     return handleApiResponse(response);
@@ -76,6 +81,7 @@ export const getScan = async (scanId: string) => {
   try {
     const response = await fetch(url.toString(), {
       headers,
+      cache: "no-store",
     });
 
     return handleApiResponse(response);
@@ -125,6 +131,7 @@ export const scanOnDemand = async (formData: FormData) => {
     const result = await handleApiResponse(response, "/scans");
     if (result?.data?.id) {
       addScanOperation("start", result.data.id);
+      revalidatePath("/scans");
     }
     return result;
   } catch (error) {

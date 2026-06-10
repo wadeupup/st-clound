@@ -4,14 +4,10 @@ import { FC } from "react";
 import { Control, Controller } from "react-hook-form";
 import { z } from "zod";
 
-import { useI18n } from "@/lib/i18n/context";
 import { cn } from "@/lib/utils";
 import { addProviderFormSchema } from "@/types";
 
-import {
-  AWSProviderBadge,
-  AzureProviderBadge,
-} from "../icons/providers-badge";
+import { AWSProviderBadge, AzureProviderBadge } from "../icons/providers-badge";
 import { FormMessage } from "../ui/form";
 
 const PROVIDERS = [

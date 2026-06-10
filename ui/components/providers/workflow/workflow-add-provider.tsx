@@ -6,9 +6,21 @@ import { usePathname } from "next/navigation";
 import React, { useMemo } from "react";
 
 import { useI18n } from "@/lib/i18n/context";
+
 import { VerticalSteps } from "./vertical-steps";
 
-const getRouteConfig = (t: ReturnType<typeof useI18n>["t"]) => ({
+type RouteConfig = {
+  stepIndex: number;
+  stepOverride?: {
+    index: number;
+    title: string;
+    description: string;
+  };
+};
+
+const getRouteConfig = (
+  t: ReturnType<typeof useI18n>["t"],
+): Record<string, RouteConfig> => ({
   "/providers/connect-account": { stepIndex: 0 },
   "/providers/add-credentials": { stepIndex: 1 },
   "/providers/test-connection": { stepIndex: 2 },

@@ -20,7 +20,13 @@ const getScanData = (row: { original: ScanProps }) => {
   return row.original;
 };
 
-const ScanDetailsCell = ({ row, t }: { row: any; t: ReturnType<typeof useI18n>["t"] }) => {
+const ScanDetailsCell = ({
+  row,
+  t,
+}: {
+  row: any;
+  t: ReturnType<typeof useI18n>["t"];
+}) => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const scanId = searchParams.get("scanId");
@@ -64,7 +70,9 @@ const ScanDetailsCell = ({ row, t }: { row: any; t: ReturnType<typeof useI18n>["
   );
 };
 
-export const getColumnGetScans = (t: ReturnType<typeof useI18n>["t"]): ColumnDef<ScanProps>[] => [
+export const getColumnGetScans = (
+  t: ReturnType<typeof useI18n>["t"],
+): ColumnDef<ScanProps>[] => [
   {
     id: "moreInfo",
     header: ({ column }) => (
@@ -76,13 +84,18 @@ export const getColumnGetScans = (t: ReturnType<typeof useI18n>["t"]): ColumnDef
   {
     accessorKey: "cloudProvider",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title={t.scans.table.cloudProvider} />
+      <DataTableColumnHeader
+        column={column}
+        title={t.scans.table.cloudProvider}
+      />
     ),
     cell: ({ row }) => {
       const providerInfo = row.original.providerInfo;
 
       if (!providerInfo) {
-        return <span className="font-medium">{t.scans.table.noProviderInfo}</span>;
+        return (
+          <span className="font-medium">{t.scans.table.noProviderInfo}</span>
+        );
       }
 
       const { provider, uid, alias } = providerInfo;
@@ -206,7 +219,10 @@ export const getColumnGetScans = (t: ReturnType<typeof useI18n>["t"]): ColumnDef
   {
     accessorKey: "scheduled_at",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title={t.scans.table.scheduledAt} />
+      <DataTableColumnHeader
+        column={column}
+        title={t.scans.table.scheduledAt}
+      />
     ),
     cell: ({ row }) => {
       const {
@@ -255,7 +271,11 @@ export const getColumnGetScans = (t: ReturnType<typeof useI18n>["t"]): ColumnDef
   {
     accessorKey: "scanName",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title={t.scans.table.scanName} param="name" />
+      <DataTableColumnHeader
+        column={column}
+        title={t.scans.table.scanName}
+        param="name"
+      />
     ),
     cell: ({ row }) => {
       const {
@@ -268,7 +288,9 @@ export const getColumnGetScans = (t: ReturnType<typeof useI18n>["t"]): ColumnDef
       return (
         <div className="flex w-fit items-center justify-center">
           <span className="text-xs font-medium">
-            {name === "Daily scheduled scan" ? t.scans.table.scheduledScan : name}
+            {name === "Daily scheduled scan"
+              ? t.scans.table.scheduledScan
+              : name}
           </span>
         </div>
       );

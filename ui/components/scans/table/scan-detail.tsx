@@ -67,16 +67,24 @@ export const ScanDetail = ({
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
           <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-            <InfoField label={t.scans.scanDetails.scanName}>{renderValue(scan.name)}</InfoField>
+            <InfoField label={t.scans.scanDetails.scanName}>
+              {renderValue(scan.name)}
+            </InfoField>
             <InfoField label={t.scans.scanDetails.resourcesScanned}>
               {scan.unique_resource_count}
             </InfoField>
-            <InfoField label={t.scans.scanDetails.progress}>{scan.progress}%</InfoField>
+            <InfoField label={t.scans.scanDetails.progress}>
+              {scan.progress}%
+            </InfoField>
           </div>
 
           <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-            <InfoField label={t.scans.scanDetails.trigger}>{renderValue(scan.trigger)}</InfoField>
-            <InfoField label={t.scans.scanDetails.state}>{renderValue(scan.state)}</InfoField>
+            <InfoField label={t.scans.scanDetails.trigger}>
+              {renderValue(scan.trigger)}
+            </InfoField>
+            <InfoField label={t.scans.scanDetails.state}>
+              {renderValue(scan.state)}
+            </InfoField>
             <InfoField label={t.scans.scanDetails.duration}>
               {formatDuration(scan.duration)}
             </InfoField>
@@ -89,7 +97,10 @@ export const ScanDetail = ({
           {scan.state === "failed" && taskDetails?.attributes.result && (
             <>
               {taskDetails.attributes.result.exc_message && (
-                <InfoField label={t.scans.scanDetails.errorMessage} variant="simple">
+                <InfoField
+                  label={t.scans.scanDetails.errorMessage}
+                  variant="simple"
+                >
                   <Snippet hideSymbol>
                     <span className="text-xs whitespace-pre-line">
                       {taskDetails.attributes.result.exc_message.join("\n")}

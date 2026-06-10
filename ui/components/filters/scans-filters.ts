@@ -1,9 +1,5 @@
-import {
-  PROVIDER_DISPLAY_NAMES,
-  ProviderType,
-} from "@/types/providers";
-
 import { FilterOption } from "@/types";
+import { PROVIDER_DISPLAY_NAMES, ProviderType } from "@/types/providers";
 
 // Only AWS and Azure for Scan Jobs page
 const SCAN_PROVIDER_TYPES = ["aws", "azure"] as const;
@@ -84,4 +80,3 @@ export const getFilterScans = (t: {
     index: 3,
   },
 ];
-

@@ -5,6 +5,7 @@ import React from "react";
 
 import { WorkflowAddProvider } from "@/components/providers/workflow";
 import { NavigationHeader } from "@/components/ui";
+
 import { ConnectAccountTitle } from "./connect-account-title";
 
 interface ProviderLayoutProps {

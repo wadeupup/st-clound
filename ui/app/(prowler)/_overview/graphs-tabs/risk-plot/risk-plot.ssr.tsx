@@ -6,8 +6,8 @@ import { getProviders } from "@/actions/providers";
 import { SearchParamsProps } from "@/types";
 
 import { pickFilterParams } from "../../_lib/filter-params";
-import { RiskPlotEmpty } from "./risk-plot-empty";
 import { RiskPlotClient } from "./risk-plot-client";
+import { RiskPlotEmpty } from "./risk-plot-empty";
 
 export async function RiskPlotSSR({
   searchParams,

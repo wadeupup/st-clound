@@ -26,4 +26,3 @@ export const getFilterUsers = (t: Translations): FilterOption[] => {
     },
   ];
 };
-

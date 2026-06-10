@@ -35,8 +35,12 @@ export const EditGroupForm = ({
   const router = useRouter();
 
   const editGroupSchema = z.object({
-    name: z.string().min(1, t.providers.providerGroups.forms.providerGroupNameRequired),
-    providers: z.array(z.object({ id: z.string(), name: z.string() })).optional(),
+    name: z
+      .string()
+      .min(1, t.providers.providerGroups.forms.providerGroupNameRequired),
+    providers: z
+      .array(z.object({ id: z.string(), name: z.string() }))
+      .optional(),
     roles: z.array(z.object({ id: z.string(), name: z.string() })).optional(),
   });
 
@@ -133,7 +137,8 @@ export const EditGroupForm = ({
       } else {
         toast({
           title: t.providers.providerGroups.forms.success,
-          description: t.providers.providerGroups.forms.groupUpdatedSuccessfully,
+          description:
+            t.providers.providerGroups.forms.groupUpdatedSuccessfully,
         });
         router.push("/manage-groups");
       }
@@ -160,7 +165,9 @@ export const EditGroupForm = ({
             type="text"
             label={t.providers.providerGroups.forms.providerGroupName}
             labelPlacement="inside"
-            placeholder={t.providers.providerGroups.forms.enterProviderGroupName}
+            placeholder={
+              t.providers.providerGroups.forms.enterProviderGroupName
+            }
             variant="flat"
             isRequired
           />
@@ -261,7 +268,9 @@ export const EditGroupForm = ({
           </Button>
           <Button type="submit" className="w-1/2" disabled={isLoading}>
             {!isLoading && <SaveIcon size={24} />}
-            {isLoading ? t.providers.providerGroups.forms.loading : t.providers.providerGroups.forms.updateGroup}
+            {isLoading
+              ? t.providers.providerGroups.forms.loading
+              : t.providers.providerGroups.forms.updateGroup}
           </Button>
         </div>
       </form>

@@ -19,6 +19,7 @@ export function ColumnGroupsWrapper({
   const { t, locale } = useI18n();
   const columns = useMemo(() => getColumnGroups(t), [t, locale]);
 
-  return <DataTable columns={columns} data={data} metadata={metadata} key={locale} />;
+  return (
+    <DataTable columns={columns} data={data} metadata={metadata} key={locale} />
+  );
 }
-

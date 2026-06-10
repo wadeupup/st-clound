@@ -12,8 +12,9 @@ import {
   Users,
   Warehouse,
 } from "lucide-react";
-import { GroupProps } from "@/types";
+
 import { Translations } from "@/lib/i18n/index";
+import { GroupProps } from "@/types";
 
 interface MenuListOptions {
   pathname: string;
@@ -72,8 +73,16 @@ export const getMenuList = ({ pathname, t }: MenuListOptions): GroupProps[] => {
           label: t.sidebar.configuration,
           icon: Settings,
           submenus: [
-            { href: "/providers", label: t.sidebar.cloudProviders, icon: CloudCog },
-            { href: "/manage-groups", label: t.sidebar.providerGroups, icon: Group },
+            {
+              href: "/providers",
+              label: t.sidebar.cloudProviders,
+              icon: CloudCog,
+            },
+            {
+              href: "/manage-groups",
+              label: t.sidebar.providerGroups,
+              icon: Group,
+            },
             { href: "/scans", label: t.sidebar.scanJobs, icon: Timer },
           ],
           defaultOpen: true,

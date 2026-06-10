@@ -12,6 +12,7 @@ import { Accordion } from "@/components/ui/accordion/Accordion";
 import { DataTable } from "@/components/ui/table";
 import { createDict } from "@/lib";
 import { getComplianceMapper } from "@/lib/compliance/compliance-mapper";
+import { useI18n } from "@/lib/i18n/context";
 import { Requirement } from "@/types/compliance";
 import { FindingProps, FindingsResponse } from "@/types/components";
 
@@ -28,6 +29,7 @@ export const ClientAccordionContent = ({
   scanId,
   disableFindings = false,
 }: ClientAccordionContentProps) => {
+  const { t } = useI18n();
   const [findings, setFindings] = useState<FindingsResponse | null>(null);
   const [expandedFindings, setExpandedFindings] = useState<FindingProps[]>([]);
   const searchParams = useSearchParams();
@@ -160,7 +162,7 @@ export const ClientAccordionContent = ({
 
           <DataTable
             // Remove select and updated_at columns for compliance view
-            columns={getColumnFindings({}, 0).filter(
+            columns={getColumnFindings({}, 0, t).filter(
               (col) =>
                 col.id !== "select" &&
                 !("accessorKey" in col && col.accessorKey === "updated_at"),

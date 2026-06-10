@@ -12,9 +12,9 @@ import { RiskRadarViewSSR } from "./risk-radar-view/risk-radar-view.ssr";
 import { ThreatMapViewSSR } from "./threat-map-view/threat-map-view.ssr";
 
 const LoadingFallback = () => (
-  <div className="border-slate-200 bg-white/80 backdrop-blur-sm shadow-lg dark:border-slate-800 dark:bg-slate-900/80 flex w-full flex-col space-y-4 rounded-lg border p-4">
-    <Skeleton className="bg-slate-200 dark:bg-slate-700 h-6 w-1/3 rounded" />
-    <Skeleton className="bg-slate-200 dark:bg-slate-700 h-[457px] w-full rounded" />
+  <div className="flex w-full flex-col space-y-4 rounded-lg border border-slate-200 bg-white/80 p-4 shadow-lg backdrop-blur-sm dark:border-slate-800 dark:bg-slate-900/80">
+    <Skeleton className="h-6 w-1/3 rounded bg-slate-200 dark:bg-slate-700" />
+    <Skeleton className="h-[457px] w-full rounded bg-slate-200 dark:bg-slate-700" />
   </div>
 );
 
@@ -36,8 +36,14 @@ export const GraphsTabsWrapper = async ({
   searchParams,
 }: GraphsTabsWrapperProps) => {
   // Define all tab IDs (order matches the client-side tabs)
-  const tabIds: TabId[] = ["findings", "threat-map", "risk-radar", "risk-pipeline", "risk-plot"];
-  
+  const tabIds: TabId[] = [
+    "findings",
+    "threat-map",
+    "risk-radar",
+    "risk-pipeline",
+    "risk-plot",
+  ];
+
   const tabsContent = Object.fromEntries(
     tabIds.map((tabId) => {
       const Component = GRAPH_COMPONENTS[tabId];

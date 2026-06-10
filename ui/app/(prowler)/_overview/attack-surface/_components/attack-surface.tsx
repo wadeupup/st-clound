@@ -24,7 +24,7 @@ export function AttackSurface({ items, filters }: AttackSurfaceProps) {
             className="flex w-full items-center justify-center py-8"
             role="status"
           >
-            <p className="text-slate-600 dark:text-slate-400 text-sm">
+            <p className="text-sm text-slate-600 dark:text-slate-400">
               {t.overview.attackSurface.noDataAvailable}
             </p>
           </div>

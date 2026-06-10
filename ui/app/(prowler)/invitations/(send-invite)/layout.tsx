@@ -5,6 +5,7 @@ import React from "react";
 
 import { WorkflowSendInvite } from "@/components/invitations/workflow";
 import { NavigationHeader } from "@/components/ui";
+
 import { DynamicTitle } from "./dynamic-title";
 
 interface InvitationLayoutProps {

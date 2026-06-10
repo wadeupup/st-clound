@@ -1,7 +1,7 @@
 "use client";
 
-import { useI18n } from "@/lib/i18n/context";
 import { CustomBanner } from "@/components/ui/custom/custom-banner";
+import { useI18n } from "@/lib/i18n/context";
 
 export function AccessDeniedBanner() {
   const { t } = useI18n();
@@ -12,4 +12,3 @@ export function AccessDeniedBanner() {
     />
   );
 }
-

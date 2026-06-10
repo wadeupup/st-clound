@@ -13,8 +13,6 @@ import { Form } from "@/components/ui/form";
 import { useI18n } from "@/lib/i18n/context";
 import { ApiError } from "@/types";
 
-type FormValues = z.infer<typeof addGroupSchema>;
-
 export const AddGroupForm = ({
   roles = [],
   providers = [],
@@ -26,7 +24,9 @@ export const AddGroupForm = ({
   const { t } = useI18n();
 
   const addGroupSchema = z.object({
-    name: z.string().min(1, t.providers.providerGroups.forms.providerGroupNameRequired),
+    name: z
+      .string()
+      .min(1, t.providers.providerGroups.forms.providerGroupNameRequired),
     providers: z.array(z.string()).optional(),
     roles: z.array(z.string()).optional(),
   });
@@ -96,7 +96,8 @@ export const AddGroupForm = ({
         form.reset();
         toast({
           title: t.providers.providerGroups.forms.success,
-          description: t.providers.providerGroups.forms.groupCreatedSuccessfully,
+          description:
+            t.providers.providerGroups.forms.groupCreatedSuccessfully,
         });
       }
     } catch (error) {
@@ -121,7 +122,9 @@ export const AddGroupForm = ({
             type="text"
             label={t.providers.providerGroups.forms.providerGroupName}
             labelPlacement="inside"
-            placeholder={t.providers.providerGroups.forms.enterProviderGroupName}
+            placeholder={
+              t.providers.providerGroups.forms.enterProviderGroupName
+            }
             variant="flat"
             isRequired
           />
@@ -179,7 +182,9 @@ export const AddGroupForm = ({
         <div className="flex w-full justify-end sm:gap-6">
           <Button type="submit" className="w-1/2" disabled={isLoading}>
             {!isLoading && <SaveIcon size={24} />}
-            {isLoading ? t.providers.providerGroups.forms.loading : t.providers.providerGroups.forms.createGroup}
+            {isLoading
+              ? t.providers.providerGroups.forms.loading
+              : t.providers.providerGroups.forms.createGroup}
           </Button>
         </div>
       </form>

@@ -5,9 +5,9 @@ import { cookies } from "next/headers";
 import {
   getAcceptLanguageFromLocale,
   getHtmlLangFromLocale,
+  type Locale,
   LOCALE_STORAGE_KEY,
   normalizeLocale,
-  type Locale,
 } from "./index";
 
 export const getRequestLocale = async (): Promise<Locale> => {

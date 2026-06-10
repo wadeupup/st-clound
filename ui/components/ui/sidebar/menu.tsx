@@ -86,7 +86,9 @@ export const Menu = ({ isOpen }: { isOpen: boolean }) => {
               </Link>
             </Button>
           </TooltipTrigger>
-          {!isOpen && <TooltipContent side="right">{t.sidebar.launchScan}</TooltipContent>}
+          {!isOpen && (
+            <TooltipContent side="right">{t.sidebar.launchScan}</TooltipContent>
+          )}
         </Tooltip>
       </div>
 
@@ -162,7 +164,9 @@ export const Menu = ({ isOpen }: { isOpen: boolean }) => {
                   <InfoIcon size={16} />
                 </Link>
               </TooltipTrigger>
-              <TooltipContent side="right">{t.sidebar.serviceStatus}</TooltipContent>
+              <TooltipContent side="right">
+                {t.sidebar.serviceStatus}
+              </TooltipContent>
             </Tooltip>
           )
         )}

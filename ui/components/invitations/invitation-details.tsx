@@ -3,11 +3,12 @@
 import { Snippet } from "@heroui/snippet";
 import Link from "next/link";
 
+import { useI18n } from "@/lib/i18n/context";
+
 import { AddIcon } from "../icons";
 import { Button, Card, CardContent, CardHeader } from "../shadcn";
 import { Separator } from "../shadcn/separator/separator";
 import { DateWithTime } from "../ui/entities";
-import { useI18n } from "@/lib/i18n/context";
 
 interface InvitationDetailsProps {
   attributes: {

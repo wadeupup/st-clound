@@ -1,16 +1,11 @@
 "use client";
 
-import { filterFindings } from "@/components/filters/data-filters";
 import { FilterControls } from "@/components/filters/filter-controls";
 import { useRelatedFilters } from "@/hooks";
-import { useI18n } from "@/lib/i18n/context";
 import { getCategoryLabel } from "@/lib/categories";
+import { useI18n } from "@/lib/i18n/context";
 import { FilterEntity, FilterType, ScanEntity, ScanProps } from "@/types";
-import {
-  PROVIDER_DISPLAY_NAMES,
-  PROVIDER_TYPES,
-  ProviderType,
-} from "@/types/providers";
+import { PROVIDER_DISPLAY_NAMES, ProviderType } from "@/types/providers";
 
 interface FindingsFiltersProps {
   providerIds: string[];

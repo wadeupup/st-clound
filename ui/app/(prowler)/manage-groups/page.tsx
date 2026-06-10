@@ -19,7 +19,6 @@ import { CreateGroupTitle } from "./create-group-title";
 import { EditGroupTitle } from "./edit-group-title";
 import { GroupNotFound } from "./group-not-found";
 import { ManageGroupsPageClient } from "./manage-groups-page-client";
-import { UnavailableForRole } from "./unavailable-for-role";
 
 export default async function ManageGroupsPage({
   searchParams,

@@ -1,7 +1,8 @@
 "use client";
 import { useMemo } from "react";
-import { DataTableFilterCustom } from "@/components/ui/table";
+
 import { getFilterProviders } from "@/components/filters/providers-filters";
+import { DataTableFilterCustom } from "@/components/ui/table";
 import { useI18n } from "@/lib/i18n/context";
 
 export const ProvidersFilters = () => {
@@ -9,4 +10,3 @@ export const ProvidersFilters = () => {
   const filters = useMemo(() => getFilterProviders(t), [locale, t]);
   return <DataTableFilterCustom key={locale} filters={filters} />;
 };
-

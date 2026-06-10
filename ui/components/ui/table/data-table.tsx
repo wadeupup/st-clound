@@ -89,7 +89,7 @@ export function DataTable<TData, TValue>({
 
   return (
     <>
-      <div className="minimal-scrollbar rounded-xl shadow-lg border-slate-200 bg-white/80 backdrop-blur-sm dark:border-slate-800 dark:bg-slate-900/80 relative z-0 flex w-full flex-col justify-between gap-4 overflow-auto border p-4">
+      <div className="minimal-scrollbar relative z-0 flex w-full flex-col justify-between gap-4 overflow-auto rounded-xl border border-slate-200 bg-white/80 p-4 shadow-lg backdrop-blur-sm dark:border-slate-800 dark:bg-slate-900/80">
         <Table>
           <TableHeader key={headerKey}>
             {table.getHeaderGroups().map((headerGroup) => (

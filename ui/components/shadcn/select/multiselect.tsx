@@ -121,14 +121,14 @@ export function MultiSelectTrigger({
         data-slot="multiselect-trigger"
         data-size={size}
         className={cn(
-          "border-slate-200 bg-white/80 backdrop-blur-sm text-slate-900 data-[placeholder]:text-slate-500 [&_svg:not([class*='text-'])]:text-slate-600 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:border-slate-800 dark:bg-slate-900/80 dark:text-slate-100 dark:data-[placeholder]:text-slate-400 dark:[&_svg:not([class*='text-'])]:text-slate-400 focus-visible:border-slate-300 focus-visible:ring-slate-300 dark:focus-visible:border-slate-700 dark:focus-visible:ring-slate-700 flex w-full items-center justify-between gap-2 rounded-lg border px-4 py-3 text-sm whitespace-nowrap shadow-sm transition-[color,box-shadow] outline-none focus-visible:ring-1 focus-visible:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50 data-[size=default]:h-[52px] data-[size=sm]:h-10 *:data-[slot=multiselect-value]:line-clamp-1 *:data-[slot=multiselect-value]:flex *:data-[slot=multiselect-value]:items-center *:data-[slot=multiselect-value]:gap-2 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-6",
+          "aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive flex w-full items-center justify-between gap-2 rounded-lg border border-slate-200 bg-white/80 px-4 py-3 text-sm whitespace-nowrap text-slate-900 shadow-sm backdrop-blur-sm transition-[color,box-shadow] outline-none focus-visible:border-slate-300 focus-visible:ring-1 focus-visible:ring-slate-300 focus-visible:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50 data-[placeholder]:text-slate-500 data-[size=default]:h-[52px] data-[size=sm]:h-10 *:data-[slot=multiselect-value]:line-clamp-1 *:data-[slot=multiselect-value]:flex *:data-[slot=multiselect-value]:items-center *:data-[slot=multiselect-value]:gap-2 dark:border-slate-800 dark:bg-slate-900/80 dark:text-slate-100 dark:focus-visible:border-slate-700 dark:focus-visible:ring-slate-700 dark:data-[placeholder]:text-slate-400 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-6 [&_svg:not([class*='text-'])]:text-slate-600 dark:[&_svg:not([class*='text-'])]:text-slate-400",
           className,
         )}
       >
         {children}
         <ChevronDown
           className={cn(
-            "text-slate-600 dark:text-slate-400 size-6 shrink-0 opacity-70 transition-transform duration-200",
+            "size-6 shrink-0 text-slate-600 opacity-70 transition-transform duration-200 dark:text-slate-400",
             open && "rotate-180",
           )}
         />
@@ -216,7 +216,7 @@ export function MultiSelectValue({
       )}
     >
       {placeholder && (
-        <span className="text-slate-500 dark:text-slate-400 shrink-0 font-normal">
+        <span className="shrink-0 font-normal text-slate-500 dark:text-slate-400">
           {placeholder}
         </span>
       )}
@@ -226,7 +226,7 @@ export function MultiSelectValue({
           <Badge
             variant="outline"
             data-selected-item
-            className="text-slate-900 dark:text-slate-100 group flex items-center gap-1.5 border-slate-200 bg-slate-100 px-2 py-1 text-xs font-medium dark:border-slate-700 dark:bg-slate-800"
+            className="group flex items-center gap-1.5 border-slate-200 bg-slate-100 px-2 py-1 text-xs font-medium text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
             key={value}
             onClick={
               clickToRemove
@@ -239,7 +239,7 @@ export function MultiSelectValue({
           >
             {items.get(value)}
             {clickToRemove && (
-              <XIcon className="text-slate-600 dark:text-slate-400 group-hover:text-destructive size-3 transition-colors" />
+              <XIcon className="group-hover:text-destructive size-3 text-slate-600 transition-colors dark:text-slate-400" />
             )}
           </Badge>
         ))}
@@ -249,7 +249,7 @@ export function MultiSelectValue({
         }}
         variant="outline"
         ref={overflowRef}
-        className="text-slate-900 dark:text-slate-100 border-slate-200 bg-slate-100 px-2 py-1 text-xs font-medium dark:border-slate-700 dark:bg-slate-800"
+        className="border-slate-200 bg-slate-100 px-2 py-1 text-xs font-medium text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
       >
         +{overflowAmount}
       </Badge>
@@ -283,7 +283,7 @@ export function MultiSelectContent({
         align="start"
         data-slot="multiselect-content"
         className={cn(
-          "bg-white/80 backdrop-blur-sm text-slate-900 dark:bg-slate-900/80 dark:text-slate-100 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 border-slate-200 dark:border-slate-800 relative z-50 rounded-lg border shadow-lg p-0",
+          "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 relative z-50 rounded-lg border border-slate-200 bg-white/80 p-0 text-slate-900 shadow-lg backdrop-blur-sm dark:border-slate-800 dark:bg-slate-900/80 dark:text-slate-100",
           widthClasses,
         )}
       >
@@ -301,7 +301,7 @@ export function MultiSelectContent({
           <CommandList className="minimal-scrollbar max-h-[300px] overflow-x-hidden overflow-y-auto">
             <div className="flex flex-col gap-1 p-3">
               {canSearch && (
-                <CommandEmpty className="text-slate-600 dark:text-slate-400 py-6 text-center text-sm">
+                <CommandEmpty className="py-6 text-center text-sm text-slate-600 dark:text-slate-400">
                   {typeof search === "object" ? search.emptyMessage : undefined}
                 </CommandEmpty>
               )}
@@ -338,7 +338,7 @@ export function MultiSelectItem({
       value={value}
       data-slot="multiselect-item"
       className={cn(
-        "focus:bg-slate-100 focus:text-slate-900 dark:focus:bg-slate-800/50 dark:focus:text-slate-100 [&_svg:not([class*='text-'])]:text-slate-600 dark:[&_svg:not([class*='text-'])]:text-slate-400 text-slate-900 dark:text-slate-100 flex w-full cursor-pointer items-center justify-between gap-3 rounded-lg px-4 py-3 text-sm outline-hidden select-none hover:bg-slate-100 dark:hover:bg-slate-800/50 data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-5",
+        "flex w-full cursor-pointer items-center justify-between gap-3 rounded-lg px-4 py-3 text-sm text-slate-900 outline-hidden select-none hover:bg-slate-100 focus:bg-slate-100 focus:text-slate-900 data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50 dark:text-slate-100 dark:hover:bg-slate-800/50 dark:focus:bg-slate-800/50 dark:focus:text-slate-100 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-5 [&_svg:not([class*='text-'])]:text-slate-600 dark:[&_svg:not([class*='text-'])]:text-slate-400",
         isSelected && "bg-slate-100 dark:bg-slate-800/50",
         className,
       )}
@@ -350,7 +350,7 @@ export function MultiSelectItem({
       <span className="flex min-w-0 flex-1 items-center gap-2">{children}</span>
       <CheckIcon
         className={cn(
-          "text-slate-600 dark:text-slate-400 size-5 shrink-0",
+          "size-5 shrink-0 text-slate-600 dark:text-slate-400",
           isSelected ? "opacity-100" : "opacity-0",
         )}
       />
@@ -401,12 +401,12 @@ export function MultiSelectSelectAll({
     <button
       type="button"
       data-slot="multiselect-select-all"
-        className={cn(
-          "focus:bg-slate-100 focus:text-slate-900 dark:focus:bg-slate-800/50 dark:focus:text-slate-100 [&_svg:not([class*='text-'])]:text-slate-600 dark:[&_svg:not([class*='text-'])]:text-slate-400 text-slate-900 dark:text-slate-100 flex w-full cursor-pointer items-center justify-between gap-3 rounded-lg px-4 py-3 text-sm outline-hidden select-none hover:bg-slate-100 dark:hover:bg-slate-800/50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-5",
-          hasSelections && "text-destructive hover:text-destructive",
-          "font-semibold",
-          className,
-        )}
+      className={cn(
+        "flex w-full cursor-pointer items-center justify-between gap-3 rounded-lg px-4 py-3 text-sm text-slate-900 outline-hidden select-none hover:bg-slate-100 focus:bg-slate-100 focus:text-slate-900 dark:text-slate-100 dark:hover:bg-slate-800/50 dark:focus:bg-slate-800/50 dark:focus:text-slate-100 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-5 [&_svg:not([class*='text-'])]:text-slate-600 dark:[&_svg:not([class*='text-'])]:text-slate-400",
+        hasSelections && "text-destructive hover:text-destructive",
+        "font-semibold",
+        className,
+      )}
       onClick={handleClearAll}
       {...props}
     >

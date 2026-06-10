@@ -38,28 +38,31 @@ export const MembershipItem = ({
           setIsOpen={setIsEditOpen}
         />
       </CustomAlertModal>
-      <Card variant="inner" className="min-w-[320px] p-2 bg-slate-50/50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
+      <Card
+        variant="inner"
+        className="min-w-[320px] border-slate-200 bg-slate-50/50 p-2 dark:border-slate-700 dark:bg-slate-800/50"
+      >
         <div className="flex w-full items-center gap-4">
           <Chip size="sm" variant="flat" color="secondary">
             {membership.attributes.role}
           </Chip>
 
           <div className="flex flex-row flex-wrap gap-1 gap-x-4">
-            <InfoField 
-              label={t.profile.name} 
-              inline 
+            <InfoField
+              label={t.profile.name}
+              inline
               variant="transparent"
-              className="[&>span]:text-slate-600 [&>span]:dark:text-slate-400 [&>div]:text-slate-900 [&>div]:dark:text-slate-100"
+              className="[&>div]:text-slate-900 [&>div]:dark:text-slate-100 [&>span]:text-slate-600 [&>span]:dark:text-slate-400"
             >
               <span className="font-semibold whitespace-nowrap text-slate-900 dark:text-slate-100">
                 {tenantName}
               </span>
             </InfoField>
-            <InfoField 
-              label={t.profile.joinedOn} 
-              inline 
+            <InfoField
+              label={t.profile.joinedOn}
+              inline
               variant="transparent"
-              className="[&>span]:text-slate-600 [&>span]:dark:text-slate-400 [&>div]:text-slate-900 [&>div]:dark:text-slate-100"
+              className="[&>div]:text-slate-900 [&>div]:dark:text-slate-100 [&>span]:text-slate-600 [&>span]:dark:text-slate-400"
             >
               <DateWithTime
                 inline

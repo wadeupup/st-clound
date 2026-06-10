@@ -10,4 +10,3 @@ export const ErrorDisplay = ({ error }: { error: string }) => {
     </div>
   );
 };
-

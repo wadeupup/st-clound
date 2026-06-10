@@ -47,7 +47,9 @@ export const FilterControls: React.FC<FilterControlsProps> = ({
         </div>
       </div>
       <Spacer y={8} />
-      {customFilters && <DataTableFilterCustom key={locale} filters={customFilters} />}
+      {customFilters && (
+        <DataTableFilterCustom key={locale} filters={customFilters} />
+      )}
     </div>
   );
 };

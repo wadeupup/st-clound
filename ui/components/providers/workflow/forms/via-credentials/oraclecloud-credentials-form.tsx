@@ -81,9 +81,7 @@ export const OracleCloudCredentialsForm = ({
         variant="bordered"
         isRequired={false}
       />
-      <div className="text-default-400 text-xs">
-        {labels.ociPrivateKeyNote}
-      </div>
+      <div className="text-default-400 text-xs">{labels.ociPrivateKeyNote}</div>
     </>
   );
 };

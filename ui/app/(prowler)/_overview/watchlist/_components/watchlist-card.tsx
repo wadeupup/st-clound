@@ -96,13 +96,13 @@ export const WatchlistCard = ({
             {/* Icon and message */}
             <div className="flex flex-col items-center gap-6 pb-[18px]">
               <SearchX size={64} className="text-bg-data-muted" />
-              <p className="text-slate-600 dark:text-slate-400 w-full text-center text-sm leading-6">
+              <p className="w-full text-center text-sm leading-6 text-slate-600 dark:text-slate-400">
                 {emptyState?.message || "This space is looking empty."}
               </p>
             </div>
 
             {/* Description with link */}
-            <p className="text-slate-600 dark:text-slate-400 w-full text-sm leading-6">
+            <p className="w-full text-sm leading-6 text-slate-600 dark:text-slate-400">
               {emptyState?.description && ctaHref && (
                 <>
                   Visit the{" "}
@@ -150,9 +150,10 @@ export const WatchlistCard = ({
                   }}
                   className={cn(
                     "flex h-[54px] items-center justify-between gap-2 px-3 py-[11px]",
-                    !isLast && "border-slate-200 dark:border-slate-700 border-b",
+                    !isLast &&
+                      "border-b border-slate-200 dark:border-slate-700",
                     isClickable &&
-                      "hover:bg-slate-100 dark:hover:bg-slate-800/50 cursor-pointer",
+                      "cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800/50",
                   )}
                 >
                   {item.icon && (
@@ -161,7 +162,7 @@ export const WatchlistCard = ({
                     </div>
                   )}
 
-                  <p className="text-slate-900 dark:text-slate-100 flex-1 truncate text-sm leading-6">
+                  <p className="flex-1 truncate text-sm leading-6 text-slate-900 dark:text-slate-100">
                     {item.label}
                   </p>
                   <div className="flex items-center gap-1.5">

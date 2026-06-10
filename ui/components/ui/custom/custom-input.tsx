@@ -44,17 +44,13 @@ export const CustomInput = <T extends FieldValues>({
   const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] =
     useState(false);
 
-  const inputLabel = label || (confirmPassword
-    ? "Confirm Password"
-    : password
-      ? "Password"
-      : name);
+  const inputLabel =
+    label ||
+    (confirmPassword ? "Confirm Password" : password ? "Password" : name);
 
-  const inputPlaceholder = placeholder || (confirmPassword
-    ? "Confirm Password"
-    : password
-      ? "Password"
-      : undefined);
+  const inputPlaceholder =
+    placeholder ||
+    (confirmPassword ? "Confirm Password" : password ? "Password" : undefined);
 
   const inputType =
     password || confirmPassword

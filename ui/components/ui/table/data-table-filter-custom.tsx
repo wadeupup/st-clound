@@ -16,8 +16,8 @@ import {
 } from "@/components/shadcn/select/multiselect";
 import { EntityInfo } from "@/components/ui/entities/entity-info";
 import { useUrlFilters } from "@/hooks/use-url-filters";
-import { useI18n } from "@/lib/i18n/context";
 import { isConnectionStatus, isScanEntity } from "@/lib/helper-filters";
+import { useI18n } from "@/lib/i18n/context";
 import {
   FilterEntity,
   FilterOption,
@@ -149,7 +149,9 @@ export const DataTableFilterCustom = ({
               <MultiSelectValue placeholder={filter.labelCheckboxGroup} />
             </MultiSelectTrigger>
             <MultiSelectContent search={false}>
-              <MultiSelectSelectAll>{t.findings.filters.selectAll}</MultiSelectSelectAll>
+              <MultiSelectSelectAll>
+                {t.findings.filters.selectAll}
+              </MultiSelectSelectAll>
               <MultiSelectSeparator />
               {filter.values.map((value) => {
                 const entity = getEntityForValue(filter, value);

@@ -5,10 +5,10 @@ import { Database } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 
 import { InfoIcon } from "@/components/icons";
-import { useI18n } from "@/lib/i18n/context";
 import { EntityInfo, SnippetChip } from "@/components/ui/entities";
 import { TriggerSheet } from "@/components/ui/sheet";
 import { DataTableColumnHeader } from "@/components/ui/table";
+import { useI18n } from "@/lib/i18n/context";
 import { ProviderType, ResourceProps } from "@/types";
 
 import { ResourceDetail } from "./resource-detail";
@@ -37,10 +37,10 @@ const getProviderData = (
   );
 };
 
-const ResourceDetailsCell = ({ 
-  row, 
-  t 
-}: { 
+const ResourceDetailsCell = ({
+  row,
+  t,
+}: {
   row: any;
   t: ReturnType<typeof useI18n>["t"];
 }) => {
@@ -74,7 +74,10 @@ export function getColumnResources(
     {
       id: "moreInfo",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={t.resources.table.details} />
+        <DataTableColumnHeader
+          column={column}
+          title={t.resources.table.details}
+        />
       ),
       cell: ({ row }) => <ResourceDetailsCell row={row} t={t} />,
       enableSorting: false,
@@ -82,7 +85,10 @@ export function getColumnResources(
     {
       accessorKey: "resourceName",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={t.resources.table.resourceName} />
+        <DataTableColumnHeader
+          column={column}
+          title={t.resources.table.resourceName}
+        />
       ),
       cell: ({ row }) => {
         const resourceName = getResourceData(row, "name");
@@ -104,7 +110,10 @@ export function getColumnResources(
     {
       accessorKey: "failedFindings",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={t.resources.table.failedFindings} />
+        <DataTableColumnHeader
+          column={column}
+          title={t.resources.table.failedFindings}
+        />
       ),
       cell: ({ row }) => {
         const failedFindingsCount = getResourceData(
@@ -125,14 +134,20 @@ export function getColumnResources(
     {
       accessorKey: "region",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={t.resources.table.region} param="region" />
+        <DataTableColumnHeader
+          column={column}
+          title={t.resources.table.region}
+          param="region"
+        />
       ),
       cell: ({ row }) => {
         const region = getResourceData(row, "region");
 
         return (
           <div className="w-[80px] text-xs">
-            {typeof region === "string" ? region : t.resources.table.invalidRegion}
+            {typeof region === "string"
+              ? region
+              : t.resources.table.invalidRegion}
           </div>
         );
       },
@@ -140,7 +155,11 @@ export function getColumnResources(
     {
       accessorKey: "type",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={t.resources.table.type} param="type" />
+        <DataTableColumnHeader
+          column={column}
+          title={t.resources.table.type}
+          param="type"
+        />
       ),
       cell: ({ row }) => {
         const type = getResourceData(row, "type");
@@ -166,7 +185,9 @@ export function getColumnResources(
 
         return (
           <div className="max-w-96 truncate text-xs">
-            {typeof service === "string" ? service : t.resources.table.invalidRegion}
+            {typeof service === "string"
+              ? service
+              : t.resources.table.invalidRegion}
           </div>
         );
       },
@@ -174,7 +195,10 @@ export function getColumnResources(
     {
       accessorKey: "provider",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={t.resources.table.cloudProvider} />
+        <DataTableColumnHeader
+          column={column}
+          title={t.resources.table.cloudProvider}
+        />
       ),
       cell: ({ row }) => {
         const provider = getProviderData(row, "provider", t);
@@ -184,7 +208,9 @@ export function getColumnResources(
           <>
             <EntityInfo
               cloudProvider={provider as ProviderType}
-              entityAlias={alias && typeof alias === "string" ? alias : undefined}
+              entityAlias={
+                alias && typeof alias === "string" ? alias : undefined
+              }
               entityId={uid && typeof uid === "string" ? uid : undefined}
             />
           </>

@@ -6,4 +6,3 @@ export function ManageGroupsTitle() {
   const { t } = useI18n();
   return <>{t.providers.providerGroups.manageGroups}</>;
 }
-

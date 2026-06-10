@@ -1,7 +1,6 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { useMemo } from "react";
 
 import { DateWithTime } from "@/components/ui/entities";
 import { DataTableColumnHeader } from "@/components/ui/table";
@@ -23,17 +22,27 @@ export const getColumnsUser = (
     {
       accessorKey: "name",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={t.users.table.name} param="name" />
+        <DataTableColumnHeader
+          column={column}
+          title={t.users.table.name}
+          param="name"
+        />
       ),
       cell: ({ row }) => {
         const data = getUserData(row);
-        return <p className="font-semibold">{data?.name || t.users.table.nA}</p>;
+        return (
+          <p className="font-semibold">{data?.name || t.users.table.nA}</p>
+        );
       },
     },
     {
       accessorKey: "email",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={t.users.table.email} param="email" />
+        <DataTableColumnHeader
+          column={column}
+          title={t.users.table.email}
+          param="email"
+        />
       ),
       cell: ({ row }) => {
         const { email } = getUserData(row);
@@ -47,7 +56,9 @@ export const getColumnsUser = (
       ),
       cell: ({ row }) => {
         const { role } = getUserData(row);
-        return <p className="font-semibold">{role?.name || t.users.table.noRole}</p>;
+        return (
+          <p className="font-semibold">{role?.name || t.users.table.noRole}</p>
+        );
       },
       enableSorting: false,
     },

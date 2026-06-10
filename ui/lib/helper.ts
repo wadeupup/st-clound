@@ -18,7 +18,8 @@ import {
 import { AuthSocialProvider, MetaDataProps, PermissionInfo } from "@/types";
 
 export const baseUrl = process.env.AUTH_URL || "http://localhost:3000";
-export const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+export const apiBaseUrl =
+  process.env.API_BASE_URL || process.env.NEXT_PUBLIC_API_BASE_URL;
 
 /**
  * Extracts a form value from a FormData object
@@ -65,7 +66,9 @@ export const getAuthHeaders = async (options?: { contentType?: boolean }) => {
   try {
     const { cookies } = await import("next/headers");
     const cookieStore = await cookies();
-    localeFromCookie = normalizeLocale(cookieStore.get(LOCALE_STORAGE_KEY)?.value);
+    localeFromCookie = normalizeLocale(
+      cookieStore.get(LOCALE_STORAGE_KEY)?.value,
+    );
   } catch {
     localeFromCookie = undefined;
   }
@@ -77,10 +80,6 @@ export const getAuthHeaders = async (options?: { contentType?: boolean }) => {
     Authorization: `Bearer ${session?.accessToken}`,
     "Accept-Language": acceptLanguage,
   };
-
-  console.log("[Next.js -> Backend] Request header: Accept-Language", {
-    "Accept-Language": acceptLanguage,
-  });
 
   if (options?.contentType) {
     headers["Content-Type"] = "application/vnd.api+json";
@@ -147,7 +146,8 @@ const DEFAULT_DOWNLOAD_MESSAGES: DownloadMessages = {
   unknownError: "An unknown error occurred.",
   processingError: "An error occurred while processing the file.",
   unexpectedResponse: "Unexpected response. Please try again later.",
-  maxRetriesExceeded: "The report is still being generated. Please try again later.",
+  maxRetriesExceeded:
+    "The report is still being generated. Please try again later.",
   unexpectedTaskState: "Unexpected task state.",
 };
 

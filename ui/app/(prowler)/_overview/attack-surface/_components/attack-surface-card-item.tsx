@@ -60,7 +60,7 @@ export function AttackSurfaceCardItem({
         >
           {item.failedFindings}
         </span>
-        <span className="text-slate-600 dark:text-slate-400 text-sm leading-6">
+        <span className="text-sm leading-6 text-slate-600 dark:text-slate-400">
           {item.label}
         </span>
       </CardContent>

@@ -1,9 +1,10 @@
 "use client";
 import { useMemo } from "react";
-import { DataTable } from "@/components/ui/table";
+
 import { getColumnProviders } from "@/components/providers/table";
+import { DataTable } from "@/components/ui/table";
 import { useI18n } from "@/lib/i18n/context";
-import { ProviderProps, MetaDataProps } from "@/types";
+import { MetaDataProps, ProviderProps } from "@/types";
 
 interface ProvidersTableClientProps {
   data: ProviderProps[];
@@ -18,12 +19,6 @@ export const ProvidersTableClient = ({
   const columns = useMemo(() => getColumnProviders(t), [locale, t]);
 
   return (
-    <DataTable
-      key={locale}
-      columns={columns}
-      data={data}
-      metadata={metadata}
-    />
+    <DataTable key={locale} columns={columns} data={data} metadata={metadata} />
   );
 };
-

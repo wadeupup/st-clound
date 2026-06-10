@@ -24,11 +24,17 @@ const getProviderData = (row: { original: ProviderProps }) => {
   };
 };
 
-export const getColumnProviders = (t: Translations): ColumnDef<ProviderProps>[] => [
+export const getColumnProviders = (
+  t: Translations,
+): ColumnDef<ProviderProps>[] => [
   {
     accessorKey: "account",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title={t.providers.table.provider} param="alias" />
+      <DataTableColumnHeader
+        column={column}
+        title={t.providers.table.provider}
+        param="alias"
+      />
     ),
     cell: ({ row }) => {
       const {
@@ -47,7 +53,10 @@ export const getColumnProviders = (t: Translations): ColumnDef<ProviderProps>[] 
   {
     accessorKey: "scanJobs",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title={t.providers.table.scanJobs} />
+      <DataTableColumnHeader
+        column={column}
+        title={t.providers.table.scanJobs}
+      />
     ),
     cell: ({ row }) => {
       const {

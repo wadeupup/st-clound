@@ -9,4 +9,3 @@ export const ErrorDisplay = ({ type }: { type: "invalidId" | "notFound" }) => {
       : t.invitations.checkDetails.notFound;
   return <div>{message}</div>;
 };
-

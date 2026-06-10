@@ -1,5 +1,3 @@
-import { check } from "zod";
-
 export const zh = {
   sidebar: {
     overview: "概览",
@@ -180,7 +178,8 @@ export const zh = {
       noRiskData: "所选提供商没有可用的风险数据",
       providersNoScans: "{count} 个提供商没有完成的扫描",
       riskPlotTitle: "风险图表",
-      riskPlotDescription: "威胁评分是基于严重性加权的，而非基于数量。严重性更高的发现对评分的影响更大。",
+      riskPlotDescription:
+        "威胁评分是基于严重性加权的，而非基于数量。严重性更高的发现对评分的影响更大。",
       failFindings: "失败发现",
       threatScore: "威胁评分",
       checkOutOnFindings: "查看发现",
@@ -274,7 +273,8 @@ export const zh = {
       region: "区域",
       firstSeen: "首次出现",
       delta: "增量",
-      deltaTooltip: "指示发现是新的（NEW）、状态已更改（CHANGED）还是与之前的扫描相比保持不变（NONE）。",
+      deltaTooltip:
+        "指示发现是新的（NEW）、状态已更改（CHANGED）还是与之前的扫描相比保持不变（NONE）。",
       severity: "严重性",
       findingId: "发现ID",
       checkId: "检查ID",
@@ -344,7 +344,7 @@ export const zh = {
     },
     checks: {
       //
-    }
+    },
   },
   resources: {
     title: "资源",
@@ -415,7 +415,8 @@ export const zh = {
       workflowDescription: "完成这些步骤以配置您的云提供商并启动首次扫描。",
       steps: "步骤",
       step1Title: "选择您的云提供商",
-      step1Description: "选择您要连接的云提供商，并从支持的选项中选择您首选的认证方法。",
+      step1Description:
+        "选择您要连接的云提供商，并从支持的选项中选择您首选的认证方法。",
       step2Title: "输入认证详情",
       step2Description: "提供必要的凭据以建立与所选云提供商的安全连接。",
       step3Title: "验证连接并开始扫描",
@@ -423,7 +424,8 @@ export const zh = {
       testConnection: {
         title: "检查连接并启动扫描",
         titleUpdated: "检查连接",
-        description: "连接成功后，扫描将每 24 小时自动运行一次。要运行单次扫描，请选择下面的复选框。",
+        description:
+          "连接成功后，扫描将每 24 小时自动运行一次。要运行单次扫描，请选择下面的复选框。",
         descriptionUpdated: "连接成功后将重定向到提供商页面。",
         providerIdError: "提供商 ID {error}。请检查并重试。",
         unknownError: "未知错误",
@@ -447,7 +449,7 @@ export const zh = {
       readTheDocs: "阅读文档",
       searchProviders: "搜索提供商",
       searchProvidersPlaceholder: "搜索提供商...",
-      noProvidersFound: "未找到匹配 \"{term}\" 的提供商",
+      noProvidersFound: '未找到匹配 "{term}" 的提供商',
       providerAlias: "提供商别名（可选）",
       providerAliasPlaceholder: "输入提供商别名",
       back: "返回",
@@ -495,9 +497,12 @@ export const zh = {
         awsCredentialsDescription: "请提供您的 AWS 凭据信息。",
         gcpCredentialsDescription: "请提供您的 GCP 凭据信息。",
         gcpServiceAccountKeyDescription: "请提供您的 GCP 凭据服务账号密钥。",
-        kubernetesCredentialsDescription: "请提供您的 Kubernetes 凭据 kubeconfig 内容。",
-        mongoAtlasKeysDescription: "请提供组织级 MongoDB Atlas API 公钥和私钥，并确保其对要由 Prowler 评估的资源具有读取权限。",
-        ociApiKeyDescription: "请提供您的 Oracle Cloud Infrastructure API 密钥凭据。",
+        kubernetesCredentialsDescription:
+          "请提供您的 Kubernetes 凭据 kubeconfig 内容。",
+        mongoAtlasKeysDescription:
+          "请提供组织级 MongoDB Atlas API 公钥和私钥，并确保其对要由 Prowler 评估的资源具有读取权限。",
+        ociApiKeyDescription:
+          "请提供您的 Oracle Cloud Infrastructure API 密钥凭据。",
         usingServiceAccount: "使用服务账号",
         connectUsingServiceAccount: "使用服务账号连接",
         connectViaServiceAccountKey: "通过服务账号密钥连接",
@@ -518,28 +523,37 @@ export const zh = {
         atlasPublicKey: "Atlas 公钥",
         atlasPrivateKey: "Atlas 私钥",
         enterPrivateKey: "输入私钥",
-        mongoAtlasKeySecurityNote: "密钥不会以未加密形式离开您的浏览器，并会作为密钥存储在后端。如有需要，可随时从 MongoDB Atlas 轮换该密钥。",
+        mongoAtlasKeySecurityNote:
+          "密钥不会以未加密形式离开您的浏览器，并会作为密钥存储在后端。如有需要，可随时从 MongoDB Atlas 轮换该密钥。",
         userOcid: "用户 OCID",
         fingerprint: "指纹",
         enterApiKeyFingerprint: "输入 API 密钥指纹",
         region: "区域",
+        awsRegions: "AWS 区域",
+        selectAwsRegions: "选择 AWS 区域",
         privateKeyContent: "私钥内容",
         passphraseOptional: "口令（可选）",
         enterPassphraseIfKeyEncrypted: "如果密钥已加密，请输入口令",
-        ociPrivateKeyNote: "粘贴 OCI 私钥文件的原始内容（PEM 格式）。该密钥将自动编码以便安全传输。",
+        ociPrivateKeyNote:
+          "粘贴 OCI 私钥文件的原始内容（PEM 格式）。该密钥将自动编码以便安全传输。",
         connectViaAccessKeys: "通过访问密钥连接",
-        alibabaAccessKeysDescription: "请提供 RAM 用户的 Access Key ID 和 Access Key Secret，并确保其对要由 Prowler 评估的资源具有读取权限。",
+        alibabaAccessKeysDescription:
+          "请提供 RAM 用户的 Access Key ID 和 Access Key Secret，并确保其对要由 Prowler 评估的资源具有读取权限。",
         usingRamRole: "使用 RAM 角色",
         accessKeyId: "Access Key ID",
         accessKeySecret: "Access Key Secret",
         enterAccessKeySecret: "输入 Access Key Secret",
-        alibabaAccessKeySecurityNote: "密钥不会以未加密形式离开您的浏览器，并会作为密钥存储在后端。如有需要，可随时从 Alibaba Cloud RAM 控制台轮换该密钥。",
+        alibabaAccessKeySecurityNote:
+          "密钥不会以未加密形式离开您的浏览器，并会作为密钥存储在后端。如有需要，可随时从 Alibaba Cloud RAM 控制台轮换该密钥。",
         connectAssumingRamRole: "通过 RAM 角色连接",
-        alibabaRamRoleDescription: "请提供要承担的 RAM 角色 ARN，以及有权限承担该角色的 RAM 用户访问密钥。",
+        alibabaRamRoleDescription:
+          "请提供要承担的 RAM 角色 ARN，以及有权限承担该角色的 RAM 用户访问密钥。",
         ramRoleToAssume: "要承担的 RAM 角色",
         credentialsForRoleAssumption: "角色承担凭据",
-        enterRoleSessionNameWithDefault: "输入角色会话名称（默认：ProwlerSession）",
-        alibabaRoleSecurityNote: "密钥不会以未加密形式离开您的浏览器，并会作为密钥存储在后端。该角色将通过 STS 承担以获取临时凭据。",
+        enterRoleSessionNameWithDefault:
+          "输入角色会话名称（默认：ProwlerSession）",
+        alibabaRoleSecurityNote:
+          "密钥不会以未加密形式离开您的浏览器，并会作为密钥存储在后端。该角色将通过 STS 承担以获取临时凭据。",
         prowlerCloudAssumeRole: "Prowler Cloud 将承担您的 IAM 角色",
         awsSdkDefault: "AWS SDK 默认",
         accessSecretKey: "访问密钥和密钥",
@@ -564,7 +578,8 @@ export const zh = {
         readOnlyRoleMustBeCreatedSuffix: "",
         readOnlyRole: "只读 IAM 角色",
         orUpdated: "或更新",
-        useCloudFormationQuickLink: "使用以下 AWS CloudFormation 快速链接创建 IAM 角色",
+        useCloudFormationQuickLink:
+          "使用以下 AWS CloudFormation 快速链接创建 IAM 角色",
         or: "或",
         referToDocumentation: "参考文档",
         useTemplateToCreateRole: "使用以下模板之一创建 IAM 角色",
@@ -605,7 +620,8 @@ export const zh = {
         deleteProviderGroup: "删除提供商组",
         deleteProviderGroupDescription: "永久删除提供商组",
         deleteConfirmTitle: "您确定吗？",
-        deleteConfirmDescription: "此操作无法撤销。这将永久删除您的提供商账户并从服务器中删除您的数据。",
+        deleteConfirmDescription:
+          "此操作无法撤销。这将永久删除您的提供商账户并从服务器中删除您的数据。",
       },
       forms: {
         providerGroupName: "提供商组名称",
@@ -613,8 +629,10 @@ export const zh = {
         providerGroupNameRequired: "提供商组名称是必需的",
         selectProviders: "选择提供商",
         selectRoles: "选择角色",
-        rolesOptionalDescription: "角色也可以与组关联。此步骤是可选的，如果需要，可以稍后完成或从角色页面完成。",
-        rolesEditDescription: "与组关联的角色可以在这里直接编辑或从角色页面编辑。",
+        rolesOptionalDescription:
+          "角色也可以与组关联。此步骤是可选的，如果需要，可以稍后完成或从角色页面完成。",
+        rolesEditDescription:
+          "与组关联的角色可以在这里直接编辑或从角色页面编辑。",
         createGroup: "创建组",
         updateGroup: "更新组",
         cancel: "取消",
@@ -665,7 +683,8 @@ export const zh = {
       deleteProviderDescription: "永久删除提供商",
       editProviderAliasTitle: "编辑提供商别名",
       deleteConfirmTitle: "您确定吗？",
-      deleteConfirmDescription: "此操作无法撤销。这将永久删除您的提供商账户并从服务器中删除您的数据。",
+      deleteConfirmDescription:
+        "此操作无法撤销。这将永久删除您的提供商账户并从服务器中删除您的数据。",
     },
   },
   users: {
@@ -719,7 +738,8 @@ export const zh = {
     },
     deleteModal: {
       title: "您确定吗？",
-      description: "此操作无法撤销。这将永久删除您的用户账户并从服务器中移除您的数据。",
+      description:
+        "此操作无法撤销。这将永久删除您的用户账户并从服务器中移除您的数据。",
       cancel: "取消",
       delete: "删除",
       loading: "加载中",
@@ -879,7 +899,8 @@ export const zh = {
     },
     deleteModal: {
       title: "您确定吗？",
-      description: "此操作无法撤销。这将永久删除您的角色并从服务器中移除您的数据。",
+      description:
+        "此操作无法撤销。这将永久删除您的角色并从服务器中移除您的数据。",
       cancel: "取消",
       delete: "删除",
       loading: "加载中",
@@ -990,8 +1011,10 @@ export const zh = {
       noProvidersConfiguredDescription: "尚未配置云提供商。请先设置云提供商。",
       getStarted: "开始使用",
       noConnectedCloudProviders: "未连接云提供商",
-      noConnectedProvidersDescription: "当前没有连接的云提供商。连接云提供商是启动按需扫描所必需的。",
-      noConnectedProvidersDescription2: "一旦云提供商正确配置，此消息将消失，可以启动按需扫描。",
+      noConnectedProvidersDescription:
+        "当前没有连接的云提供商。连接云提供商是启动按需扫描所必需的。",
+      noConnectedProvidersDescription2:
+        "一旦云提供商正确配置，此消息将消失，可以启动按需扫描。",
       reviewCloudProviders: "查看云提供商",
     },
     linkToScans: {

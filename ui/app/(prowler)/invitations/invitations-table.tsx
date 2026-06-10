@@ -1,8 +1,9 @@
 "use client";
 import { useMemo } from "react";
-import { useI18n } from "@/lib/i18n/context";
-import { DataTable } from "@/components/ui/table";
+
 import { getColumnsInvitation } from "@/components/invitations/table/column-invitations";
+import { DataTable } from "@/components/ui/table";
+import { useI18n } from "@/lib/i18n/context";
 import { InvitationProps, MetaDataProps } from "@/types";
 
 export function InvitationsTable({
@@ -14,18 +15,9 @@ export function InvitationsTable({
 }) {
   const { t, locale } = useI18n();
 
-  const columns = useMemo(
-    () => getColumnsInvitation(t),
-    [t, locale],
-  );
+  const columns = useMemo(() => getColumnsInvitation(t), [t, locale]);
 
   return (
-    <DataTable
-      key={locale}
-      columns={columns}
-      data={data}
-      metadata={metadata}
-    />
+    <DataTable key={locale} columns={columns} data={data} metadata={metadata} />
   );
 }
-

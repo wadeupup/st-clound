@@ -13,11 +13,17 @@ const getProviderData = (row: { original: ProviderGroup }) => {
   return row.original;
 };
 
-export const getColumnGroups = (t: ReturnType<typeof useI18n>["t"]): ColumnDef<ProviderGroup>[] => [
+export const getColumnGroups = (
+  t: ReturnType<typeof useI18n>["t"],
+): ColumnDef<ProviderGroup>[] => [
   {
     accessorKey: "name",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title={t.providers.providerGroups.table.name} param="name" />
+      <DataTableColumnHeader
+        column={column}
+        title={t.providers.providerGroups.table.name}
+        param="name"
+      />
     ),
     cell: ({ row }) => {
       const {
@@ -30,7 +36,11 @@ export const getColumnGroups = (t: ReturnType<typeof useI18n>["t"]): ColumnDef<P
   {
     accessorKey: "providers_count",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title={t.providers.providerGroups.table.providers} param="name" />
+      <DataTableColumnHeader
+        column={column}
+        title={t.providers.providerGroups.table.providers}
+        param="name"
+      />
     ),
     cell: ({ row }) => {
       const {
@@ -49,7 +59,11 @@ export const getColumnGroups = (t: ReturnType<typeof useI18n>["t"]): ColumnDef<P
   {
     accessorKey: "roles_count",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title={t.providers.providerGroups.table.roles} param="roles" />
+      <DataTableColumnHeader
+        column={column}
+        title={t.providers.providerGroups.table.roles}
+        param="roles"
+      />
     ),
     cell: ({ row }) => {
       const {

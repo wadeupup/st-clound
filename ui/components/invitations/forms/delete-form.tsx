@@ -82,7 +82,9 @@ export const DeleteForm = ({
             disabled={isLoading}
           >
             {!isLoading && <DeleteIcon size={24} />}
-            {isLoading ? t.invitations.deleteModal.loading : t.invitations.deleteModal.revoke}
+            {isLoading
+              ? t.invitations.deleteModal.loading
+              : t.invitations.deleteModal.revoke}
           </Button>
         </div>
       </form>
