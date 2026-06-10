@@ -26,6 +26,35 @@ services:
       - /home/prowler/docker-entrypoint.sh
       - dev
 
+  worker:
+    image: cspm-backend-main-api:latest
+    hostname: prowler-worker
+    environment:
+      DJANGO_SETTINGS_MODULE: config.django.devel
+      PYTHONPATH: /home/prowler
+    env_file:
+      - path: .env
+        required: false
+    volumes:
+      - ./api/src/backend:/home/prowler/backend
+      - ./api/pyproject.toml:/home/prowler/pyproject.toml
+      - ./api/docker-entrypoint.sh:/home/prowler/docker-entrypoint.sh
+      - ./prowler:/home/prowler/prowler
+      - ./_data/api:/home/prowler/.config/prowler-api
+      - cspm_backend_output:/tmp/prowler_api_output
+    depends_on:
+      postgres:
+        condition: service_healthy
+      valkey:
+        condition: service_healthy
+    ulimits:
+      nofile:
+        soft: 65535
+        hard: 65535
+    entrypoint:
+      - /home/prowler/docker-entrypoint.sh
+      - worker
+
   postgres:
     image: postgres:16.3-alpine3.20
     hostname: postgres-db
