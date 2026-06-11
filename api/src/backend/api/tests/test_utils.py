@@ -8,9 +8,11 @@ from api.db_router import MainRouter
 from api.exceptions import InvitationTokenExpiredException
 from api.models import Integration, Invitation, Provider
 from api.utils import (
+    get_aws_sts_region,
     get_prowler_provider_kwargs,
     initialize_prowler_provider,
     merge_dicts,
+    prioritize_aws_sts_region,
     prowler_integration_connection_test,
     prowler_provider_connection_test,
     return_prowler_provider,
@@ -172,6 +174,28 @@ class TestProwlerProviderConnectionTest:
             key="value", provider_id="1234567890", raise_on_exception=False
         )
 
+    @patch("api.utils.return_prowler_provider")
+    def test_prowler_provider_connection_test_aws_uses_stable_sts_region(
+        self, mock_return_prowler_provider
+    ):
+        provider = MagicMock()
+        provider.provider = Provider.ProviderChoices.AWS.value
+        provider.uid = "1234567890"
+        provider.secret.secret = {
+            "key": "value",
+            "regions": ["ap-northeast-1", "us-east-1"],
+        }
+        mock_return_prowler_provider.return_value = MagicMock()
+
+        prowler_provider_connection_test(provider)
+
+        mock_return_prowler_provider.return_value.test_connection.assert_called_once_with(
+            key="value",
+            aws_region="us-east-1",
+            provider_id="1234567890",
+            raise_on_exception=False,
+        )
+
     @pytest.mark.django_db
     @patch("api.utils.return_prowler_provider")
     def test_prowler_provider_connection_test_without_secret(
@@ -234,7 +258,8 @@ class TestGetProwlerProviderKwargs:
         provider.secret = secret_mock
         provider.uid = provider_uid
 
-        result = get_prowler_provider_kwargs(provider)
+        with patch("api.utils.get_default_aws_regions", return_value=[]):
+            result = get_prowler_provider_kwargs(provider)
 
         expected_result = {**secret_dict, **expected_extra_kwargs}
         assert result == expected_result
@@ -253,10 +278,67 @@ class TestGetProwlerProviderKwargs:
         provider.secret = secret_mock
         provider.uid = provider_uid
 
-        result = get_prowler_provider_kwargs(provider, mutelist_processor)
+        with patch("api.utils.get_default_aws_regions", return_value=[]):
+            result = get_prowler_provider_kwargs(provider, mutelist_processor)
 
         expected_result = {**secret_dict, "mutelist_content": {"key": "value"}}
         assert result == expected_result
+
+    def test_get_aws_sts_region_prefers_us_east_1_when_present(self):
+        assert (
+            get_aws_sts_region(["ap-northeast-1", "us-east-1", "eu-west-1"])
+            == "us-east-1"
+        )
+
+    def test_get_aws_sts_region_falls_back_to_first_selected_region(self):
+        assert get_aws_sts_region(["ap-northeast-1", "eu-west-1"]) == "ap-northeast-1"
+
+    def test_prioritize_aws_sts_region_keeps_regions_ordered_and_deduplicated(self):
+        assert prioritize_aws_sts_region(
+            ["ap-northeast-1", "us-east-1", "ap-northeast-1", "eu-west-1"]
+        ) == ["us-east-1", "ap-northeast-1", "eu-west-1"]
+
+    def test_get_prowler_provider_kwargs_aws_keeps_regions_ordered_for_scans(self):
+        provider_uid = "provider_uid"
+        secret_dict = {
+            "key": "value",
+            "regions": ["ap-northeast-1", "us-east-1", "eu-west-1"],
+        }
+        secret_mock = MagicMock()
+        secret_mock.secret = secret_dict
+
+        provider = MagicMock()
+        provider.provider = Provider.ProviderChoices.AWS.value
+        provider.secret = secret_mock
+        provider.uid = provider_uid
+
+        result = get_prowler_provider_kwargs(provider)
+
+        assert result["regions"] == ["us-east-1", "ap-northeast-1", "eu-west-1"]
+        assert isinstance(result["regions"], list)
+
+    def test_get_prowler_provider_kwargs_aws_scan_regions_override_provider_regions(
+        self,
+    ):
+        provider_uid = "provider_uid"
+        secret_dict = {
+            "key": "value",
+            "regions": ["ap-northeast-1"],
+        }
+        secret_mock = MagicMock()
+        secret_mock.secret = secret_dict
+
+        provider = MagicMock()
+        provider.provider = Provider.ProviderChoices.AWS.value
+        provider.secret = secret_mock
+        provider.uid = provider_uid
+
+        result = get_prowler_provider_kwargs(
+            provider,
+            scanner_args={"regions": ["eu-west-1", "us-east-1"]},
+        )
+
+        assert result["regions"] == ["us-east-1", "eu-west-1"]
 
     def test_get_prowler_provider_kwargs_iac_provider(self):
         """Test that IaC provider gets correct kwargs with repository URL."""
@@ -352,7 +434,8 @@ class TestGetProwlerProviderKwargs:
         provider.secret = secret_mock
         provider.uid = provider_uid
 
-        result = get_prowler_provider_kwargs(provider)
+        with patch("api.utils.get_default_aws_regions", return_value=[]):
+            result = get_prowler_provider_kwargs(provider)
 
         expected_result = {}
         assert result == expected_result

@@ -27,6 +27,7 @@ from prowler.providers.mongodbatlas.mongodbatlas_provider import MongodbatlasPro
 from prowler.providers.oraclecloud.oraclecloud_provider import OraclecloudProvider
 
 AWS_DEFAULT_REGIONS_ENV_VAR = "PROWLER_AWS_DEFAULT_REGIONS"
+AWS_STS_PREFERRED_REGION = "us-east-1"
 
 
 class CustomOAuth2Client(OAuth2Client):
@@ -89,6 +90,26 @@ def normalize_aws_regions(regions) -> list[str]:
     return normalized_regions
 
 
+def get_aws_sts_region(regions: list[str] | None) -> str:
+    """Return a stable AWS region for STS credential validation."""
+    normalized_regions = normalize_aws_regions(regions)
+    if AWS_STS_PREFERRED_REGION in normalized_regions:
+        return AWS_STS_PREFERRED_REGION
+    if normalized_regions:
+        return normalized_regions[0]
+    return AWS_STS_PREFERRED_REGION
+
+
+def prioritize_aws_sts_region(regions: list[str] | None) -> list[str]:
+    """Keep requested regions stable while making STS validation deterministic."""
+    normalized_regions = normalize_aws_regions(regions)
+    if not normalized_regions:
+        return []
+
+    sts_region = get_aws_sts_region(normalized_regions)
+    return [sts_region, *[region for region in normalized_regions if region != sts_region]]
+
+
 def get_all_aws_regions(partition: str = "aws") -> list[str]:
     """Return all known AWS regions for a partition."""
     try:
@@ -105,15 +126,16 @@ def get_default_aws_regions(partition: str = "aws") -> list[str]:
     """
     configured_regions = normalize_aws_regions(os.getenv(AWS_DEFAULT_REGIONS_ENV_VAR))
     if configured_regions:
-        return configured_regions
-    return get_all_aws_regions(partition=partition)
+        return prioritize_aws_sts_region(configured_regions)
+    return prioritize_aws_sts_region(get_all_aws_regions(partition=partition))
 
 
 def get_aws_provider_regions(secret: dict | None) -> list[str]:
     """Return selected AWS regions from a provider secret."""
-    return normalize_aws_regions(
-        (secret or {}).get("regions")
-    ) or get_default_aws_regions()
+    selected_regions = normalize_aws_regions((secret or {}).get("regions"))
+    if selected_regions:
+        return prioritize_aws_sts_region(selected_regions)
+    return get_default_aws_regions()
 
 
 def return_prowler_provider(
@@ -189,7 +211,7 @@ def get_prowler_provider_kwargs(
         if regions:
             prowler_provider_kwargs = {
                 **prowler_provider_kwargs,
-                "regions": set(regions),
+                "regions": regions,
             }
     elif provider.provider == Provider.ProviderChoices.AZURE.value:
         prowler_provider_kwargs = {
@@ -287,7 +309,7 @@ def prowler_provider_connection_test(provider: Provider) -> Connection:
     if provider.provider == Provider.ProviderChoices.AWS.value:
         regions = get_aws_provider_regions(prowler_provider_kwargs)
         if regions:
-            prowler_provider_kwargs["aws_region"] = regions[0]
+            prowler_provider_kwargs["aws_region"] = get_aws_sts_region(regions)
         prowler_provider_kwargs.pop("regions", None)
 
     # For IaC provider, construct the kwargs properly for test_connection

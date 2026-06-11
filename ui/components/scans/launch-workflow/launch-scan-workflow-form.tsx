@@ -3,6 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/navigation";
+import { useEffect, useRef } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import * as z from "zod";
 
@@ -30,6 +31,7 @@ export const LaunchScanWorkflow = ({
   providers: ProviderInfo[];
 }) => {
   const router = useRouter();
+  const refreshTimeoutsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
   const formSchema = z.object({
     ...onDemandScanFormSchema().shape,
     scanName: z
@@ -56,6 +58,22 @@ export const LaunchScanWorkflow = ({
   const hasProviderSelected = Boolean(providerId);
 
   const isLoading = form.formState.isSubmitting;
+
+  useEffect(() => {
+    return () => {
+      refreshTimeoutsRef.current.forEach(clearTimeout);
+    };
+  }, []);
+
+  const refreshScansListAfterLaunch = () => {
+    refreshTimeoutsRef.current.forEach(clearTimeout);
+    refreshTimeoutsRef.current = [];
+
+    router.refresh();
+    refreshTimeoutsRef.current = [1000, 3000, 5000].map((delay) =>
+      setTimeout(() => router.refresh(), delay),
+    );
+  };
 
   const onSubmitClient = async (values: z.infer<typeof formSchema>) => {
     const formValues = { ...values };
@@ -87,7 +105,7 @@ export const LaunchScanWorkflow = ({
       });
       // Reset form after successful submission
       form.reset();
-      router.refresh();
+      refreshScansListAfterLaunch();
     }
   };
 
