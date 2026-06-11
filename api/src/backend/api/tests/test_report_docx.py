@@ -286,3 +286,47 @@ def test_build_findings_report_docx_supports_localized_detail_tables():
     assert "高" in text
     assert "IAM ユーザー MFA 有効化" in text
     assert "{{" not in text
+
+
+def test_build_findings_report_docx_replaces_localized_action_placeholders():
+    scan = SimpleNamespace(
+        id="scan-id",
+        name="生产 AWS 评估",
+        completed_at=datetime(2026, 6, 10, tzinfo=timezone.utc),
+        provider=SimpleNamespace(provider="aws", uid="123456789012"),
+    )
+    rows = [
+        {
+            "uid": "finding-1",
+            "status": "FAIL",
+            "severity": "high",
+            "check_id": "organizations_scp_check_deny_regions",
+            "check_title": "AWS Organization 使用 SCP 策略将操作限制在已配置的 AWS 区域内",
+            "description": "应通过 SCP 将账号操作限制在已批准的区域内。",
+            "risk": "未限制区域会带来治理风险。",
+            "remediation": "使用 SCP 限制未批准区域。\n定期复核允许区域列表。",
+            "resource_uid": "arn:aws:organizations::123456789012:account/o-example/123456789012",
+            "resource_name": "123456789012",
+            "region": "global",
+            "service": "organizations",
+            "resource_type": "Other",
+            "status_extended": "AWS Organizations 当前未使用。",
+        }
+    ]
+    findings = [
+        SimpleNamespace(
+            uid="finding-1",
+            check_id="organizations_scp_check_deny_regions",
+            check_metadata={
+                "checkid": "organizations_scp_check_deny_regions",
+                "categories": ["identity-access"],
+            },
+        )
+    ]
+
+    docx_bytes = build_findings_report_docx(scan, rows, findings, {}, locale="zh-CN")
+
+    text = _document_text(docx_bytes)
+    assert "使用 SCP 限制未批准区域。" in text
+    assert "定期复核允许区域列表。" in text
+    assert "启用 CloudTrail。" not in text

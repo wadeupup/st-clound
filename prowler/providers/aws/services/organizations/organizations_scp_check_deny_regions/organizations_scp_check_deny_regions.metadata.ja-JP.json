@@ -1,7 +1,7 @@
 {
   "Provider": "aws",
   "CheckID": "organizations_scp_check_deny_regions",
-  "CheckTitle": "AWS Organization restricts operations to only the configured AWS Regions with SCP policies",
+  "CheckTitle": "AWS Organization が SCP ポリシーで操作を設定済み AWS リージョンのみに制限している",
   "CheckType": [
     "Software and Configuration Checks/AWS Security Best Practices",
     "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices"
@@ -12,8 +12,8 @@
   "Severity": "high",
   "ResourceType": "Other",
   "ResourceGroup": "governance",
-  "Description": "**AWS Organizations SCPs** limit account actions to approved regions using conditions on `aws:RequestedRegion`.\n\nThis evaluates whether policies exist and fully restrict access to the configured allowlist, rather than only some regions.",
-  "Risk": "Without comprehensive Region limits, users or attackers can deploy resources in ungoverned locations, bypassing monitoring and guardrails.\n\nImpacts:\n- Data outside approved jurisdictions (confidentiality)\n- Policy gaps and drift (integrity)\n- IR blind spots and unexpected cost (availability)",
+  "Description": "**AWS Organizations SCP** は、`aws:RequestedRegion` 条件を使用してアカウント操作を承認済みリージョンに制限できます。\n\nこのチェックでは、関連ポリシーが存在し、設定された許可リージョンリストにアクセスを完全に制限しているかを評価します。一部のリージョンだけを制限している状態では不十分です。",
+  "Risk": "包括的なリージョン制限がない場合、ユーザーまたは攻撃者が管理対象外の場所にリソースをデプロイし、監視やガードレールを回避できる可能性があります。\n\n影響:\n- 承認されていない管轄区域外にデータが配置される（機密性）\n- ポリシーのギャップやドリフト（完全性）\n- インシデント対応の盲点や予期しないコスト（可用性）",
   "RelatedUrl": "",
   "AdditionalURLs": [
     "https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_scps_examples_general.html#example-scp-deny-region"
@@ -22,11 +22,11 @@
     "Code": {
       "CLI": "",
       "NativeIaC": "```yaml\n# CloudFormation: SCP denying requests outside approved regions\nResources:\n  <example_resource_name>Policy:\n    Type: AWS::Organizations::Policy\n    Properties:\n      Name: <example_resource_name>\n      Type: SERVICE_CONTROL_POLICY\n      Content:\n        Version: '2012-10-17'\n        Statement:\n          - Effect: Deny\n            Action: \"*\"\n            Resource: \"*\"\n            Condition:\n              StringNotEquals:\n                aws:RequestedRegion:\n                  - <REGION_1>  # Critical: only these regions are allowed; others are denied\n                  - <REGION_2>\n\n  <example_resource_name>Attachment:\n    Type: AWS::Organizations::PolicyAttachment\n    Properties:\n      PolicyId: !Ref <example_resource_name>Policy\n      TargetId: <example_resource_id>  # Critical: attach SCP to the root/OU/account\n```",
-      "Other": "1. In the AWS Management Console, go to AWS Organizations\n2. In Policies, ensure Service control policies are Enabled (click Enable if needed)\n3. Go to Policies > Service control policies > Create policy\n4. Paste this JSON as the policy content and save:\n   {\n     \"Version\": \"2012-10-17\",\n     \"Statement\": [{\n       \"Effect\": \"Deny\",\n       \"Action\": \"*\",\n       \"Resource\": \"*\",\n       \"Condition\": {\"StringNotEquals\": {\"aws:RequestedRegion\": [\"<REGION_1>\", \"<REGION_2>\"]}}\n     }]\n   }\n5. Attach the policy to the organization root (r-xxxx), target OU, or specific account\n6. Verify the policy is attached and shows as Applied to the intended target",
+      "Other": "1. AWS マネジメントコンソールで AWS Organizations を開きます\n2. Policies で Service control policies が有効であることを確認します（必要に応じて Enable をクリック）\n3. Policies > Service control policies > Create policy に進みます\n4. 以下の JSON をポリシー内容として貼り付け、保存します:\n   {\n     \"Version\": \"2012-10-17\",\n     \"Statement\": [{\n       \"Effect\": \"Deny\",\n       \"Action\": \"*\",\n       \"Resource\": \"*\",\n       \"Condition\": {\"StringNotEquals\": {\"aws:RequestedRegion\": [\"<REGION_1>\", \"<REGION_2>\"]}}\n     }]\n   }\n5. ポリシーを組織ルート（r-xxxx）、対象 OU、または特定アカウントにアタッチします\n6. ポリシーがアタッチされ、意図した対象に Applied と表示されることを確認します",
       "Terraform": "```hcl\n# Terraform: SCP denying requests outside approved regions\nresource \"aws_organizations_policy\" \"<example_resource_name>\" {\n  name = \"<example_resource_name>\"\n  type = \"SERVICE_CONTROL_POLICY\"\n  content = jsonencode({\n    Version   = \"2012-10-17\"\n    Statement = [\n      {\n        Effect   = \"Deny\"\n        Action   = \"*\"\n        Resource = \"*\"\n        Condition = {\n          StringNotEquals = {\n            \"aws:RequestedRegion\" = [\"<REGION_1>\", \"<REGION_2>\"] # Critical: only these regions are allowed; others are denied\n          }\n        }\n      }\n    ]\n  })\n}\n\nresource \"aws_organizations_policy_attachment\" \"<example_resource_name>\" {\n  policy_id = aws_organizations_policy.<example_resource_name>.id\n  target_id = \"<example_resource_id>\" # Critical: attach to the root (r-xxxx), OU (ou-xxxx), or account ID\n}\n```"
     },
     "Recommendation": {
-      "Text": "Enforce Region governance with **SCPs** that allow only approved regions via `aws:RequestedRegion` conditions (deny-by-default).\n\nApply across relevant OUs and accounts, with narrow exceptions for required global services. Review often; align to least privilege, data residency, and continuous monitoring.",
+      "Text": "**SCP** と `aws:RequestedRegion` 条件を使用してリージョンガバナンスを実施し、承認済みリージョンのみを許可します（デフォルト拒否）。\n\n関連する OU とアカウントに適用し、必要なグローバルサービスには限定的な例外を設定してください。定期的に見直し、最小権限、データレジデンシー、継続的監視の要件と整合させてください。",
       "Url": "https://hub.prowler.com/check/organizations_scp_check_deny_regions"
     }
   },

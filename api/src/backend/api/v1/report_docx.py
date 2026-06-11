@@ -1370,10 +1370,26 @@ def _populate_finding_block(
         _replace_table(tables[1], resource_rows)
 
     action_placeholders = [
-        "Enable CloudTrail.",
-        "Enable multi-region logging.",
-        "Store logs centrally in S3.",
-        "Configure log monitoring alerts.",
+        [
+            "Enable CloudTrail.",
+            "启用 CloudTrail。",
+            "CloudTrail を有効化してください。",
+        ],
+        [
+            "Enable multi-region logging.",
+            "启用多区域日志记录。",
+            "マルチリージョンログを有効化してください。",
+        ],
+        [
+            "Store logs centrally in S3.",
+            "将日志集中存储到 S3。",
+            "ログを S3 に集中保管してください。",
+        ],
+        [
+            "Configure log monitoring alerts.",
+            "配置日志监控告警。",
+            "ログ監視アラートを設定してください。",
+        ],
     ]
     reference_placeholders = ["AWS Documentation", "CIS Benchmark", "Vendor Guidance"]
     actions = detail["actions"]
@@ -1453,12 +1469,17 @@ def _populate_finding_block(
         if paragraph_text.startswith("CloudTrail logging is not enabled"):
             _set_paragraph_text(paragraph, detail["summary"])
             continue
-        if paragraph_text in action_placeholders:
-            index = action_placeholders.index(paragraph_text)
+        matched_action_placeholder = False
+        for index, placeholders in enumerate(action_placeholders):
+            if paragraph_text not in placeholders:
+                continue
             if index < len(actions):
                 _set_paragraph_text(paragraph, actions[index])
             else:
                 _remove_paragraph(paragraph)
+            matched_action_placeholder = True
+            break
+        if matched_action_placeholder:
             continue
         if paragraph_text in reference_placeholders:
             index = reference_placeholders.index(paragraph_text)
