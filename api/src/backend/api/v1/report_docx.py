@@ -3,6 +3,7 @@ import io
 import re
 import zipfile
 from collections import Counter, defaultdict
+from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -33,6 +34,214 @@ SEVERITY_COLORS = {
     "low": "375E1D",
     "informational": "1F4E79",
 }
+SUPPORTED_DOCX_LOCALES = {"en", "zh-CN", "ja-JP"}
+
+
+@dataclass(frozen=True)
+class ReportDocxText:
+    severity: dict[str, str]
+    labels: dict[str, str]
+    fallback: dict[str, str]
+    recommendations: list[str]
+
+
+REPORT_DOCX_TEXT = {
+    "en": ReportDocxText(
+        severity=SEVERITY_LABELS,
+        labels={
+            "account_id": "Account ID",
+            "affected_assets": "Affected Assets",
+            "affected_resources": "Affected Resources",
+            "assessment_date": "Assessment Date",
+            "assessment_name": "Assessment Name",
+            "assessment_scope": "Assessment Scope",
+            "category": "Category",
+            "check_id": "Check ID",
+            "check_title": "Check Title",
+            "cloud_provider": "Cloud Provider",
+            "count": "Count",
+            "current_status": "Current status",
+            "description": "Description",
+            "field": "Field",
+            "finding": "Finding",
+            "finding_id": "Finding ID",
+            "findings": "Findings",
+            "item": "Item",
+            "open": "Open",
+            "priority": "Priority",
+            "region": "Region",
+            "resource_count": "Resource Count",
+            "resource_name": "Resource Name",
+            "resource_type": "Resource Type",
+            "risk": "Risk",
+            "service": "Service",
+            "severity": "Severity",
+            "status": "Status",
+            "value": "Value",
+        },
+        fallback={
+            "assessment_name": "Cloud Security Assessment",
+            "assessment_scope": "{provider} Cloud Security Assessment",
+            "global": "global",
+            "no_external_reference": "No external reference is available in scan data.",
+            "no_findings": "No findings",
+            "no_findings_available": "No failed findings are available in the scan data.",
+            "no_findings_severity": "No findings in this severity level.",
+            "no_narrative": "No narrative details are available in the scan data.",
+            "no_resource": "No resource",
+            "none": "None",
+            "security_finding": "security finding",
+            "uncategorized": "Uncategorized",
+            "unknown": "Unknown",
+        },
+        recommendations=[
+            "Remediate the highest-severity failed findings first.",
+            "Prioritize logging, identity, and data protection controls.",
+            "Review privileged access and exposed resources.",
+            "Track medium-severity findings through a short-term remediation plan.",
+            "Review recurring services and categories with repeated failed findings.",
+            "Use scan results to drive alerting and control validation.",
+            "Adopt continuous CSPM monitoring and periodic access reviews.",
+            "Integrate report generation into recurring security operations.",
+            "Route high-priority findings into the incident response workflow.",
+            "Use trend and compliance modules once reliable historical and compliance data are available.",
+        ],
+    ),
+    "zh-CN": ReportDocxText(
+        severity={
+            "critical": "严重",
+            "high": "高",
+            "medium": "中",
+            "low": "低",
+            "informational": "信息",
+        },
+        labels={
+            "account_id": "账号 ID",
+            "affected_assets": "受影响资产",
+            "affected_resources": "受影响资源",
+            "assessment_date": "评估日期",
+            "assessment_name": "评估名称",
+            "assessment_scope": "评估范围",
+            "category": "类别",
+            "check_id": "检查项 ID",
+            "check_title": "检查项标题",
+            "cloud_provider": "云提供商",
+            "count": "数量",
+            "current_status": "当前状态",
+            "description": "描述",
+            "field": "字段",
+            "finding": "发现",
+            "finding_id": "发现 ID",
+            "findings": "发现数",
+            "item": "项目",
+            "open": "未关闭",
+            "priority": "优先级",
+            "region": "区域",
+            "resource_count": "资源数量",
+            "resource_name": "资源名称",
+            "resource_type": "资源类型",
+            "risk": "风险",
+            "service": "服务",
+            "severity": "严重性",
+            "status": "状态",
+            "value": "值",
+        },
+        fallback={
+            "assessment_name": "云安全评估",
+            "assessment_scope": "{provider} 云安全评估",
+            "global": "全局",
+            "no_external_reference": "扫描数据中没有可用的外部参考链接。",
+            "no_findings": "无发现",
+            "no_findings_available": "扫描数据中没有失败的发现。",
+            "no_findings_severity": "此严重等级下没有发现。",
+            "no_narrative": "扫描数据中没有可用的文字详情。",
+            "no_resource": "无资源",
+            "none": "无",
+            "security_finding": "安全发现",
+            "uncategorized": "未分类",
+            "unknown": "未知",
+        },
+        recommendations=[
+            "优先修复最高严重等级的失败发现。",
+            "优先处理日志、身份与数据保护控制项。",
+            "复核高权限访问与暴露资源。",
+            "将中危发现纳入短期修复计划跟踪。",
+            "复核反复出现失败发现的服务和类别。",
+            "使用扫描结果驱动告警和控制有效性验证。",
+            "采用持续 CSPM 监控和定期访问复核。",
+            "将报告生成纳入常态化安全运营流程。",
+            "将高优先级发现接入事件响应流程。",
+            "在历史数据和合规数据可靠后使用趋势与合规模块。",
+        ],
+    ),
+    "ja-JP": ReportDocxText(
+        severity={
+            "critical": "重大",
+            "high": "高",
+            "medium": "中",
+            "low": "低",
+            "informational": "情報",
+        },
+        labels={
+            "account_id": "アカウント ID",
+            "affected_assets": "影響資産",
+            "affected_resources": "影響リソース",
+            "assessment_date": "評価日",
+            "assessment_name": "評価名",
+            "assessment_scope": "評価範囲",
+            "category": "カテゴリ",
+            "check_id": "チェック ID",
+            "check_title": "チェックタイトル",
+            "cloud_provider": "クラウドプロバイダー",
+            "count": "件数",
+            "current_status": "現在の状態",
+            "description": "説明",
+            "field": "項目",
+            "finding": "検出結果",
+            "finding_id": "検出 ID",
+            "findings": "検出数",
+            "item": "項目",
+            "open": "未対応",
+            "priority": "優先度",
+            "region": "リージョン",
+            "resource_count": "リソース数",
+            "resource_name": "リソース名",
+            "resource_type": "リソースタイプ",
+            "risk": "リスク",
+            "service": "サービス",
+            "severity": "重大度",
+            "status": "ステータス",
+            "value": "値",
+        },
+        fallback={
+            "assessment_name": "クラウドセキュリティ評価",
+            "assessment_scope": "{provider} クラウドセキュリティ評価",
+            "global": "グローバル",
+            "no_external_reference": "スキャンデータに外部参照リンクはありません。",
+            "no_findings": "検出なし",
+            "no_findings_available": "スキャンデータに失敗した検出結果はありません。",
+            "no_findings_severity": "この重大度の検出結果はありません。",
+            "no_narrative": "スキャンデータに説明文はありません。",
+            "no_resource": "リソースなし",
+            "none": "なし",
+            "security_finding": "セキュリティ検出結果",
+            "uncategorized": "未分類",
+            "unknown": "不明",
+        },
+        recommendations=[
+            "最も重大度の高い失敗検出結果を優先的に修復してください。",
+            "ログ、ID、データ保護のコントロールを優先してください。",
+            "特権アクセスと公開リソースを確認してください。",
+            "中程度の検出結果は短期修復計画で追跡してください。",
+            "失敗が繰り返されるサービスとカテゴリを確認してください。",
+            "スキャン結果をアラートとコントロール検証に活用してください。",
+            "継続的な CSPM 監視と定期的なアクセスレビューを導入してください。",
+            "レポート生成を定常的なセキュリティ運用に組み込んでください。",
+            "高優先度の検出結果をインシデント対応フローに連携してください。",
+            "信頼できる履歴データとコンプライアンスデータが揃った後に、傾向分析とコンプライアンス機能を利用してください。",
+        ],
+    ),
+}
 
 EXECUTIVE_TEMPLATE = (
     Path(__file__).resolve().parent
@@ -58,8 +267,28 @@ def build_english_executive_report_docx(
     template_path: Path | None = None,
 ) -> bytes:
     """Build the English Executive Word report from exported scan data."""
+    return build_executive_report_docx(
+        scan,
+        rows,
+        findings,
+        summary,
+        locale="en",
+        template_path=template_path,
+    )
+
+
+def build_executive_report_docx(
+    scan,
+    rows: list[dict],
+    findings: list,
+    summary: dict,
+    locale: str = "en",
+    template_path: Path | None = None,
+) -> bytes:
+    """Build the Executive Word report from exported scan data."""
     template = template_path or EXECUTIVE_TEMPLATE
-    data = _build_executive_data(scan, rows, findings, summary)
+    text = _docx_text(locale)
+    data = _build_executive_data(scan, rows, findings, summary, text)
 
     with zipfile.ZipFile(template, "r") as source:
         document_xml = etree.fromstring(source.read("word/document.xml"))
@@ -98,8 +327,28 @@ def build_english_findings_report_docx(
     template_path: Path | None = None,
 ) -> bytes:
     """Build the English Findings Word report from exported scan data."""
+    return build_findings_report_docx(
+        scan,
+        rows,
+        findings,
+        summary,
+        locale="en",
+        template_path=template_path,
+    )
+
+
+def build_findings_report_docx(
+    scan,
+    rows: list[dict],
+    findings: list,
+    summary: dict,
+    locale: str = "en",
+    template_path: Path | None = None,
+) -> bytes:
+    """Build the Findings Word report from exported scan data."""
     template = template_path or FINDINGS_TEMPLATE
-    data = _build_findings_data(scan, rows, findings, summary)
+    text = _docx_text(locale)
+    data = _build_findings_data(scan, rows, findings, summary, text)
 
     with zipfile.ZipFile(template, "r") as source:
         document_xml = etree.fromstring(source.read("word/document.xml"))
@@ -107,7 +356,7 @@ def build_english_findings_report_docx(
 
         _replace_paragraph_text(document_xml, data["paragraphs"])
         _replace_tables(document_xml, data["tables"])
-        _replace_findings_detail_blocks(document_xml, data["findings"])
+        _replace_findings_detail_blocks(document_xml, data["findings"], text)
         _replace_paragraph_text(
             document_xml,
             {"2.1 Finding {{finding_number}}3": "2.1 Finding Details"},
@@ -136,7 +385,17 @@ def build_english_findings_report_docx(
     return output.getvalue()
 
 
-def _build_executive_data(scan, rows: list[dict], findings: list, summary: dict) -> dict:
+def _docx_text(locale: str) -> ReportDocxText:
+    return REPORT_DOCX_TEXT.get(locale, REPORT_DOCX_TEXT["en"])
+
+
+def _build_executive_data(
+    scan,
+    rows: list[dict],
+    findings: list,
+    summary: dict,
+    text: ReportDocxText,
+) -> dict:
     unique_rows = _unique_finding_rows(rows)
     risk_rows = {
         uid: row for uid, row in unique_rows.items() if row.get("status") == "FAIL"
@@ -144,13 +403,13 @@ def _build_executive_data(scan, rows: list[dict], findings: list, summary: dict)
     resources = _unique_resources(rows)
     severity_counts = Counter(row.get("severity") or "" for row in risk_rows.values())
     status_counts = Counter(row.get("status") or "" for row in unique_rows.values())
-    region_counts = _count_resources_by(resources.values(), "region")
-    resource_type_counts = _count_resources_by(resources.values(), "type")
+    region_counts = _count_resources_by(resources.values(), "region", text)
+    resource_type_counts = _count_resources_by(resources.values(), "type", text)
     category_by_uid = _category_by_finding_uid(findings)
     category_counts = Counter(
-        category_by_uid.get(uid, "Uncategorized") for uid in risk_rows
+        category_by_uid.get(uid, text.fallback["uncategorized"]) for uid in risk_rows
     )
-    service_severity = _severity_matrix(risk_rows.values(), "service")
+    service_severity = _severity_matrix(risk_rows.values(), "service", text)
 
     top_risk_rows = _top_risk_rows(risk_rows, category_by_uid)
     critical_rows = [row for row in top_risk_rows if row["severity"] == "critical"]
@@ -158,120 +417,153 @@ def _build_executive_data(scan, rows: list[dict], findings: list, summary: dict)
 
     return {
         "paragraphs": {
-            "Assessment Name: {{assessment_name}}": f"Assessment Name: {_scan_name(scan)}",
-            "Cloud Provider: {{cloud_provider}}": f"Cloud Provider: {_provider_name(scan)}",
-            "Account ID: {{account_id}}": f"Account ID: {_provider_uid(scan)}",
+            "Assessment Name: {{assessment_name}}": (
+                f"{text.labels['assessment_name']}: {_scan_name(scan, text)}"
+            ),
+            "Cloud Provider: {{cloud_provider}}": (
+                f"{text.labels['cloud_provider']}: {_provider_name(scan)}"
+            ),
+            "Account ID: {{account_id}}": f"{text.labels['account_id']}: {_provider_uid(scan)}",
             "Assessment Date: {{assessment_date}}": (
-                f"Assessment Date: {_assessment_date(scan, summary)}"
+                f"{text.labels['assessment_date']}: {_assessment_date(scan, summary)}"
             ),
             "Enable MFA for all IAM users with console access.": _recommendation_line(
-                top_risk_rows, 0, "Remediate the highest-severity failed findings first."
+                top_risk_rows,
+                0,
+                text.recommendations[0],
+                text,
             ),
             "Enable CloudTrail logging across all AWS regions.": _recommendation_line(
-                top_risk_rows, 1, "Prioritize logging, identity, and data protection controls."
+                top_risk_rows,
+                1,
+                text.recommendations[1],
+                text,
             ),
             "Review privileged IAM permissions.": _recommendation_line(
-                top_risk_rows, 2, "Review privileged access and exposed resources."
+                top_risk_rows,
+                2,
+                text.recommendations[2],
+                text,
             ),
-            "Implement centralized log monitoring.": (
-                "Track medium-severity findings through a short-term remediation plan."
-            ),
+            "Implement centralized log monitoring.": text.recommendations[3],
             "Perform periodic IAM access reviews.": (
-                "Review recurring services and categories with repeated failed findings."
+                text.recommendations[4]
             ),
-            "Strengthen account activity alerting.": (
-                "Use scan results to drive alerting and control validation."
-            ),
-            "Adopt Zero Trust access controls.": (
-                "Adopt continuous CSPM monitoring and periodic access reviews."
-            ),
+            "Strengthen account activity alerting.": text.recommendations[5],
+            "Adopt Zero Trust access controls.": text.recommendations[6],
             "Implement continuous CSPM monitoring.": (
-                "Integrate report generation into recurring security operations."
+                text.recommendations[7]
             ),
             "Integrate cloud security findings into the incident response process.": (
-                "Route high-priority findings into the incident response workflow."
+                text.recommendations[8]
             ),
-            "Establish compliance-driven cloud governance.": (
-                "Use trend and compliance modules once reliable historical and "
-                "compliance data are available."
-            ),
+            "Establish compliance-driven cloud governance.": text.recommendations[9],
         },
         "tables": {
             1: [
-                ["Item", "Value"],
-                ["Assessment Name", _scan_name(scan)],
-                ["Cloud Provider", _provider_name(scan)],
-                ["Account ID", _provider_uid(scan)],
-                ["Assessment Date", _assessment_date(scan, summary)],
-                ["Assessment Scope", f"{_provider_name(scan)} Cloud Security Assessment"],
+                [text.labels["item"], text.labels["value"]],
+                [text.labels["assessment_name"], _scan_name(scan, text)],
+                [text.labels["cloud_provider"], _provider_name(scan)],
+                [text.labels["account_id"], _provider_uid(scan)],
+                [text.labels["assessment_date"], _assessment_date(scan, summary)],
+                [
+                    text.labels["assessment_scope"],
+                    text.fallback["assessment_scope"].format(provider=_provider_name(scan)),
+                ],
             ],
-            2: [["Severity", "Count"]]
+            2: [[text.labels["severity"], text.labels["count"]]]
             + [
-                [SEVERITY_LABELS[severity], str(severity_counts.get(severity, 0))]
+                [text.severity[severity], str(severity_counts.get(severity, 0))]
                 for severity in SEVERITY_ORDER
             ],
-            3: _finding_table(["Finding", "Affected Assets", "Risk"], critical_rows),
-            4: _finding_table(["Finding", "Affected Assets", "Risk"], high_rows),
-            5: _counter_table("Category", "Findings", category_counts),
-            6: _counter_table("Resource Type", "Count", resource_type_counts),
-            7: _counter_table("Region", "Resource Count", region_counts),
-            8: _service_severity_table(service_severity),
-            9: _counter_table("Category", "Findings", category_counts),
-            10: _priority_table(top_risk_rows, {"critical", "high"}),
-            11: _priority_table(top_risk_rows, {"medium"}),
-            12: _priority_table(top_risk_rows, {"low", "informational"}),
+            3: _finding_table(
+                [
+                    text.labels["finding"],
+                    text.labels["affected_assets"],
+                    text.labels["risk"],
+                ],
+                critical_rows,
+                text,
+            ),
+            4: _finding_table(
+                [
+                    text.labels["finding"],
+                    text.labels["affected_assets"],
+                    text.labels["risk"],
+                ],
+                high_rows,
+                text,
+            ),
+            5: _counter_table(text.labels["category"], text.labels["findings"], category_counts, text),
+            6: _counter_table(text.labels["resource_type"], text.labels["count"], resource_type_counts, text),
+            7: _counter_table(text.labels["region"], text.labels["resource_count"], region_counts, text),
+            8: _service_severity_table(service_severity, text),
+            9: _counter_table(text.labels["category"], text.labels["findings"], category_counts, text),
+            10: _priority_table(top_risk_rows, {"critical", "high"}, text),
+            11: _priority_table(top_risk_rows, {"medium"}, text),
+            12: _priority_table(top_risk_rows, {"low", "informational"}, text),
         },
         "charts": {
             "Figure 1-1 Risk Distribution": [
                 (
-                    "Count",
-                    [SEVERITY_LABELS[s] for s in SEVERITY_ORDER],
+                    text.labels["count"],
+                    [text.severity[s] for s in SEVERITY_ORDER],
                     [severity_counts.get(s, 0) for s in SEVERITY_ORDER],
                 )
             ],
             "Figure 1-2 Risk Categories": [
-                ("Findings", *_chart_categories_values(category_counts))
+                (text.labels["findings"], *_chart_categories_values(category_counts, text))
             ],
             "Figure 2-1 Asset Distribution": [
-                ("Resource Count", *_chart_categories_values(resource_type_counts))
+                (text.labels["resource_count"], *_chart_categories_values(resource_type_counts, text))
             ],
             "Figure 2-2 Resource Distribution by Region": [
-                ("Resource Count", *_chart_categories_values(region_counts))
+                (text.labels["resource_count"], *_chart_categories_values(region_counts, text))
             ],
-            "Figure 3-1 Findings by Service": _service_severity_chart(service_severity),
+            "Figure 3-1 Findings by Service": _service_severity_chart(service_severity, text),
             "Figure 3-2 Findings by Category": [
-                ("Findings", *_chart_categories_values(category_counts))
+                (text.labels["findings"], *_chart_categories_values(category_counts, text))
             ],
         },
         "status_counts": status_counts,
     }
 
 
-def _build_findings_data(scan, rows: list[dict], findings: list, summary: dict) -> dict:
-    groups = _finding_detail_groups(rows, findings)
+def _build_findings_data(
+    scan,
+    rows: list[dict],
+    findings: list,
+    summary: dict,
+    text: ReportDocxText,
+) -> dict:
+    groups = _finding_detail_groups(rows, findings, text)
     severity_counts = Counter(group["severity"] for group in groups)
 
     return {
         "paragraphs": {
-            "Assessment Name: {{assessment_name}}": f"Assessment Name: {_scan_name(scan)}",
-            "Cloud Provider: {{cloud_provider}}": f"Cloud Provider: {_provider_name(scan)}",
-            "Account ID: {{account_id}}": f"Account ID: {_provider_uid(scan)}",
+            "Assessment Name: {{assessment_name}}": (
+                f"{text.labels['assessment_name']}: {_scan_name(scan, text)}"
+            ),
+            "Cloud Provider: {{cloud_provider}}": (
+                f"{text.labels['cloud_provider']}: {_provider_name(scan)}"
+            ),
+            "Account ID: {{account_id}}": f"{text.labels['account_id']}: {_provider_uid(scan)}",
             "Assessment Date: {{assessment_date}}": (
-                f"Assessment Date: {_assessment_date(scan, summary)}"
+                f"{text.labels['assessment_date']}: {_assessment_date(scan, summary)}"
             ),
         },
         "tables": {
-            1: [["Severity", "Count"]]
+            1: [[text.labels["severity"], text.labels["count"]]]
             + [
-                [SEVERITY_LABELS[severity], str(severity_counts.get(severity, 0))]
+                [text.severity[severity], str(severity_counts.get(severity, 0))]
                 for severity in ["critical", "high", "medium", "low"]
             ],
         },
         "charts": {
             "Figure 1-1 Findings Distribution": [
                 (
-                    "Count",
-                    [SEVERITY_LABELS[s] for s in ["critical", "high", "medium", "low"]],
+                    text.labels["count"],
+                    [text.severity[s] for s in ["critical", "high", "medium", "low"]],
                     [severity_counts.get(s, 0) for s in ["critical", "high", "medium", "low"]],
                 )
             ],
@@ -280,7 +572,11 @@ def _build_findings_data(scan, rows: list[dict], findings: list, summary: dict) 
     }
 
 
-def _finding_detail_groups(rows: list[dict], findings: list) -> list[dict]:
+def _finding_detail_groups(
+    rows: list[dict],
+    findings: list,
+    text: ReportDocxText,
+) -> list[dict]:
     metadata_by_check_id = _metadata_by_check_id(findings)
     grouped = {}
     for row in rows:
@@ -311,8 +607,8 @@ def _finding_detail_groups(rows: list[dict], findings: list) -> list[dict]:
                 {
                     "uid": row.get("resource_uid") or "",
                     "name": row.get("resource_name") or row.get("resource_uid") or "",
-                    "type": row.get("resource_type") or "Unknown",
-                    "region": row.get("region") or "global",
+                    "type": row.get("resource_type") or text.fallback["unknown"],
+                    "region": row.get("region") or text.fallback["global"],
                     "service": row.get("service") or group["service"],
                 }
             )
@@ -335,16 +631,18 @@ def _finding_detail_groups(rows: list[dict], findings: list) -> list[dict]:
             **group,
             "number": index,
             "finding_id": f"F-{index:03d}",
-            "title": group["check_title"] or group["check_id"] or f"Finding {index:03d}",
-            "severity_label": SEVERITY_LABELS.get(
-                group["severity"], _label(group["severity"])
+            "title": group["check_title"]
+            or group["check_id"]
+            or f"{text.labels['finding']} {index:03d}",
+            "severity_label": text.severity.get(
+                group["severity"], _label(group["severity"], text)
             ),
             "priority": _priority_for_severity(group["severity"]),
-            "category": _category_from_metadata(metadata, group["service"]),
+            "category": _category_from_metadata(metadata, group["service"], text),
             "resources": resources,
-            "summary": _finding_summary(group),
-            "actions": _remediation_actions(group),
-            "references": _finding_references(metadata),
+            "summary": _finding_summary(group, text),
+            "actions": _remediation_actions(group, text),
+            "references": _finding_references(metadata, text),
         }
         details.append(detail)
 
@@ -355,18 +653,18 @@ def _finding_detail_groups(rows: list[dict], findings: list) -> list[dict]:
         {
             "number": 1,
             "finding_id": "F-001",
-            "check_id": "No failed findings",
-            "check_title": "No failed findings",
-            "title": "No failed findings",
+            "check_id": text.fallback["no_findings"],
+            "check_title": text.fallback["no_findings"],
+            "title": text.fallback["no_findings"],
             "severity": "informational",
-            "severity_label": "Informational",
+            "severity_label": text.severity["informational"],
             "priority": "P3",
-            "category": "None",
-            "service": "None",
+            "category": text.fallback["none"],
+            "service": text.fallback["none"],
             "resources": [],
-            "summary": "No failed findings are available in the scan data.",
-            "actions": ["Continue periodic CSPM monitoring."],
-            "references": ["No external reference is available in scan data."],
+            "summary": text.fallback["no_findings_available"],
+            "actions": [text.recommendations[6]],
+            "references": [text.fallback["no_external_reference"]],
         }
     ]
 
@@ -393,13 +691,21 @@ def _unique_resource_rows(resources: list[dict]) -> list[dict]:
     return list(unique.values())
 
 
-def _category_from_metadata(metadata: dict, fallback: str) -> str:
+def _category_from_metadata(
+    metadata: dict,
+    fallback: str,
+    text: ReportDocxText | None = None,
+) -> str:
+    text = text or REPORT_DOCX_TEXT["en"]
     categories = metadata.get("categories") or []
     if isinstance(categories, str):
-        return _label(categories)
+        return _label(categories, text)
     if categories:
-        return _label(categories[0])
-    return _label(metadata.get("servicename") or fallback or "Uncategorized")
+        return _label(categories[0], text)
+    return _label(
+        metadata.get("servicename") or fallback or text.fallback["uncategorized"],
+        text,
+    )
 
 
 def _priority_for_severity(severity: str) -> str:
@@ -410,20 +716,22 @@ def _priority_for_severity(severity: str) -> str:
     return "P3"
 
 
-def _finding_summary(group: dict) -> str:
+def _finding_summary(group: dict, text: ReportDocxText) -> str:
     parts = []
     if group.get("description"):
-        parts.append(f"Description: {_clean_markdown(group['description'])}")
+        parts.append(f"{text.labels['description']}: {_clean_markdown(group['description'])}")
     if group.get("risk"):
-        parts.append(f"Risk: {_clean_markdown(group['risk'])}")
+        parts.append(f"{text.labels['risk']}: {_clean_markdown(group['risk'])}")
     if group.get("status_extended"):
-        parts.append(f"Current status: {_clean_markdown(group['status_extended'])}")
+        parts.append(
+            f"{text.labels['current_status']}: {_clean_markdown(group['status_extended'])}"
+        )
     if not parts:
-        parts.append("No narrative details are available in the scan data.")
+        parts.append(text.fallback["no_narrative"])
     return _short_text(" ".join(parts), 1200)
 
 
-def _remediation_actions(group: dict) -> list[str]:
+def _remediation_actions(group: dict, text: ReportDocxText) -> list[str]:
     remediation = _clean_markdown(group.get("remediation") or "")
     lines = []
     for raw_line in remediation.splitlines():
@@ -435,12 +743,12 @@ def _remediation_actions(group: dict) -> list[str]:
         lines = [remediation]
     if not lines:
         lines = [
-            f"Review and remediate {group.get('check_title') or group.get('check_id') or 'this finding'}."
+            f"{text.recommendations[0]} {group.get('check_title') or group.get('check_id') or text.fallback['security_finding']}."
         ]
     return [_short_text(line, 220) for line in lines[:4]]
 
 
-def _finding_references(metadata: dict) -> list[str]:
+def _finding_references(metadata: dict, text: ReportDocxText) -> list[str]:
     references = []
     recommendation = metadata.get("remediation", {}).get("recommendation", {})
     for value in [
@@ -450,7 +758,7 @@ def _finding_references(metadata: dict) -> list[str]:
     ]:
         if value and value not in references:
             references.append(str(value))
-    return references[:3] or ["No external reference is available in scan data."]
+    return references[:3] or [text.fallback["no_external_reference"]]
 
 
 def _unique_finding_rows(rows: list[dict]) -> dict[str, dict]:
@@ -519,27 +827,43 @@ def _top_risk_rows(unique_rows: dict[str, dict], category_by_uid: dict[str, str]
     )
 
 
-def _count_by(rows, field: str) -> Counter:
-    return Counter(_label(row.get(field) or "Unknown") for row in rows)
+def _count_by(rows, field: str, text: ReportDocxText | None = None) -> Counter:
+    text = text or REPORT_DOCX_TEXT["en"]
+    return Counter(_label(row.get(field) or text.fallback["unknown"], text) for row in rows)
 
 
-def _count_resources_by(resources, field: str) -> Counter:
+def _count_resources_by(
+    resources,
+    field: str,
+    text: ReportDocxText | None = None,
+) -> Counter:
+    text = text or REPORT_DOCX_TEXT["en"]
     if field == "region":
-        return Counter(str(resource.get(field) or "global") for resource in resources)
-    return Counter(_label(resource.get(field) or "Unknown") for resource in resources)
+        return Counter(str(resource.get(field) or text.fallback["global"]) for resource in resources)
+    return Counter(_label(resource.get(field) or text.fallback["unknown"], text) for resource in resources)
 
 
-def _severity_matrix(rows, field: str) -> dict[str, Counter]:
+def _severity_matrix(
+    rows,
+    field: str,
+    text: ReportDocxText | None = None,
+) -> dict[str, Counter]:
+    text = text or REPORT_DOCX_TEXT["en"]
     matrix = defaultdict(Counter)
     for row in rows:
-        key = _label(row.get(field) or "Unknown")
+        key = _label(row.get(field) or text.fallback["unknown"], text)
         severity = row.get("severity")
         if severity in SEVERITY_ORDER:
             matrix[key][severity] += 1
     return dict(matrix)
 
 
-def _finding_table(headers: list[str], rows: list[dict], limit: int = 8) -> list[list[str]]:
+def _finding_table(
+    headers: list[str],
+    rows: list[dict],
+    text: ReportDocxText,
+    limit: int = 8,
+) -> list[list[str]]:
     table = [headers]
     for row in rows[:limit]:
         table.append(
@@ -550,28 +874,50 @@ def _finding_table(headers: list[str], rows: list[dict], limit: int = 8) -> list
             ]
         )
     if len(table) == 1:
-        table.append(["No findings", "0", "No findings in this severity level."])
+        table.append(
+            [
+                text.fallback["no_findings"],
+                "0",
+                text.fallback["no_findings_severity"],
+            ]
+        )
     return table
 
 
 def _counter_table(
-    label: str, count_label: str, counter: Counter, limit: int = 8
+    label: str,
+    count_label: str,
+    counter: Counter,
+    text: ReportDocxText,
+    limit: int = 8,
 ) -> list[list[str]]:
     table = [[label, count_label]]
     for key, value in counter.most_common(limit):
         table.append([key, str(value)])
     if len(table) == 1:
-        table.append(["None", "0"])
+        table.append([text.fallback["none"], "0"])
     return table
 
 
-def _service_severity_table(matrix: dict[str, Counter], limit: int = 8) -> list[list[str]]:
+def _service_severity_table(
+    matrix: dict[str, Counter],
+    text: ReportDocxText,
+    limit: int = 8,
+) -> list[list[str]]:
     services = sorted(
         matrix,
         key=lambda service: sum(matrix[service].values()),
         reverse=True,
     )[:limit]
-    table = [["Service", "Critical", "High", "Medium", "Low"]]
+    table = [
+        [
+            text.labels["service"],
+            text.severity["critical"],
+            text.severity["high"],
+            text.severity["medium"],
+            text.severity["low"],
+        ]
+    ]
     for service in services:
         counts = matrix[service]
         table.append(
@@ -584,36 +930,51 @@ def _service_severity_table(matrix: dict[str, Counter], limit: int = 8) -> list[
             ]
         )
     if len(table) == 1:
-        table.append(["None", "0", "0", "0", "0"])
+        table.append([text.fallback["none"], "0", "0", "0", "0"])
     return table
 
 
-def _priority_table(rows: list[dict], severities: set[str], limit: int = 8) -> list[list[str]]:
-    table = [["Finding", "Severity", "Assets"]]
+def _priority_table(
+    rows: list[dict],
+    severities: set[str],
+    text: ReportDocxText,
+    limit: int = 8,
+) -> list[list[str]]:
+    table = [
+        [
+            text.labels["finding"],
+            text.labels["severity"],
+            text.labels["affected_assets"],
+        ]
+    ]
     for row in [row for row in rows if row.get("severity") in severities][:limit]:
         table.append(
             [
                 row.get("check_title") or row.get("check_id") or "",
-                SEVERITY_LABELS.get(row.get("severity"), row.get("severity") or ""),
+                text.severity.get(row.get("severity"), row.get("severity") or ""),
                 str(row.get("affected_assets") or 1),
             ]
         )
     if len(table) == 1:
-        table.append(["No findings", "", "0"])
+        table.append([text.fallback["no_findings"], "", "0"])
     return table
 
 
-def _service_severity_chart(matrix: dict[str, Counter], limit: int = 8) -> list[tuple]:
+def _service_severity_chart(
+    matrix: dict[str, Counter],
+    text: ReportDocxText,
+    limit: int = 8,
+) -> list[tuple]:
     services = sorted(
         matrix,
         key=lambda service: sum(matrix[service].values()),
         reverse=True,
     )[:limit]
     if not services:
-        services = ["None"]
+        services = [text.fallback["none"]]
     return [
         (
-            SEVERITY_LABELS[severity],
+            text.severity[severity],
             services,
             [matrix.get(service, Counter()).get(severity, 0) for service in services],
         )
@@ -621,16 +982,24 @@ def _service_severity_chart(matrix: dict[str, Counter], limit: int = 8) -> list[
     ]
 
 
-def _chart_categories_values(counter: Counter, limit: int = 8) -> tuple[list[str], list[int]]:
+def _chart_categories_values(
+    counter: Counter,
+    text: ReportDocxText,
+    limit: int = 8,
+) -> tuple[list[str], list[int]]:
     items = counter.most_common(limit)
     if not items:
-        return ["None"], [0]
+        return [text.fallback["none"]], [0]
     categories, values = zip(*items)
     return list(categories), list(values)
 
 
-def _scan_name(scan) -> str:
-    return str(getattr(scan, "name", "") or getattr(scan, "id", "Cloud Security Assessment"))
+def _scan_name(scan, text: ReportDocxText | None = None) -> str:
+    text = text or REPORT_DOCX_TEXT["en"]
+    return str(
+        getattr(scan, "name", "")
+        or getattr(scan, "id", text.fallback["assessment_name"])
+    )
 
 
 def _provider_name(scan) -> str:
@@ -657,18 +1026,26 @@ def _assessment_date(scan, summary: dict) -> str:
     return datetime.now(UTC).date().isoformat()
 
 
-def _recommendation_line(rows: list[dict], index: int, fallback: str) -> str:
+def _recommendation_line(
+    rows: list[dict],
+    index: int,
+    fallback: str,
+    text: ReportDocxText,
+) -> str:
     if index >= len(rows):
         return fallback
     row = rows[index]
-    title = row.get("check_title") or row.get("check_id") or "security finding"
-    return f"Remediate {title}."
+    title = row.get("check_title") or row.get("check_id") or text.fallback["security_finding"]
+    if text is REPORT_DOCX_TEXT["en"]:
+        return f"Remediate {title}."
+    return f"{fallback} {title}"
 
 
-def _label(value: str) -> str:
+def _label(value: str, text: ReportDocxText | None = None) -> str:
+    text = text or REPORT_DOCX_TEXT["en"]
     raw = str(value or "").strip()
     if not raw:
-        return "Unknown"
+        return text.fallback["unknown"]
 
     known = {
         "acm": "ACM",
@@ -724,7 +1101,11 @@ def _replace_paragraph_text(document_xml, replacements: dict[str, str]) -> None:
             _set_paragraph_text(paragraph, replacements[current])
 
 
-def _replace_findings_detail_blocks(document_xml, details: list[dict]) -> None:
+def _replace_findings_detail_blocks(
+    document_xml,
+    details: list[dict],
+    text: ReportDocxText,
+) -> None:
     body = document_xml.find("w:body", namespaces=NS)
     if body is None:
         return
@@ -741,7 +1122,7 @@ def _replace_findings_detail_blocks(document_xml, details: list[dict]) -> None:
     insert_at = start
     for detail in details:
         block = [copy.deepcopy(element) for element in template_block]
-        _populate_finding_block(block, detail)
+        _populate_finding_block(block, detail, text)
         block = [element for element in block if element.get("data-delete") != "1"]
         for offset, element in enumerate(block):
             body.insert(insert_at + offset, element)
@@ -782,32 +1163,57 @@ def _prune_findings_toc(document_xml) -> None:
                 break
 
 
-def _populate_finding_block(block: list, detail: dict) -> None:
+def _populate_finding_block(
+    block: list,
+    detail: dict,
+    text: ReportDocxText,
+) -> None:
     overview_rows = [
-        ["Field", "Value"],
-        ["Finding ID", detail["finding_id"]],
-        ["Check ID", detail["check_id"]],
-        ["Check Title", detail["check_title"]],
-        ["Severity", detail["severity_label"]],
-        ["Priority", detail["priority"]],
-        ["Category", detail["category"]],
-        ["Service", _label(detail["service"])],
-        ["Status", "Open"],
-        ["Affected Resources", str(len(detail["resources"]))],
+        [text.labels["field"], text.labels["value"]],
+        [text.labels["finding_id"], detail["finding_id"]],
+        [text.labels["check_id"], detail["check_id"]],
+        [text.labels["check_title"], detail["check_title"]],
+        [text.labels["severity"], detail["severity_label"]],
+        [text.labels["priority"], detail["priority"]],
+        [text.labels["category"], detail["category"]],
+        [text.labels["service"], _label(detail["service"], text)],
+        [text.labels["status"], text.labels["open"]],
+        [text.labels["affected_resources"], str(len(detail["resources"]))],
     ]
-    resource_rows = [["Resource Name", "Resource Type", "Region", "Service", "Account ID"]]
+    resource_rows = [
+        [
+            text.labels["resource_name"],
+            text.labels["resource_type"],
+            text.labels["region"],
+            text.labels["service"],
+            text.labels["account_id"],
+        ]
+    ]
     for resource in detail["resources"][:20]:
         resource_rows.append(
             [
                 _short_text(resource.get("name") or resource.get("uid") or "", 80),
-                _label(resource.get("type") or "Unknown"),
-                resource.get("region") or "global",
-                _label(resource.get("service") or detail.get("service") or "Unknown"),
+                _label(resource.get("type") or text.fallback["unknown"], text),
+                resource.get("region") or text.fallback["global"],
+                _label(
+                    resource.get("service")
+                    or detail.get("service")
+                    or text.fallback["unknown"],
+                    text,
+                ),
                 _account_id_from_resource(resource.get("uid") or ""),
             ]
         )
     if len(resource_rows) == 1:
-        resource_rows.append(["No resource", "Unknown", "global", _label(detail["service"]), ""])
+        resource_rows.append(
+            [
+                text.fallback["no_resource"],
+                text.fallback["unknown"],
+                text.fallback["global"],
+                _label(detail["service"], text),
+                "",
+            ]
+        )
 
     tables = []
     paragraphs = []
@@ -834,10 +1240,10 @@ def _populate_finding_block(block: list, detail: dict) -> None:
     references = detail["references"]
 
     for paragraph in list(paragraphs):
-        text = _paragraph_text(paragraph).strip()
+        paragraph_text = _paragraph_text(paragraph).strip()
         replacements = {
             "2.1 Finding {{finding_number}}": (
-                f"2.{detail['number']} Finding {detail['finding_id']} - "
+                f"2.{detail['number']} {text.labels['finding']} {detail['finding_id']} - "
                 f"{_short_text(detail['title'], 90)}"
             ),
             "2.1.1 Overview": f"2.{detail['number']}.1 Overview",
@@ -852,21 +1258,21 @@ def _populate_finding_block(block: list, detail: dict) -> None:
                 f"Table 2-{detail['number'] * 2} Affected Resources"
             ),
         }
-        if text in replacements:
-            _set_paragraph_text(paragraph, replacements[text])
+        if paragraph_text in replacements:
+            _set_paragraph_text(paragraph, replacements[paragraph_text])
             continue
-        if text.startswith("CloudTrail logging is not enabled"):
+        if paragraph_text.startswith("CloudTrail logging is not enabled"):
             _set_paragraph_text(paragraph, detail["summary"])
             continue
-        if text in action_placeholders:
-            index = action_placeholders.index(text)
+        if paragraph_text in action_placeholders:
+            index = action_placeholders.index(paragraph_text)
             if index < len(actions):
                 _set_paragraph_text(paragraph, actions[index])
             else:
                 _remove_paragraph(paragraph)
             continue
-        if text in reference_placeholders:
-            index = reference_placeholders.index(text)
+        if paragraph_text in reference_placeholders:
+            index = reference_placeholders.index(paragraph_text)
             if index < len(references):
                 _set_paragraph_text(paragraph, references[index])
             else:
@@ -1049,7 +1455,7 @@ def _set_cell_text(cell, value: str) -> None:
 
 
 def _apply_severity_color(cell, value: str) -> None:
-    severity = value.lower()
+    severity = _severity_from_label(value)
     if severity not in SEVERITY_COLORS:
         return
     run = cell.find(".//w:r", namespaces=NS)
@@ -1173,14 +1579,27 @@ def _set_series_values(series, values: list[int]) -> None:
 
 
 def _set_series_color(series, name: str, categories: list[str]) -> None:
-    severity = SEVERITY_BY_LABEL.get(name)
+    severity = _severity_from_label(name)
     if severity:
         _set_shape_color(series, SEVERITY_COLORS[severity])
 
     for index, category in enumerate(categories):
-        severity = SEVERITY_BY_LABEL.get(category)
+        severity = _severity_from_label(category)
         if severity:
             _set_data_point_color(series, index, SEVERITY_COLORS[severity])
+
+
+def _severity_from_label(value: str) -> str | None:
+    normalized = str(value or "").strip().lower()
+    if normalized in SEVERITY_COLORS:
+        return normalized
+    if value in SEVERITY_BY_LABEL:
+        return SEVERITY_BY_LABEL[value]
+    for report_text in REPORT_DOCX_TEXT.values():
+        for severity, label in report_text.severity.items():
+            if value == label:
+                return severity
+    return None
 
 
 def _set_data_point_color(series, index: int, color: str) -> None:
