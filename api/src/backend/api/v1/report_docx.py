@@ -67,15 +67,20 @@ REPORT_DOCX_TEXT = {
             "field": "Field",
             "finding": "Finding",
             "finding_id": "Finding ID",
+            "finding_overview": "Finding Overview",
             "findings": "Findings",
             "item": "Item",
             "open": "Open",
+            "overview": "Overview",
             "priority": "Priority",
             "region": "Region",
             "resource_count": "Resource Count",
             "resource_name": "Resource Name",
             "resource_type": "Resource Type",
             "risk": "Risk",
+            "executive_summary": "Executive Summary",
+            "remediation_guidance": "Remediation Guidance",
+            "references": "References",
             "service": "Service",
             "severity": "Severity",
             "status": "Status",
@@ -134,15 +139,20 @@ REPORT_DOCX_TEXT = {
             "field": "字段",
             "finding": "发现",
             "finding_id": "发现 ID",
+            "finding_overview": "发现概览",
             "findings": "发现数",
             "item": "项目",
             "open": "未关闭",
+            "overview": "概览",
             "priority": "优先级",
             "region": "区域",
             "resource_count": "资源数量",
             "resource_name": "资源名称",
             "resource_type": "资源类型",
             "risk": "风险",
+            "executive_summary": "执行摘要",
+            "remediation_guidance": "修复指导",
+            "references": "参考资料",
             "service": "服务",
             "severity": "严重性",
             "status": "状态",
@@ -201,15 +211,20 @@ REPORT_DOCX_TEXT = {
             "field": "項目",
             "finding": "検出結果",
             "finding_id": "検出 ID",
+            "finding_overview": "検出結果概要",
             "findings": "検出数",
             "item": "項目",
             "open": "未対応",
+            "overview": "概要",
             "priority": "優先度",
             "region": "リージョン",
             "resource_count": "リソース数",
             "resource_name": "リソース名",
             "resource_type": "リソースタイプ",
             "risk": "リスク",
+            "executive_summary": "エグゼクティブサマリー",
+            "remediation_guidance": "修復ガイダンス",
+            "references": "参考資料",
             "service": "サービス",
             "severity": "重大度",
             "status": "ステータス",
@@ -245,20 +260,49 @@ REPORT_DOCX_TEXT = {
     ),
 }
 
+TEMPLATE_ROOT = Path(__file__).resolve().parent / "report_templates"
 EXECUTIVE_TEMPLATE = (
-    Path(__file__).resolve().parent
-    / "report_templates"
-    / "en"
-    / "executive_report"
-    / "executive_report-template.docx"
+    TEMPLATE_ROOT / "en" / "executive_report" / "executive_report-template.docx"
 )
-FINDINGS_TEMPLATE = (
-    Path(__file__).resolve().parent
-    / "report_templates"
-    / "en"
-    / "findings_report"
-    / "Findings Report.docx"
-)
+FINDINGS_TEMPLATE = TEMPLATE_ROOT / "en" / "findings_report" / "Findings Report.docx"
+EXECUTIVE_TEMPLATES = {
+    "en": EXECUTIVE_TEMPLATE,
+    "zh-CN": (
+        TEMPLATE_ROOT
+        / "zh-CN"
+        / "executive_report"
+        / "executive_report-template.docx"
+    ),
+    "ja-JP": (
+        TEMPLATE_ROOT
+        / "ja-JP"
+        / "executive_report"
+        / "executive_report-template.docx"
+    ),
+}
+FINDINGS_TEMPLATES = {
+    "en": FINDINGS_TEMPLATE,
+    "zh-CN": TEMPLATE_ROOT / "zh-CN" / "findings_report" / "Findings Report.docx",
+    "ja-JP": TEMPLATE_ROOT / "ja-JP" / "findings_report" / "Findings Report.docx",
+}
+CANONICAL_FIGURE_TITLES = {
+    "图 1-1 风险分布": "Figure 1-1 Risk Distribution",
+    "图 1-2 风险类别": "Figure 1-2 Risk Categories",
+    "图 2-1 资产分布": "Figure 2-1 Asset Distribution",
+    "图 2-2 按区域分布的资源": "Figure 2-2 Resource Distribution by Region",
+    "图 3-1 按服务统计发现": "Figure 3-1 Findings by Service",
+    "图 3-2 按类别统计发现": "Figure 3-2 Findings by Category",
+    "图 1-1 发现分布": "Figure 1-1 Findings Distribution",
+    "図 1-1 リスク分布": "Figure 1-1 Risk Distribution",
+    "図 1-2 リスクカテゴリ": "Figure 1-2 Risk Categories",
+    "図 2-1 資産分布": "Figure 2-1 Asset Distribution",
+    "図 2-2 リージョン別リソース分布": (
+        "Figure 2-2 Resource Distribution by Region"
+    ),
+    "図 3-1 サービス別検出結果": "Figure 3-1 Findings by Service",
+    "図 3-2 カテゴリ別検出結果": "Figure 3-2 Findings by Category",
+    "図 1-1 検出結果分布": "Figure 1-1 Findings Distribution",
+}
 
 
 def build_english_executive_report_docx(
@@ -288,7 +332,7 @@ def build_executive_report_docx(
     template_path: Path | None = None,
 ) -> bytes:
     """Build the Executive Word report from exported scan data."""
-    template = template_path or EXECUTIVE_TEMPLATE
+    template = template_path or _template_path(locale, EXECUTIVE_TEMPLATES)
     text = _docx_text(locale)
     data = _build_executive_data(scan, rows, findings, summary, text)
 
@@ -348,7 +392,7 @@ def build_findings_report_docx(
     template_path: Path | None = None,
 ) -> bytes:
     """Build the Findings Word report from exported scan data."""
-    template = template_path or FINDINGS_TEMPLATE
+    template = template_path or _template_path(locale, FINDINGS_TEMPLATES)
     text = _docx_text(locale)
     data = _build_findings_data(scan, rows, findings, summary, text)
 
@@ -391,6 +435,13 @@ def _docx_text(locale: str) -> ReportDocxText:
     return REPORT_DOCX_TEXT.get(locale, REPORT_DOCX_TEXT["en"])
 
 
+def _template_path(locale: str, templates: dict[str, Path]) -> Path:
+    template = templates.get(locale) or templates["en"]
+    if template.is_file():
+        return template
+    return templates["en"]
+
+
 def _build_executive_data(
     scan,
     rows: list[dict],
@@ -416,50 +467,86 @@ def _build_executive_data(
     top_risk_rows = _top_risk_rows(risk_rows, category_by_uid)
     critical_rows = [row for row in top_risk_rows if row["severity"] == "critical"]
     high_rows = [row for row in top_risk_rows if row["severity"] == "high"]
+    recommendation_replacements = {
+        "Enable MFA for all IAM users with console access.": _recommendation_line(
+            top_risk_rows,
+            0,
+            text.recommendations[0],
+            text,
+        ),
+        "Enable CloudTrail logging across all AWS regions.": _recommendation_line(
+            top_risk_rows,
+            1,
+            text.recommendations[1],
+            text,
+        ),
+        "Review privileged IAM permissions.": _recommendation_line(
+            top_risk_rows,
+            2,
+            text.recommendations[2],
+            text,
+        ),
+        text.recommendations[0]: _recommendation_line(
+            top_risk_rows,
+            0,
+            text.recommendations[0],
+            text,
+        ),
+        text.recommendations[1]: _recommendation_line(
+            top_risk_rows,
+            1,
+            text.recommendations[1],
+            text,
+        ),
+        text.recommendations[2]: _recommendation_line(
+            top_risk_rows,
+            2,
+            text.recommendations[2],
+            text,
+        ),
+        "Implement centralized log monitoring.": text.recommendations[3],
+        "Perform periodic IAM access reviews.": text.recommendations[4],
+        "Strengthen account activity alerting.": text.recommendations[5],
+        "Adopt Zero Trust access controls.": text.recommendations[6],
+        "Implement continuous CSPM monitoring.": text.recommendations[7],
+        "Integrate cloud security findings into the incident response process.": (
+            text.recommendations[8]
+        ),
+        "Establish compliance-driven cloud governance.": text.recommendations[9],
+        text.recommendations[3]: text.recommendations[3],
+        text.recommendations[4]: text.recommendations[4],
+        text.recommendations[5]: text.recommendations[5],
+        text.recommendations[6]: text.recommendations[6],
+        text.recommendations[7]: text.recommendations[7],
+        text.recommendations[8]: text.recommendations[8],
+        text.recommendations[9]: text.recommendations[9],
+    }
 
     return {
         "paragraphs": {
             "Assessment Name: {{assessment_name}}": (
                 f"{text.labels['assessment_name']}: {_scan_name(scan, text)}"
             ),
+            f"{text.labels['assessment_name']}: {{{{assessment_name}}}}": (
+                f"{text.labels['assessment_name']}: {_scan_name(scan, text)}"
+            ),
             "Cloud Provider: {{cloud_provider}}": (
                 f"{text.labels['cloud_provider']}: {_provider_name(scan)}"
             ),
+            f"{text.labels['cloud_provider']}: {{{{cloud_provider}}}}": (
+                f"{text.labels['cloud_provider']}: {_provider_name(scan)}"
+            ),
             "Account ID: {{account_id}}": f"{text.labels['account_id']}: {_provider_uid(scan)}",
+            f"{text.labels['account_id']}: {{{{account_id}}}}": (
+                f"{text.labels['account_id']}: {_provider_uid(scan)}"
+            ),
             "Assessment Date: {{assessment_date}}": (
                 f"{text.labels['assessment_date']}: {_assessment_date(scan, summary)}"
             ),
-            "Enable MFA for all IAM users with console access.": _recommendation_line(
-                top_risk_rows,
-                0,
-                text.recommendations[0],
-                text,
+            f"{text.labels['assessment_date']}: {{{{assessment_date}}}}": (
+                f"{text.labels['assessment_date']}: {_assessment_date(scan, summary)}"
             ),
-            "Enable CloudTrail logging across all AWS regions.": _recommendation_line(
-                top_risk_rows,
-                1,
-                text.recommendations[1],
-                text,
-            ),
-            "Review privileged IAM permissions.": _recommendation_line(
-                top_risk_rows,
-                2,
-                text.recommendations[2],
-                text,
-            ),
-            "Implement centralized log monitoring.": text.recommendations[3],
-            "Perform periodic IAM access reviews.": (
-                text.recommendations[4]
-            ),
-            "Strengthen account activity alerting.": text.recommendations[5],
-            "Adopt Zero Trust access controls.": text.recommendations[6],
-            "Implement continuous CSPM monitoring.": (
-                text.recommendations[7]
-            ),
-            "Integrate cloud security findings into the incident response process.": (
-                text.recommendations[8]
-            ),
-            "Establish compliance-driven cloud governance.": text.recommendations[9],
+            **recommendation_replacements,
         },
         "tables": {
             1: [
@@ -546,11 +633,23 @@ def _build_findings_data(
             "Assessment Name: {{assessment_name}}": (
                 f"{text.labels['assessment_name']}: {_scan_name(scan, text)}"
             ),
+            f"{text.labels['assessment_name']}: {{{{assessment_name}}}}": (
+                f"{text.labels['assessment_name']}: {_scan_name(scan, text)}"
+            ),
             "Cloud Provider: {{cloud_provider}}": (
                 f"{text.labels['cloud_provider']}: {_provider_name(scan)}"
             ),
+            f"{text.labels['cloud_provider']}: {{{{cloud_provider}}}}": (
+                f"{text.labels['cloud_provider']}: {_provider_name(scan)}"
+            ),
             "Account ID: {{account_id}}": f"{text.labels['account_id']}: {_provider_uid(scan)}",
+            f"{text.labels['account_id']}: {{{{account_id}}}}": (
+                f"{text.labels['account_id']}: {_provider_uid(scan)}"
+            ),
             "Assessment Date: {{assessment_date}}": (
+                f"{text.labels['assessment_date']}: {_assessment_date(scan, summary)}"
+            ),
+            f"{text.labels['assessment_date']}: {{{{assessment_date}}}}": (
                 f"{text.labels['assessment_date']}: {_assessment_date(scan, summary)}"
             ),
         },
@@ -1112,8 +1211,22 @@ def _replace_findings_detail_blocks(
     if body is None:
         return
     children = list(body)
-    start = _body_paragraph_index(children, "2.1 Finding {{finding_number}}")
-    end = _body_paragraph_index(children, "Appendix A. Severity Definitions")
+    start = _body_paragraph_index_any(
+        children,
+        {
+            "2.1 Finding {{finding_number}}",
+            "2.1 发现 {{finding_number}}",
+            "2.1 検出結果 {{finding_number}}",
+        },
+    )
+    end = _body_paragraph_index_any(
+        children,
+        {
+            "Appendix A. Severity Definitions",
+            "附录 A. 严重等级定义",
+            "付録 A. 重大度定義",
+        },
+    )
     if start is None or end is None or start >= end:
         return
 
@@ -1138,6 +1251,13 @@ def _body_paragraph_index(children: list, text: str) -> int | None:
     return None
 
 
+def _body_paragraph_index_any(children: list, texts: set[str]) -> int | None:
+    for index, element in enumerate(children):
+        if element.tag == _qn("w:p") and _paragraph_text(element).strip() in texts:
+            return index
+    return None
+
+
 def _prune_findings_toc(document_xml) -> None:
     remove_entries = {
         "2.1 Finding Details",
@@ -1148,14 +1268,32 @@ def _prune_findings_toc(document_xml) -> None:
         "2.1.4 Remediation Guidance",
         "2.1.5 References",
         "Appendix A. Severity Definitions",
+        "2.1 发现 {{finding_number}}",
+        "2.1.1 概览",
+        "2.1.2 执行摘要",
+        "2.1.3 受影响资源",
+        "2.1.4 修复指导",
+        "2.1.5 参考资料",
+        "附录 A. 严重等级定义",
+        "2.1 検出結果 {{finding_number}}",
+        "2.1.1 概要",
+        "2.1.2 エグゼクティブサマリー",
+        "2.1.3 影響リソース",
+        "2.1.4 修復ガイダンス",
+        "2.1.5 参考資料",
+        "付録 A. 重大度定義",
     }
     in_toc = False
     for paragraph in list(document_xml.xpath(".//w:p", namespaces=NS)):
         text = _paragraph_text(paragraph).strip()
-        if text == "Table of Contents":
+        if text in {"Table of Contents", "目录", "目次"}:
             in_toc = True
             continue
-        if in_toc and text == "1. Findings Summary":
+        if in_toc and text in {
+            "1. Findings Summary",
+            "1. 发现汇总",
+            "1. 検出結果サマリー",
+        }:
             break
         if not in_toc:
             continue
@@ -1248,16 +1386,65 @@ def _populate_finding_block(
                 f"2.{detail['number']} {text.labels['finding']} {detail['finding_id']} - "
                 f"{_short_text(detail['title'], 90)}"
             ),
-            "2.1.1 Overview": f"2.{detail['number']}.1 Overview",
-            "2.1.2 Executive Summary": f"2.{detail['number']}.2 Executive Summary",
-            "2.1.3 Affected Resources": f"2.{detail['number']}.3 Affected Resources",
-            "2.1.4 Remediation Guidance": f"2.{detail['number']}.4 Remediation Guidance",
-            "2.1.5 References": f"2.{detail['number']}.5 References",
+            f"2.1 {text.labels['finding']} {{{{finding_number}}}}": (
+                f"2.{detail['number']} {text.labels['finding']} {detail['finding_id']} - "
+                f"{_short_text(detail['title'], 90)}"
+            ),
+            "2.1.1 Overview": f"2.{detail['number']}.1 {text.labels['overview']}",
+            f"2.1.1 {text.labels['overview']}": (
+                f"2.{detail['number']}.1 {text.labels['overview']}"
+            ),
+            "2.1.2 Executive Summary": (
+                f"2.{detail['number']}.2 {text.labels['executive_summary']}"
+            ),
+            f"2.1.2 {text.labels['executive_summary']}": (
+                f"2.{detail['number']}.2 {text.labels['executive_summary']}"
+            ),
+            "2.1.3 Affected Resources": (
+                f"2.{detail['number']}.3 {text.labels['affected_resources']}"
+            ),
+            f"2.1.3 {text.labels['affected_resources']}": (
+                f"2.{detail['number']}.3 {text.labels['affected_resources']}"
+            ),
+            "2.1.4 Remediation Guidance": (
+                f"2.{detail['number']}.4 {text.labels['remediation_guidance']}"
+            ),
+            f"2.1.4 {text.labels['remediation_guidance']}": (
+                f"2.{detail['number']}.4 {text.labels['remediation_guidance']}"
+            ),
+            "2.1.5 References": (
+                f"2.{detail['number']}.5 {text.labels['references']}"
+            ),
+            f"2.1.5 {text.labels['references']}": (
+                f"2.{detail['number']}.5 {text.labels['references']}"
+            ),
             "Table 2-1 Finding Overview": (
-                f"Table 2-{detail['number'] * 2 - 1} Finding Overview"
+                _table_caption(
+                    f"2-{detail['number'] * 2 - 1}",
+                    text.labels["finding_overview"],
+                    text,
+                )
             ),
             "Table 2-2 Affected Resources": (
-                f"Table 2-{detail['number'] * 2} Affected Resources"
+                _table_caption(
+                    f"2-{detail['number'] * 2}",
+                    text.labels["affected_resources"],
+                    text,
+                )
+            ),
+            _table_caption("2-1", text.labels["finding_overview"], text): (
+                _table_caption(
+                    f"2-{detail['number'] * 2 - 1}",
+                    text.labels["finding_overview"],
+                    text,
+                )
+            ),
+            _table_caption("2-2", text.labels["affected_resources"], text): (
+                _table_caption(
+                    f"2-{detail['number'] * 2}",
+                    text.labels["affected_resources"],
+                    text,
+                )
             ),
         }
         if paragraph_text in replacements:
@@ -1289,6 +1476,12 @@ def _remove_paragraph(paragraph) -> None:
         paragraph.set("data-delete", "1")
 
 
+def _table_caption(number: str, title: str, text: ReportDocxText) -> str:
+    if text is REPORT_DOCX_TEXT["en"]:
+        return f"Table {number} {title}"
+    return f"表 {number} {title}"
+
+
 def _account_id_from_resource(resource_uid: str) -> str:
     match = re.search(r":(\d{12}):", resource_uid or "")
     if match:
@@ -1305,7 +1498,7 @@ def _format_generated_layout(document_xml, report_type: str) -> None:
 def _center_caption_paragraphs(document_xml) -> None:
     for paragraph in document_xml.xpath(".//w:p", namespaces=NS):
         text = _paragraph_text(paragraph).strip()
-        if not text.startswith(("Table ", "Figure ")):
+        if not text.startswith(("Table ", "Figure ", "表 ", "图 ", "図 ")):
             continue
         ppr = _get_or_add(paragraph, "w:pPr", first=True)
         ind = ppr.find("w:ind", namespaces=NS)
@@ -1592,6 +1785,9 @@ def _chart_paths_by_figure(source: zipfile.ZipFile, document_xml) -> dict[str, s
                 relationship_id = chart.get(_qn("r:id"))
                 if relationship_id in rels:
                     chart_paths[last_figure] = rels[relationship_id]
+                    canonical = CANONICAL_FIGURE_TITLES.get(last_figure)
+                    if canonical:
+                        chart_paths[canonical] = rels[relationship_id]
                 last_figure = None
     return chart_paths
 

@@ -10,8 +10,8 @@ from config.env import env
 
 from api.models import Finding, Scan
 from api.v1.report_docx import (
-    build_english_executive_report_docx,
-    build_english_findings_report_docx,
+    build_executive_report_docx,
+    build_findings_report_docx,
 )
 from api.v1.serializer_utils.check_metadata_i18n import (
     get_localized_check_metadata,
@@ -181,7 +181,7 @@ def get_or_create_localized_scan_report(
     report_path = localized_report_path(scan, locale)
 
     if report_path.is_file():
-        if locale != "en" or _report_zip_has_expected_layout(report_path, locale):
+        if _report_zip_has_expected_layout(report_path, locale):
             return str(report_path), locale
 
     findings_qs = Finding.all_objects.filter(
@@ -220,9 +220,8 @@ def _report_zip_has_expected_layout(report_path: Path, locale: str) -> bool:
         "data/resources.json",
         "data/scan_summary.json",
     }
-    if locale == "en":
-        expected.add("report/executive_report/executive_report.docx")
-        expected.add("report/findings_report/Findings Report.docx")
+    expected.add("report/executive_report/executive_report.docx")
+    expected.add("report/findings_report/Findings Report.docx")
     return expected.issubset(names)
 
 
@@ -507,15 +506,14 @@ def _write_scan_report_zip(
             "data/resources.json",
             json.dumps(list(resources.values()), ensure_ascii=False, indent=2),
         )
-        if locale == "en":
-            report_zip.writestr(
-                "report/executive_report/executive_report.docx",
-                build_english_executive_report_docx(scan, rows, findings, summary),
-            )
-            report_zip.writestr(
-                "report/findings_report/Findings Report.docx",
-                build_english_findings_report_docx(scan, rows, findings, summary),
-            )
+        report_zip.writestr(
+            "report/executive_report/executive_report.docx",
+            build_executive_report_docx(scan, rows, findings, summary, locale=locale),
+        )
+        report_zip.writestr(
+            "report/findings_report/Findings Report.docx",
+            build_findings_report_docx(scan, rows, findings, summary, locale=locale),
+        )
 
 
 def _write_resources_csv(resources: dict, locale: str) -> str:

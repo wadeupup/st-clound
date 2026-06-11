@@ -230,9 +230,11 @@ def test_build_executive_report_docx_supports_localized_text():
     )
 
     text = _document_text(docx_bytes)
+    assert "执行报告" in text
     assert "评估名称: 生产 AWS 评估" in text
     assert "严重" in text
     assert "受影响资产" in text
+    assert "{{" not in text
 
 
 def test_build_findings_report_docx_supports_localized_detail_tables():
@@ -278,7 +280,9 @@ def test_build_findings_report_docx_supports_localized_detail_tables():
     )
 
     text = _document_text(docx_bytes)
+    assert "検出結果詳細レポート" in text
     assert "重大度" in text
     assert "影響リソース" in text
     assert "高" in text
     assert "IAM ユーザー MFA 有効化" in text
+    assert "{{" not in text
