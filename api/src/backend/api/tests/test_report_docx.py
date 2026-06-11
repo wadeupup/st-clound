@@ -23,6 +23,15 @@ def _document_text(docx_bytes: bytes) -> str:
     return " ".join(document.xpath(".//w:t/text()", namespaces=WORD_NS))
 
 
+def _first_table_width(docx_bytes: bytes) -> str | None:
+    with zipfile.ZipFile(BytesIO(docx_bytes)) as docx:
+        document = etree.fromstring(docx.read("word/document.xml"))
+    table_width = document.find(".//w:tbl/w:tblPr/w:tblW", namespaces=WORD_NS)
+    if table_width is None:
+        return None
+    return table_width.get(f"{{{WORD_NS['w']}}}w")
+
+
 def test_build_english_executive_report_docx_populates_scan_data():
     scan = SimpleNamespace(
         id="scan-id",
@@ -146,6 +155,40 @@ def test_build_english_findings_report_docx_populates_finding_details():
     assert "https://example.com/remediate" in text
     assert "{{" not in text
     assert "CloudTrail logging is not enabled" not in text
+
+
+def test_build_findings_report_docx_uses_standard_table_width():
+    scan = SimpleNamespace(
+        id="scan-id",
+        name="Production AWS Assessment",
+        completed_at=datetime(2026, 6, 10, tzinfo=timezone.utc),
+        provider=SimpleNamespace(provider="aws", uid="123456789012"),
+    )
+    rows = [
+        {
+            "uid": "finding-1",
+            "status": "FAIL",
+            "severity": "high",
+            "check_id": "iam_user_mfa_enabled",
+            "check_title": "IAM user MFA enabled",
+            "resource_uid": "arn:aws:iam::123456789012:user/test",
+            "resource_name": "test",
+            "region": "global",
+            "service": "iam",
+            "resource_type": "AwsIamUser",
+        }
+    ]
+    findings = [
+        SimpleNamespace(
+            uid="finding-1",
+            check_id="iam_user_mfa_enabled",
+            check_metadata={"checkid": "iam_user_mfa_enabled"},
+        )
+    ]
+
+    docx_bytes = build_english_findings_report_docx(scan, rows, findings, {})
+
+    assert _first_table_width(docx_bytes) == "7488"
 
 
 def test_build_executive_report_docx_supports_localized_text():

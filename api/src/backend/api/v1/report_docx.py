@@ -34,6 +34,8 @@ SEVERITY_COLORS = {
     "low": "375E1D",
     "informational": "1F4E79",
 }
+BODY_WIDTH_DXA = 9360
+STANDARD_BLOCK_WIDTH_DXA = int(BODY_WIDTH_DXA * 0.8)
 SUPPORTED_DOCX_LOCALES = {"en", "zh-CN", "ja-JP"}
 
 
@@ -1414,6 +1416,103 @@ def _replace_table(table, rows: list[list[str]]) -> None:
         row = copy.deepcopy(template)
         _set_row_values(row, values)
         table.append(row)
+    _format_table_geometry(table)
+
+
+def _format_table_geometry(table) -> None:
+    rows = table.xpath("./w:tr", namespaces=NS)
+    if not rows:
+        return
+    first_cells = rows[0].xpath("./w:tc", namespaces=NS)
+    column_count = len(first_cells)
+    if column_count == 0:
+        return
+    widths = _table_column_widths(column_count)
+    _set_table_width(table, STANDARD_BLOCK_WIDTH_DXA)
+    _set_table_grid(table, widths)
+    for row in rows:
+        cells = row.xpath("./w:tc", namespaces=NS)
+        for index, cell in enumerate(cells):
+            width = widths[min(index, len(widths) - 1)]
+            _set_cell_width(cell, width)
+            _set_cell_margins(cell)
+
+
+def _table_column_widths(column_count: int) -> list[int]:
+    ratios_by_count = {
+        2: [0.42, 0.58],
+        3: [0.45, 0.2, 0.35],
+        4: [0.25, 0.32, 0.18, 0.25],
+        5: [0.25, 0.25, 0.15, 0.18, 0.17],
+    }
+    ratios = ratios_by_count.get(column_count)
+    if not ratios:
+        each = int(STANDARD_BLOCK_WIDTH_DXA / column_count)
+        widths = [each] * column_count
+        widths[-1] += STANDARD_BLOCK_WIDTH_DXA - sum(widths)
+        return widths
+
+    total = sum(ratios)
+    widths = [int(STANDARD_BLOCK_WIDTH_DXA * ratio / total) for ratio in ratios]
+    widths[-1] += STANDARD_BLOCK_WIDTH_DXA - sum(widths)
+    return widths
+
+
+def _set_table_width(table, width_dxa: int) -> None:
+    tbl_pr = table.find("w:tblPr", namespaces=NS)
+    if tbl_pr is None:
+        tbl_pr = etree.Element(_qn("w:tblPr"))
+        table.insert(0, tbl_pr)
+    tbl_w = tbl_pr.find("w:tblW", namespaces=NS)
+    if tbl_w is None:
+        tbl_w = etree.SubElement(tbl_pr, _qn("w:tblW"))
+    tbl_w.set(_qn("w:w"), str(width_dxa))
+    tbl_w.set(_qn("w:type"), "dxa")
+
+    jc = tbl_pr.find("w:jc", namespaces=NS)
+    if jc is None:
+        jc = etree.SubElement(tbl_pr, _qn("w:jc"))
+    jc.set(_qn("w:val"), "center")
+
+    layout = tbl_pr.find("w:tblLayout", namespaces=NS)
+    if layout is None:
+        layout = etree.SubElement(tbl_pr, _qn("w:tblLayout"))
+    layout.set(_qn("w:type"), "fixed")
+
+
+def _set_table_grid(table, widths: list[int]) -> None:
+    tbl_grid = table.find("w:tblGrid", namespaces=NS)
+    if tbl_grid is None:
+        insert_at = 1 if table.find("w:tblPr", namespaces=NS) is not None else 0
+        tbl_grid = etree.Element(_qn("w:tblGrid"))
+        table.insert(insert_at, tbl_grid)
+    for child in list(tbl_grid):
+        tbl_grid.remove(child)
+    for width in widths:
+        grid_col = etree.SubElement(tbl_grid, _qn("w:gridCol"))
+        grid_col.set(_qn("w:w"), str(width))
+
+
+def _set_cell_width(cell, width_dxa: int) -> None:
+    tc_pr = _get_or_add(cell, "w:tcPr", first=True)
+    tc_w = tc_pr.find("w:tcW", namespaces=NS)
+    if tc_w is None:
+        tc_w = etree.SubElement(tc_pr, _qn("w:tcW"))
+    tc_w.set(_qn("w:w"), str(width_dxa))
+    tc_w.set(_qn("w:type"), "dxa")
+
+
+def _set_cell_margins(cell, margin_dxa: int = 100) -> None:
+    tc_pr = _get_or_add(cell, "w:tcPr", first=True)
+    tc_mar = tc_pr.find("w:tcMar", namespaces=NS)
+    if tc_mar is None:
+        tc_mar = etree.SubElement(tc_pr, _qn("w:tcMar"))
+    for side in ("top", "left", "bottom", "right"):
+        node = tc_mar.find(f"w:{side}", namespaces=NS)
+        if node is None:
+            node = etree.SubElement(tc_mar, _qn(f"w:{side}"))
+        node.set(_qn("w:w"), str(margin_dxa))
+        node.set(_qn("w:type"), "dxa")
 
 
 def _set_row_values(row, values: list[str]) -> None:
