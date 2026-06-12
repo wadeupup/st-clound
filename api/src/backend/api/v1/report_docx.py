@@ -1,10 +1,6 @@
 import copy
 import io
-import os
 import re
-import shutil
-import subprocess
-import tempfile
 import zipfile
 from collections import Counter, defaultdict
 from dataclasses import dataclass
@@ -22,6 +18,13 @@ NS = {
 }
 
 REL_NS = "http://schemas.openxmlformats.org/package/2006/relationships"
+CONTENT_TYPES_NS = "http://schemas.openxmlformats.org/package/2006/content-types"
+FOOTER_REL_TYPE = (
+    "http://schemas.openxmlformats.org/officeDocument/2006/relationships/footer"
+)
+FOOTER_CONTENT_TYPE = (
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml"
+)
 SEVERITY_ORDER = ["critical", "high", "medium", "low", "informational"]
 SEVERITY_LABELS = {
     "critical": "Critical",
@@ -41,6 +44,37 @@ SEVERITY_COLORS = {
 BODY_WIDTH_DXA = 9360
 STANDARD_BLOCK_WIDTH_DXA = int(BODY_WIDTH_DXA * 0.8)
 SUPPORTED_DOCX_LOCALES = {"en", "zh-CN", "ja-JP"}
+DOCX_FONT_BY_LOCALE = {
+    "en": "Century",
+    "zh-CN": "宋体",
+    "ja-JP": "ＭＳ 明朝",
+}
+DOCX_SIZE_BIG_TITLE = 48
+DOCX_SIZE_HEADING_1 = 36
+DOCX_SIZE_HEADING_2 = 28
+DOCX_SIZE_HEADING_3 = 24
+DOCX_SIZE_BODY = 21
+DOCX_SIZE_TOC_LEVEL_1 = 24
+DOCX_SIZE_TOC_LEVEL_2 = 20
+DOCX_COVER_TITLES = {
+    "Executive_Report",
+    "Executive Report",
+    "Findings Report",
+    "执行报告",
+    "发现详情报告",
+    "エグゼクティブレポート",
+    "検出結果詳細レポート",
+}
+DOCX_COVER_ASSESSMENT_PREFIXES = ("Assessment Name:", "评估名称:", "評価名:")
+DOCX_COVER_STANDARD_PREFIXES = (
+    "Cloud Provider:",
+    "Account ID:",
+    "云提供商:",
+    "账号 ID:",
+    "クラウドプロバイダー:",
+    "アカウント ID:",
+)
+DOCX_COVER_DATE_PREFIXES = ("Assessment Date:", "评估日期:", "評価日:")
 
 STATUS_EXTENDED_TRANSLATIONS = {
     "zh-CN": {
@@ -377,9 +411,11 @@ def build_executive_report_docx(
 
         _replace_paragraph_text(document_xml, data["paragraphs"])
         _replace_tables(document_xml, data["tables"])
-        _format_generated_layout(document_xml, report_type="executive")
+        _format_generated_layout(document_xml, report_type="executive", locale=locale)
 
-        replacements = {"word/document.xml": _xml_bytes(document_xml)}
+        replacements = {}
+        _ensure_page_number_footer(source, document_xml, replacements)
+        replacements["word/document.xml"] = _xml_bytes(document_xml)
         settings_xml = etree.fromstring(source.read("word/settings.xml"))
         _enable_update_fields_on_open(settings_xml)
         replacements["word/settings.xml"] = _xml_bytes(settings_xml)
@@ -394,13 +430,9 @@ def build_executive_report_docx(
 
         output = io.BytesIO()
         with zipfile.ZipFile(output, "w", zipfile.ZIP_DEFLATED) as target:
-            for item in source.infolist():
-                content = replacements.get(item.filename)
-                if content is None:
-                    content = source.read(item.filename)
-                target.writestr(item, content)
+            _write_docx_package(source, target, replacements)
 
-    return _update_docx_fields(output.getvalue())
+    return output.getvalue()
 
 
 def build_english_findings_report_docx(
@@ -446,9 +478,11 @@ def build_findings_report_docx(
             {"2.1 Finding {{finding_number}}3": "2.1 Finding Details"},
         )
         _replace_findings_toc(document_xml, data["findings"], text)
-        _format_generated_layout(document_xml, report_type="findings")
+        _format_generated_layout(document_xml, report_type="findings", locale=locale)
 
-        replacements = {"word/document.xml": _xml_bytes(document_xml)}
+        replacements = {}
+        _ensure_page_number_footer(source, document_xml, replacements)
+        replacements["word/document.xml"] = _xml_bytes(document_xml)
         settings_xml = etree.fromstring(source.read("word/settings.xml"))
         _enable_update_fields_on_open(settings_xml)
         replacements["word/settings.xml"] = _xml_bytes(settings_xml)
@@ -463,13 +497,9 @@ def build_findings_report_docx(
 
         output = io.BytesIO()
         with zipfile.ZipFile(output, "w", zipfile.ZIP_DEFLATED) as target:
-            for item in source.infolist():
-                content = replacements.get(item.filename)
-                if content is None:
-                    content = source.read(item.filename)
-                target.writestr(item, content)
+            _write_docx_package(source, target, replacements)
 
-    return _update_docx_fields(output.getvalue())
+    return output.getvalue()
 
 
 def _docx_text(locale: str) -> ReportDocxText:
@@ -481,6 +511,20 @@ def _template_path(locale: str, templates: dict[str, Path]) -> Path:
     if template.is_file():
         return template
     return templates["en"]
+
+
+def _write_docx_package(source, target, replacements: dict[str, bytes]) -> None:
+    source_names = set()
+    for item in source.infolist():
+        source_names.add(item.filename)
+        content = replacements.get(item.filename)
+        if content is None:
+            content = source.read(item.filename)
+        target.writestr(item, content)
+
+    for filename, content in replacements.items():
+        if filename not in source_names:
+            target.writestr(filename, content)
 
 
 def _build_executive_data(
@@ -1470,6 +1514,9 @@ def _replace_findings_toc(
     if detail_paragraph is None:
         return
 
+    for paragraph in toc_paragraphs:
+        _set_findings_toc_spacing(paragraph)
+
     _remove_static_findings_toc_entries(toc_paragraphs)
     parent = detail_paragraph.getparent()
     if parent is None:
@@ -1485,6 +1532,7 @@ def _replace_findings_toc(
             fallback_page="3",
         )
         _set_toc_entry_indent(paragraph, left=360)
+        _set_findings_toc_spacing(paragraph)
         parent.insert(parent.index(insert_after) + 1, paragraph)
         insert_after = paragraph
 
@@ -1566,6 +1614,10 @@ def _set_toc_entry_indent(paragraph, left: int) -> None:
         ind = etree.SubElement(ppr, _qn("w:ind"))
     ind.set(_qn("w:left"), str(left))
     ind.set(_qn("w:firstLine"), "0")
+
+
+def _set_findings_toc_spacing(paragraph) -> None:
+    _set_paragraph_spacing(paragraph, after=100, line=320, line_rule="auto")
 
 
 def _populate_finding_block(
@@ -1789,12 +1841,301 @@ def _account_id_from_resource(resource_uid: str) -> str:
     return match.group(0) if match else ""
 
 
-def _format_generated_layout(document_xml, report_type: str) -> None:
+def _format_generated_layout(document_xml, report_type: str, locale: str) -> None:
     _center_caption_paragraphs(document_xml)
     _normalize_all_table_geometry(document_xml)
     _normalize_table_severity_text_colors(document_xml)
     _add_static_toc_target_bookmarks(document_xml, report_type)
     _add_static_toc_page_numbers(document_xml, report_type)
+    _apply_estimated_toc_page_numbers(document_xml, report_type)
+    _normalize_document_typography(document_xml, locale)
+
+
+def _normalize_document_typography(document_xml, locale: str) -> None:
+    font_name = DOCX_FONT_BY_LOCALE.get(locale, DOCX_FONT_BY_LOCALE["en"])
+    tree = document_xml.getroottree()
+    toc_sizes = {
+        tree.getpath(paragraph): _toc_paragraph_font_size(label)
+        for paragraph, label in _toc_entries_with_paragraphs(document_xml)
+    }
+    for paragraph in document_xml.xpath(".//w:p", namespaces=NS):
+        size = toc_sizes.get(tree.getpath(paragraph), _paragraph_font_size(paragraph))
+        paragraph_properties = _get_or_add(paragraph, "w:pPr", first=True)
+        paragraph_run_properties = paragraph_properties.find("w:rPr", namespaces=NS)
+        if paragraph_run_properties is None:
+            paragraph_run_properties = etree.SubElement(
+                paragraph_properties,
+                _qn("w:rPr"),
+            )
+        _set_run_properties_typography(paragraph_run_properties, font_name, size)
+        for run in paragraph.xpath("./w:r", namespaces=NS):
+            _set_run_typography(run, font_name, size)
+        for run in paragraph.xpath("./w:fldSimple/w:r", namespaces=NS):
+            _set_run_typography(run, font_name, size)
+
+
+def _paragraph_font_size(paragraph) -> int:
+    text = _paragraph_text(paragraph).strip()
+    style_id = _paragraph_style_id(paragraph)
+    if style_id in {"Title", "TOCHeading"} or text in {
+        "Table of Contents",
+        "目录",
+        "目次",
+    }:
+        return DOCX_SIZE_BIG_TITLE
+    cover_size = _cover_paragraph_font_size(text)
+    if cover_size:
+        return cover_size
+    if style_id == "Heading1" or _is_heading_1_text(text):
+        return DOCX_SIZE_HEADING_1
+    if style_id == "Heading2" or _is_heading_2_text(text):
+        return DOCX_SIZE_HEADING_2
+    if style_id == "Heading3" or _is_heading_3_text(text):
+        return DOCX_SIZE_HEADING_3
+    return DOCX_SIZE_BODY
+
+
+def _toc_paragraph_font_size(label: str) -> int:
+    if re.match(r"^\d+\.\d+\s+\S", label):
+        return DOCX_SIZE_TOC_LEVEL_2
+    return DOCX_SIZE_TOC_LEVEL_1
+
+
+def _cover_paragraph_font_size(text: str) -> int | None:
+    if text in DOCX_COVER_TITLES:
+        return DOCX_SIZE_HEADING_2
+    if text.startswith(DOCX_COVER_ASSESSMENT_PREFIXES):
+        return DOCX_SIZE_BIG_TITLE
+    if text.startswith(DOCX_COVER_STANDARD_PREFIXES):
+        return DOCX_SIZE_HEADING_2
+    if text.startswith(DOCX_COVER_DATE_PREFIXES):
+        return DOCX_SIZE_HEADING_3
+    return None
+
+
+def _paragraph_style_id(paragraph) -> str:
+    style = paragraph.find("w:pPr/w:pStyle", namespaces=NS)
+    return style.get(_qn("w:val"), "") if style is not None else ""
+
+
+def _is_heading_1_text(text: str) -> bool:
+    return bool(
+        re.match(r"^\d+\.\s+\S", text)
+        or re.match(r"^Appendix [A-Z]\.\s+\S", text)
+        or re.match(r"^附录 [A-Z]\.\s+\S", text)
+        or re.match(r"^付録 [A-Z]\.\s+\S", text)
+    )
+
+
+def _is_heading_2_text(text: str) -> bool:
+    return bool(re.match(r"^\d+\.\d+\s+\S", text))
+
+
+def _is_heading_3_text(text: str) -> bool:
+    return bool(re.match(r"^\d+\.\d+\.\d+\s+\S", text))
+
+
+def _set_run_typography(run, font_name: str, size: int) -> None:
+    run_properties = _get_or_add(run, "w:rPr", first=True)
+    _set_run_properties_typography(run_properties, font_name, size)
+
+
+def _set_run_properties_typography(run_properties, font_name: str, size: int) -> None:
+    fonts = run_properties.find("w:rFonts", namespaces=NS)
+    if fonts is None:
+        fonts = etree.Element(_qn("w:rFonts"))
+        run_properties.insert(0, fonts)
+    for attribute in ("w:asciiTheme", "w:hAnsiTheme", "w:eastAsiaTheme", "w:cstheme"):
+        fonts.attrib.pop(_qn(attribute), None)
+    for attribute in ("w:ascii", "w:hAnsi", "w:eastAsia", "w:cs"):
+        fonts.set(_qn(attribute), font_name)
+
+    size_element = run_properties.find("w:sz", namespaces=NS)
+    if size_element is None:
+        size_element = etree.SubElement(run_properties, _qn("w:sz"))
+    size_element.set(_qn("w:val"), str(size))
+
+    complex_size = run_properties.find("w:szCs", namespaces=NS)
+    if complex_size is None:
+        complex_size = etree.SubElement(run_properties, _qn("w:szCs"))
+    complex_size.set(_qn("w:val"), str(size))
+
+
+def _ensure_page_number_footer(source, document_xml, replacements: dict[str, bytes]) -> None:
+    section_properties = document_xml.xpath(".//w:sectPr", namespaces=NS)
+    if not section_properties:
+        body = document_xml.find("w:body", namespaces=NS)
+        if body is None:
+            return
+        section_property = etree.SubElement(body, _qn("w:sectPr"))
+        section_properties = [section_property]
+
+    relationships_path = "word/_rels/document.xml.rels"
+    relationships_xml = etree.fromstring(source.read(relationships_path))
+    footer_relationship = None
+    for relationship in relationships_xml.findall(f"{{{REL_NS}}}Relationship"):
+        if relationship.get("Type") == FOOTER_REL_TYPE:
+            footer_relationship = relationship
+            break
+
+    if footer_relationship is None:
+        footer_name = _next_footer_name(source.namelist())
+        relationship_id = _next_relationship_id(relationships_xml)
+        footer_relationship = etree.SubElement(
+            relationships_xml,
+            f"{{{REL_NS}}}Relationship",
+        )
+        footer_relationship.set("Id", relationship_id)
+        footer_relationship.set("Type", FOOTER_REL_TYPE)
+        footer_relationship.set("Target", footer_name)
+    else:
+        footer_name = footer_relationship.get("Target") or _next_footer_name(
+            source.namelist()
+        )
+        footer_relationship.set("Target", footer_name)
+
+    footer_package_path = (
+        footer_name if footer_name.startswith("word/") else f"word/{footer_name}"
+    )
+    footer_part_name = footer_package_path.removeprefix("word/")
+    replacements[footer_package_path] = _page_number_footer_xml()
+    _ensure_footer_content_type(source, replacements, footer_part_name)
+
+    relationship_id = footer_relationship.get("Id")
+    if not relationship_id:
+        return
+
+    for section_property in section_properties:
+        _apply_page_footer_to_section(section_property, relationship_id)
+
+    replacements[relationships_path] = _xml_bytes(relationships_xml)
+
+
+def _apply_page_footer_to_section(section_property, relationship_id: str) -> None:
+    # WPS is stricter than Word here: default-only footer references may not be
+    # rendered after template generation. Point all footer slots at the page
+    # footer and make the footer margin explicit.
+    for footer_type in ("default", "first", "even"):
+        _set_section_footer_reference(section_property, footer_type, relationship_id)
+    _ensure_section_footer_margin(section_property)
+
+
+def _set_section_footer_reference(
+    section_property,
+    footer_type: str,
+    relationship_id: str,
+) -> None:
+    footer_reference = None
+    for candidate in section_property.findall("w:footerReference", namespaces=NS):
+        if candidate.get(_qn("w:type")) == footer_type:
+            footer_reference = candidate
+            break
+    if footer_reference is None:
+        footer_reference = etree.Element(_qn("w:footerReference"))
+        footer_reference.set(_qn("w:type"), footer_type)
+        section_property.insert(_section_footer_reference_insert_index(section_property), footer_reference)
+    footer_reference.set(_qn("r:id"), relationship_id)
+
+
+def _section_footer_reference_insert_index(section_property) -> int:
+    index = 0
+    for index, child in enumerate(section_property):
+        if child.tag not in {_qn("w:headerReference"), _qn("w:footerReference")}:
+            return index
+    return len(section_property)
+
+
+def _ensure_section_footer_margin(section_property) -> None:
+    page_margin = section_property.find("w:pgMar", namespaces=NS)
+    if page_margin is None:
+        page_margin = etree.Element(_qn("w:pgMar"))
+        page_margin.set(_qn("w:top"), "1440")
+        page_margin.set(_qn("w:right"), "1440")
+        page_margin.set(_qn("w:bottom"), "1440")
+        page_margin.set(_qn("w:left"), "1440")
+        page_margin.set(_qn("w:gutter"), "0")
+        section_property.insert(_section_page_margin_insert_index(section_property), page_margin)
+    page_margin.set(_qn("w:footer"), page_margin.get(_qn("w:footer")) or "720")
+    page_margin.set(_qn("w:header"), page_margin.get(_qn("w:header")) or "720")
+
+
+def _section_page_margin_insert_index(section_property) -> int:
+    for index, child in enumerate(section_property):
+        if child.tag in {_qn("w:cols"), _qn("w:docGrid")}:
+            return index
+    return len(section_property)
+
+
+def _next_footer_name(package_names: list[str]) -> str:
+    footer_numbers = []
+    for name in package_names:
+        match = re.fullmatch(r"word/footer(\d+)\.xml", name)
+        if match:
+            footer_numbers.append(int(match.group(1)))
+    return f"footer{(max(footer_numbers) if footer_numbers else 0) + 1}.xml"
+
+
+def _next_relationship_id(relationships_xml) -> str:
+    relationship_numbers = []
+    for relationship in relationships_xml.findall(f"{{{REL_NS}}}Relationship"):
+        relationship_id = relationship.get("Id") or ""
+        match = re.fullmatch(r"rId(\d+)", relationship_id)
+        if match:
+            relationship_numbers.append(int(match.group(1)))
+    return f"rId{(max(relationship_numbers) if relationship_numbers else 0) + 1}"
+
+
+def _page_number_footer_xml() -> bytes:
+    footer = etree.Element(_qn("w:ftr"), nsmap={"w": NS["w"]})
+    paragraph = etree.SubElement(footer, _qn("w:p"))
+    paragraph_properties = etree.SubElement(paragraph, _qn("w:pPr"))
+    justification = etree.SubElement(paragraph_properties, _qn("w:jc"))
+    justification.set(_qn("w:val"), "center")
+
+    begin_run = etree.SubElement(paragraph, _qn("w:r"))
+    begin = etree.SubElement(begin_run, _qn("w:fldChar"))
+    begin.set(_qn("w:fldCharType"), "begin")
+    begin.set(_qn("w:dirty"), "true")
+
+    instruction_run = etree.SubElement(paragraph, _qn("w:r"))
+    instruction = etree.SubElement(instruction_run, _qn("w:instrText"))
+    instruction.set("{http://www.w3.org/XML/1998/namespace}space", "preserve")
+    instruction.text = " PAGE "
+
+    separator_run = etree.SubElement(paragraph, _qn("w:r"))
+    separator = etree.SubElement(separator_run, _qn("w:fldChar"))
+    separator.set(_qn("w:fldCharType"), "separate")
+
+    result_run = etree.SubElement(paragraph, _qn("w:r"))
+    result = etree.SubElement(result_run, _qn("w:t"))
+    result.text = "1"
+
+    end_run = etree.SubElement(paragraph, _qn("w:r"))
+    end = etree.SubElement(end_run, _qn("w:fldChar"))
+    end.set(_qn("w:fldCharType"), "end")
+
+    return _xml_bytes(footer)
+
+
+def _ensure_footer_content_type(
+    source,
+    replacements: dict[str, bytes],
+    footer_name: str,
+) -> None:
+    content_types_path = "[Content_Types].xml"
+    content_types_xml = etree.fromstring(source.read(content_types_path))
+    part_name = f"/word/{footer_name}"
+    for override in content_types_xml.findall(f"{{{CONTENT_TYPES_NS}}}Override"):
+        if override.get("PartName") == part_name:
+            return
+
+    override = etree.SubElement(
+        content_types_xml,
+        f"{{{CONTENT_TYPES_NS}}}Override",
+    )
+    override.set("PartName", part_name)
+    override.set("ContentType", FOOTER_CONTENT_TYPE)
+    replacements[content_types_path] = _xml_bytes(content_types_xml)
 
 
 def _normalize_all_table_geometry(document_xml) -> None:
@@ -1850,6 +2191,160 @@ def _add_static_toc_page_numbers(document_xml, report_type: str) -> None:
             _set_paragraph_text(paragraph, f"{toc_text}\t{page}")
         if toc_text == final_toc_entry:
             break
+
+
+def _apply_estimated_toc_page_numbers(document_xml, report_type: str) -> None:
+    toc_entries = _toc_entries_with_paragraphs(document_xml)
+    if not toc_entries:
+        return
+
+    labels = [label for _, label in toc_entries]
+    page_map = _estimate_toc_pages_from_document(document_xml, labels, report_type)
+    previous_page = 3
+    for paragraph, label in toc_entries:
+        page = page_map.get(label, previous_page)
+        previous_page = max(previous_page, page)
+        _set_toc_paragraph_text_with_page(paragraph, label, str(page))
+
+
+def _toc_entries_with_paragraphs(document_xml) -> list[tuple[object, str]]:
+    entries = []
+    for paragraph in _toc_paragraphs(document_xml):
+        label = _toc_label_from_paragraph(paragraph)
+        if label:
+            entries.append((paragraph, label))
+    return entries
+
+
+def _toc_label_from_paragraph(paragraph) -> str:
+    field = paragraph.find("w:fldSimple", namespaces=NS)
+    if field is not None:
+        parts = []
+        for child in paragraph:
+            if child is field:
+                break
+            if child.tag == _qn("w:r"):
+                parts.append(_paragraph_text(child))
+        return "".join(parts).strip()
+
+    text = _paragraph_text(paragraph).strip()
+    if not text:
+        return ""
+    text = re.sub(r"\s*[\t.]+\s*\d+\s*$", "", text)
+    return text.strip()
+
+
+def _estimate_toc_pages_from_document(
+    document_xml,
+    toc_labels: list[str],
+    report_type: str,
+) -> dict[str, int]:
+    toc_page_count = _estimated_toc_page_count(toc_labels, report_type)
+    page = 2 + toc_page_count
+    used = 0
+    capacity = 42
+    page_map: dict[str, int] = {}
+    label_set = set(toc_labels)
+    started = False
+    seen_toc = False
+    body = document_xml.find("w:body", namespaces=NS)
+    if body is None:
+        return {}
+
+    for element in list(body):
+        if element.tag == _qn("w:p"):
+            text = _paragraph_text(element).strip()
+            if text in {"Table of Contents", "目录", "目次"}:
+                seen_toc = True
+                continue
+            if seen_toc and element.xpath(".//w:br[@w:type='page']", namespaces=NS):
+                started = True
+                continue
+        if not started:
+            continue
+
+        text = _paragraph_text(element).strip() if element.tag == _qn("w:p") else ""
+        units = _estimated_body_element_units(element)
+        if text in label_set and used > capacity - 8:
+            page += 1
+            used = 0
+        if text in label_set:
+            page_map.setdefault(text, page)
+
+        if element.tag == _qn("w:p") and element.xpath(
+            ".//w:br[@w:type='page']",
+            namespaces=NS,
+        ):
+            page += 1
+            used = 0
+            continue
+
+        if units <= 0:
+            continue
+        if used and used + units > capacity:
+            page += 1
+            used = 0
+        used += units
+        while used > capacity:
+            page += 1
+            used -= capacity
+
+    return page_map
+
+
+def _estimated_toc_page_count(toc_labels: list[str], report_type: str) -> int:
+    capacity = 22 if report_type == "findings" else 28
+    units = 2
+    for label in toc_labels:
+        wrapped_lines = max(0, (len(label) - 58) // 58)
+        units += 1 + wrapped_lines
+    return max(1, (units + capacity - 1) // capacity)
+
+
+def _estimated_body_element_units(element) -> int:
+    if element.tag == _qn("w:tbl"):
+        rows = element.xpath(".//w:tr", namespaces=NS)
+        return 5 + max(1, len(rows)) * 3
+    if element.tag != _qn("w:p"):
+        return 1
+
+    text = _paragraph_text(element).strip()
+    if element.xpath(".//w:drawing", namespaces=NS):
+        return 20
+    if not text:
+        return 1
+    if _is_heading_1_text(text):
+        return 8
+    if _is_heading_2_text(text):
+        return 6
+    if _is_heading_3_text(text):
+        return 4
+    if text.startswith(("Table ", "Figure ", "表 ", "图 ", "図 ")):
+        return 3
+    return 2 + (len(text) + 59) // 60
+
+
+def _set_toc_paragraph_text_with_page(
+    paragraph,
+    label: str,
+    page: str,
+) -> None:
+    for child in list(paragraph):
+        if child.tag != _qn("w:pPr"):
+            paragraph.remove(child)
+
+    run = etree.SubElement(paragraph, _qn("w:r"))
+    text = etree.SubElement(run, _qn("w:t"))
+    text.text = label
+
+    tab_run = etree.SubElement(paragraph, _qn("w:r"))
+    etree.SubElement(tab_run, _qn("w:tab"))
+
+    page_run = etree.SubElement(paragraph, _qn("w:r"))
+    page_text = etree.SubElement(page_run, _qn("w:t"))
+    page_text.text = page
+
+    _add_right_tab_stop(paragraph)
 
 
 def _toc_pages(report_type: str, toc_title: str = "Table of Contents") -> dict[str, str]:
@@ -2105,55 +2600,6 @@ def _enable_update_fields_on_open(settings_xml) -> None:
     if update_fields is None:
         update_fields = etree.SubElement(settings_xml, _qn("w:updateFields"))
     update_fields.set(_qn("w:val"), "true")
-
-
-def _update_docx_fields(docx_bytes: bytes) -> bytes:
-    office = (
-        shutil.which("soffice")
-        or shutil.which("libreoffice")
-        or shutil.which("lowriter")
-    )
-    if not office:
-        return docx_bytes
-
-    try:
-        with tempfile.TemporaryDirectory(prefix="report-docx-") as tmp:
-            tmp_path = Path(tmp)
-            input_path = tmp_path / "report.docx"
-            output_dir = tmp_path / "out"
-            output_dir.mkdir()
-            input_path.write_bytes(docx_bytes)
-
-            env = os.environ.copy()
-            env["HOME"] = str(tmp_path)
-            subprocess.run(
-                [
-                    office,
-                    "--headless",
-                    "--invisible",
-                    "--nodefault",
-                    "--nofirststartwizard",
-                    "--norestore",
-                    "--convert-to",
-                    "docx",
-                    "--outdir",
-                    str(output_dir),
-                    str(input_path),
-                ],
-                check=True,
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL,
-                timeout=90,
-                env=env,
-            )
-
-            output_path = output_dir / input_path.name
-            if output_path.is_file():
-                return output_path.read_bytes()
-    except Exception:
-        return docx_bytes
-
-    return docx_bytes
 
 
 def _add_right_tab_stop(paragraph) -> None:
@@ -2666,13 +3112,23 @@ def _set_labeled_paragraph_text(paragraph, label: str, value: str) -> None:
     value_text.text = value
 
 
-def _set_paragraph_spacing(paragraph, before: int = 0, after: int = 0) -> None:
+def _set_paragraph_spacing(
+    paragraph,
+    before: int = 0,
+    after: int = 0,
+    line: int | None = None,
+    line_rule: str | None = None,
+) -> None:
     paragraph_properties = _get_or_add(paragraph, "w:pPr", first=True)
     spacing = paragraph_properties.find("w:spacing", namespaces=NS)
     if spacing is None:
         spacing = etree.SubElement(paragraph_properties, _qn("w:spacing"))
     spacing.set(_qn("w:before"), str(before))
     spacing.set(_qn("w:after"), str(after))
+    if line is not None:
+        spacing.set(_qn("w:line"), str(line))
+    if line_rule is not None:
+        spacing.set(_qn("w:lineRule"), line_rule)
 
 
 def _xml_bytes(xml) -> bytes:
