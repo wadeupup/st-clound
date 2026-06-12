@@ -1,6 +1,7 @@
 "use client";
 
 import { Languages } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 import {
   Select,
@@ -19,6 +20,7 @@ const localeLabels: Record<Locale, string> = {
 
 export function LanguageSwitcher() {
   const { locale, setLocale } = useI18n();
+  const router = useRouter();
 
   return (
     <Select
@@ -29,7 +31,7 @@ export function LanguageSwitcher() {
         if (nextLocale === locale) return;
 
         setLocale(nextLocale);
-        window.location.reload();
+        router.refresh();
       }}
     >
       <SelectTrigger className="h-9 w-9 rounded-full border-slate-300 bg-white/50 p-0 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800/50 dark:hover:bg-slate-800 [&>svg:last-child]:hidden">

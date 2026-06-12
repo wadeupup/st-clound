@@ -16,12 +16,21 @@ from api.v1.report_docx import (
 WORD_NS = {
     "w": "http://schemas.openxmlformats.org/wordprocessingml/2006/main",
 }
+CHART_NS = {
+    "c": "http://schemas.openxmlformats.org/drawingml/2006/chart",
+}
 
 
 def _document_text(docx_bytes: bytes) -> str:
     with zipfile.ZipFile(BytesIO(docx_bytes)) as docx:
         document = etree.fromstring(docx.read("word/document.xml"))
     return " ".join(document.xpath(".//w:t/text()", namespaces=WORD_NS))
+
+
+def _chart_values(docx_bytes: bytes, chart_path: str) -> list[str]:
+    with zipfile.ZipFile(BytesIO(docx_bytes)) as docx:
+        chart = etree.fromstring(docx.read(chart_path))
+    return chart.xpath(".//c:v/text()", namespaces=CHART_NS)
 
 
 def _paragraph_texts(docx_bytes: bytes) -> list[str]:
@@ -68,16 +77,6 @@ def _table_border_values(docx_bytes: bytes) -> list[str]:
             namespaces=WORD_NS,
         )
         if border.get(f"{{{WORD_NS['w']}}}val")
-    ]
-
-
-def _field_instructions(docx_bytes: bytes) -> list[str]:
-    with zipfile.ZipFile(BytesIO(docx_bytes)) as docx:
-        document = etree.fromstring(docx.read("word/document.xml"))
-    return [
-        field.get(f"{{{WORD_NS['w']}}}instr")
-        for field in document.xpath(".//w:fldSimple", namespaces=WORD_NS)
-        if field.get(f"{{{WORD_NS['w']}}}instr")
     ]
 
 
@@ -325,8 +324,8 @@ def test_build_findings_report_docx_adds_dynamic_toc_entries():
     assert not any("{{finding_number}}" in paragraph for paragraph in paragraphs)
     assert "finding_001" in _bookmark_names(docx_bytes)
     assert "finding_002" in _bookmark_names(docx_bytes)
-    assert any("PAGEREF finding_001" in field for field in _field_instructions(docx_bytes))
-    assert any("PAGEREF finding_002" in field for field in _field_instructions(docx_bytes))
+    assert "toc_findings_appendix_a" in _bookmark_names(docx_bytes)
+    assert any(paragraph.startswith("Appendix A. Severity Definitions") for paragraph in paragraphs)
     assert _update_fields_enabled(docx_bytes)
 
 
@@ -371,19 +370,25 @@ def test_build_executive_report_docx_supports_localized_text():
     text = _document_text(docx_bytes)
     assert "执行报告" in text
     assert "评估名称: 生产 AWS 评估" in text
+    assert "关键检测结果" in text
     assert "严重" in text
     assert "受影响资产" in text
     assert "{{" not in text
     assert "toc_executive_summary" in _bookmark_names(docx_bytes)
     assert "toc_recommendations" in _bookmark_names(docx_bytes)
-    assert any(
-        "PAGEREF toc_executive_summary" in field
-        for field in _field_instructions(docx_bytes)
-    )
-    assert any(
-        "PAGEREF toc_recommendations" in field
-        for field in _field_instructions(docx_bytes)
-    )
+    assert _chart_values(docx_bytes, "word/charts/chart2.xml") == [
+        "数量",
+        "严重",
+        "高",
+        "中",
+        "低",
+        "信息",
+        "1",
+        "0",
+        "0",
+        "0",
+        "0",
+    ]
     assert _update_fields_enabled(docx_bytes)
 
 
@@ -525,6 +530,9 @@ def test_build_findings_report_docx_replaces_localized_action_placeholders():
 
     text = _document_text(docx_bytes)
     paragraphs = _paragraph_texts(docx_bytes)
+    assert "检测结果详情报告" in text
+    assert "2. 检测结果详情" in text
+    assert "附录 A. 严重等级定义" in text
     assert "使用 SCP 限制未批准区域。" in text
     assert "定期复核允许区域列表。" in text
     assert "启用 CloudTrail。" not in text

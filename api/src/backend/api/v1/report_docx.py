@@ -62,6 +62,7 @@ DOCX_COVER_TITLES = {
     "Findings Report",
     "执行报告",
     "发现详情报告",
+    "检测结果详情报告",
     "エグゼクティブレポート",
     "検出結果詳細レポート",
 }
@@ -206,10 +207,10 @@ REPORT_DOCX_TEXT = {
             "current_status": "当前状态",
             "description": "描述",
             "field": "字段",
-            "finding": "发现",
-            "finding_id": "发现 ID",
-            "finding_overview": "发现概览",
-            "findings": "发现数",
+            "finding": "检测结果",
+            "finding_id": "检测结果 ID",
+            "finding_overview": "检测结果概览",
+            "findings": "检测结果数",
             "item": "项目",
             "open": "未关闭",
             "overview": "概览",
@@ -232,26 +233,26 @@ REPORT_DOCX_TEXT = {
             "assessment_scope": "{provider} 云安全评估",
             "global": "全局",
             "no_external_reference": "扫描数据中没有可用的外部参考链接。",
-            "no_findings": "无发现",
-            "no_findings_available": "扫描数据中没有失败的发现。",
-            "no_findings_severity": "此严重等级下没有发现。",
+            "no_findings": "无检测结果",
+            "no_findings_available": "扫描数据中没有失败的检测结果。",
+            "no_findings_severity": "此严重等级下没有检测结果。",
             "no_narrative": "扫描数据中没有可用的文字详情。",
             "no_resource": "无资源",
             "none": "无",
-            "security_finding": "安全发现",
+            "security_finding": "安全检测结果",
             "uncategorized": "未分类",
             "unknown": "未知",
         },
         recommendations=[
-            "优先修复最高严重等级的失败发现。",
+            "优先修复最高严重等级的失败检测结果。",
             "优先处理日志、身份与数据保护控制项。",
             "复核高权限访问与暴露资源。",
-            "将中危发现纳入短期修复计划跟踪。",
-            "复核反复出现失败发现的服务和类别。",
+            "将中危检测结果纳入短期修复计划跟踪。",
+            "复核反复出现失败检测结果的服务和类别。",
             "使用扫描结果驱动告警和控制有效性验证。",
             "采用持续 CSPM 监控和定期访问复核。",
             "将报告生成纳入常态化安全运营流程。",
-            "将高优先级发现接入事件响应流程。",
+            "将高优先级检测结果接入事件响应流程。",
             "在历史数据和合规数据可靠后使用趋势与合规模块。",
         ],
     ),
@@ -359,8 +360,11 @@ CANONICAL_FIGURE_TITLES = {
     "图 1-2 风险类别": "Figure 1-2 Risk Categories",
     "图 2-1 资产分布": "Figure 2-1 Asset Distribution",
     "图 2-2 按区域分布的资源": "Figure 2-2 Resource Distribution by Region",
+    "图 3-1 按服务统计检测结果": "Figure 3-1 Findings by Service",
     "图 3-1 按服务统计发现": "Figure 3-1 Findings by Service",
+    "图 3-2 按类别统计检测结果": "Figure 3-2 Findings by Category",
     "图 3-2 按类别统计发现": "Figure 3-2 Findings by Category",
+    "图 1-1 检测结果分布": "Figure 1-1 Findings Distribution",
     "图 1-1 发现分布": "Figure 1-1 Findings Distribution",
     "図 1-1 リスク分布": "Figure 1-1 Risk Distribution",
     "図 1-2 リスクカテゴリ": "Figure 1-2 Risk Categories",
@@ -1453,6 +1457,7 @@ def _replace_findings_detail_blocks(
         children,
         {
             "2.1 Finding {{finding_number}}",
+            "2.1 检测结果 {{finding_number}}",
             "2.1 发现 {{finding_number}}",
             "2.1 検出結果 {{finding_number}}",
         },
@@ -1508,7 +1513,10 @@ def _replace_findings_toc(
 
     detail_paragraph = None
     for paragraph in toc_paragraphs:
-        if _paragraph_text(paragraph).strip().startswith(detail_entry):
+        paragraph_label = _paragraph_text(paragraph).strip()
+        if paragraph_label.startswith(detail_entry) or paragraph_label.startswith(
+            _legacy_finding_details_toc_entry(text)
+        ):
             detail_paragraph = paragraph
             break
     if detail_paragraph is None:
@@ -1522,6 +1530,13 @@ def _replace_findings_toc(
     if parent is None:
         return
 
+    _set_paragraph_text_with_pageref(
+        detail_paragraph,
+        detail_entry,
+        "toc_finding_details",
+        fallback_page="3",
+    )
+
     insert_after = detail_paragraph
     for finding in findings:
         paragraph = copy.deepcopy(detail_paragraph)
@@ -1532,6 +1547,19 @@ def _replace_findings_toc(
             fallback_page="3",
         )
         _set_toc_entry_indent(paragraph, left=360)
+        _set_findings_toc_spacing(paragraph)
+        parent.insert(parent.index(insert_after) + 1, paragraph)
+        insert_after = paragraph
+
+    for label, bookmark_name, fallback_page in _findings_appendix_toc_entries(text):
+        paragraph = copy.deepcopy(detail_paragraph)
+        _set_paragraph_text_with_pageref(
+            paragraph,
+            label,
+            bookmark_name,
+            fallback_page=fallback_page,
+        )
+        _set_toc_entry_indent(paragraph, left=0)
         _set_findings_toc_spacing(paragraph)
         parent.insert(parent.index(insert_after) + 1, paragraph)
         insert_after = paragraph
@@ -1564,6 +1592,12 @@ def _remove_static_findings_toc_entries(toc_paragraphs: list) -> None:
         "2.1.4 Remediation Guidance",
         "2.1.5 References",
         "Appendix A. Severity Definitions",
+        "2.1 检测结果 {{finding_number}}",
+        "2.1.1 概览",
+        "2.1.2 执行摘要",
+        "2.1.3 受影响资源",
+        "2.1.4 修复指导",
+        "2.1.5 参考资料",
         "2.1 发现 {{finding_number}}",
         "2.1.1 概览",
         "2.1.2 执行摘要",
@@ -1589,10 +1623,16 @@ def _remove_static_findings_toc_entries(toc_paragraphs: list) -> None:
 
 def _finding_details_toc_entry(text: ReportDocxText) -> str:
     if text is REPORT_DOCX_TEXT["zh-CN"]:
-        return "2. 发现详情"
+        return "2. 检测结果详情"
     if text is REPORT_DOCX_TEXT["ja-JP"]:
         return "2. 検出結果詳細"
     return "2. Finding Details"
+
+
+def _legacy_finding_details_toc_entry(text: ReportDocxText) -> str:
+    if text is REPORT_DOCX_TEXT["zh-CN"]:
+        return "2. 发现详情"
+    return _finding_details_toc_entry(text)
 
 
 def _finding_toc_entry(finding: dict, text: ReportDocxText) -> str:
@@ -1601,6 +1641,14 @@ def _finding_toc_entry(finding: dict, text: ReportDocxText) -> str:
         f"2.{finding['number']} {text.labels['finding']} "
         f"{finding['finding_id']} - {title}"
     )
+
+
+def _findings_appendix_toc_entries(text: ReportDocxText) -> list[tuple[str, str, str]]:
+    if text is REPORT_DOCX_TEXT["zh-CN"]:
+        return [("附录 A. 严重等级定义", "toc_findings_appendix_a", "5")]
+    if text is REPORT_DOCX_TEXT["ja-JP"]:
+        return [("付録 A. 重大度定義", "toc_findings_appendix_a", "5")]
+    return [("Appendix A. Severity Definitions", "toc_findings_appendix_a", "5")]
 
 
 def _finding_bookmark_name(finding: dict) -> str:
@@ -1716,6 +1764,10 @@ def _populate_finding_block(
         paragraph_text = _paragraph_text(paragraph).strip()
         replacements = {
             "2.1 Finding {{finding_number}}": (
+                f"2.{detail['number']} {text.labels['finding']} {detail['finding_id']} - "
+                f"{_short_text(detail['title'], 90)}"
+            ),
+            "2.1 发现 {{finding_number}}": (
                 f"2.{detail['number']} {text.labels['finding']} {detail['finding_id']} - "
                 f"{_short_text(detail['title'], 90)}"
             ),
@@ -2351,9 +2403,10 @@ def _toc_pages(report_type: str, toc_title: str = "Table of Contents") -> dict[s
     if report_type == "findings":
         if toc_title == "目录":
             return {
-                "1. 发现汇总": "3",
-                "1.1 发现统计": "3",
-                "2. 发现详情": "3",
+                "1. 检测结果汇总": "3",
+                "1.1 检测结果统计": "3",
+                "2. 检测结果详情": "3",
+                "附录 A. 严重等级定义": "5",
             }
         if toc_title == "目次":
             return {
@@ -2371,14 +2424,14 @@ def _toc_pages(report_type: str, toc_title: str = "Table of Contents") -> dict[s
             "1. 执行摘要": "3",
             "1.1 评估概览": "3",
             "1.2 风险汇总": "3",
-            "1.3 关键发现": "4",
+            "1.3 关键检测结果": "4",
             "1.4 主要风险类别": "6",
             "2. 资产概览": "7",
             "2.1 云资产汇总": "7",
             "2.2 按区域分布的资源": "8",
-            "3. 发现概览": "9",
-            "3.1 按服务统计发现": "9",
-            "3.2 按类别统计发现": "10",
+            "3. 检测结果概览": "9",
+            "3.1 按服务统计检测结果": "9",
+            "3.2 按类别统计检测结果": "10",
             "4. 修复优先级": "11",
             "4.1 优先级 1（需立即处理）": "11",
             "4.2 优先级 2（建议修复）": "12",
@@ -2462,14 +2515,20 @@ def _toc_bookmark_targets(report_type: str) -> dict[str, tuple[str, int]]:
     if report_type == "findings":
         return {
             "1. Findings Summary": ("toc_findings_summary", 19001),
+            "1. 检测结果汇总": ("toc_findings_summary", 19001),
             "1. 发现汇总": ("toc_findings_summary", 19001),
             "1. 検出結果サマリー": ("toc_findings_summary", 19001),
             "1.1 Findings Statistics": ("toc_findings_statistics", 19002),
+            "1.1 检测结果统计": ("toc_findings_statistics", 19002),
             "1.1 发现统计": ("toc_findings_statistics", 19002),
             "1.1 検出結果統計": ("toc_findings_statistics", 19002),
             "2. Finding Details": ("toc_finding_details", 19003),
+            "2. 检测结果详情": ("toc_finding_details", 19003),
             "2. 发现详情": ("toc_finding_details", 19003),
             "2. 検出結果詳細": ("toc_finding_details", 19003),
+            "Appendix A. Severity Definitions": ("toc_findings_appendix_a", 19004),
+            "附录 A. 严重等级定义": ("toc_findings_appendix_a", 19004),
+            "付録 A. 重大度定義": ("toc_findings_appendix_a", 19004),
         }
     if report_type != "executive":
         return {}
@@ -2484,6 +2543,7 @@ def _toc_bookmark_targets(report_type: str) -> dict[str, tuple[str, int]]:
         "1.2 风险汇总": ("toc_risk_summary", 18003),
         "1.2 リスクサマリー": ("toc_risk_summary", 18003),
         "1.3 Key Findings": ("toc_key_findings", 18004),
+        "1.3 关键检测结果": ("toc_key_findings", 18004),
         "1.3 关键发现": ("toc_key_findings", 18004),
         "1.3 主な検出結果": ("toc_key_findings", 18004),
         "1.4 Top Risk Categories": ("toc_top_risk_categories", 18005),
@@ -2505,12 +2565,15 @@ def _toc_bookmark_targets(report_type: str) -> dict[str, tuple[str, int]]:
             18008,
         ),
         "3. Findings Overview": ("toc_findings_overview", 18009),
+        "3. 检测结果概览": ("toc_findings_overview", 18009),
         "3. 发现概览": ("toc_findings_overview", 18009),
         "3. 検出結果の概要": ("toc_findings_overview", 18009),
         "3.1 Findings by Service": ("toc_findings_by_service", 18010),
+        "3.1 按服务统计检测结果": ("toc_findings_by_service", 18010),
         "3.1 按服务统计发现": ("toc_findings_by_service", 18010),
         "3.1 サービス別検出結果": ("toc_findings_by_service", 18010),
         "3.2 Findings by Category": ("toc_findings_by_category", 18011),
+        "3.2 按类别统计检测结果": ("toc_findings_by_category", 18011),
         "3.2 按类别统计发现": ("toc_findings_by_category", 18011),
         "3.2 カテゴリ別検出結果": ("toc_findings_by_category", 18011),
         "4. Remediation Priorities": ("toc_remediation_priorities", 18012),
@@ -2870,7 +2933,7 @@ def _chart_paths_by_figure(source: zipfile.ZipFile, document_xml) -> dict[str, s
     for element in body_children:
         if element.tag == _qn("w:p"):
             text = _paragraph_text(element).strip()
-            if text.startswith("Figure "):
+            if text.startswith("Figure ") or text in CANONICAL_FIGURE_TITLES:
                 last_figure = text
             chart = element.find(".//c:chart", namespaces=NS)
             if chart is not None and last_figure:

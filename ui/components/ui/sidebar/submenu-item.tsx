@@ -66,6 +66,7 @@ export const SubmenuItem = ({
       <Link
         href={href}
         target={target}
+        prefetch={false}
         className="flex items-center"
         onClick={onClick}
       >

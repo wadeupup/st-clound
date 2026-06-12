@@ -70,7 +70,7 @@ export const LaunchScanWorkflow = ({
     refreshTimeoutsRef.current = [];
 
     router.refresh();
-    refreshTimeoutsRef.current = [1000, 3000, 5000].map((delay) =>
+    refreshTimeoutsRef.current = [3000, 10000].map((delay) =>
       setTimeout(() => router.refresh(), delay),
     );
   };

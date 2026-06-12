@@ -81,7 +81,11 @@ export const Menu = ({ isOpen }: { isOpen: boolean }) => {
               variant="default"
               size="default"
             >
-              <Link href="/scans" aria-label={t.sidebar.launchScan}>
+              <Link
+                href="/scans"
+                aria-label={t.sidebar.launchScan}
+                prefetch={false}
+              >
                 {isOpen ? t.sidebar.launchScan : <AddIcon className="size-5" />}
               </Link>
             </Button>
@@ -142,6 +146,7 @@ export const Menu = ({ isOpen }: { isOpen: boolean }) => {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-1"
+                  prefetch={false}
                 >
                   <InfoIcon size={16} />
                   <span className="text-muted-foreground font-normal opacity-80 transition-opacity hover:font-bold hover:opacity-100">
@@ -160,6 +165,7 @@ export const Menu = ({ isOpen }: { isOpen: boolean }) => {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center"
+                  prefetch={false}
                 >
                   <InfoIcon size={16} />
                 </Link>

@@ -294,6 +294,10 @@ export const authConfig = {
     jwt: async ({ token, account, user }) => {
       const authToken = token as AuthToken;
 
+      if (authToken.error) {
+        return authToken;
+      }
+
       applyDecodedClaims(authToken, authToken.accessToken);
 
       if (account && user) {

@@ -20,7 +20,7 @@ from api.v1.serializer_utils.check_metadata_i18n import (
 )
 
 SUPPORTED_REPORT_LOCALES = {"en", "zh-CN", "ja-JP"}
-REPORT_BUILD_VERSION = "docx-localized-2026-06-12-14-wps-footer-page"
+REPORT_BUILD_VERSION = "docx-localized-2026-06-12-16-zh-finding-result-toc"
 
 REPORT_TEXT = {
     "en": {
@@ -70,17 +70,17 @@ REPORT_TEXT = {
     },
     "zh-CN": {
         "readme_title": "扫描报告",
-        "readme_body": "此报告基于已入库的扫描发现生成。",
+        "readme_body": "此报告基于已入库的扫描检测结果生成。",
         "executive_title": "执行报告",
         "summary": "摘要",
         "scan": "扫描",
         "provider": "云提供商",
         "generated_at": "生成时间",
-        "total_findings": "发现总数",
+        "total_findings": "检测结果总数",
         "status_breakdown": "状态分布",
         "severity_breakdown": "严重性分布",
-        "top_findings": "主要发现",
-        "no_findings": "此扫描没有可用发现。",
+        "top_findings": "主要检测结果",
+        "no_findings": "此扫描没有可用检测结果。",
         "status": {
             "PASS": "通过",
             "FAIL": "失败",
@@ -95,7 +95,7 @@ REPORT_TEXT = {
             "informational": "信息",
         },
         "csv": {
-            "uid": "发现 UID",
+            "uid": "检测结果 UID",
             "status": "状态",
             "status_display": "状态标签",
             "severity": "严重性",

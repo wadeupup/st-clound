@@ -47,7 +47,7 @@ export const MenuItem = ({
           )}
           asChild
         >
-          <Link href={href} target={target}>
+          <Link href={href} target={target} prefetch={false}>
             <div className="flex items-center">
               <span className={cn(isOpen ? "mr-4" : "")}>
                 <Icon size={18} />
