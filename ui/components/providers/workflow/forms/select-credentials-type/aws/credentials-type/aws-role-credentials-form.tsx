@@ -12,15 +12,11 @@ import { ProviderCredentialFields } from "@/lib/provider-credentials/provider-cr
 import { AWSCredentialsRole } from "@/types";
 import { IntegrationType } from "@/types/integrations";
 
-import { AWSRegionOption, AWSRegionsSelect } from "./aws-regions-select";
-
 export const AWSRoleCredentialsForm = ({
   control,
   setValue,
   externalId,
   templateLinks,
-  regions = [],
-  defaultRegions = [],
   type = "providers",
   integrationType,
 }: {
@@ -32,8 +28,6 @@ export const AWSRoleCredentialsForm = ({
     cloudformationQuickLink: string;
     terraform: string;
   };
-  regions?: AWSRegionOption[];
-  defaultRegions?: string[];
   type?: "providers" | "integrations";
   integrationType?: IntegrationType;
 }) => {
@@ -265,18 +259,6 @@ export const AWSRoleCredentialsForm = ({
               isRequired={false}
             />
           </div>
-        </>
-      )}
-
-      {type === "providers" && (
-        <>
-          <Divider />
-          <AWSRegionsSelect
-            control={control}
-            setValue={setValue}
-            regions={regions}
-            defaultRegions={defaultRegions}
-          />
         </>
       )}
     </>

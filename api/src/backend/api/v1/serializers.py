@@ -864,7 +864,6 @@ class ProviderSerializer(RLSSerializer):
 
     provider = ProviderEnumSerializerField()
     connection = serializers.SerializerMethodField(read_only=True)
-    regions = serializers.SerializerMethodField(read_only=True)
 
     included_serializers = {
         "provider_groups": "api.v1.serializers.ProviderGroupIncludedSerializer",
@@ -880,7 +879,6 @@ class ProviderSerializer(RLSSerializer):
             "uid",
             "alias",
             "connection",
-            "regions",
             # "scanner_args",
             "secret",
             "provider_groups",
@@ -902,18 +900,6 @@ class ProviderSerializer(RLSSerializer):
             "last_checked_at": obj.connection_last_checked_at,
         }
 
-    @extend_schema_field(serializers.ListField(child=serializers.CharField()))
-    def get_regions(self, obj):
-        if obj.provider != Provider.ProviderChoices.AWS.value:
-            return []
-
-        from api.utils import get_aws_provider_regions
-
-        try:
-            return get_aws_provider_regions(obj.secret.secret)
-        except Provider.secret.RelatedObjectDoesNotExist:
-            return []
-
 
 class ProviderIncludeSerializer(RLSSerializer):
     """
@@ -922,7 +908,6 @@ class ProviderIncludeSerializer(RLSSerializer):
 
     provider = ProviderEnumSerializerField()
     connection = serializers.SerializerMethodField(read_only=True)
-    regions = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Provider
@@ -934,7 +919,6 @@ class ProviderIncludeSerializer(RLSSerializer):
             "uid",
             "alias",
             "connection",
-            "regions",
             # "scanner_args",
         ]
 
@@ -952,18 +936,6 @@ class ProviderIncludeSerializer(RLSSerializer):
             "connected": obj.connected,
             "last_checked_at": obj.connection_last_checked_at,
         }
-
-    @extend_schema_field(serializers.ListField(child=serializers.CharField()))
-    def get_regions(self, obj):
-        if obj.provider != Provider.ProviderChoices.AWS.value:
-            return []
-
-        from api.utils import get_aws_provider_regions
-
-        try:
-            return get_aws_provider_regions(obj.secret.secret)
-        except Provider.secret.RelatedObjectDoesNotExist:
-            return []
 
 
 class ProviderCreateSerializer(RLSSerializer, BaseWriteSerializer):
@@ -1085,40 +1057,20 @@ class ScanCreateSerializer(RLSSerializer, BaseWriteSerializer):
         fields = [
             "id",
             "provider",
-            "scanner_args",
+            # "scanner_args",
             "name",
         ]
 
-    def validate_scanner_args(self, value):
-        from api.utils import normalize_aws_regions
-
-        if value is None:
-            return {}
-        if not isinstance(value, dict):
-            raise serializers.ValidationError("scanner_args must be an object.")
-
-        next_value = dict(value)
-        if "regions" in next_value:
-            regions = normalize_aws_regions(next_value.get("regions"))
-            if not regions:
-                raise serializers.ValidationError(
-                    {"regions": "Provide at least one AWS region."}
-                )
-            next_value["regions"] = regions
-
-        return next_value
-
     def create(self, validated_data):
-        from api.utils import merge_dicts
+        # provider = validated_data.get("provider")
 
-        provider = validated_data.get("provider")
-
-        if not validated_data.get("scanner_args"):
-            validated_data["scanner_args"] = provider.scanner_args
-        else:
-            validated_data["scanner_args"] = merge_dicts(
-                provider.scanner_args, validated_data["scanner_args"]
-            )
+        # scanner_args will be disabled for the user in the first release
+        # if not validated_data.get("scanner_args"):
+        #     validated_data["scanner_args"] = provider.scanner_args
+        # else:
+        #     validated_data["scanner_args"] = merge_dicts(
+        #         provider.scanner_args, validated_data["scanner_args"]
+        #     )
 
         if not validated_data.get("trigger"):
             validated_data["trigger"] = Scan.TriggerChoices.MANUAL.value
@@ -1440,17 +1392,6 @@ class FindingMetadataSerializer(BaseSerializerV1):
 
 
 # Provider secrets
-def _validate_aws_regions(regions: list[str]) -> list[str]:
-    normalized_regions = []
-    for region in regions:
-        clean_region = region.strip()
-        if not clean_region:
-            raise serializers.ValidationError("AWS region cannot be empty.")
-        if clean_region not in normalized_regions:
-            normalized_regions.append(clean_region)
-    return normalized_regions
-
-
 class BaseWriteProviderSecretSerializer(BaseWriteSerializer):
     @staticmethod
     def validate_secret_based_on_provider(
@@ -1513,12 +1454,6 @@ class AwsProviderSecret(serializers.Serializer):
     aws_access_key_id = serializers.CharField()
     aws_secret_access_key = serializers.CharField()
     aws_session_token = serializers.CharField(required=False)
-    regions = serializers.ListField(
-        child=serializers.CharField(), required=False, allow_empty=False
-    )
-
-    def validate_regions(self, regions):
-        return _validate_aws_regions(regions)
 
     class Meta:
         resource_name = "provider-secrets"
@@ -1672,12 +1607,6 @@ class AWSRoleAssumptionProviderSecret(serializers.Serializer):
     aws_access_key_id = serializers.CharField(required=False)
     aws_secret_access_key = serializers.CharField(required=False)
     aws_session_token = serializers.CharField(required=False)
-    regions = serializers.ListField(
-        child=serializers.CharField(), required=False, allow_empty=False
-    )
-
-    def validate_regions(self, regions):
-        return _validate_aws_regions(regions)
 
     class Meta:
         resource_name = "provider-secrets"

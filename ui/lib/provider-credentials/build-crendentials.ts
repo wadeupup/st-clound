@@ -3,18 +3,8 @@ import { ProviderType } from "@/types";
 
 import { ProviderCredentialFields } from "./provider-credential-fields";
 
-const getAWSRegions = (formData: FormData) => {
-  return formData
-    .getAll(ProviderCredentialFields.AWS_REGIONS)
-    .flatMap((value) => String(value).split(","))
-    .map((region) => region.trim())
-    .filter(Boolean);
-};
-
 // Helper functions for each provider type
 export const buildAWSSecret = (formData: FormData, isRole: boolean) => {
-  const regions = getAWSRegions(formData);
-
   if (isRole) {
     const secret = {
       [ProviderCredentialFields.ROLE_ARN]: getFormValue(
@@ -49,7 +39,6 @@ export const buildAWSSecret = (formData: FormData, isRole: boolean) => {
         formData,
         ProviderCredentialFields.ROLE_SESSION_NAME,
       ),
-      [ProviderCredentialFields.AWS_REGIONS]: regions,
     };
     return filterEmptyValues(secret);
   }
@@ -67,7 +56,6 @@ export const buildAWSSecret = (formData: FormData, isRole: boolean) => {
       formData,
       ProviderCredentialFields.AWS_SESSION_TOKEN,
     ),
-    [ProviderCredentialFields.AWS_REGIONS]: regions,
   };
   return filterEmptyValues(secret);
 };

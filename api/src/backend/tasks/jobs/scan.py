@@ -794,9 +794,7 @@ def perform_prowler_scan(
         with rls_transaction(tenant_id):
             try:
                 prowler_provider = initialize_prowler_provider(
-                    provider_instance,
-                    mutelist_processor,
-                    scanner_args=scan_instance.scanner_args,
+                    provider_instance, mutelist_processor
                 )
                 provider_instance.connected = True
             except Exception as e:

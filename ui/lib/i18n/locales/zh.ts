@@ -529,8 +529,6 @@ export const zh = {
         fingerprint: "指纹",
         enterApiKeyFingerprint: "输入 API 密钥指纹",
         region: "区域",
-        awsRegions: "AWS 区域",
-        selectAwsRegions: "选择 AWS 区域",
         privateKeyContent: "私钥内容",
         passphraseOptional: "口令（可选）",
         enterPassphraseIfKeyEncrypted: "如果密钥已加密，请输入口令",

@@ -2,10 +2,8 @@
 
 import { Divider } from "@heroui/divider";
 import { ChevronLeftIcon, ChevronRightIcon, Loader2 } from "lucide-react";
-import { useEffect, useState } from "react";
 import { Control, UseFormSetValue } from "react-hook-form";
 
-import { getAWSRegions } from "@/actions/providers/providers";
 import { Button } from "@/components/shadcn";
 import { Form } from "@/components/ui/form";
 import { useCredentialsForm } from "@/hooks/use-credentials-form";
@@ -36,7 +34,6 @@ import {
   AlibabaCloudStaticCredentialsForm,
 } from "./select-credentials-type/alibabacloud/credentials-type";
 import { AWSStaticCredentialsForm } from "./select-credentials-type/aws/credentials-type";
-import { AWSRegionOption } from "./select-credentials-type/aws/credentials-type/aws-regions-select";
 import { AWSRoleCredentialsForm } from "./select-credentials-type/aws/credentials-type/aws-role-credentials-form";
 import { GCPDefaultCredentialsForm } from "./select-credentials-type/gcp/credentials-type";
 import { GCPServiceAccountKeyForm } from "./select-credentials-type/gcp/credentials-type/gcp-service-account-key-form";
@@ -70,9 +67,6 @@ export const BaseCredentialsForm = ({
   submitButtonText = "Next",
   showBackButton = true,
 }: BaseCredentialsFormProps) => {
-  const [awsRegions, setAwsRegions] = useState<AWSRegionOption[]>([]);
-  const [defaultAwsRegions, setDefaultAwsRegions] = useState<string[]>([]);
-
   const {
     form,
     isLoading,
@@ -89,27 +83,6 @@ export const BaseCredentialsForm = ({
   });
 
   const templateLinks = getAWSCredentialsTemplateLinks(externalId);
-
-  useEffect(() => {
-    if (providerType !== "aws") return;
-
-    let isMounted = true;
-    getAWSRegions().then((response) => {
-      if (!isMounted) return;
-
-      const attributes = response?.data?.attributes;
-      if (attributes?.regions?.length) {
-        setAwsRegions(attributes.regions);
-      }
-      if (attributes?.default?.length) {
-        setDefaultAwsRegions(attributes.default);
-      }
-    });
-
-    return () => {
-      isMounted = false;
-    };
-  }, [providerType]);
 
   return (
     <Form {...form}>
@@ -147,18 +120,11 @@ export const BaseCredentialsForm = ({
             }
             externalId={externalId}
             templateLinks={templateLinks}
-            regions={awsRegions}
-            defaultRegions={defaultAwsRegions}
           />
         )}
         {providerType === "aws" && searchParamsObj.get("via") !== "role" && (
           <AWSStaticCredentialsForm
             control={form.control as unknown as Control<AWSCredentials>}
-            setValue={
-              form.setValue as unknown as UseFormSetValue<AWSCredentials>
-            }
-            regions={awsRegions}
-            defaultRegions={defaultAwsRegions}
           />
         )}
         {providerType === "azure" && (

@@ -2821,6 +2821,9 @@ class TestScanViewSet:
         # Provider5 has these scanner_args
         # scanner_args={"key1": "value1", "key2": {"key21": "value21"}}
 
+        # scanner_args will be disabled in the first release
+        scan_json_payload["data"]["attributes"].pop("scanner_args", None)
+
         scan_json_payload["data"]["relationships"]["provider"]["data"]["id"] = str(
             provider5.id
         )
@@ -2838,55 +2841,7 @@ class TestScanViewSet:
         assert scan.name == scan_json_payload["data"]["attributes"]["name"]
         assert scan.provider == provider5
         assert scan.trigger == Scan.TriggerChoices.MANUAL
-        assert scan.scanner_args == expected_scanner_args
-
-    @patch("api.v1.views.Task.objects.get")
-    @patch("api.v1.views.perform_scan_task.apply_async")
-    def test_scans_create_valid_with_regions(
-        self,
-        mock_perform_scan_task,
-        mock_task_get,
-        authenticated_client,
-        providers_fixture,
-        tasks_fixture,
-    ):
-        prowler_task = tasks_fixture[0]
-        mock_perform_scan_task.return_value.id = prowler_task.id
-        mock_task_get.return_value = prowler_task
-        *_, provider5 = providers_fixture
-
-        response = authenticated_client.post(
-            reverse("scan-list"),
-            data={
-                "data": {
-                    "type": "scans",
-                    "attributes": {
-                        "name": "Regional Scan",
-                        "scanner_args": {
-                            "regions": [
-                                "us-east-1",
-                                " US-EAST-1 ",
-                                "ap-northeast-1",
-                            ]
-                        },
-                    },
-                    "relationships": {
-                        "provider": {
-                            "data": {"type": "providers", "id": str(provider5.id)}
-                        }
-                    },
-                }
-            },
-            content_type=API_JSON_CONTENT_TYPE,
-        )
-
-        assert response.status_code == status.HTTP_202_ACCEPTED
-        scan = Scan.objects.get()
-        assert scan.scanner_args == {
-            "key1": "value1",
-            "key2": {"key21": "value21"},
-            "regions": ["us-east-1", "ap-northeast-1"],
-        }
+        # assert scan.scanner_args == expected_scanner_args
 
     @pytest.mark.parametrize(
         "scan_json_payload, error_code",

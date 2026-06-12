@@ -1,24 +1,16 @@
 "use client";
 
-import { Control, UseFormSetValue } from "react-hook-form";
+import { Control } from "react-hook-form";
 
 import { CustomInput } from "@/components/ui/custom";
 import { useI18n } from "@/lib/i18n/context";
 import { ProviderCredentialFields } from "@/lib/provider-credentials/provider-credential-fields";
 import { AWSCredentials } from "@/types";
 
-import { AWSRegionOption, AWSRegionsSelect } from "./aws-regions-select";
-
 export const AWSStaticCredentialsForm = ({
   control,
-  setValue,
-  regions,
-  defaultRegions,
 }: {
   control: Control<AWSCredentials>;
-  setValue: UseFormSetValue<AWSCredentials>;
-  regions: AWSRegionOption[];
-  defaultRegions: string[];
 }) => {
   const { t } = useI18n();
   const labels = t.providers.connectAccount.credentialsType;
@@ -62,12 +54,6 @@ export const AWSStaticCredentialsForm = ({
         placeholder={labels.enterAwsSessionToken}
         variant="bordered"
         isRequired={false}
-      />
-      <AWSRegionsSelect
-        control={control}
-        setValue={setValue}
-        regions={regions}
-        defaultRegions={defaultRegions}
       />
     </>
   );

@@ -546,8 +546,6 @@ export const ja = {
         fingerprint: "フィンガープリント",
         enterApiKeyFingerprint: "API キーのフィンガープリントを入力",
         region: "リージョン",
-        awsRegions: "AWS リージョン",
-        selectAwsRegions: "AWS リージョンを選択",
         privateKeyContent: "秘密キーの内容",
         passphraseOptional: "パスフレーズ（任意）",
         enterPassphraseIfKeyEncrypted:

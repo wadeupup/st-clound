@@ -241,7 +241,6 @@ export type AWSCredentials = {
   [ProviderCredentialFields.AWS_ACCESS_KEY_ID]: string;
   [ProviderCredentialFields.AWS_SECRET_ACCESS_KEY]: string;
   [ProviderCredentialFields.AWS_SESSION_TOKEN]: string;
-  [ProviderCredentialFields.AWS_REGIONS]?: string[];
   [ProviderCredentialFields.PROVIDER_ID]: string;
 };
 
@@ -251,7 +250,6 @@ export type AWSCredentialsRole = {
   [ProviderCredentialFields.AWS_SECRET_ACCESS_KEY]?: string;
   [ProviderCredentialFields.AWS_SESSION_TOKEN]?: string;
   [ProviderCredentialFields.EXTERNAL_ID]?: string;
-  [ProviderCredentialFields.AWS_REGIONS]?: string[];
   [ProviderCredentialFields.ROLE_SESSION_NAME]?: string;
   [ProviderCredentialFields.SESSION_DURATION]?: number;
   [ProviderCredentialFields.CREDENTIALS_TYPE]?: AWSCredentialsType;

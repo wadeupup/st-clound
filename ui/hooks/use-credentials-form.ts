@@ -76,7 +76,6 @@ export const useCredentialsForm = ({
         [ProviderCredentialFields.AWS_ACCESS_KEY_ID]: "",
         [ProviderCredentialFields.AWS_SECRET_ACCESS_KEY]: "",
         [ProviderCredentialFields.AWS_SESSION_TOKEN]: "",
-        [ProviderCredentialFields.AWS_REGIONS]: [],
         [ProviderCredentialFields.ROLE_SESSION_NAME]: "",
         [ProviderCredentialFields.SESSION_DURATION]: "3600",
       };
@@ -97,7 +96,6 @@ export const useCredentialsForm = ({
           [ProviderCredentialFields.AWS_ACCESS_KEY_ID]: "",
           [ProviderCredentialFields.AWS_SECRET_ACCESS_KEY]: "",
           [ProviderCredentialFields.AWS_SESSION_TOKEN]: "",
-          [ProviderCredentialFields.AWS_REGIONS]: [],
         };
       case "azure":
         return {
@@ -229,12 +227,7 @@ export const useCredentialsForm = ({
     const filteredValues = filterEmptyValues(values);
 
     Object.entries(filteredValues).forEach(([key, value]) => {
-      if (Array.isArray(value)) {
-        value.forEach((item) => formData.append(key, String(item)));
-        return;
-      }
-
-      formData.append(key, value as string | Blob);
+      formData.append(key, value);
     });
 
     const data = await onSubmit(formData);

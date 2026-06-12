@@ -9,44 +9,6 @@ import { ProviderCredentialFields } from "@/lib/provider-credentials/provider-cr
 import { handleApiError, handleApiResponse } from "@/lib/server-actions-helper";
 import { ProvidersApiResponse, ProviderType } from "@/types/providers";
 
-export type AWSRegionOption = {
-  value: string;
-  label: string;
-};
-
-export type AWSRegionsResponse = {
-  data?: {
-    id?: string;
-    type?: string;
-    attributes?: {
-      partition?: string;
-      default?: string[];
-      regions?: AWSRegionOption[];
-    };
-  };
-};
-
-export const getAWSRegions = async (
-  partition = "aws",
-): Promise<AWSRegionsResponse | undefined> => {
-  const headers = await getAuthHeaders({ contentType: false });
-  const url = new URL(`${apiBaseUrl}/providers/aws/regions`);
-  url.searchParams.append("partition", partition);
-
-  try {
-    const response = await fetch(url.toString(), {
-      headers,
-    });
-
-    return (await handleApiResponse(response)) as
-      | AWSRegionsResponse
-      | undefined;
-  } catch (error) {
-    console.error("Error fetching AWS regions:", error);
-    return undefined;
-  }
-};
-
 export const getProviders = async ({
   page = 1,
   query = "",

@@ -549,8 +549,6 @@ export const en = {
         fingerprint: "Fingerprint",
         enterApiKeyFingerprint: "Enter the API key fingerprint",
         region: "Region",
-        awsRegions: "AWS regions",
-        selectAwsRegions: "Select AWS regions",
         privateKeyContent: "Private Key Content",
         passphraseOptional: "Passphrase (Optional)",
         enterPassphraseIfKeyEncrypted: "Enter passphrase if key is encrypted",
