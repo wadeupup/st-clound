@@ -238,6 +238,63 @@ def test_build_findings_report_docx_uses_standard_table_width():
     assert _first_table_width(docx_bytes) == "7488"
 
 
+def test_build_findings_report_docx_adds_dynamic_toc_entries():
+    scan = SimpleNamespace(
+        id="scan-id",
+        name="Production AWS Assessment",
+        completed_at=datetime(2026, 6, 10, tzinfo=timezone.utc),
+        provider=SimpleNamespace(provider="aws", uid="123456789012"),
+    )
+    rows = [
+        {
+            "uid": "finding-1",
+            "status": "FAIL",
+            "severity": "critical",
+            "check_id": "iam_user_mfa_enabled",
+            "check_title": "IAM user MFA enabled",
+            "resource_uid": "arn:aws:iam::123456789012:user/test",
+            "resource_name": "test",
+            "region": "global",
+            "service": "iam",
+            "resource_type": "AwsIamUser",
+        },
+        {
+            "uid": "finding-2",
+            "status": "FAIL",
+            "severity": "high",
+            "check_id": "s3_bucket_public_access",
+            "check_title": "S3 bucket public access",
+            "resource_uid": "arn:aws:s3:::example",
+            "resource_name": "example",
+            "region": "ap-northeast-1",
+            "service": "s3",
+            "resource_type": "AwsS3Bucket",
+        },
+    ]
+    findings = [
+        SimpleNamespace(
+            uid="finding-1",
+            check_id="iam_user_mfa_enabled",
+            check_metadata={"checkid": "iam_user_mfa_enabled"},
+        ),
+        SimpleNamespace(
+            uid="finding-2",
+            check_id="s3_bucket_public_access",
+            check_metadata={"checkid": "s3_bucket_public_access"},
+        ),
+    ]
+
+    docx_bytes = build_english_findings_report_docx(scan, rows, findings, {})
+
+    paragraphs = _paragraph_texts(docx_bytes)
+    first_finding = "2.1 Finding F-001 - IAM user MFA enabled"
+    second_finding = "2.2 Finding F-002 - S3 bucket public access"
+
+    assert paragraphs.count(first_finding) == 2
+    assert paragraphs.count(second_finding) == 2
+    assert not any("{{finding_number}}" in paragraph for paragraph in paragraphs)
+
+
 def test_build_executive_report_docx_supports_localized_text():
     scan = SimpleNamespace(
         id="scan-id",

@@ -438,7 +438,7 @@ def build_findings_report_docx(
             document_xml,
             {"2.1 Finding {{finding_number}}3": "2.1 Finding Details"},
         )
-        _prune_findings_toc(document_xml)
+        _replace_findings_toc(document_xml, data["findings"], text)
         _format_generated_layout(document_xml, report_type="findings")
 
         replacements = {"word/document.xml": _xml_bytes(document_xml)}
@@ -1442,7 +1442,56 @@ def _body_paragraph_index_any(children: list, texts: set[str]) -> int | None:
     return None
 
 
-def _prune_findings_toc(document_xml) -> None:
+def _replace_findings_toc(
+    document_xml,
+    findings: list[dict],
+    text: ReportDocxText,
+) -> None:
+    detail_entry = _finding_details_toc_entry(text)
+    toc_paragraphs = _toc_paragraphs(document_xml)
+    if not toc_paragraphs:
+        return
+
+    detail_paragraph = None
+    for paragraph in toc_paragraphs:
+        if _paragraph_text(paragraph).strip().startswith(detail_entry):
+            detail_paragraph = paragraph
+            break
+    if detail_paragraph is None:
+        return
+
+    _remove_static_findings_toc_entries(toc_paragraphs)
+    parent = detail_paragraph.getparent()
+    if parent is None:
+        return
+
+    insert_after = detail_paragraph
+    for finding in findings:
+        paragraph = copy.deepcopy(detail_paragraph)
+        _set_paragraph_text(paragraph, _finding_toc_entry(finding, text))
+        _set_toc_entry_indent(paragraph, left=360)
+        parent.insert(parent.index(insert_after) + 1, paragraph)
+        insert_after = paragraph
+
+
+def _toc_paragraphs(document_xml) -> list:
+    paragraphs = document_xml.xpath(".//w:p", namespaces=NS)
+    toc_paragraphs = []
+    in_toc = False
+    for paragraph in paragraphs:
+        paragraph_text = _paragraph_text(paragraph).strip()
+        if paragraph_text in {"Table of Contents", "目录", "目次"}:
+            in_toc = True
+            continue
+        if not in_toc:
+            continue
+        if paragraph.xpath(".//w:br[@w:type='page']", namespaces=NS):
+            break
+        toc_paragraphs.append(paragraph)
+    return toc_paragraphs
+
+
+def _remove_static_findings_toc_entries(toc_paragraphs: list) -> None:
     remove_entries = {
         "2.1 Finding Details",
         "2.1 Finding {{finding_number}}",
@@ -1467,24 +1516,37 @@ def _prune_findings_toc(document_xml) -> None:
         "2.1.5 参考資料",
         "付録 A. 重大度定義",
     }
-    in_toc = False
-    for paragraph in list(document_xml.xpath(".//w:p", namespaces=NS)):
+    for paragraph in list(toc_paragraphs):
         text = _paragraph_text(paragraph).strip()
-        if text in {"Table of Contents", "目录", "目次"}:
-            in_toc = True
-            continue
-        if in_toc and text in {
-            "1. Findings Summary",
-            "1. 发现汇总",
-            "1. 検出結果サマリー",
-        }:
-            break
-        if not in_toc:
-            continue
         for entry in remove_entries:
             if text.startswith(entry):
                 _remove_paragraph(paragraph)
                 break
+
+
+def _finding_details_toc_entry(text: ReportDocxText) -> str:
+    if text is REPORT_DOCX_TEXT["zh-CN"]:
+        return "2. 发现详情"
+    if text is REPORT_DOCX_TEXT["ja-JP"]:
+        return "2. 検出結果詳細"
+    return "2. Finding Details"
+
+
+def _finding_toc_entry(finding: dict, text: ReportDocxText) -> str:
+    title = _short_text(finding.get("title") or finding.get("check_title") or "", 90)
+    return (
+        f"2.{finding['number']} {text.labels['finding']} "
+        f"{finding['finding_id']} - {title}"
+    )
+
+
+def _set_toc_entry_indent(paragraph, left: int) -> None:
+    ppr = _get_or_add(paragraph, "w:pPr", first=True)
+    ind = ppr.find("w:ind", namespaces=NS)
+    if ind is None:
+        ind = etree.SubElement(ppr, _qn("w:ind"))
+    ind.set(_qn("w:left"), str(left))
+    ind.set(_qn("w:firstLine"), "0")
 
 
 def _populate_finding_block(
@@ -1730,12 +1792,14 @@ def _center_caption_paragraphs(document_xml) -> None:
 
 
 def _add_static_toc_page_numbers(document_xml, report_type: str) -> None:
-    toc_pages = _toc_pages(report_type)
-    final_toc_entry = list(toc_pages)[-1]
+    toc_pages = {}
+    final_toc_entry = ""
     in_toc = False
     for paragraph in document_xml.xpath(".//w:p", namespaces=NS):
         text = _paragraph_text(paragraph).strip()
-        if text == "Table of Contents":
+        if text in {"Table of Contents", "目录", "目次"}:
+            toc_pages = _toc_pages(report_type, text)
+            final_toc_entry = list(toc_pages)[-1]
             in_toc = True
             continue
         if not in_toc:
@@ -1750,8 +1814,20 @@ def _add_static_toc_page_numbers(document_xml, report_type: str) -> None:
             break
 
 
-def _toc_pages(report_type: str) -> dict[str, str]:
+def _toc_pages(report_type: str, toc_title: str = "Table of Contents") -> dict[str, str]:
     if report_type == "findings":
+        if toc_title == "目录":
+            return {
+                "1. 发现汇总": "3",
+                "1.1 发现统计": "3",
+                "2. 发现详情": "3",
+            }
+        if toc_title == "目次":
+            return {
+                "1. 検出結果サマリー": "3",
+                "1.1 検出結果統計": "3",
+                "2. 検出結果詳細": "3",
+            }
         return {
             "1. Findings Summary": "3",
             "1.1 Findings Statistics": "3",
