@@ -20,6 +20,7 @@ from api.v1.serializer_utils.check_metadata_i18n import (
 )
 
 SUPPORTED_REPORT_LOCALES = {"en", "zh-CN", "ja-JP"}
+REPORT_BUILD_VERSION = "docx-localized-2026-06-12-07"
 
 REPORT_TEXT = {
     "en": {
@@ -217,13 +218,22 @@ def _report_zip_has_expected_layout(report_path: Path, locale: str) -> bool:
         "data/findings.csv",
         "data/findings.json",
         "data/raw_findings.json",
+        "data/report_version.txt",
         "data/resources.csv",
         "data/resources.json",
         "data/scan_summary.json",
     }
     expected.add("report/executive_report/executive_report.docx")
     expected.add("report/findings_report/Findings Report.docx")
-    return expected.issubset(names)
+    if not expected.issubset(names):
+        return False
+
+    try:
+        with zipfile.ZipFile(report_path) as report_zip:
+            version = report_zip.read("data/report_version.txt").decode().strip()
+    except (KeyError, UnicodeDecodeError, zipfile.BadZipFile):
+        return False
+    return version == REPORT_BUILD_VERSION
 
 
 def _localized_check_metadata(finding: Finding, locale: str) -> dict:
@@ -387,6 +397,7 @@ def _summary(scan: Scan, locale: str, rows: list[dict]) -> dict:
     unique_findings = {row["uid"] for row in rows}
     return {
         "locale": locale,
+        "report_build_version": REPORT_BUILD_VERSION,
         "generated_at": datetime.now(UTC).isoformat(),
         "scan": {
             "id": str(scan.id),
@@ -476,6 +487,7 @@ def _write_scan_report_zip(
 
     with zipfile.ZipFile(report_path, "w", zipfile.ZIP_DEFLATED) as report_zip:
         report_zip.writestr("data/README.md", readme)
+        report_zip.writestr("data/report_version.txt", REPORT_BUILD_VERSION)
         report_zip.writestr(
             "data/executive_report.md",
             _markdown_report(scan, locale, rows, summary),
