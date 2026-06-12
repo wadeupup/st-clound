@@ -1701,6 +1701,7 @@ def _account_id_from_resource(resource_uid: str) -> str:
 
 def _format_generated_layout(document_xml, report_type: str) -> None:
     _center_caption_paragraphs(document_xml)
+    _normalize_table_severity_text_colors(document_xml)
     _add_static_toc_page_numbers(document_xml, report_type)
 
 
@@ -1958,6 +1959,34 @@ def _set_cell_text(cell, value: str) -> None:
     if value.strip() != value:
         text.set("{http://www.w3.org/XML/1998/namespace}space", "preserve")
     text.text = value
+
+
+def _normalize_table_severity_text_colors(document_xml) -> None:
+    for table in document_xml.xpath(".//w:tbl", namespaces=NS):
+        rows = table.xpath("./w:tr", namespaces=NS)
+        for row_index, row in enumerate(rows):
+            for cell in row.xpath("./w:tc", namespaces=NS):
+                if row_index == 0:
+                    _set_cell_text_color(cell, "FFFFFF")
+                    continue
+                if _severity_from_label(_cell_text(cell).strip()):
+                    _apply_severity_color(cell, _cell_text(cell).strip())
+
+
+def _cell_text(cell) -> str:
+    return "".join(cell.xpath(".//w:t/text()", namespaces=NS))
+
+
+def _set_cell_text_color(cell, color_value: str) -> None:
+    for run in cell.xpath(".//w:r", namespaces=NS):
+        properties = run.find("w:rPr", namespaces=NS)
+        if properties is None:
+            properties = etree.Element(_qn("w:rPr"))
+            run.insert(0, properties)
+        color = properties.find("w:color", namespaces=NS)
+        if color is None:
+            color = etree.SubElement(properties, _qn("w:color"))
+        color.set(_qn("w:val"), color_value)
 
 
 def _apply_severity_color(cell, value: str) -> None:

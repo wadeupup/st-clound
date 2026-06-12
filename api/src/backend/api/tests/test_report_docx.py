@@ -313,6 +313,7 @@ def test_build_executive_report_docx_does_not_color_severity_table_headers():
     service_summary_header_colors = _table_row_text_colors(docx_bytes, 7, 0)
 
     assert SEVERITY_COLORS["critical"] in risk_summary_body_colors
+    assert "FFFFFF" in service_summary_header_colors
     assert severity_colors.isdisjoint(service_summary_header_colors)
 
 
