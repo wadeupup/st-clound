@@ -1,6 +1,10 @@
 import copy
 import io
+import os
 import re
+import shutil
+import subprocess
+import tempfile
 import zipfile
 from collections import Counter, defaultdict
 from dataclasses import dataclass
@@ -376,6 +380,9 @@ def build_executive_report_docx(
         _format_generated_layout(document_xml, report_type="executive")
 
         replacements = {"word/document.xml": _xml_bytes(document_xml)}
+        settings_xml = etree.fromstring(source.read("word/settings.xml"))
+        _enable_update_fields_on_open(settings_xml)
+        replacements["word/settings.xml"] = _xml_bytes(settings_xml)
         for figure, series in data["charts"].items():
             chart_path = chart_paths.get(figure)
             if not chart_path:
@@ -393,7 +400,7 @@ def build_executive_report_docx(
                     content = source.read(item.filename)
                 target.writestr(item, content)
 
-    return output.getvalue()
+    return _update_docx_fields(output.getvalue())
 
 
 def build_english_findings_report_docx(
@@ -462,7 +469,7 @@ def build_findings_report_docx(
                     content = source.read(item.filename)
                 target.writestr(item, content)
 
-    return output.getvalue()
+    return _update_docx_fields(output.getvalue())
 
 
 def _docx_text(locale: str) -> ReportDocxText:
@@ -1864,6 +1871,50 @@ def _toc_pages(report_type: str, toc_title: str = "Table of Contents") -> dict[s
             "1.1 Findings Statistics": "3",
             "2. Finding Details": "3",
         }
+    if toc_title == "目录":
+        return {
+            "1. 执行摘要": "3",
+            "1.1 评估概览": "3",
+            "1.2 风险汇总": "3",
+            "1.3 关键发现": "4",
+            "1.4 主要风险类别": "6",
+            "2. 资产概览": "7",
+            "2.1 云资产汇总": "7",
+            "2.2 按区域分布的资源": "8",
+            "3. 发现概览": "9",
+            "3.1 按服务统计发现": "9",
+            "3.2 按类别统计发现": "10",
+            "4. 修复优先级": "11",
+            "4.1 优先级 1（需立即处理）": "11",
+            "4.2 优先级 2（建议修复）": "12",
+            "4.3 优先级 3（持续改进）": "12",
+            "5. 建议": "13",
+            "附录 A. 评估方法": "13",
+            "附录 B. 严重等级定义": "14",
+            "附录 C. 免责声明": "14",
+        }
+    if toc_title == "目次":
+        return {
+            "1. エグゼクティブサマリー": "3",
+            "1.1 評価概要": "3",
+            "1.2 リスクサマリー": "3",
+            "1.3 主な検出結果": "4",
+            "1.4 主なリスクカテゴリ": "6",
+            "2. 資産概要": "7",
+            "2.1 クラウド資産サマリー": "7",
+            "2.2 リージョン別リソース分布": "8",
+            "3. 検出結果の概要": "9",
+            "3.1 サービス別検出結果": "9",
+            "3.2 カテゴリ別検出結果": "10",
+            "4. 修復優先度": "11",
+            "4.1 優先度 1（即時対応）": "11",
+            "4.2 優先度 2（修復推奨）": "12",
+            "4.3 優先度 3（継続改善）": "12",
+            "5. 推奨事項": "13",
+            "付録 A. 評価方法": "13",
+            "付録 B. 重大度定義": "14",
+            "付録 C. 免責事項": "14",
+        }
     return {
         "1. Executive Summary": "3",
         "1.1 Assessment Overview": "3",
@@ -1898,19 +1949,7 @@ def _toc_entry_text(text: str, toc_pages: dict[str, str]) -> str | None:
 
 
 def _add_static_toc_target_bookmarks(document_xml, report_type: str) -> None:
-    if report_type != "findings":
-        return
-    targets = {
-        "1. Findings Summary": ("toc_findings_summary", 19001),
-        "1. 发现汇总": ("toc_findings_summary", 19001),
-        "1. 検出結果サマリー": ("toc_findings_summary", 19001),
-        "1.1 Findings Statistics": ("toc_findings_statistics", 19002),
-        "1.1 发现统计": ("toc_findings_statistics", 19002),
-        "1.1 検出結果統計": ("toc_findings_statistics", 19002),
-        "2. Finding Details": ("toc_finding_details", 19003),
-        "2. 发现详情": ("toc_finding_details", 19003),
-        "2. 検出結果詳細": ("toc_finding_details", 19003),
-    }
+    targets = _toc_bookmark_targets(report_type)
     for paragraph in document_xml.xpath(".//w:p", namespaces=NS):
         text = _paragraph_text(paragraph).strip()
         target = targets.get(text)
@@ -1920,20 +1959,90 @@ def _add_static_toc_target_bookmarks(document_xml, report_type: str) -> None:
 
 
 def _static_toc_bookmark(report_type: str, toc_text: str) -> str:
-    if report_type != "findings":
-        return ""
-    bookmarks = {
-        "1. Findings Summary": "toc_findings_summary",
-        "1. 发现汇总": "toc_findings_summary",
-        "1. 検出結果サマリー": "toc_findings_summary",
-        "1.1 Findings Statistics": "toc_findings_statistics",
-        "1.1 发现统计": "toc_findings_statistics",
-        "1.1 検出結果統計": "toc_findings_statistics",
-        "2. Finding Details": "toc_finding_details",
-        "2. 发现详情": "toc_finding_details",
-        "2. 検出結果詳細": "toc_finding_details",
+    target = _toc_bookmark_targets(report_type).get(toc_text)
+    return target[0] if target else ""
+
+
+def _toc_bookmark_targets(report_type: str) -> dict[str, tuple[str, int]]:
+    if report_type == "findings":
+        return {
+            "1. Findings Summary": ("toc_findings_summary", 19001),
+            "1. 发现汇总": ("toc_findings_summary", 19001),
+            "1. 検出結果サマリー": ("toc_findings_summary", 19001),
+            "1.1 Findings Statistics": ("toc_findings_statistics", 19002),
+            "1.1 发现统计": ("toc_findings_statistics", 19002),
+            "1.1 検出結果統計": ("toc_findings_statistics", 19002),
+            "2. Finding Details": ("toc_finding_details", 19003),
+            "2. 发现详情": ("toc_finding_details", 19003),
+            "2. 検出結果詳細": ("toc_finding_details", 19003),
+        }
+    if report_type != "executive":
+        return {}
+    return {
+        "1. Executive Summary": ("toc_executive_summary", 18001),
+        "1. 执行摘要": ("toc_executive_summary", 18001),
+        "1. エグゼクティブサマリー": ("toc_executive_summary", 18001),
+        "1.1 Assessment Overview": ("toc_assessment_overview", 18002),
+        "1.1 评估概览": ("toc_assessment_overview", 18002),
+        "1.1 評価概要": ("toc_assessment_overview", 18002),
+        "1.2 Risk Summary": ("toc_risk_summary", 18003),
+        "1.2 风险汇总": ("toc_risk_summary", 18003),
+        "1.2 リスクサマリー": ("toc_risk_summary", 18003),
+        "1.3 Key Findings": ("toc_key_findings", 18004),
+        "1.3 关键发现": ("toc_key_findings", 18004),
+        "1.3 主な検出結果": ("toc_key_findings", 18004),
+        "1.4 Top Risk Categories": ("toc_top_risk_categories", 18005),
+        "1.4 主要风险类别": ("toc_top_risk_categories", 18005),
+        "1.4 主なリスクカテゴリ": ("toc_top_risk_categories", 18005),
+        "2. Asset Overview": ("toc_asset_overview", 18006),
+        "2. 资产概览": ("toc_asset_overview", 18006),
+        "2. 資産概要": ("toc_asset_overview", 18006),
+        "2.1 Cloud Asset Summary": ("toc_cloud_asset_summary", 18007),
+        "2.1 云资产汇总": ("toc_cloud_asset_summary", 18007),
+        "2.1 クラウド資産サマリー": ("toc_cloud_asset_summary", 18007),
+        "2.2 Resource Distribution by Region": (
+            "toc_resource_distribution_region",
+            18008,
+        ),
+        "2.2 按区域分布的资源": ("toc_resource_distribution_region", 18008),
+        "2.2 リージョン別リソース分布": (
+            "toc_resource_distribution_region",
+            18008,
+        ),
+        "3. Findings Overview": ("toc_findings_overview", 18009),
+        "3. 发现概览": ("toc_findings_overview", 18009),
+        "3. 検出結果の概要": ("toc_findings_overview", 18009),
+        "3.1 Findings by Service": ("toc_findings_by_service", 18010),
+        "3.1 按服务统计发现": ("toc_findings_by_service", 18010),
+        "3.1 サービス別検出結果": ("toc_findings_by_service", 18010),
+        "3.2 Findings by Category": ("toc_findings_by_category", 18011),
+        "3.2 按类别统计发现": ("toc_findings_by_category", 18011),
+        "3.2 カテゴリ別検出結果": ("toc_findings_by_category", 18011),
+        "4. Remediation Priorities": ("toc_remediation_priorities", 18012),
+        "4. 修复优先级": ("toc_remediation_priorities", 18012),
+        "4. 修復優先度": ("toc_remediation_priorities", 18012),
+        "4.1 Priority 1 (Immediate Action Required)": ("toc_priority_1", 18013),
+        "4.1 优先级 1（需立即处理）": ("toc_priority_1", 18013),
+        "4.1 優先度 1（即時対応）": ("toc_priority_1", 18013),
+        "4.2 Priority 2 (Remediation Recommended)": ("toc_priority_2", 18014),
+        "4.2 优先级 2（建议修复）": ("toc_priority_2", 18014),
+        "4.2 優先度 2（修復推奨）": ("toc_priority_2", 18014),
+        "4.3 Priority 3 (Continuous Improvement)": ("toc_priority_3", 18015),
+        "4.3 优先级 3（持续改进）": ("toc_priority_3", 18015),
+        "4.3 優先度 3（継続改善）": ("toc_priority_3", 18015),
+        "5. Recommendations": ("toc_recommendations", 18016),
+        "5. 建议": ("toc_recommendations", 18016),
+        "5. 推奨事項": ("toc_recommendations", 18016),
+        "Appendix A. Assessment Methodology": ("toc_appendix_a", 18017),
+        "附录 A. 评估方法": ("toc_appendix_a", 18017),
+        "付録 A. 評価方法": ("toc_appendix_a", 18017),
+        "Appendix B. Severity Definitions": ("toc_appendix_b", 18018),
+        "附录 B. 严重等级定义": ("toc_appendix_b", 18018),
+        "付録 B. 重大度定義": ("toc_appendix_b", 18018),
+        "Appendix C. Disclaimer": ("toc_appendix_c", 18019),
+        "附录 C. 免责声明": ("toc_appendix_c", 18019),
+        "付録 C. 免責事項": ("toc_appendix_c", 18019),
     }
-    return bookmarks.get(toc_text, "")
 
 
 def _set_paragraph_text_with_pageref(
@@ -1996,6 +2105,55 @@ def _enable_update_fields_on_open(settings_xml) -> None:
     if update_fields is None:
         update_fields = etree.SubElement(settings_xml, _qn("w:updateFields"))
     update_fields.set(_qn("w:val"), "true")
+
+
+def _update_docx_fields(docx_bytes: bytes) -> bytes:
+    office = (
+        shutil.which("soffice")
+        or shutil.which("libreoffice")
+        or shutil.which("lowriter")
+    )
+    if not office:
+        return docx_bytes
+
+    try:
+        with tempfile.TemporaryDirectory(prefix="report-docx-") as tmp:
+            tmp_path = Path(tmp)
+            input_path = tmp_path / "report.docx"
+            output_dir = tmp_path / "out"
+            output_dir.mkdir()
+            input_path.write_bytes(docx_bytes)
+
+            env = os.environ.copy()
+            env["HOME"] = str(tmp_path)
+            subprocess.run(
+                [
+                    office,
+                    "--headless",
+                    "--invisible",
+                    "--nodefault",
+                    "--nofirststartwizard",
+                    "--norestore",
+                    "--convert-to",
+                    "docx",
+                    "--outdir",
+                    str(output_dir),
+                    str(input_path),
+                ],
+                check=True,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                timeout=90,
+                env=env,
+            )
+
+            output_path = output_dir / input_path.name
+            if output_path.is_file():
+                return output_path.read_bytes()
+    except Exception:
+        return docx_bytes
+
+    return docx_bytes
 
 
 def _add_right_tab_stop(paragraph) -> None:

@@ -374,6 +374,17 @@ def test_build_executive_report_docx_supports_localized_text():
     assert "严重" in text
     assert "受影响资产" in text
     assert "{{" not in text
+    assert "toc_executive_summary" in _bookmark_names(docx_bytes)
+    assert "toc_recommendations" in _bookmark_names(docx_bytes)
+    assert any(
+        "PAGEREF toc_executive_summary" in field
+        for field in _field_instructions(docx_bytes)
+    )
+    assert any(
+        "PAGEREF toc_recommendations" in field
+        for field in _field_instructions(docx_bytes)
+    )
+    assert _update_fields_enabled(docx_bytes)
 
 
 def test_build_executive_report_docx_does_not_color_severity_table_headers():

@@ -12,6 +12,9 @@ ENV TRIVY_VERSION=${TRIVY_VERSION}
 RUN apt-get update && apt-get install -y --no-install-recommends \
     wget \
     libicu72 \
+    libreoffice-writer \
+    fonts-liberation \
+    fonts-noto-cjk \
     gcc \
     g++ \
     make \
