@@ -12,6 +12,7 @@ from api.models import Finding, Scan
 from api.v1.report_docx import (
     build_executive_report_docx,
     build_findings_report_docx,
+    localize_status_extended,
 )
 from api.v1.serializer_utils.check_metadata_i18n import (
     get_localized_check_metadata,
@@ -327,7 +328,10 @@ def _build_report_rows(scan: Scan, locale: str, findings: list[Finding]) -> list
                     "region": resource["region"],
                     "service": resource["service"],
                     "resource_type": resource["type"],
-                    "status_extended": finding.status_extended or "",
+                    "status_extended": localize_status_extended(
+                        finding.status_extended or "",
+                        locale,
+                    ),
                 }
             )
 

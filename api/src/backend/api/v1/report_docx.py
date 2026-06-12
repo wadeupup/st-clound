@@ -38,6 +38,37 @@ BODY_WIDTH_DXA = 9360
 STANDARD_BLOCK_WIDTH_DXA = int(BODY_WIDTH_DXA * 0.8)
 SUPPORTED_DOCX_LOCALES = {"en", "zh-CN", "ja-JP"}
 
+STATUS_EXTENDED_TRANSLATIONS = {
+    "zh-CN": {
+        "AWS Organizations is not in-use for this AWS Account.": "此 AWS 账号未使用 AWS Organizations。",
+        "No CloudTrail trails enabled with logging were found.": "未发现已启用日志记录的 CloudTrail trail。",
+        "No CloudTrail trails enabled and logging management events were found.": "未发现已启用的 CloudTrail trail，也未发现管理事件日志记录。",
+        "No CloudTrail trails have a data event to record all S3 object-level API operations.": "没有 CloudTrail trail 配置用于记录所有 S3 对象级 API 操作的数据事件。",
+        "No CloudWatch log groups found with metric filters or alarms associated.": "未发现关联指标筛选器或告警的 CloudWatch 日志组。",
+        "SECURITY, BILLING and OPERATIONS contacts not found or they are not different between each other and between ROOT contact.": "未找到 SECURITY、BILLING 和 OPERATIONS 联系人，或这些联系人彼此之间以及与 ROOT 联系人并不不同。",
+        "No Backup Vault exist.": "不存在 Backup Vault。",
+        "No SAML Providers found.": "未发现 SAML Provider。",
+        "No SSM Incidents replication set exists.": "不存在 SSM Incidents 复制集。",
+        "Amazon Web Services Premium Support Plan isn't subscribed.": "未订阅 Amazon Web Services Premium Support Plan。",
+        "VPCs found only in one region.": "仅在一个区域中发现 VPC。",
+        "Password expiration is not set.": "未设置密码过期时间。",
+    },
+    "ja-JP": {
+        "AWS Organizations is not in-use for this AWS Account.": "この AWS アカウントでは AWS Organizations が使用されていません。",
+        "No CloudTrail trails enabled with logging were found.": "ログ記録が有効な CloudTrail trail が見つかりません。",
+        "No CloudTrail trails enabled and logging management events were found.": "有効な CloudTrail trail、および管理イベントのログ記録が見つかりません。",
+        "No CloudTrail trails have a data event to record all S3 object-level API operations.": "すべての S3 オブジェクトレベル API 操作を記録するデータイベントが CloudTrail trail に設定されていません。",
+        "No CloudWatch log groups found with metric filters or alarms associated.": "メトリクスフィルターまたはアラームに関連付けられた CloudWatch ロググループが見つかりません。",
+        "SECURITY, BILLING and OPERATIONS contacts not found or they are not different between each other and between ROOT contact.": "SECURITY、BILLING、OPERATIONS の連絡先が見つからないか、相互に、または ROOT 連絡先と異なっていません。",
+        "No Backup Vault exist.": "Backup Vault が存在しません。",
+        "No SAML Providers found.": "SAML Provider が見つかりません。",
+        "No SSM Incidents replication set exists.": "SSM Incidents レプリケーションセットが存在しません。",
+        "Amazon Web Services Premium Support Plan isn't subscribed.": "Amazon Web Services Premium Support Plan が契約されていません。",
+        "VPCs found only in one region.": "VPC が 1 つのリージョンでのみ見つかりました。",
+        "Password expiration is not set.": "パスワードの有効期限が設定されていません。",
+    },
+}
+
 
 @dataclass(frozen=True)
 class ReportDocxText:
@@ -824,12 +855,151 @@ def _finding_summary(group: dict, text: ReportDocxText) -> str:
     if group.get("risk"):
         parts.append(f"{text.labels['risk']}: {_clean_markdown(group['risk'])}")
     if group.get("status_extended"):
+        status_extended = localize_status_extended(
+            _clean_markdown(group["status_extended"]),
+            _locale_for_text(text),
+        )
         parts.append(
-            f"{text.labels['current_status']}: {_clean_markdown(group['status_extended'])}"
+            f"{text.labels['current_status']}: {status_extended}"
         )
     if not parts:
         parts.append(text.fallback["no_narrative"])
     return _short_text(" ".join(parts), 1200)
+
+
+def _locale_for_text(text: ReportDocxText) -> str:
+    for locale, candidate in REPORT_DOCX_TEXT.items():
+        if text is candidate:
+            return locale
+    return "en"
+
+
+def localize_status_extended(status_extended: str, locale: str) -> str:
+    if not status_extended or locale == "en":
+        return status_extended or ""
+
+    status_extended = status_extended.strip()
+    exact = STATUS_EXTENDED_TRANSLATIONS.get(locale, {}).get(status_extended)
+    if exact:
+        return exact
+
+    if locale == "zh-CN":
+        return _localize_status_extended_zh(status_extended)
+    if locale == "ja-JP":
+        return _localize_status_extended_ja(status_extended)
+    return status_extended
+
+
+def _localize_status_extended_zh(status_extended: str) -> str:
+    patterns = [
+        (r"^Lambda function (.+) is not inside a VPC$", r"Lambda 函数 \1 不在 VPC 内。"),
+        (r"^Lambda function (.+) is not recorded by CloudTrail\.$", r"Lambda 函数 \1 未被 CloudTrail 记录。"),
+        (r"^Lambda function (.+) has a resource-based policy with public access\.$", r"Lambda 函数 \1 的基于资源的策略允许公开访问。"),
+        (r"^Lambda function (.+) has a publicly accessible function URL\.$", r"Lambda 函数 \1 的函数 URL 可公开访问。"),
+        (r"^Root user in the account was last accessed (.+) days ago\.$", r"此账号中的 root 用户最近一次访问是在 \1 天前。"),
+        (r"^Root account has one active access key\.$", r"root 账号存在一个活跃访问密钥。"),
+        (r"^Root account has a virtual MFA instead of a hardware MFA device enabled\.$", r"root 账号启用了虚拟 MFA，而不是硬件 MFA 设备。"),
+        (r"^Block Public Access is not configured for the account (.+)\.$", r"账号 \1 未配置 Block Public Access。"),
+        (r"^S3 Bucket (.+) does not have correct cross region replication configuration\.$", r"S3 Bucket \1 未配置正确的跨区域复制。"),
+        (r"^S3 Bucket (.+) does not have a bucket policy, thus it allows HTTP requests\.$", r"S3 Bucket \1 没有 bucket policy，因此允许 HTTP 请求。"),
+        (r"^S3 Bucket (.+) has server access logging disabled\.$", r"S3 Bucket \1 已禁用服务器访问日志。"),
+        (r"^Server Side Encryption is not configured with kms for S3 Bucket (.+)\.$", r"S3 Bucket \1 未配置基于 KMS 的服务端加密。"),
+        (r"^Log Group (.+) does not have AWS KMS keys associated\.$", r"Log Group \1 未关联 AWS KMS key。"),
+        (r"^Network ACL (.+) has every port open to the Internet\.$", r"Network ACL \1 向互联网开放了所有端口。"),
+        (r"^Network ACL (.+) has SSH port 22 open to the Internet\.$", r"Network ACL \1 向互联网开放了 SSH 22 端口。"),
+        (r"^Network ACL (.+) has Microsoft RDP port 3389 open to the Internet\.$", r"Network ACL \1 向互联网开放了 Microsoft RDP 3389 端口。"),
+        (r"^Security group (.+) it is not being used\.$", r"Security group \1 当前未被使用。"),
+        (r"^Inline policy (.+) attached to user (.+) allows privilege escalation using the following actions: (.+)\.$", r"附加到用户 \2 的内联策略 \1 允许通过以下操作进行权限提升：\3。"),
+        (r"^Inline policy (.+) attached to user (.+) allows '(.+)' administrative privileges\.$", r"附加到用户 \2 的内联策略 \1 允许 '\3' 管理员权限。"),
+        (r"^Inline policy (.+) attached to user (.+) allows '(.+)' privileges to all resources\.$", r"附加到用户 \2 的内联策略 \1 允许对所有资源使用 '\3' 权限。"),
+        (r"^Inline policy (.+) attached to user (.+) allows '(.+)' privileges\.$", r"附加到用户 \2 的内联策略 \1 允许 '\3' 权限。"),
+        (r"^IAM password policy does not require at least one lowercase letter\.$", r"IAM 密码策略未要求至少包含一个小写字母。"),
+        (r"^IAM password policy does not require minimum length of 14 characters\.$", r"IAM 密码策略未要求最小长度为 14 个字符。"),
+        (r"^IAM password policy does not require at least one number\.$", r"IAM 密码策略未要求至少包含一个数字。"),
+        (r"^IAM password policy reuse prevention is less than 24 or not set\.$", r"IAM 密码策略的重复使用限制小于 24 次或未设置。"),
+        (r"^IAM password policy does not require at least one symbol\.$", r"IAM 密码策略未要求至少包含一个符号。"),
+        (r"^IAM password policy does not require at least one uppercase letter\.$", r"IAM 密码策略未要求至少包含一个大写字母。"),
+        (r"^User (.+) has the policy (.+) attached\.$", r"用户 \1 附加了策略 \2。"),
+        (r"^User (.+) has the inline policy (.+) attached\.$", r"用户 \1 附加了内联策略 \2。"),
+        (r"^IAM Service Role (.+) does not prevent against a cross-service confused deputy attack\.$", r"IAM Service Role \1 未防止跨服务 confused deputy 攻击。"),
+        (r"^User (.+) does not have any type of MFA enabled\.$", r"用户 \1 未启用任何类型的 MFA。"),
+        (r"^AWS Support Access policy is not attached to any role\.$", r"AWS Support Access 策略未附加到任何角色。"),
+        (r"^User (.+) has Console Password enabled but MFA disabled\.$", r"用户 \1 启用了控制台密码，但未启用 MFA。"),
+        (r"^(.+) is not enabled in this account\.$", r"\1 未在此账号中启用。"),
+        (r"^(.+) is not enabled for this region\.$", r"\1 未在此区域中启用。"),
+        (r"^(.+) is not enabled\.$", r"\1 未启用。"),
+        (r"^(.+) is disabled\.$", r"\1 已禁用。"),
+        (r"^AWS Config recorder (.+) is disabled\.$", r"AWS Config recorder \1 已禁用。"),
+        (r"^No (.+) were found\.$", r"未发现 \1。"),
+        (r"^No (.+) found\.$", r"未发现 \1。"),
+        (r"^(.+) has termination protection disabled\.$", r"\1 未启用终止保护。"),
+        (r"^(.+) has MFA Delete disabled\.$", r"\1 已禁用 MFA Delete。"),
+        (r"^(.+) has Object Lock disabled\.$", r"\1 已禁用 Object Lock。"),
+        (r"^(.+) has versioning disabled\.$", r"\1 已禁用版本控制。"),
+        (r"^(.+) does not have event notifications enabled\.$", r"\1 未启用事件通知。"),
+        (r"^(.+) does not have a lifecycle configuration enabled\.$", r"\1 未启用生命周期配置。"),
+    ]
+    for pattern, replacement in patterns:
+        translated = re.sub(pattern, replacement, status_extended)
+        if translated != status_extended:
+            return translated
+    return status_extended
+
+
+def _localize_status_extended_ja(status_extended: str) -> str:
+    patterns = [
+        (r"^Lambda function (.+) is not inside a VPC$", r"Lambda 関数 \1 は VPC 内にありません。"),
+        (r"^Lambda function (.+) is not recorded by CloudTrail\.$", r"Lambda 関数 \1 は CloudTrail に記録されていません。"),
+        (r"^Lambda function (.+) has a resource-based policy with public access\.$", r"Lambda 関数 \1 のリソースベースポリシーが公開アクセスを許可しています。"),
+        (r"^Lambda function (.+) has a publicly accessible function URL\.$", r"Lambda 関数 \1 の関数 URL が公開アクセス可能です。"),
+        (r"^Root user in the account was last accessed (.+) days ago\.$", r"このアカウントの root ユーザーは \1 日前に最後にアクセスされました。"),
+        (r"^Root account has one active access key\.$", r"root アカウントに有効なアクセスキーが 1 つあります。"),
+        (r"^Root account has a virtual MFA instead of a hardware MFA device enabled\.$", r"root アカウントではハードウェア MFA デバイスではなく仮想 MFA が有効化されています。"),
+        (r"^Block Public Access is not configured for the account (.+)\.$", r"アカウント \1 に Block Public Access が設定されていません。"),
+        (r"^S3 Bucket (.+) does not have correct cross region replication configuration\.$", r"S3 Bucket \1 に正しいクロスリージョンレプリケーション設定がありません。"),
+        (r"^S3 Bucket (.+) does not have a bucket policy, thus it allows HTTP requests\.$", r"S3 Bucket \1 には bucket policy がないため、HTTP リクエストを許可しています。"),
+        (r"^S3 Bucket (.+) has server access logging disabled\.$", r"S3 Bucket \1 はサーバーアクセスログが無効化されています。"),
+        (r"^Server Side Encryption is not configured with kms for S3 Bucket (.+)\.$", r"S3 Bucket \1 には KMS によるサーバーサイド暗号化が設定されていません。"),
+        (r"^Log Group (.+) does not have AWS KMS keys associated\.$", r"Log Group \1 には AWS KMS key が関連付けられていません。"),
+        (r"^Network ACL (.+) has every port open to the Internet\.$", r"Network ACL \1 はすべてのポートをインターネットに公開しています。"),
+        (r"^Network ACL (.+) has SSH port 22 open to the Internet\.$", r"Network ACL \1 は SSH ポート 22 をインターネットに公開しています。"),
+        (r"^Network ACL (.+) has Microsoft RDP port 3389 open to the Internet\.$", r"Network ACL \1 は Microsoft RDP ポート 3389 をインターネットに公開しています。"),
+        (r"^Security group (.+) it is not being used\.$", r"Security group \1 は現在使用されていません。"),
+        (r"^Inline policy (.+) attached to user (.+) allows privilege escalation using the following actions: (.+)\.$", r"ユーザー \2 にアタッチされたインラインポリシー \1 は、次のアクションによる権限昇格を許可しています: \3。"),
+        (r"^Inline policy (.+) attached to user (.+) allows '(.+)' administrative privileges\.$", r"ユーザー \2 にアタッチされたインラインポリシー \1 は '\3' 管理者権限を許可しています。"),
+        (r"^Inline policy (.+) attached to user (.+) allows '(.+)' privileges to all resources\.$", r"ユーザー \2 にアタッチされたインラインポリシー \1 は、すべてのリソースに対して '\3' 権限を許可しています。"),
+        (r"^Inline policy (.+) attached to user (.+) allows '(.+)' privileges\.$", r"ユーザー \2 にアタッチされたインラインポリシー \1 は '\3' 権限を許可しています。"),
+        (r"^IAM password policy does not require at least one lowercase letter\.$", r"IAM パスワードポリシーで小文字が 1 文字以上要求されていません。"),
+        (r"^IAM password policy does not require minimum length of 14 characters\.$", r"IAM パスワードポリシーで 14 文字以上の最小長が要求されていません。"),
+        (r"^IAM password policy does not require at least one number\.$", r"IAM パスワードポリシーで数字が 1 文字以上要求されていません。"),
+        (r"^IAM password policy reuse prevention is less than 24 or not set\.$", r"IAM パスワードポリシーの再利用防止設定が 24 未満、または未設定です。"),
+        (r"^IAM password policy does not require at least one symbol\.$", r"IAM パスワードポリシーで記号が 1 文字以上要求されていません。"),
+        (r"^IAM password policy does not require at least one uppercase letter\.$", r"IAM パスワードポリシーで大文字が 1 文字以上要求されていません。"),
+        (r"^User (.+) has the policy (.+) attached\.$", r"ユーザー \1 にポリシー \2 がアタッチされています。"),
+        (r"^User (.+) has the inline policy (.+) attached\.$", r"ユーザー \1 にインラインポリシー \2 がアタッチされています。"),
+        (r"^IAM Service Role (.+) does not prevent against a cross-service confused deputy attack\.$", r"IAM Service Role \1 はクロスサービス confused deputy 攻撃を防止していません。"),
+        (r"^User (.+) does not have any type of MFA enabled\.$", r"ユーザー \1 はどの種類の MFA も有効化していません。"),
+        (r"^AWS Support Access policy is not attached to any role\.$", r"AWS Support Access ポリシーがどのロールにもアタッチされていません。"),
+        (r"^User (.+) has Console Password enabled but MFA disabled\.$", r"ユーザー \1 はコンソールパスワードが有効ですが、MFA が無効です。"),
+        (r"^(.+) is not enabled in this account\.$", r"\1 はこのアカウントで有効化されていません。"),
+        (r"^(.+) is not enabled for this region\.$", r"\1 はこのリージョンで有効化されていません。"),
+        (r"^(.+) is not enabled\.$", r"\1 は有効化されていません。"),
+        (r"^(.+) is disabled\.$", r"\1 は無効化されています。"),
+        (r"^AWS Config recorder (.+) is disabled\.$", r"AWS Config recorder \1 は無効化されています。"),
+        (r"^No (.+) were found\.$", r"\1 が見つかりません。"),
+        (r"^No (.+) found\.$", r"\1 が見つかりません。"),
+        (r"^(.+) has termination protection disabled\.$", r"\1 は終了保護が無効化されています。"),
+        (r"^(.+) has MFA Delete disabled\.$", r"\1 は MFA Delete が無効化されています。"),
+        (r"^(.+) has Object Lock disabled\.$", r"\1 は Object Lock が無効化されています。"),
+        (r"^(.+) has versioning disabled\.$", r"\1 はバージョニングが無効化されています。"),
+        (r"^(.+) does not have event notifications enabled\.$", r"\1 はイベント通知が有効化されていません。"),
+        (r"^(.+) does not have a lifecycle configuration enabled\.$", r"\1 はライフサイクル設定が有効化されていません。"),
+    ]
+    for pattern, replacement in patterns:
+        translated = re.sub(pattern, replacement, status_extended)
+        if translated != status_extended:
+            return translated
+    return status_extended
 
 
 def _remediation_actions(group: dict, text: ReportDocxText) -> list[str]:

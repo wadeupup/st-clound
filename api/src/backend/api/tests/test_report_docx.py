@@ -310,7 +310,7 @@ def test_build_findings_report_docx_replaces_localized_action_placeholders():
             "region": "global",
             "service": "organizations",
             "resource_type": "Other",
-            "status_extended": "AWS Organizations 当前未使用。",
+            "status_extended": "AWS Organizations is not in-use for this AWS Account.",
         }
     ]
     findings = [
@@ -330,3 +330,5 @@ def test_build_findings_report_docx_replaces_localized_action_placeholders():
     assert "使用 SCP 限制未批准区域。" in text
     assert "定期复核允许区域列表。" in text
     assert "启用 CloudTrail。" not in text
+    assert "当前状态: 此 AWS 账号未使用 AWS Organizations。" in text
+    assert "AWS Organizations is not in-use for this AWS Account." not in text
