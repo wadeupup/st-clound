@@ -58,6 +58,19 @@ def _table_row_text_colors(
     ]
 
 
+def _table_border_values(docx_bytes: bytes) -> list[str]:
+    with zipfile.ZipFile(BytesIO(docx_bytes)) as docx:
+        document = etree.fromstring(docx.read("word/document.xml"))
+    return [
+        border.get(f"{{{WORD_NS['w']}}}val")
+        for border in document.xpath(
+            ".//w:tblBorders/* | .//w:tcBorders/*",
+            namespaces=WORD_NS,
+        )
+        if border.get(f"{{{WORD_NS['w']}}}val")
+    ]
+
+
 def test_build_english_executive_report_docx_populates_scan_data():
     scan = SimpleNamespace(
         id="scan-id",
@@ -315,6 +328,7 @@ def test_build_executive_report_docx_does_not_color_severity_table_headers():
     assert SEVERITY_COLORS["critical"] in risk_summary_body_colors
     assert "FFFFFF" in service_summary_header_colors
     assert severity_colors.isdisjoint(service_summary_header_colors)
+    assert set(_table_border_values(docx_bytes)) == {"single"}
 
 
 def test_build_findings_report_docx_supports_localized_detail_tables():

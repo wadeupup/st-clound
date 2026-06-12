@@ -1701,8 +1701,15 @@ def _account_id_from_resource(resource_uid: str) -> str:
 
 def _format_generated_layout(document_xml, report_type: str) -> None:
     _center_caption_paragraphs(document_xml)
+    _normalize_all_table_geometry(document_xml)
     _normalize_table_severity_text_colors(document_xml)
     _add_static_toc_page_numbers(document_xml, report_type)
+
+
+def _normalize_all_table_geometry(document_xml) -> None:
+    for table in document_xml.xpath(".//w:tbl", namespaces=NS):
+        _format_table_geometry(table)
+        _set_table_borders(table)
 
 
 def _center_caption_paragraphs(document_xml) -> None:
@@ -1881,6 +1888,36 @@ def _set_table_width(table, width_dxa: int) -> None:
     if layout is None:
         layout = etree.SubElement(tbl_pr, _qn("w:tblLayout"))
     layout.set(_qn("w:type"), "fixed")
+
+
+def _set_table_borders(table) -> None:
+    tbl_pr = _get_or_add(table, "w:tblPr", first=True)
+    tbl_borders = tbl_pr.find("w:tblBorders", namespaces=NS)
+    if tbl_borders is None:
+        tbl_borders = etree.SubElement(tbl_pr, _qn("w:tblBorders"))
+    for edge in ("top", "left", "bottom", "right", "insideH", "insideV"):
+        border = tbl_borders.find(f"w:{edge}", namespaces=NS)
+        if border is None:
+            border = etree.SubElement(tbl_borders, _qn(f"w:{edge}"))
+        _set_border_style(border)
+
+    for cell in table.xpath(".//w:tc", namespaces=NS):
+        tc_pr = _get_or_add(cell, "w:tcPr", first=True)
+        tc_borders = tc_pr.find("w:tcBorders", namespaces=NS)
+        if tc_borders is None:
+            tc_borders = etree.SubElement(tc_pr, _qn("w:tcBorders"))
+        for edge in ("top", "left", "bottom", "right"):
+            border = tc_borders.find(f"w:{edge}", namespaces=NS)
+            if border is None:
+                border = etree.SubElement(tc_borders, _qn(f"w:{edge}"))
+            _set_border_style(border)
+
+
+def _set_border_style(border) -> None:
+    border.set(_qn("w:val"), "single")
+    border.set(_qn("w:sz"), "8")
+    border.set(_qn("w:space"), "0")
+    border.set(_qn("w:color"), "000000")
 
 
 def _set_table_grid(table, widths: list[int]) -> None:
