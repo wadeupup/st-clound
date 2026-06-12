@@ -442,6 +442,9 @@ def build_findings_report_docx(
         _format_generated_layout(document_xml, report_type="findings")
 
         replacements = {"word/document.xml": _xml_bytes(document_xml)}
+        settings_xml = etree.fromstring(source.read("word/settings.xml"))
+        _enable_update_fields_on_open(settings_xml)
+        replacements["word/settings.xml"] = _xml_bytes(settings_xml)
         for figure, series in data["charts"].items():
             chart_path = chart_paths.get(figure)
             if not chart_path:
@@ -1468,7 +1471,12 @@ def _replace_findings_toc(
     insert_after = detail_paragraph
     for finding in findings:
         paragraph = copy.deepcopy(detail_paragraph)
-        _set_paragraph_text(paragraph, _finding_toc_entry(finding, text))
+        _set_paragraph_text_with_pageref(
+            paragraph,
+            _finding_toc_entry(finding, text),
+            _finding_bookmark_name(finding),
+            fallback_page="3",
+        )
         _set_toc_entry_indent(paragraph, left=360)
         parent.insert(parent.index(insert_after) + 1, paragraph)
         insert_after = paragraph
@@ -1538,6 +1546,10 @@ def _finding_toc_entry(finding: dict, text: ReportDocxText) -> str:
         f"2.{finding['number']} {text.labels['finding']} "
         f"{finding['finding_id']} - {title}"
     )
+
+
+def _finding_bookmark_name(finding: dict) -> str:
+    return f"finding_{int(finding['number']):03d}"
 
 
 def _set_toc_entry_indent(paragraph, left: int) -> None:
@@ -1711,6 +1723,15 @@ def _populate_finding_block(
         }
         if paragraph_text in replacements:
             _set_paragraph_text(paragraph, replacements[paragraph_text])
+            if paragraph_text in {
+                "2.1 Finding {{finding_number}}",
+                f"2.1 {text.labels['finding']} {{{{finding_number}}}}",
+            }:
+                _add_bookmark_to_paragraph(
+                    paragraph,
+                    _finding_bookmark_name(detail),
+                    20000 + int(detail["number"]),
+                )
             continue
         if paragraph_text.startswith("CloudTrail logging is not enabled"):
             _replace_paragraph_with_labeled_items(
@@ -1765,6 +1786,7 @@ def _format_generated_layout(document_xml, report_type: str) -> None:
     _center_caption_paragraphs(document_xml)
     _normalize_all_table_geometry(document_xml)
     _normalize_table_severity_text_colors(document_xml)
+    _add_static_toc_target_bookmarks(document_xml, report_type)
     _add_static_toc_page_numbers(document_xml, report_type)
 
 
@@ -1808,8 +1830,17 @@ def _add_static_toc_page_numbers(document_xml, report_type: str) -> None:
         if not toc_text:
             continue
         page = toc_pages[toc_text]
-        _add_right_tab_stop(paragraph)
-        _set_paragraph_text(paragraph, f"{toc_text}\t{page}")
+        bookmark = _static_toc_bookmark(report_type, toc_text)
+        if bookmark:
+            _set_paragraph_text_with_pageref(
+                paragraph,
+                toc_text,
+                bookmark,
+                fallback_page=page,
+            )
+        else:
+            _add_right_tab_stop(paragraph)
+            _set_paragraph_text(paragraph, f"{toc_text}\t{page}")
         if toc_text == final_toc_entry:
             break
 
@@ -1864,6 +1895,107 @@ def _toc_entry_text(text: str, toc_pages: dict[str, str]) -> str | None:
         if not suffix or re.fullmatch(r"[.\s\t]*\d+", suffix):
             return entry
     return None
+
+
+def _add_static_toc_target_bookmarks(document_xml, report_type: str) -> None:
+    if report_type != "findings":
+        return
+    targets = {
+        "1. Findings Summary": ("toc_findings_summary", 19001),
+        "1. 发现汇总": ("toc_findings_summary", 19001),
+        "1. 検出結果サマリー": ("toc_findings_summary", 19001),
+        "1.1 Findings Statistics": ("toc_findings_statistics", 19002),
+        "1.1 发现统计": ("toc_findings_statistics", 19002),
+        "1.1 検出結果統計": ("toc_findings_statistics", 19002),
+        "2. Finding Details": ("toc_finding_details", 19003),
+        "2. 发现详情": ("toc_finding_details", 19003),
+        "2. 検出結果詳細": ("toc_finding_details", 19003),
+    }
+    for paragraph in document_xml.xpath(".//w:p", namespaces=NS):
+        text = _paragraph_text(paragraph).strip()
+        target = targets.get(text)
+        if not target:
+            continue
+        _add_bookmark_to_paragraph(paragraph, target[0], target[1])
+
+
+def _static_toc_bookmark(report_type: str, toc_text: str) -> str:
+    if report_type != "findings":
+        return ""
+    bookmarks = {
+        "1. Findings Summary": "toc_findings_summary",
+        "1. 发现汇总": "toc_findings_summary",
+        "1. 検出結果サマリー": "toc_findings_summary",
+        "1.1 Findings Statistics": "toc_findings_statistics",
+        "1.1 发现统计": "toc_findings_statistics",
+        "1.1 検出結果統計": "toc_findings_statistics",
+        "2. Finding Details": "toc_finding_details",
+        "2. 发现详情": "toc_finding_details",
+        "2. 検出結果詳細": "toc_finding_details",
+    }
+    return bookmarks.get(toc_text, "")
+
+
+def _set_paragraph_text_with_pageref(
+    paragraph,
+    label: str,
+    bookmark_name: str,
+    fallback_page: str,
+) -> None:
+    for child in list(paragraph):
+        if child.tag != _qn("w:pPr"):
+            paragraph.remove(child)
+
+    run = etree.SubElement(paragraph, _qn("w:r"))
+    text = etree.SubElement(run, _qn("w:t"))
+    text.text = label
+
+    tab_run = etree.SubElement(paragraph, _qn("w:r"))
+    etree.SubElement(tab_run, _qn("w:tab"))
+
+    field = etree.SubElement(paragraph, _qn("w:fldSimple"))
+    field.set(_qn("w:instr"), f" PAGEREF {bookmark_name} \\h ")
+    field.set(_qn("w:dirty"), "true")
+    result_run = etree.SubElement(field, _qn("w:r"))
+    result_text = etree.SubElement(result_run, _qn("w:t"))
+    result_text.text = fallback_page
+
+    _add_right_tab_stop(paragraph)
+
+
+def _add_bookmark_to_paragraph(
+    paragraph,
+    name: str,
+    bookmark_id: int,
+) -> None:
+    for bookmark_start in paragraph.xpath(
+        f"./w:bookmarkStart[@w:name='{name}']",
+        namespaces=NS,
+    ):
+        paragraph.remove(bookmark_start)
+    for bookmark_end in paragraph.xpath(
+        f"./w:bookmarkEnd[@w:id='{bookmark_id}']",
+        namespaces=NS,
+    ):
+        paragraph.remove(bookmark_end)
+
+    start = etree.Element(_qn("w:bookmarkStart"))
+    start.set(_qn("w:id"), str(bookmark_id))
+    start.set(_qn("w:name"), name)
+    end = etree.Element(_qn("w:bookmarkEnd"))
+    end.set(_qn("w:id"), str(bookmark_id))
+
+    ppr = paragraph.find("w:pPr", namespaces=NS)
+    insert_at = 1 if ppr is not None else 0
+    paragraph.insert(insert_at, start)
+    paragraph.append(end)
+
+
+def _enable_update_fields_on_open(settings_xml) -> None:
+    update_fields = settings_xml.find("w:updateFields", namespaces=NS)
+    if update_fields is None:
+        update_fields = etree.SubElement(settings_xml, _qn("w:updateFields"))
+    update_fields.set(_qn("w:val"), "true")
 
 
 def _add_right_tab_stop(paragraph) -> None:

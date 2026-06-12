@@ -71,6 +71,36 @@ def _table_border_values(docx_bytes: bytes) -> list[str]:
     ]
 
 
+def _field_instructions(docx_bytes: bytes) -> list[str]:
+    with zipfile.ZipFile(BytesIO(docx_bytes)) as docx:
+        document = etree.fromstring(docx.read("word/document.xml"))
+    return [
+        field.get(f"{{{WORD_NS['w']}}}instr")
+        for field in document.xpath(".//w:fldSimple", namespaces=WORD_NS)
+        if field.get(f"{{{WORD_NS['w']}}}instr")
+    ]
+
+
+def _bookmark_names(docx_bytes: bytes) -> list[str]:
+    with zipfile.ZipFile(BytesIO(docx_bytes)) as docx:
+        document = etree.fromstring(docx.read("word/document.xml"))
+    return [
+        bookmark.get(f"{{{WORD_NS['w']}}}name")
+        for bookmark in document.xpath(".//w:bookmarkStart", namespaces=WORD_NS)
+        if bookmark.get(f"{{{WORD_NS['w']}}}name")
+    ]
+
+
+def _update_fields_enabled(docx_bytes: bytes) -> bool:
+    with zipfile.ZipFile(BytesIO(docx_bytes)) as docx:
+        settings = etree.fromstring(docx.read("word/settings.xml"))
+    update_fields = settings.find(".//w:updateFields", namespaces=WORD_NS)
+    return (
+        update_fields is not None
+        and update_fields.get(f"{{{WORD_NS['w']}}}val") == "true"
+    )
+
+
 def test_build_english_executive_report_docx_populates_scan_data():
     scan = SimpleNamespace(
         id="scan-id",
@@ -290,9 +320,14 @@ def test_build_findings_report_docx_adds_dynamic_toc_entries():
     first_finding = "2.1 Finding F-001 - IAM user MFA enabled"
     second_finding = "2.2 Finding F-002 - S3 bucket public access"
 
-    assert paragraphs.count(first_finding) == 2
-    assert paragraphs.count(second_finding) == 2
+    assert sum(paragraph.startswith(first_finding) for paragraph in paragraphs) == 2
+    assert sum(paragraph.startswith(second_finding) for paragraph in paragraphs) == 2
     assert not any("{{finding_number}}" in paragraph for paragraph in paragraphs)
+    assert "finding_001" in _bookmark_names(docx_bytes)
+    assert "finding_002" in _bookmark_names(docx_bytes)
+    assert any("PAGEREF finding_001" in field for field in _field_instructions(docx_bytes))
+    assert any("PAGEREF finding_002" in field for field in _field_instructions(docx_bytes))
+    assert _update_fields_enabled(docx_bytes)
 
 
 def test_build_executive_report_docx_supports_localized_text():

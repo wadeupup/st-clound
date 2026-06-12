@@ -20,7 +20,7 @@ from api.v1.serializer_utils.check_metadata_i18n import (
 )
 
 SUPPORTED_REPORT_LOCALES = {"en", "zh-CN", "ja-JP"}
-REPORT_BUILD_VERSION = "docx-localized-2026-06-12-09"
+REPORT_BUILD_VERSION = "docx-localized-2026-06-12-10"
 
 REPORT_TEXT = {
     "en": {
