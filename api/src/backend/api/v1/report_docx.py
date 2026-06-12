@@ -772,7 +772,8 @@ def _finding_detail_groups(
             "priority": _priority_for_severity(group["severity"]),
             "category": _category_from_metadata(metadata, group["service"], text),
             "resources": resources,
-            "summary": _finding_summary(group, text),
+            "summary": _finding_summary_text(group, text),
+            "summary_items": _finding_summary_items(group, text),
             "actions": _remediation_actions(group, text),
             "references": _finding_references(metadata, text),
         }
@@ -795,6 +796,9 @@ def _finding_detail_groups(
             "service": text.fallback["none"],
             "resources": [],
             "summary": text.fallback["no_findings_available"],
+            "summary_items": [
+                (text.labels["executive_summary"], text.fallback["no_findings_available"])
+            ],
             "actions": [text.recommendations[6]],
             "references": [text.fallback["no_external_reference"]],
         }
@@ -848,23 +852,33 @@ def _priority_for_severity(severity: str) -> str:
     return "P3"
 
 
-def _finding_summary(group: dict, text: ReportDocxText) -> str:
-    parts = []
+def _finding_summary_items(group: dict, text: ReportDocxText) -> list[tuple[str, str]]:
+    items = []
     if group.get("description"):
-        parts.append(f"{text.labels['description']}: {_clean_markdown(group['description'])}")
+        items.append(
+            (
+                text.labels["description"],
+                _short_text(_clean_markdown(group["description"]), 700),
+            )
+        )
     if group.get("risk"):
-        parts.append(f"{text.labels['risk']}: {_clean_markdown(group['risk'])}")
+        items.append((text.labels["risk"], _short_text(_clean_markdown(group["risk"]), 700)))
     if group.get("status_extended"):
         status_extended = localize_status_extended(
             _clean_markdown(group["status_extended"]),
             _locale_for_text(text),
         )
-        parts.append(
-            f"{text.labels['current_status']}: {status_extended}"
-        )
-    if not parts:
-        parts.append(text.fallback["no_narrative"])
-    return _short_text(" ".join(parts), 1200)
+        items.append((text.labels["current_status"], _short_text(status_extended, 500)))
+    if not items:
+        items.append((text.labels["executive_summary"], text.fallback["no_narrative"]))
+    return items
+
+
+def _finding_summary_text(group: dict, text: ReportDocxText) -> str:
+    return _short_text(
+        " ".join(f"{label}: {value}" for label, value in _finding_summary_items(group, text)),
+        1200,
+    )
 
 
 def _locale_for_text(text: ReportDocxText) -> str:
@@ -1637,7 +1651,11 @@ def _populate_finding_block(
             _set_paragraph_text(paragraph, replacements[paragraph_text])
             continue
         if paragraph_text.startswith("CloudTrail logging is not enabled"):
-            _set_paragraph_text(paragraph, detail["summary"])
+            _replace_paragraph_with_labeled_items(
+                paragraph,
+                detail["summary_items"],
+                block,
+            )
             continue
         matched_action_placeholder = False
         for index, placeholders in enumerate(action_placeholders):
@@ -2176,6 +2194,53 @@ def _set_paragraph_text(paragraph, value: str) -> None:
     first_text.text = value
     for run in runs[1:]:
         paragraph.remove(run)
+
+
+def _replace_paragraph_with_labeled_items(
+    paragraph,
+    items: list[tuple[str, str]],
+    container: list | None = None,
+) -> None:
+    parent = paragraph.getparent()
+    current = paragraph
+    for index, (label, value) in enumerate(items):
+        target = paragraph if index == 0 else copy.deepcopy(paragraph)
+        if index > 0:
+            if parent is not None:
+                parent.insert(parent.index(current) + 1, target)
+                current = target
+            elif container is not None and current in container:
+                container.insert(container.index(current) + 1, target)
+                current = target
+        _set_labeled_paragraph_text(target, label, value)
+        _set_paragraph_spacing(target, before=80 if index else 0, after=80)
+
+
+def _set_labeled_paragraph_text(paragraph, label: str, value: str) -> None:
+    for child in list(paragraph):
+        if child.tag != _qn("w:pPr"):
+            paragraph.remove(child)
+
+    label_run = etree.SubElement(paragraph, _qn("w:r"))
+    label_properties = etree.SubElement(label_run, _qn("w:rPr"))
+    etree.SubElement(label_properties, _qn("w:b"))
+    label_text = etree.SubElement(label_run, _qn("w:t"))
+    label_text.text = f"{label}: "
+
+    value_run = etree.SubElement(paragraph, _qn("w:r"))
+    value_text = etree.SubElement(value_run, _qn("w:t"))
+    if value.strip() != value:
+        value_text.set("{http://www.w3.org/XML/1998/namespace}space", "preserve")
+    value_text.text = value
+
+
+def _set_paragraph_spacing(paragraph, before: int = 0, after: int = 0) -> None:
+    paragraph_properties = _get_or_add(paragraph, "w:pPr", first=True)
+    spacing = paragraph_properties.find("w:spacing", namespaces=NS)
+    if spacing is None:
+        spacing = etree.SubElement(paragraph_properties, _qn("w:spacing"))
+    spacing.set(_qn("w:before"), str(before))
+    spacing.set(_qn("w:after"), str(after))
 
 
 def _xml_bytes(xml) -> bytes:

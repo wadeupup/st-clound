@@ -24,6 +24,15 @@ def _document_text(docx_bytes: bytes) -> str:
     return " ".join(document.xpath(".//w:t/text()", namespaces=WORD_NS))
 
 
+def _paragraph_texts(docx_bytes: bytes) -> list[str]:
+    with zipfile.ZipFile(BytesIO(docx_bytes)) as docx:
+        document = etree.fromstring(docx.read("word/document.xml"))
+    return [
+        "".join(paragraph.xpath(".//w:t/text()", namespaces=WORD_NS))
+        for paragraph in document.xpath(".//w:p", namespaces=WORD_NS)
+    ]
+
+
 def _first_table_width(docx_bytes: bytes) -> str | None:
     with zipfile.ZipFile(BytesIO(docx_bytes)) as docx:
         document = etree.fromstring(docx.read("word/document.xml"))
@@ -172,6 +181,14 @@ def test_build_english_findings_report_docx_populates_finding_details():
     assert "https://example.com/remediate" in text
     assert "{{" not in text
     assert "CloudTrail logging is not enabled" not in text
+
+    paragraphs = _paragraph_texts(docx_bytes)
+    assert "Description: IAM users with console access should use MFA." in paragraphs
+    assert (
+        "Risk: Console users without MFA increase account takeover risk."
+        in paragraphs
+    )
+    assert "Current status: MFA is not enabled for this user." in paragraphs
 
 
 def test_build_findings_report_docx_uses_standard_table_width():
@@ -389,8 +406,9 @@ def test_build_findings_report_docx_replaces_localized_action_placeholders():
     docx_bytes = build_findings_report_docx(scan, rows, findings, {}, locale="zh-CN")
 
     text = _document_text(docx_bytes)
+    paragraphs = _paragraph_texts(docx_bytes)
     assert "使用 SCP 限制未批准区域。" in text
     assert "定期复核允许区域列表。" in text
     assert "启用 CloudTrail。" not in text
-    assert "当前状态: 此 AWS 账号未使用 AWS Organizations。" in text
+    assert "当前状态: 此 AWS 账号未使用 AWS Organizations。" in paragraphs
     assert "AWS Organizations is not in-use for this AWS Account." not in text
