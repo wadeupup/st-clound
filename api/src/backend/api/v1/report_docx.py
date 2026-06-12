@@ -1798,7 +1798,7 @@ def _replace_table(table, rows: list[list[str]]) -> None:
     for index, values in enumerate(rows):
         template = header_template if index == 0 else data_template
         row = copy.deepcopy(template)
-        _set_row_values(row, values)
+        _set_row_values(row, values, allow_severity_color=index != 0)
         table.append(row)
     _format_table_geometry(table)
 
@@ -1899,12 +1899,17 @@ def _set_cell_margins(cell, margin_dxa: int = 100) -> None:
         node.set(_qn("w:type"), "dxa")
 
 
-def _set_row_values(row, values: list[str]) -> None:
+def _set_row_values(
+    row,
+    values: list[str],
+    allow_severity_color: bool = True,
+) -> None:
     cells = row.xpath("./w:tc", namespaces=NS)
     for index, cell in enumerate(cells):
         value = values[index] if index < len(values) else ""
         _set_cell_text(cell, str(value))
-        _apply_severity_color(cell, str(value))
+        if allow_severity_color:
+            _apply_severity_color(cell, str(value))
 
 
 def _set_cell_text(cell, value: str) -> None:

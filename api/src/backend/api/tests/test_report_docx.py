@@ -6,6 +6,7 @@ from types import SimpleNamespace
 from lxml import etree
 
 from api.v1.report_docx import (
+    SEVERITY_COLORS,
     build_executive_report_docx,
     build_english_executive_report_docx,
     build_english_findings_report_docx,
@@ -30,6 +31,22 @@ def _first_table_width(docx_bytes: bytes) -> str | None:
     if table_width is None:
         return None
     return table_width.get(f"{{{WORD_NS['w']}}}w")
+
+
+def _table_row_text_colors(
+    docx_bytes: bytes,
+    table_index: int,
+    row_index: int,
+) -> list[str]:
+    with zipfile.ZipFile(BytesIO(docx_bytes)) as docx:
+        document = etree.fromstring(docx.read("word/document.xml"))
+    tables = document.xpath(".//w:tbl", namespaces=WORD_NS)
+    rows = tables[table_index].xpath("./w:tr", namespaces=WORD_NS)
+    return [
+        color.get(f"{{{WORD_NS['w']}}}val")
+        for color in rows[row_index].xpath(".//w:color", namespaces=WORD_NS)
+        if color.get(f"{{{WORD_NS['w']}}}val")
+    ]
 
 
 def test_build_english_executive_report_docx_populates_scan_data():
@@ -235,6 +252,51 @@ def test_build_executive_report_docx_supports_localized_text():
     assert "严重" in text
     assert "受影响资产" in text
     assert "{{" not in text
+
+
+def test_build_executive_report_docx_does_not_color_severity_table_headers():
+    scan = SimpleNamespace(
+        id="scan-id",
+        name="生产 AWS 评估",
+        completed_at=datetime(2026, 6, 10, tzinfo=timezone.utc),
+        provider=SimpleNamespace(provider="aws", uid="123456789012"),
+    )
+    rows = [
+        {
+            "uid": "finding-1",
+            "status": "FAIL",
+            "severity": "critical",
+            "check_id": "iam_user_mfa_enabled",
+            "check_title": "IAM 用户未启用 MFA",
+            "risk": "未启用 MFA 会增加账号接管风险。",
+            "resource_uid": "arn:aws:iam::123456789012:user/test",
+            "resource_name": "test",
+            "region": "global",
+            "service": "iam",
+            "resource_type": "AwsIamUser",
+        }
+    ]
+    findings = [
+        SimpleNamespace(
+            uid="finding-1",
+            check_metadata={"categories": ["identity-access"]},
+        )
+    ]
+
+    docx_bytes = build_executive_report_docx(
+        scan,
+        rows,
+        findings,
+        {},
+        locale="zh-CN",
+    )
+
+    severity_colors = set(SEVERITY_COLORS.values())
+    risk_summary_body_colors = _table_row_text_colors(docx_bytes, 1, 1)
+    service_summary_header_colors = _table_row_text_colors(docx_bytes, 7, 0)
+
+    assert SEVERITY_COLORS["critical"] in risk_summary_body_colors
+    assert severity_colors.isdisjoint(service_summary_header_colors)
 
 
 def test_build_findings_report_docx_supports_localized_detail_tables():
