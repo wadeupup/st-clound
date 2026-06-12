@@ -1,7 +1,7 @@
 {
   "Provider": "aws",
   "CheckID": "organizations_tags_policies_enabled_and_attached",
-  "CheckTitle": "AWS Organization has tag policies enabled and attached",
+  "CheckTitle": "AWS Organization でタグポリシーが有効化され、アタッチされている",
   "CheckType": [
     "Software and Configuration Checks/AWS Security Best Practices"
   ],
@@ -11,8 +11,8 @@
   "Severity": "low",
   "ResourceType": "Other",
   "ResourceGroup": "governance",
-  "Description": "**AWS Organizations** tag policies are evaluated for their presence and attachment to 組織 targets (accounts or OUs), distinguishing between no policies, policies defined but not attached, and policies attached to at least one target.",
-  "Risk": "Absent or unattached tag policies cause inconsistent or missing tags, undermining:\n- **Confidentiality** via bypassed tag-based access conditions\n- **Integrity** through misclassified resources and drift\n- **Availability** when automation, cost routing, or incident scoping that rely on tags break",
+  "Description": "**AWS Organizations** のタグポリシーについて、存在しているか、および組織ターゲット（アカウントまたは OU）にアタッチされているかを評価します。ポリシーがない状態、定義済みだが未アタッチの状態、少なくとも 1 つのターゲットにアタッチ済みの状態を区別します。",
+  "Risk": "タグポリシーが存在しない、またはアタッチされていない場合、タグの不整合や欠落が発生し、以下を弱めます:\n- タグベースのアクセス条件が回避されることによる**機密性**\n- リソースの誤分類やドリフトによる**完全性**\n- タグに依存する自動化、コスト配賦、インシデント範囲特定が失敗した場合の**可用性**",
   "RelatedUrl": "",
   "AdditionalURLs": [
     "https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_tag-policies.html"
@@ -25,7 +25,7 @@
       "Terraform": "```hcl\n# Create a Tag Policy\nresource \"aws_organizations_policy\" \"<example_resource_name>\" {\n  name    = \"<example_resource_name>\"\n  type    = \"TAG_POLICY\"  # Critical: defines a Tag Policy type\n  content = jsonencode({\n    tags = {\n      Environment = {\n        tag_key = { \"@@assign\" = \"Environment\" }\n      }\n    }\n  })\n}\n\n# Attach the Tag Policy to a target (Root/OU/Account)\nresource \"aws_organizations_policy_attachment\" \"<example_resource_name>\" {\n  policy_id = aws_organizations_policy.<example_resource_name>.id\n  target_id = \"<example_resource_id>\"  # Critical: attaches the policy to an account/OU/root\n}\n```"
     },
     "Recommendation": {
-      "Text": "Enable **tag policies** and attach them to relevant roots/OUs/accounts. Define mandatory keys (e.g., `Environment`, `CostCenter`) with allowed values. Apply **defense in depth** by using tags in IAM conditions and SCPs. Start with validation-only, then enforce, and continuously monitor compliance across accounts.",
+      "Text": "**タグポリシー**を有効化し、関連するルート、OU、アカウントにアタッチしてください。必須キー（例: `Environment`、`CostCenter`）と許可値を定義します。IAM 条件や SCP でタグを使用して**多層防御**を適用します。まず検証のみで開始し、その後強制適用へ進め、アカウント横断の準拠状況を継続的に監視してください。",
       "Url": "https://hub.prowler.com/check/organizations_tags_policies_enabled_and_attached"
     }
   },

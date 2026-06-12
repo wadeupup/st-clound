@@ -1,7 +1,7 @@
 {
   "Provider": "aws",
   "CheckID": "organizations_opt_out_ai_services_policy",
-  "CheckTitle": "AWS Organization has opted out of all AI services and child accounts cannot override the policy",
+  "CheckTitle": "AWS Organization がすべての AI サービスをオプトアウトし、子アカウントがポリシーを上書きできない",
   "CheckType": [
     "Software and Configuration Checks/AWS Security Best Practices",
     "Effects/Data Exposure"
@@ -12,8 +12,8 @@
   "Severity": "medium",
   "ResourceType": "Other",
   "ResourceGroup": "governance",
-  "Description": "**AWS Organizations** is assessed for an AI services opt-out policy that sets `services.default.opt_out_policy` to `optOut` and blocks child overrides via `@@operators_allowed_for_child_policies` set to `@@none`.",
-  "Risk": "an enforced opt-out, AI services may store and use your content for model training, weakening **confidentiality** and **data sovereignty**. If child accounts can override, they can re-enable data use, risking unintended cross-Region retention and exposure of logs, documents, or code processed by these services.がない場合、",
+  "Description": "**AWS Organizations** の AI サービスオプトアウトポリシーを評価します。`services.default.opt_out_policy` が `optOut` に設定され、`@@operators_allowed_for_child_policies` が `@@none` に設定されて子アカウントによる上書きがブロックされているかを確認します。",
+  "Risk": "強制されたオプトアウトがない場合、AI サービスがコンテンツを保存し、モデル学習に使用する可能性があり、**機密性**と**データ主権**が弱まります。子アカウントが上書きできる場合、データ利用を再度有効化でき、ログ、文書、コードなどがこれらのサービスで処理された後に、意図しないクロスリージョン保持や露出が発生する可能性があります。",
   "RelatedUrl": "",
   "AdditionalURLs": [
     "https://docs.aws.amazon.com/organizations/latest/userguide/disable-policy-type.html",
@@ -28,7 +28,7 @@
       "Terraform": "```hcl\n# Enable AI services opt-out policy type\nresource \"aws_organizations_organization\" \"<example_resource_name>\" {\n  enabled_policy_types = [\"AISERVICES_OPT_OUT_POLICY\"]  # Critical: allow AI opt-out policies\n}\n\n# Create the AI opt-out policy\nresource \"aws_organizations_policy\" \"<example_resource_name>\" {\n  name    = \"<example_resource_name>\"\n  type    = \"AISERVICES_OPT_OUT_POLICY\"\n  content = <<JSON\n{ \"services\": { \"default\": { \"opt_out_policy\": { \"@@assign\": \"optOut\", \"@@operators_allowed_for_child_policies\": [\"@@none\"] } } } }\nJSON\n  # Critical: @@assign \"optOut\" opts out; @@operators... [\"@@none\"] prevents child overrides\n}\n\n# Attach policy to the org root\nresource \"aws_organizations_policy_attachment\" \"<example_resource_name>\" {\n  policy_id = aws_organizations_policy.<example_resource_name>.id\n  target_id = aws_organizations_organization.<example_resource_name>.roots[0].id  # Critical: attach to root\n}\n```"
     },
     "Recommendation": {
-      "Text": "Establish an org-wide AI services opt-out: set the default to `optOut` and prohibit child policy overrides (`@@none`). Apply at the highest scope, gate exceptions through change control, and review periodically. Align with **least privilege** and **data minimization** to prevent unintended content sharing with managed AI services.",
+      "Text": "組織全体の AI サービスオプトアウトを確立してください。デフォルトを `optOut` に設定し、子ポリシーによる上書き（`@@none`）を禁止します。最上位スコープに適用し、例外は変更管理で制御し、定期的に見直してください。**最小権限**と**データ最小化**に整合させ、マネージド AI サービスとの意図しないコンテンツ共有を防ぎます。",
       "Url": "https://hub.prowler.com/check/organizations_opt_out_ai_services_policy"
     }
   },

@@ -1,7 +1,7 @@
 {
   "Provider": "aws",
   "CheckID": "organizations_account_part_of_organizations",
-  "CheckTitle": "AWS account is a member of an active AWS Organization",
+  "CheckTitle": "AWS 账号是活跃 AWS Organization 的成员",
   "CheckType": [
     "Software and Configuration Checks/AWS Security Best Practices"
   ],
@@ -11,8 +11,8 @@
   "Severity": "medium",
   "ResourceType": "Other",
   "ResourceGroup": "governance",
-  "Description": "**AWS account** 成员hip in **AWS Organizations** with 组织 status `ACTIVE`.\n\nAssesses if the account is associated with an 组织 and that the 组织 state is `ACTIVE`.",
-  "Risk": "Absence of **AWS Organizations** weakens governance across accounts. Without **SCP guardrails** and centralized policy, excessive permissions, unsafe 网络 settings, or risky services may be enabled, threatening **confidentiality** and **integrity**. Fragmented logging and response slow containment, impacting **availability** and increasing cost exposure.",
+  "Description": "**AWS 账号**应属于状态为 `ACTIVE` 的 **AWS Organizations** 组织。\n\n此检查会评估账号是否关联到组织，以及该组织状态是否为 `ACTIVE`。",
+  "Risk": "缺少 **AWS Organizations** 会削弱跨账号治理。没有 **SCP 防护栏** 和集中策略时，可能启用过度权限、不安全网络设置或高风险服务，威胁**机密性**和**完整性**。日志和响应分散会拖慢遏制速度，影响**可用性**并增加成本暴露。",
   "RelatedUrl": "",
   "AdditionalURLs": [
     "https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_org_create.html",
@@ -26,7 +26,7 @@
       "Terraform": "```hcl\n# Creates an AWS Organization so this account becomes a member (status ACTIVE)\nresource \"aws_organizations_organization\" \"<example_resource_name>\" {\n  # Critical: creating this resource makes the account part of an active AWS Organization\n}\n```"
     },
     "Recommendation": {
-      "Text": "Operate all accounts under **AWS Organizations** (preferably with *all features*). Structure OUs, enforce **SCPs** for least privilege, and apply separation of duties between management and member accounts. Centralize logging and billing to support defense-in-depth, and routinely review org 成员hip and policies.",
+      "Text": "在 **AWS Organizations** 下管理所有账号（最好启用 *All features*）。规划 OU，使用 **SCP** 执行最小权限，并在管理账号和成员账号之间落实职责分离。集中日志与账单以支持纵深防御，并定期复核组织成员和策略。",
       "Url": "https://hub.prowler.com/check/organizations_account_part_of_organizations"
     }
   },

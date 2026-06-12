@@ -1,7 +1,7 @@
 {
   "Provider": "aws",
   "CheckID": "account_maintain_different_contact_details_to_security_billing_and_operations",
-  "CheckTitle": "AWS account has distinct Security, Billing, and Operations contact details, different from each other and from the root contact",
+  "CheckTitle": "AWS 账号为 Security、Billing 和 Operations 配置了彼此不同且不同于 root 联系人的联系方式",
   "CheckType": [
     "Software and Configuration Checks/Industry and Regulatory Standards/AWS Foundational Security Best Practices",
     "Software and Configuration Checks/Industry and Regulatory Standards/CIS AWS Foundations Benchmark"
@@ -12,8 +12,8 @@
   "Severity": "medium",
   "ResourceType": "Other",
   "ResourceGroup": "governance",
-  "Description": "**AWS account alternate contacts** are defined for **Security**, **Billing**, and **Operations** with `name`, `email`, and `phone`. The finding evaluates that all three exist, are distinct from one another, and differ from the **primary (root) contact**.",
-  "Risk": "Missing or shared contacts can delay response to abuse alerts, credential compromise, or billing anomalies, reducing **availability** (possible AWS traffic throttling) and raising **confidentiality** and **integrity** risk through extended exposure. If AWS cannot reach you, urgent mitigation may disrupt service.",
+  "Description": "**AWS 账号备用联系人**会为 **Security**、**Billing** 和 **Operations** 分别配置 `name`、`email` 和 `phone`。此检查会评估三类联系人是否都存在、彼此不同，并且不同于**主联系人（root 联系人）**。",
+  "Risk": "缺失或共用联系人会延迟对滥用告警、凭证泄露或账单异常的响应，降低**可用性**（可能触发 AWS 流量限制），并因暴露时间延长而提高**机密性**和**完整性**风险。如果 AWS 无法及时联系到你，紧急缓解措施可能影响服务。",
   "RelatedUrl": "",
   "AdditionalURLs": [
     "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/account_alternate_contact",
@@ -32,7 +32,7 @@
       "Terraform": "```hcl\n# Set distinct alternate contacts for SECURITY, BILLING, and OPERATIONS\n# Critical: each resource sets a required contact type to satisfy the check\n\nresource \"aws_account_alternate_contact\" \"security\" {\n  alternate_contact_type = \"SECURITY\"  # Sets SECURITY contact\n  email_address          = \"security@example.com\"\n  name                   = \"Security Team\"\n  phone_number           = \"+1-555-0100\"\n  title                  = \"Security\"\n}\n\nresource \"aws_account_alternate_contact\" \"billing\" {\n  alternate_contact_type = \"BILLING\"   # Sets BILLING contact\n  email_address          = \"billing@example.com\"\n  name                   = \"Billing Team\"\n  phone_number           = \"+1-555-0101\"\n  title                  = \"Billing\"\n}\n\nresource \"aws_account_alternate_contact\" \"operations\" {\n  alternate_contact_type = \"OPERATIONS\" # Sets OPERATIONS contact\n  email_address          = \"operations@example.com\"\n  name                   = \"Operations Team\"\n  phone_number           = \"+1-555-0102\"\n  title                  = \"Operations\"\n}\n```"
     },
     "Recommendation": {
-      "Text": "Maintain distinct, monitored **Security**, **Billing**, and **Operations** alternate contacts that differ from the root contact.\n- Use team aliases and 24x7 phones\n- Review and test contact paths regularly\n- Centralize at org level for consistency\n\nApplies **operational resilience** and **separation of duties**.",
+      "Text": "维护与 root 联系人不同且受监控的 **Security**、**Billing** 和 **Operations** 备用联系人。\n- 使用团队别名和 7x24 电话\n- 定期复核并测试联系路径\n- 尽量在组织层面集中管理以保持一致性\n\n这有助于提升**运营韧性**并落实**职责分离**。",
       "Url": "https://hub.prowler.com/check/account_maintain_different_contact_details_to_security_billing_and_operations"
     }
   },
