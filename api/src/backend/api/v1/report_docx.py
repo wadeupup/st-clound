@@ -2381,13 +2381,17 @@ def _set_toc_paragraph_text_with_page(
     label: str,
     page: str,
 ) -> None:
+    bookmark_name = _paragraph_hyperlink_anchor(paragraph)
     for child in list(paragraph):
         if child.tag != _qn("w:pPr"):
             paragraph.remove(child)
 
-    run = etree.SubElement(paragraph, _qn("w:r"))
-    text = etree.SubElement(run, _qn("w:t"))
-    text.text = label
+    if bookmark_name:
+        _append_internal_hyperlink(paragraph, label, bookmark_name)
+    else:
+        run = etree.SubElement(paragraph, _qn("w:r"))
+        text = etree.SubElement(run, _qn("w:t"))
+        text.text = label
 
     tab_run = etree.SubElement(paragraph, _qn("w:r"))
     etree.SubElement(tab_run, _qn("w:tab"))
@@ -2613,9 +2617,7 @@ def _set_paragraph_text_with_pageref(
         if child.tag != _qn("w:pPr"):
             paragraph.remove(child)
 
-    run = etree.SubElement(paragraph, _qn("w:r"))
-    text = etree.SubElement(run, _qn("w:t"))
-    text.text = label
+    _append_internal_hyperlink(paragraph, label, bookmark_name)
 
     tab_run = etree.SubElement(paragraph, _qn("w:r"))
     etree.SubElement(tab_run, _qn("w:tab"))
@@ -2628,6 +2630,23 @@ def _set_paragraph_text_with_pageref(
     result_text.text = fallback_page
 
     _add_right_tab_stop(paragraph)
+
+
+def _append_internal_hyperlink(paragraph, label: str, bookmark_name: str) -> None:
+    hyperlink = etree.SubElement(paragraph, _qn("w:hyperlink"))
+    hyperlink.set(_qn("w:anchor"), bookmark_name)
+    hyperlink.set(_qn("w:history"), "1")
+
+    run = etree.SubElement(hyperlink, _qn("w:r"))
+    text = etree.SubElement(run, _qn("w:t"))
+    text.text = label
+
+
+def _paragraph_hyperlink_anchor(paragraph) -> str:
+    hyperlink = paragraph.find("w:hyperlink", namespaces=NS)
+    if hyperlink is None:
+        return ""
+    return hyperlink.get(_qn("w:anchor"), "")
 
 
 def _add_bookmark_to_paragraph(

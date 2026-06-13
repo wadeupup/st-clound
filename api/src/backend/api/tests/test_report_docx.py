@@ -90,6 +90,22 @@ def _bookmark_names(docx_bytes: bytes) -> list[str]:
     ]
 
 
+def _paragraph_hyperlink_anchors(docx_bytes: bytes) -> dict[str, list[str]]:
+    with zipfile.ZipFile(BytesIO(docx_bytes)) as docx:
+        document = etree.fromstring(docx.read("word/document.xml"))
+    anchors_by_text = {}
+    for paragraph in document.xpath(".//w:p", namespaces=WORD_NS):
+        text = "".join(paragraph.xpath(".//w:t/text()", namespaces=WORD_NS))
+        anchors = [
+            hyperlink.get(f"{{{WORD_NS['w']}}}anchor")
+            for hyperlink in paragraph.xpath(".//w:hyperlink", namespaces=WORD_NS)
+            if hyperlink.get(f"{{{WORD_NS['w']}}}anchor")
+        ]
+        if anchors:
+            anchors_by_text[text] = anchors
+    return anchors_by_text
+
+
 def _update_fields_enabled(docx_bytes: bytes) -> bool:
     with zipfile.ZipFile(BytesIO(docx_bytes)) as docx:
         settings = etree.fromstring(docx.read("word/settings.xml"))
@@ -326,6 +342,14 @@ def test_build_findings_report_docx_adds_dynamic_toc_entries():
     assert "finding_002" in _bookmark_names(docx_bytes)
     assert "toc_findings_appendix_a" in _bookmark_names(docx_bytes)
     assert any(paragraph.startswith("Appendix A. Severity Definitions") for paragraph in paragraphs)
+    anchors_by_text = _paragraph_hyperlink_anchors(docx_bytes)
+    assert anchors_by_text["1. Findings Summary3"] == ["toc_findings_summary"]
+    assert anchors_by_text["2. Finding Details3"] == ["toc_finding_details"]
+    assert anchors_by_text[f"{first_finding}3"] == ["finding_001"]
+    assert anchors_by_text[f"{second_finding}3"] == ["finding_002"]
+    assert anchors_by_text["Appendix A. Severity Definitions5"] == [
+        "toc_findings_appendix_a"
+    ]
     assert _update_fields_enabled(docx_bytes)
 
 
