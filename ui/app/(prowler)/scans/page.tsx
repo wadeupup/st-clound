@@ -169,9 +169,7 @@ const SSRDataTableScans = async ({
     }) || [];
 
   const hasExecutingScan = expandedScansData.some(
-    (scan: ScanProps) =>
-      scan.attributes.state === "executing" ||
-      scan.attributes.state === "available",
+    (scan: ScanProps) => scan.attributes.state === "executing",
   );
 
   return (
