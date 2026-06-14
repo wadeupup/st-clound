@@ -4,6 +4,7 @@ import { Spacer } from "@heroui/spacer";
 import Image from "next/image";
 
 import { DataTableFilterCustom } from "@/components/ui/table/data-table-filter-custom";
+import { getComplianceDisplayName } from "@/lib/compliance/display-names";
 import { useI18n } from "@/lib/i18n/context";
 import { ScanEntity } from "@/types/scans";
 
@@ -88,7 +89,7 @@ export const ComplianceHeader = ({
               <div className="relative h-24 w-24">
                 <Image
                   src={logoPath}
-                  alt={`${complianceTitle} logo`}
+                  alt={`${getComplianceDisplayName(complianceTitle)} logo`}
                   fill
                   className="rounded-lg border border-gray-300 bg-white object-contain p-0"
                 />

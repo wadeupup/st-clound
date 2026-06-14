@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 
 import { Card, CardContent } from "@/components/shadcn/card/card";
+import { getComplianceDisplayName } from "@/lib/compliance/display-names";
 import { DownloadIconButton, toast } from "@/components/ui";
 import { downloadComplianceCsv } from "@/lib/helper";
 import { ScanEntity } from "@/types/scans";
@@ -39,10 +40,6 @@ export const ComplianceCard: React.FC<ComplianceCardProps> = ({
   const router = useRouter();
   const hasRegionFilter = searchParams.has("filter[region__in]");
   const [isDownloading, setIsDownloading] = useState<boolean>(false);
-
-  const formatTitle = (title: string) => {
-    return title.split("-").join(" ");
-  };
 
   const ratingPercentage = Math.floor(
     (passingRequirements / totalRequirements) * 100,
@@ -106,13 +103,13 @@ export const ComplianceCard: React.FC<ComplianceCardProps> = ({
           {getComplianceIcon(title) && (
             <Image
               src={getComplianceIcon(title)}
-              alt={`${title} logo`}
+              alt={`${getComplianceDisplayName(title)} logo`}
               className="h-10 w-10 min-w-10 rounded-md border border-gray-300 bg-white object-contain p-1"
             />
           )}
           <div className="flex w-full flex-col">
             <h4 className="text-small mb-1 leading-5 font-bold">
-              {formatTitle(title)}
+              {getComplianceDisplayName(title)}
               {version ? ` - ${version}` : ""}
             </h4>
             <Progress

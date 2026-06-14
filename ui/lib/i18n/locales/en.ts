@@ -40,7 +40,7 @@ export const en = {
     invitationToken: "Invitation Token",
     termsAgreement: "I agree with the",
     termsOfService: "Terms of Service",
-    termsOfServiceOf: "of Prowler",
+    termsOfServiceOf: "of ST Cloud",
     success: "Success!",
     userRegistered: "The user was registered successfully.",
     sessionExpired: "Session Expired",
@@ -517,7 +517,7 @@ export const en = {
         kubernetesCredentialsDescription:
           "Please provide the kubeconfig content for your Kubernetes credentials.",
         mongoAtlasKeysDescription:
-          "Provide an organization-level MongoDB Atlas API public and private key with read access to the resources you want Prowler to assess.",
+          "Provide an organization-level MongoDB Atlas API public and private key with read access to the resources you want ST Cloud to assess.",
         ociApiKeyDescription:
           "Please provide your Oracle Cloud Infrastructure API key credentials.",
         usingServiceAccount: "Using Service Account",
@@ -556,7 +556,7 @@ export const en = {
           "Paste the raw content of your OCI private key file (PEM format). The key will be automatically encoded for secure transmission.",
         connectViaAccessKeys: "Connect via Access Keys",
         alibabaAccessKeysDescription:
-          "Provide a RAM user Access Key ID and Access Key Secret with read access to the resources you want Prowler to assess.",
+          "Provide a RAM user Access Key ID and Access Key Secret with read access to the resources you want ST Cloud to assess.",
         usingRamRole: "Using RAM Role",
         accessKeyId: "Access Key ID",
         accessKeySecret: "Access Key Secret",
@@ -569,10 +569,10 @@ export const en = {
         ramRoleToAssume: "RAM Role to Assume",
         credentialsForRoleAssumption: "Credentials for Role Assumption",
         enterRoleSessionNameWithDefault:
-          "Enter the role session name (default: ProwlerSession)",
+          "Enter the role session name (default: STCloudSession)",
         alibabaRoleSecurityNote:
           "Keys never leave your browser unencrypted and are stored as secrets in the backend. The role will be assumed using STS to obtain temporary credentials.",
-        prowlerCloudAssumeRole: "Prowler Cloud will assume your IAM role",
+        prowlerCloudAssumeRole: "ST Cloud will assume your IAM role",
         awsSdkDefault: "AWS SDK Default",
         accessSecretKey: "Access & Secret Key",
         awsAccessKeyId: "AWS Access Key ID",

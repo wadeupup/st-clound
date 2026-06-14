@@ -10,6 +10,10 @@ import {
 } from "@/lib/compliance/compliance-report-types";
 import { addScanOperation } from "@/lib/sentry-breadcrumbs";
 import { handleApiError, handleApiResponse } from "@/lib/server-actions-helper";
+
+const formatExportFilename = (filename: string) =>
+  filename.replace(/prowler[_-]threatscore/gi, "st-cloud-threatscore");
+
 export const getScans = async ({
   page = 1,
   query = "",
@@ -285,7 +289,9 @@ export const getComplianceCsv = async (
     return {
       success: true,
       data: base64,
-      filename: `scan-${scanId}-compliance-${complianceId}.csv`,
+      filename: formatExportFilename(
+        `scan-${scanId}-compliance-${complianceId}.csv`,
+      ),
     };
   } catch (error) {
     return {
@@ -337,7 +343,7 @@ export const getCompliancePdfReport = async (
     return {
       success: true,
       data: base64,
-      filename: `scan-${scanId}-${reportType}.pdf`,
+      filename: formatExportFilename(`scan-${scanId}-${reportType}.pdf`),
     };
   } catch (error) {
     return {

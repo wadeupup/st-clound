@@ -37,7 +37,7 @@ export const AlibabaCloudRoleCredentialsForm = ({
         type="text"
         label={labels.roleArn}
         labelPlacement="inside"
-        placeholder="e.g. acs:ram::1234567890123456:role/ProwlerRole"
+        placeholder="e.g. acs:ram::1234567890123456:role/STCloudRole"
         variant="bordered"
         isRequired
       />

@@ -20,6 +20,7 @@ import {
 } from "@/components/compliance";
 import { getComplianceIcon } from "@/components/icons/compliance/IconCompliance";
 import { ContentLayout } from "@/components/ui";
+import { getComplianceDisplayName } from "@/lib/compliance/display-names";
 import { getComplianceMapper } from "@/lib/compliance/compliance-mapper";
 import { getReportTypeForFramework } from "@/lib/compliance/compliance-report-types";
 import {
@@ -62,7 +63,7 @@ export default async function ComplianceDetail({
   );
   const searchParamsKey = JSON.stringify(paramsForKey);
 
-  const formattedTitle = compliancetitle.split("-").join(" ");
+  const formattedTitle = getComplianceDisplayName(compliancetitle);
   const pageTitle = version
     ? `${formattedTitle} - ${version}`
     : `${formattedTitle}`;
@@ -88,7 +89,9 @@ export default async function ComplianceDetail({
 
   // Use compliance_name from attributes if available, otherwise fallback to formatted title
   const complianceName = attributesData?.data?.[0]?.attributes?.compliance_name;
-  const finalPageTitle = complianceName ? `${complianceName}` : pageTitle;
+  const finalPageTitle = complianceName
+    ? getComplianceDisplayName(complianceName)
+    : pageTitle;
 
   return (
     <ContentLayout title={finalPageTitle}>

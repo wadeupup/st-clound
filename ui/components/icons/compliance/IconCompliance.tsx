@@ -15,9 +15,9 @@ import MITRELogo from "./mitre-attack.svg";
 import NIS2Logo from "./nis2.svg";
 import NISTLogo from "./nist.svg";
 import PCILogo from "./pci-dss.svg";
-import PROWLERTHREATLogo from "./prowlerThreat.svg";
 import RBILogo from "./rbi.svg";
 import SOC2Logo from "./soc2.svg";
+import STLogo from "./st.png";
 
 const COMPLIANCE_LOGOS = {
   aws: AWSLogo,
@@ -36,7 +36,7 @@ const COMPLIANCE_LOGOS = {
   rbi: RBILogo,
   soc2: SOC2Logo,
   kisa: KISALogo,
-  prowlerthreatscore: PROWLERTHREATLogo,
+  prowlerthreatscore: STLogo,
   nis2: NIS2Logo,
   c5: C5Logo,
   ccc: CCCLogo,

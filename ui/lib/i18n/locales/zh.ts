@@ -500,7 +500,7 @@ export const zh = {
         kubernetesCredentialsDescription:
           "请提供您的 Kubernetes 凭据 kubeconfig 内容。",
         mongoAtlasKeysDescription:
-          "请提供组织级 MongoDB Atlas API 公钥和私钥，并确保其对要由 Prowler 评估的资源具有读取权限。",
+          "请提供组织级 MongoDB Atlas API 公钥和私钥，并确保其对要由 ST Cloud 评估的资源具有读取权限。",
         ociApiKeyDescription:
           "请提供您的 Oracle Cloud Infrastructure API 密钥凭据。",
         usingServiceAccount: "使用服务账号",
@@ -536,7 +536,7 @@ export const zh = {
           "粘贴 OCI 私钥文件的原始内容（PEM 格式）。该密钥将自动编码以便安全传输。",
         connectViaAccessKeys: "通过访问密钥连接",
         alibabaAccessKeysDescription:
-          "请提供 RAM 用户的 Access Key ID 和 Access Key Secret，并确保其对要由 Prowler 评估的资源具有读取权限。",
+          "请提供 RAM 用户的 Access Key ID 和 Access Key Secret，并确保其对要由 ST Cloud 评估的资源具有读取权限。",
         usingRamRole: "使用 RAM 角色",
         accessKeyId: "Access Key ID",
         accessKeySecret: "Access Key Secret",
@@ -549,10 +549,10 @@ export const zh = {
         ramRoleToAssume: "要承担的 RAM 角色",
         credentialsForRoleAssumption: "角色承担凭据",
         enterRoleSessionNameWithDefault:
-          "输入角色会话名称（默认：ProwlerSession）",
+          "输入角色会话名称（默认：STCloudSession）",
         alibabaRoleSecurityNote:
           "密钥不会以未加密形式离开您的浏览器，并会作为密钥存储在后端。该角色将通过 STS 承担以获取临时凭据。",
-        prowlerCloudAssumeRole: "Prowler Cloud 将承担您的 IAM 角色",
+        prowlerCloudAssumeRole: "ST Cloud 将承担您的 IAM 角色",
         awsSdkDefault: "AWS SDK 默认",
         accessSecretKey: "访问密钥和密钥",
         awsAccessKeyId: "AWS 访问密钥 ID",

@@ -115,7 +115,9 @@ RUN PYTHONPATH=/home/prowler/local-cspm-backend poetry run python "/home/prowler
 COPY api/src/backend/ ./backend/
 COPY api/docker-entrypoint.sh ./docker-entrypoint.sh
 
+USER root
 RUN chmod -R a+rX ./backend/api/v1/report_templates
+USER prowler
 
 WORKDIR /home/prowler/backend
 

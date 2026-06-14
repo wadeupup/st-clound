@@ -205,7 +205,7 @@ export const SignUpForm = ({
                         >
                           Terms of Service
                         </CustomLink>
-                        &nbsp;of Prowler
+                        &nbsp;of ST Cloud
                       </Checkbox>
                     </FormControl>
                     <FormMessage className="text-text-error" />

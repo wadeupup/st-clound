@@ -2,7 +2,7 @@ import { Spacer } from "@heroui/spacer";
 import { Suspense } from "react";
 
 import { getProviders } from "@/actions/providers";
-import { getScans, getScansByState } from "@/actions/scans";
+import { getScans } from "@/actions/scans";
 import { auth } from "@/auth.config";
 import { MutedFindingsConfigButton } from "@/components/providers";
 import {
@@ -61,15 +61,6 @@ export default async function Scans({
 
   const hasManageScansPermission = session?.user?.permissions?.manage_scans;
 
-  // Get scans data to check for executing scans
-  const scansData = await getScansByState();
-
-  const hasExecutingScan = scansData?.data?.some(
-    (scan: ScanProps) =>
-      scan.attributes.state === "executing" ||
-      scan.attributes.state === "available",
-  );
-
   // Extract provider UIDs and create provider details mapping for filtering
   const providerUIDs = providersData ? extractProviderUIDs(providersData) : [];
   const providerDetails = providersData
@@ -86,7 +77,6 @@ export default async function Scans({
 
   return (
     <ContentLayout title={<ScansTitle />} icon="lucide:timer">
-      <AutoRefresh hasExecutingScan={hasExecutingScan} />
       <>
         {!hasManageScansPermission ? (
           <AccessDeniedBanner />
@@ -178,7 +168,16 @@ const SSRDataTableScans = async ({
       };
     }) || [];
 
+  const hasExecutingScan = expandedScansData.some(
+    (scan: ScanProps) =>
+      scan.attributes.state === "executing" ||
+      scan.attributes.state === "available",
+  );
+
   return (
-    <ColumnGetScansWrapper data={expandedScansData || []} metadata={meta} />
+    <>
+      <AutoRefresh hasExecutingScan={hasExecutingScan} />
+      <ColumnGetScansWrapper data={expandedScansData || []} metadata={meta} />
+    </>
   );
 };

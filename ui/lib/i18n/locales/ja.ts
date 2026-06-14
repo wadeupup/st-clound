@@ -514,7 +514,7 @@ export const ja = {
         kubernetesCredentialsDescription:
           "Kubernetes 認証情報の kubeconfig 内容を入力してください。",
         mongoAtlasKeysDescription:
-          "Prowler が評価するリソースへの読み取りアクセス権を持つ、組織レベルの MongoDB Atlas API 公開キーと秘密キーを入力してください。",
+          "ST Cloud が評価するリソースへの読み取りアクセス権を持つ、組織レベルの MongoDB Atlas API 公開キーと秘密キーを入力してください。",
         ociApiKeyDescription:
           "Oracle Cloud Infrastructure API キー認証情報を入力してください。",
         usingServiceAccount: "サービスアカウントを使用",
@@ -554,7 +554,7 @@ export const ja = {
           "OCI 秘密キーファイルの生の内容（PEM 形式）を貼り付けてください。キーは安全な送信のため自動的にエンコードされます。",
         connectViaAccessKeys: "アクセスキーで接続",
         alibabaAccessKeysDescription:
-          "Prowler が評価するリソースへの読み取りアクセス権を持つ RAM ユーザーの Access Key ID と Access Key Secret を入力してください。",
+          "ST Cloud が評価するリソースへの読み取りアクセス権を持つ RAM ユーザーの Access Key ID と Access Key Secret を入力してください。",
         usingRamRole: "RAM ロールを使用",
         accessKeyId: "Access Key ID",
         accessKeySecret: "Access Key Secret",
@@ -567,10 +567,10 @@ export const ja = {
         ramRoleToAssume: "引き受ける RAM ロール",
         credentialsForRoleAssumption: "ロール引き受け用の認証情報",
         enterRoleSessionNameWithDefault:
-          "ロールセッション名を入力（デフォルト：ProwlerSession）",
+          "ロールセッション名を入力（デフォルト：STCloudSession）",
         alibabaRoleSecurityNote:
           "キーは暗号化されていない状態でブラウザーから送信されることはなく、バックエンドにシークレットとして保存されます。このロールは STS を使用して引き受けられ、一時認証情報を取得します。",
-        prowlerCloudAssumeRole: "Prowler Cloud が IAM ロールを引き受けます",
+        prowlerCloudAssumeRole: "ST Cloud が IAM ロールを引き受けます",
         awsSdkDefault: "AWS SDK デフォルト",
         accessSecretKey: "アクセスキーとシークレットキー",
         awsAccessKeyId: "AWS アクセスキー ID",

@@ -1944,6 +1944,13 @@ class ScanViewSet(BaseRLSViewSet):
 
         return response
 
+    def _format_export_filename(self, filename):
+        return (
+            filename.replace("prowler_threatscore", "st-cloud-threatscore")
+            .replace("prowler-threatscore", "st-cloud-threatscore")
+            .replace("ProwlerThreatScore", "ST-Cloud-ThreatScore")
+        )
+
     @action(detail=True, methods=["get"], url_name="report")
     def report(self, request, pk=None):
         scan = self.get_object()
@@ -2044,6 +2051,7 @@ class ScanViewSet(BaseRLSViewSet):
             return loader
 
         content, filename = loader
+        filename = self._format_export_filename(filename)
         return self._serve_file(content, filename, "text/csv")
 
     @action(
@@ -2084,6 +2092,7 @@ class ScanViewSet(BaseRLSViewSet):
             return loader
 
         content, filename = loader
+        filename = self._format_export_filename(filename)
         return self._serve_file(content, filename, "application/pdf")
 
     @action(

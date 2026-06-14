@@ -1,9 +1,9 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
-const SCANS_REFRESH_INTERVAL_MS = 30000;
+const SCANS_REFRESH_INTERVAL_MS = 5000;
 
 interface AutoRefreshProps {
   hasExecutingScan: boolean;
@@ -11,14 +11,9 @@ interface AutoRefreshProps {
 
 export function AutoRefresh({ hasExecutingScan }: AutoRefreshProps) {
   const router = useRouter();
-  const searchParams = useSearchParams();
 
   useEffect(() => {
     if (!hasExecutingScan) return;
-
-    // Don't auto-refresh if scan details drawer is open
-    const scanId = searchParams.get("scanId");
-    if (scanId) return;
 
     const refreshIfVisible = () => {
       if (document.visibilityState !== "visible") return;
@@ -26,9 +21,15 @@ export function AutoRefresh({ hasExecutingScan }: AutoRefreshProps) {
     };
 
     const interval = setInterval(refreshIfVisible, SCANS_REFRESH_INTERVAL_MS);
+    const handleVisibilityChange = () => refreshIfVisible();
 
-    return () => clearInterval(interval);
-  }, [hasExecutingScan, router, searchParams]);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [hasExecutingScan, router]);
 
   return null;
 }
