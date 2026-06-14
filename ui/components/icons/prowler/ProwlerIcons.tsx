@@ -19,9 +19,24 @@ export const ProwlerExtended: React.FC<IconSvgProps> = ({
       {...props}
     >
       <rect width="140" height="140" rx="28" fill="currentColor" />
-      <path d="M34 95h72" stroke="white" strokeWidth="14" strokeLinecap="round" />
-      <path d="M43 64h54" stroke="white" strokeWidth="14" strokeLinecap="round" />
-      <path d="M55 36h30" stroke="white" strokeWidth="14" strokeLinecap="round" />
+      <path
+        d="M34 95h72"
+        stroke="white"
+        strokeWidth="14"
+        strokeLinecap="round"
+      />
+      <path
+        d="M43 64h54"
+        stroke="white"
+        strokeWidth="14"
+        strokeLinecap="round"
+      />
+      <path
+        d="M55 36h30"
+        stroke="white"
+        strokeWidth="14"
+        strokeLinecap="round"
+      />
       <text
         x="168"
         y="88"

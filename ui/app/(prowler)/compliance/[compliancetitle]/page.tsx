@@ -20,9 +20,9 @@ import {
 } from "@/components/compliance";
 import { getComplianceIcon } from "@/components/icons/compliance/IconCompliance";
 import { ContentLayout } from "@/components/ui";
-import { getComplianceDisplayName } from "@/lib/compliance/display-names";
 import { getComplianceMapper } from "@/lib/compliance/compliance-mapper";
 import { getReportTypeForFramework } from "@/lib/compliance/compliance-report-types";
+import { getComplianceDisplayName } from "@/lib/compliance/display-names";
 import {
   AttributesData,
   Framework,

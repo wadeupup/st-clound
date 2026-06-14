@@ -6,8 +6,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 
 import { Card, CardContent } from "@/components/shadcn/card/card";
-import { getComplianceDisplayName } from "@/lib/compliance/display-names";
 import { DownloadIconButton, toast } from "@/components/ui";
+import { getComplianceDisplayName } from "@/lib/compliance/display-names";
 import { downloadComplianceCsv } from "@/lib/helper";
 import { ScanEntity } from "@/types/scans";
 
